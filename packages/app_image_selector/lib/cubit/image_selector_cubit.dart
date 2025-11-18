@@ -1,48 +1,7 @@
 import 'dart:io';
+import 'package:app_image_selector/cubit/image_selector_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
-
-// --- State Class ---
-
-enum ImageSourceType {
-  none, // No image selected
-  gallery,
-  camera,
-  stock, // Asset image
-}
-
-class ImageSelectorState {
-  final File? selectedFile;
-  final String? stockAssetPath;
-  final ImageSourceType sourceType;
-  final bool isLoading;
-  final String? errorMessage;
-
-  const ImageSelectorState({
-    this.selectedFile,
-    this.stockAssetPath,
-    this.sourceType = ImageSourceType.none,
-    this.isLoading = false,
-    this.errorMessage,
-  });
-
-  // Helper method to copy/update state
-  ImageSelectorState copyWith({
-    File? selectedFile,
-    String? stockAssetPath,
-    ImageSourceType? sourceType,
-    bool? isLoading,
-    String? errorMessage,
-  }) {
-    return ImageSelectorState(
-      selectedFile: selectedFile,
-      stockAssetPath: stockAssetPath,
-      sourceType: sourceType ?? this.sourceType,
-      isLoading: isLoading ?? this.isLoading,
-      errorMessage: errorMessage, // We keep the last error unless cleared
-    );
-  }
-}
 
 // --- Cubit Class ---
 
@@ -51,8 +10,10 @@ class ImageSelectorCubit extends Cubit<ImageSelectorState> {
 
   // List of paths for stock images provided by the consuming app
   final List<String> stockAssetPaths;
+  final String? preselectedImage;
 
-  ImageSelectorCubit({required this.stockAssetPaths}) : super(const ImageSelectorState());
+  ImageSelectorCubit({required this.stockAssetPaths, this.preselectedImage})
+      : super(ImageSelectorState(stockAssetPath: preselectedImage));
 
   // Handles camera and gallery picking
   Future<void> pickImage(ImageSource source) async {

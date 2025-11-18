@@ -7,6 +7,7 @@ import 'package:widgetbook_workspace/helpers/wrap_in_mocks_helper.dart';
 Widget build(BuildContext context) {
   final widget = Center(
     child: ImageSelectorWidget(
+      preselectedImage: 'assets/images/baking.png',
       onImageSelected: (state) {},
       stockAssetPaths: [
         'assets/images/baking.png',

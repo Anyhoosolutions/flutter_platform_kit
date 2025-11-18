@@ -1,3 +1,4 @@
+import 'package:app_image_selector/cubit/image_selector_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
@@ -8,11 +9,13 @@ class ImageSelectorWidget extends StatelessWidget {
   // Callback when a file is selected (null if cleared)
   final ValueChanged<ImageSelectorState> onImageSelected;
   final List<String> stockAssetPaths;
+  final String? preselectedImage;
 
   const ImageSelectorWidget({
     super.key,
     required this.onImageSelected,
     this.stockAssetPaths = const [],
+    this.preselectedImage,
   });
 
   @override
@@ -21,6 +24,7 @@ class ImageSelectorWidget extends StatelessWidget {
     return BlocProvider(
       create: (context) => ImageSelectorCubit(
         stockAssetPaths: stockAssetPaths,
+        preselectedImage: preselectedImage,
       ),
       child: _ImageSelectorView(onImageSelected: onImageSelected),
     );
