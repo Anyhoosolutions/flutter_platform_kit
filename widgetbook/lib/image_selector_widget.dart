@@ -1,12 +1,12 @@
 // ignore_for_file: deprecated_member_use
 
-import 'package:app_image_selector/widgets/image_selector_widget.dart';
+import 'package:image_selector/widgets/image_selector_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:widgetbook/widgetbook.dart';
 import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
 import 'package:widgetbook_workspace/helpers/wrap_in_mocks_helper.dart';
 
-@widgetbook.UseCase(name: 'Default', type: ImageSelectorWidget, path: 'app_image_selector')
+@widgetbook.UseCase(name: 'Default', type: ImageSelectorWidget, path: 'image_selector')
 Widget build(BuildContext context) {
   final colorSchemeOptions = ['red', 'green', 'purple'];
   final colorScheme = context.knobs.list(label: 'Color scheme', options: colorSchemeOptions, initialOption: 'red');

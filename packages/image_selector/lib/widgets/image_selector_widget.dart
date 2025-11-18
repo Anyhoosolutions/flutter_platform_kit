@@ -1,8 +1,8 @@
 import 'dart:typed_data';
 
-import 'package:app_image_selector/cubit/image_selector_state.dart';
-import 'package:app_image_selector/cubit/show_stock_photos_cubit.dart';
-import 'package:app_image_selector/widgets/add_stock_photo_page.dart';
+import 'package:image_selector/cubit/image_selector_state.dart';
+import 'package:image_selector/cubit/show_stock_photos_cubit.dart';
+import 'package:image_selector/widgets/add_stock_photo_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
