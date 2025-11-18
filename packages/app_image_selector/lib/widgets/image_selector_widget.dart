@@ -56,7 +56,7 @@ class _ImageSelectorView extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               // Display the selected image preview
-              _buildImagePreview(state, parentWidth),
+              _buildImagePreview(context, state, parentWidth),
 
               const SizedBox(height: 16),
 
@@ -103,7 +103,7 @@ class _ImageSelectorView extends StatelessWidget {
     });
   }
 
-  Widget _buildImagePreview(ImageSelectorState state, double parentWidth) {
+  Widget _buildImagePreview(BuildContext context, ImageSelectorState state, double parentWidth) {
     Widget image;
 
     if (state.selectedFile != null) {
@@ -120,7 +120,6 @@ class _ImageSelectorView extends StatelessWidget {
     }
     return Container(
         decoration: BoxDecoration(
-          color: Colors.grey.shade200,
           borderRadius: BorderRadius.circular(30),
         ),
         child: ClipRRect(
@@ -141,7 +140,7 @@ class _ImageSelectorView extends StatelessWidget {
           ),
           child: DottedBorder(
             options: RoundedRectDottedBorderOptions(
-              color: Theme.of(context).colorScheme.primary.withAlpha(80),
+              color: Theme.of(context).colorScheme.primary,
               strokeWidth: 2,
               dashPattern: [10, 6],
               radius: const Radius.circular(20),
@@ -150,7 +149,7 @@ class _ImageSelectorView extends StatelessWidget {
               children: [
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: Icon(icon, size: 40),
+                  child: Icon(icon, size: 40, color: Theme.of(context).colorScheme.primary),
                 ),
                 Text(label, style: Theme.of(context).textTheme.bodySmall),
               ],
