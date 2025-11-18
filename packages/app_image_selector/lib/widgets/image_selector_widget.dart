@@ -59,7 +59,10 @@ class ImageSelectorWidget extends StatelessWidget {
         ),
       ],
       child: _ImageSelectorView(
-          onImageSelected: onImageSelected, stockAssetPaths: stockAssetPaths, layoutType: layoutType),
+          onImageSelected: onImageSelected,
+          stockAssetPaths: stockAssetPaths,
+          layoutType: layoutType,
+          roundImage: roundImage),
     );
   }
 }
@@ -68,8 +71,14 @@ class _ImageSelectorView extends StatelessWidget {
   final ValueChanged<ImageSelectorState> onImageSelected;
   final List<String> stockAssetPaths;
   final LayoutType layoutType;
+  final bool roundImage;
 
-  const _ImageSelectorView({required this.onImageSelected, required this.stockAssetPaths, required this.layoutType});
+  const _ImageSelectorView({
+    required this.onImageSelected,
+    required this.stockAssetPaths,
+    required this.layoutType,
+    required this.roundImage,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -89,6 +98,7 @@ class _ImageSelectorView extends StatelessWidget {
         }
 
         final showImage = shouldShowImage(imageSelectorState);
+
         return Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -148,10 +158,12 @@ class _ImageSelectorView extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(30),
           ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(30),
-            child: image,
-          )),
+          child: roundImage
+              ? ClipOval(child: image)
+              : ClipRRect(
+                  borderRadius: BorderRadius.circular(30),
+                  child: image,
+                )),
       Positioned(
           bottom: 4,
           right: 4,

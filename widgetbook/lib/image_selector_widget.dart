@@ -1,6 +1,5 @@
 // ignore_for_file: deprecated_member_use
 
-import 'package:app_image_selector/widgets/add_stock_photo_page.dart';
 import 'package:app_image_selector/widgets/image_selector_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:widgetbook/widgetbook.dart';
@@ -12,6 +11,7 @@ Widget build(BuildContext context) {
   final colorSchemeOptions = ['red', 'green', 'purple'];
   final colorScheme = context.knobs.list(label: 'Color scheme', options: colorSchemeOptions, initialOption: 'red');
   final showImage = context.knobs.boolean(label: 'Show image', initialValue: true);
+  final roundImage = context.knobs.boolean(label: 'Round image', initialValue: false);
 
   final layoutType = context.knobs.list(
     label: 'Layout type',
@@ -33,6 +33,7 @@ Widget build(BuildContext context) {
               layoutType: LayoutType.values.firstWhere((e) => e.name == layoutType),
               preselectedImage: showImage ? 'assets/images/baking.png' : null,
               onImageSelected: (state) {},
+              roundImage: roundImage,
               stockAssetPaths: [
                 'assets/images/baking.png',
                 'assets/images/casserole.png',
