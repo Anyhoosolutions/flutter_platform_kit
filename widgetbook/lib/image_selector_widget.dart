@@ -21,19 +21,23 @@ Widget build(BuildContext context) {
   final widget = Theme(
     data: ThemeData(colorScheme: getColorScheme(colorScheme)),
     child: Center(
-      child: ImageSelectorWidget(
-        layoutType: LayoutType.values.firstWhere((e) => e.name == layoutType),
-        preselectedImage: showImage ? 'assets/images/baking.png' : null,
-        onImageSelected: (state) {},
-        stockAssetPaths: [
-          'assets/images/baking.png',
-          'assets/images/casserole.png',
-          'assets/images/cocktail.png',
-          'assets/images/dessert.png',
-          'assets/images/drink.png',
-          'assets/images/pot.png',
-          'assets/images/stew.png',
-        ],
+      child: SizedBox(
+        width: 300,
+        height: 300,
+        child: ImageSelectorWidget(
+          layoutType: LayoutType.values.firstWhere((e) => e.name == layoutType),
+          preselectedImage: showImage ? 'assets/images/baking.png' : null,
+          onImageSelected: (state) {},
+          stockAssetPaths: [
+            'assets/images/baking.png',
+            'assets/images/casserole.png',
+            'assets/images/cocktail.png',
+            'assets/images/dessert.png',
+            'assets/images/drink.png',
+            'assets/images/pot.png',
+            'assets/images/stew.png',
+          ],
+        ),
       ),
     ),
   );

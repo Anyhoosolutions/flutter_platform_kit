@@ -23,17 +23,31 @@ class _StockPhotoPageState extends State<StockPhotoPage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final screenSize = MediaQuery.of(context).size;
 
-    return Scaffold(
-        backgroundColor: Theme.of(context).colorScheme.surface,
-        body: SafeArea(
-          child: CustomScrollView(
-            slivers: [
-              _buildImageGrid(context, theme),
-              _buildDoneButton(context, theme),
-            ],
-          ),
-        ));
+    return SizedBox(
+      width: screenSize.width,
+      height: screenSize.height,
+      child: Scaffold(
+        backgroundColor: Colors.brown, // Theme.of(context).colorScheme.surface,
+        body: CustomScrollView(
+          slivers: [
+            _buildTitle(context, theme),
+            _buildImageGrid(context, theme),
+            _buildDoneButton(context, theme),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTitle(BuildContext context, ThemeData theme) {
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Center(child: Text('Select a stock photo', style: theme.textTheme.titleLarge)),
+      ),
+    );
   }
 
   Widget _buildImageGrid(
