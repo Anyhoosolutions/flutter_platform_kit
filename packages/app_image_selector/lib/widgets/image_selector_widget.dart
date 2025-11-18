@@ -1,4 +1,6 @@
 import 'package:app_image_selector/cubit/image_selector_state.dart';
+import 'package:app_image_selector/cubit/show_stock_photos_cubit.dart';
+import 'package:app_image_selector/widgets/add_stock_photo_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
@@ -24,84 +26,108 @@ class ImageSelectorWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Provide the cubit locally to the widget subtree
-    return BlocProvider(
-      create: (context) => ImageSelectorCubit(
-        stockAssetPaths: stockAssetPaths,
-        preselectedImage: preselectedImage,
-      ),
-      child: _ImageSelectorView(onImageSelected: onImageSelected),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) => ImageSelectorCubit(
+            stockAssetPaths: stockAssetPaths,
+            preselectedImage: preselectedImage,
+          ),
+        ),
+        BlocProvider(
+          create: (context) => ShowStockPhotosCubit(),
+        ),
+      ],
+      child: _ImageSelectorView(onImageSelected: onImageSelected, stockAssetPaths: stockAssetPaths),
     );
   }
 }
 
 class _ImageSelectorView extends StatelessWidget {
   final ValueChanged<ImageSelectorState> onImageSelected;
+  final List<String> stockAssetPaths;
 
-  const _ImageSelectorView({required this.onImageSelected});
+  const _ImageSelectorView({required this.onImageSelected, required this.stockAssetPaths});
 
   @override
   Widget build(BuildContext context) {
     final cubit = context.read<ImageSelectorCubit>();
 
-    return LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) {
-      final parentWidth = constraints.maxWidth;
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        final parentWidth = constraints.maxWidth;
 
-      return BlocBuilder<ImageSelectorCubit, ImageSelectorState>(
-        builder: (context, state) {
-          if (state.isLoading) {
-            return const Center(child: CircularProgressIndicator());
-          }
+        final imageSelectorState = context.watch<ImageSelectorCubit>().state;
+        final showStockPhotos = context.watch<ShowStockPhotosCubit>().state;
 
-          return Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Display the selected image preview
-              if (shouldShowImage(state)) _buildImagePreview(context, state, parentWidth),
-              if (!shouldShowImage(state))
+        if (imageSelectorState.isLoading) {
+          return const Center(child: CircularProgressIndicator());
+        }
 
-                // Action buttons
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    _buildEmptyImageIcon(context, parentWidth),
-                    const SizedBox(height: 16),
+        if (showStockPhotos) {
+          return _showStockPhotos(context, stockAssetPaths);
+        }
+
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Display the selected image preview
+            if (shouldShowImage(imageSelectorState)) _buildImagePreview(context, imageSelectorState, parentWidth),
+            if (!shouldShowImage(imageSelectorState))
+
+              // Action buttons
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _buildEmptyImageIcon(context, parentWidth),
+                  const SizedBox(height: 16),
+                  _buildActionButton(
+                    context,
+                    parentWidth,
+                    icon: Icons.photo_library,
+                    label: 'Gallery',
+                    onPressed: () => cubit.pickImage(ImageSource.gallery),
+                  ),
+                  _buildActionButton(
+                    context,
+                    parentWidth,
+                    icon: Icons.camera_alt,
+                    label: 'Camera',
+                    onPressed: () => cubit.pickImage(ImageSource.camera),
+                  ),
+                  if (cubit.stockAssetPaths.isNotEmpty)
                     _buildActionButton(
                       context,
                       parentWidth,
-                      icon: Icons.photo_library,
-                      label: 'Gallery',
-                      onPressed: () => cubit.pickImage(ImageSource.gallery),
+                      icon: Icons.image,
+                      label: 'Stock',
+                      onPressed: () {
+                        context.read<ShowStockPhotosCubit>().showStockPhotos();
+                      },
                     ),
+                  if (imageSelectorState.sourceType != ImageSourceType.none)
                     _buildActionButton(
                       context,
                       parentWidth,
-                      icon: Icons.camera_alt,
-                      label: 'Camera',
-                      onPressed: () => cubit.pickImage(ImageSource.camera),
+                      icon: Icons.clear,
+                      label: 'Clear',
+                      onPressed: cubit.clearSelection,
                     ),
-                    if (cubit.stockAssetPaths.isNotEmpty)
-                      _buildActionButton(
-                        context,
-                        parentWidth,
-                        icon: Icons.image,
-                        label: 'Stock',
-                        onPressed: () => _showStockPhotoDialog(context, cubit),
-                      ),
-                    if (state.sourceType != ImageSourceType.none)
-                      _buildActionButton(
-                        context,
-                        parentWidth,
-                        icon: Icons.clear,
-                        label: 'Clear',
-                        onPressed: cubit.clearSelection,
-                      ),
-                  ],
-                ),
-            ],
-          );
-        },
-      );
-    });
+                ],
+              ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _showStockPhotos(BuildContext context, List<String> stockAssetPaths) {
+    return StockPhotoPage(
+        stockAssetPaths: stockAssetPaths,
+        onSelected: (String image) {
+          context.read<ShowStockPhotosCubit>().hideStockPhotos();
+          context.read<ImageSelectorCubit>().selectStockPhoto(image);
+        });
   }
 
   bool shouldShowImage(ImageSelectorState state) {
@@ -194,36 +220,5 @@ class _ImageSelectorView extends StatelessWidget {
             ),
           ),
         ));
-  }
-
-  void _showStockPhotoDialog(BuildContext context, ImageSelectorCubit cubit) {
-    showDialog(
-      context: context,
-      builder: (BuildContext dialogContext) {
-        return AlertDialog(
-          title: const Text('Select Stock Photo'),
-          content: SingleChildScrollView(
-            child: Wrap(
-              spacing: 8.0,
-              runSpacing: 8.0,
-              children: cubit.stockAssetPaths.map((path) {
-                return InkWell(
-                  onTap: () {
-                    cubit.selectStockPhoto(path);
-                    Navigator.of(dialogContext).pop();
-                  },
-                  child: Image.asset(
-                    path,
-                    width: 80,
-                    height: 80,
-                    fit: BoxFit.cover,
-                  ),
-                );
-              }).toList(),
-            ),
-          ),
-        );
-      },
-    );
   }
 }

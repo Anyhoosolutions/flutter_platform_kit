@@ -19,7 +19,7 @@ Widget build(BuildContext context) {
           'assets/images/baking.png',
           'assets/images/casserole.png',
           'assets/images/cocktail.png',
-          'assets/images/desssert.png',
+          'assets/images/dessert.png',
           'assets/images/drink.png',
           'assets/images/pot.png',
           'assets/images/stew.png',
