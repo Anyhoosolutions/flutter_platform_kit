@@ -42,6 +42,7 @@ class _ImageSelectorView extends StatelessWidget {
         onImageSelected(state);
         if (state.errorMessage != null) {
           // You might show a toast or SnackBar here
+          // ignore: avoid_print
           print('Error: ${state.errorMessage}');
         }
       },
