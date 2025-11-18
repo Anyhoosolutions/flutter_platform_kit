@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'dart:typed_data';
 
 import 'package:app_image_selector/cubit/image_selector_state.dart';
@@ -10,12 +12,29 @@ import 'package:dotted_border/dotted_border.dart';
 
 import '../cubit/image_selector_cubit.dart';
 
+const emptyIconSize = 40.0;
+const emptyIconTotalSize = 100.0;
+const horizontalSplitSpacing = 16.0;
+const horizontalSplitPadding = 16.0;
+
+enum LayoutType {
+  /// Image and buttons are stacked vertically in a single column.
+  verticalStack,
+
+  /// Image is on the left, buttons are stacked vertically on the right.
+  horizontalSplit,
+
+  /// Image is on top, buttons are laid out horizontally beneath it.
+  imageTopRowBottom,
+}
+
 class ImageSelectorWidget extends StatelessWidget {
   // Callback when a file is selected (null if cleared)
   final ValueChanged<ImageSelectorState> onImageSelected;
   final List<String> stockAssetPaths;
   final String? preselectedImage;
   final bool roundImage;
+  final LayoutType layoutType;
 
   const ImageSelectorWidget({
     super.key,
@@ -23,6 +42,7 @@ class ImageSelectorWidget extends StatelessWidget {
     this.stockAssetPaths = const [],
     this.preselectedImage,
     this.roundImage = false,
+    required this.layoutType,
   });
 
   @override
@@ -40,7 +60,8 @@ class ImageSelectorWidget extends StatelessWidget {
           create: (context) => ShowStockPhotosCubit(),
         ),
       ],
-      child: _ImageSelectorView(onImageSelected: onImageSelected, stockAssetPaths: stockAssetPaths),
+      child: _ImageSelectorView(
+          onImageSelected: onImageSelected, stockAssetPaths: stockAssetPaths, layoutType: layoutType),
     );
   }
 }
@@ -48,13 +69,12 @@ class ImageSelectorWidget extends StatelessWidget {
 class _ImageSelectorView extends StatelessWidget {
   final ValueChanged<ImageSelectorState> onImageSelected;
   final List<String> stockAssetPaths;
+  final LayoutType layoutType;
 
-  const _ImageSelectorView({required this.onImageSelected, required this.stockAssetPaths});
+  const _ImageSelectorView({required this.onImageSelected, required this.stockAssetPaths, required this.layoutType});
 
   @override
   Widget build(BuildContext context) {
-    final cubit = context.read<ImageSelectorCubit>();
-
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         final parentWidth = constraints.maxWidth;
@@ -69,59 +89,20 @@ class _ImageSelectorView extends StatelessWidget {
         if (showStockPhotos) {
           return _showStockPhotos(context, stockAssetPaths);
         }
+        print('layoutType: ${layoutType.name}');
 
+        final showImage = shouldShowImage(imageSelectorState);
         return Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             // Display the selected image preview
-            if (shouldShowImage(imageSelectorState))
+            if (showImage)
               FutureBuilder<Widget>(
                   future: _buildImagePreview(context, imageSelectorState, parentWidth),
                   builder: (context, snapshot) {
                     return snapshot.data ?? const SizedBox.shrink();
                   }),
-            if (!shouldShowImage(imageSelectorState))
-
-              // Action buttons
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  _buildEmptyImageIcon(context, parentWidth),
-                  const SizedBox(height: 16),
-                  _buildActionButton(
-                    context,
-                    parentWidth,
-                    icon: Icons.photo_library,
-                    label: 'Gallery',
-                    onPressed: () => cubit.pickImage(ImageSource.gallery),
-                  ),
-                  _buildActionButton(
-                    context,
-                    parentWidth,
-                    icon: Icons.camera_alt,
-                    label: 'Camera',
-                    onPressed: () => cubit.pickImage(ImageSource.camera),
-                  ),
-                  if (cubit.stockAssetPaths.isNotEmpty)
-                    _buildActionButton(
-                      context,
-                      parentWidth,
-                      icon: Icons.image,
-                      label: 'Stock',
-                      onPressed: () {
-                        context.read<ShowStockPhotosCubit>().showStockPhotos();
-                      },
-                    ),
-                  if (imageSelectorState.sourceType != ImageSourceType.none)
-                    _buildActionButton(
-                      context,
-                      parentWidth,
-                      icon: Icons.clear,
-                      label: 'Clear',
-                      onPressed: cubit.clearSelection,
-                    ),
-                ],
-              ),
+            if (!showImage) getEmptyIconAndButtonsLayout(context, parentWidth),
           ],
         );
       },
@@ -143,10 +124,8 @@ class _ImageSelectorView extends StatelessWidget {
 
   Future<Widget> _buildImagePreview(BuildContext context, ImageSelectorState state, double parentWidth) async {
     Widget image;
-
     Uint8List? imageBytes;
-    print('state.selectedImage: ${state.selectedImage != null}');
-    print('state.selectedFile: ${state.selectedImage != null}');
+
     if (state.selectedImage != null) {
       imageBytes = state.selectedImage;
     } else if (state.selectedFile != null) {
@@ -154,7 +133,7 @@ class _ImageSelectorView extends StatelessWidget {
     }
 
     if (imageBytes != null) {
-      image = Image.memory(imageBytes!, width: parentWidth * 0.9, fit: BoxFit.cover);
+      image = Image.memory(imageBytes, width: parentWidth * 0.9, fit: BoxFit.cover);
     } else if (state.selectedFile != null) {
       image = Image.file(state.selectedFile!, width: parentWidth * 0.9, fit: BoxFit.cover);
     } else if (state.stockAssetPath != null) {
@@ -211,32 +190,131 @@ class _ImageSelectorView extends StatelessWidget {
   }
 
   Widget _buildActionButton(BuildContext context, double parentWidth,
-      {required IconData icon, required String label, required VoidCallback onPressed}) {
-    return InkWell(
-        onTap: onPressed,
-        child: Padding(
-          padding: EdgeInsets.only(
-            left: parentWidth * 0.05 + 8.0,
-            right: parentWidth * 0.05 + 8.0,
-            bottom: 16,
-          ),
-          child: DottedBorder(
-            options: RoundedRectDottedBorderOptions(
-              color: Theme.of(context).colorScheme.primary,
-              strokeWidth: 2,
-              dashPattern: [10, 6],
-              radius: const Radius.circular(20),
-            ),
-            child: Row(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: Icon(icon, size: 40, color: Theme.of(context).colorScheme.primary),
+      {required IconData icon,
+      required String label,
+      required VoidCallback onPressed,
+      required LayoutType layoutType}) {
+    final showLabel = layoutType != LayoutType.imageTopRowBottom;
+    print('parentWidth: $parentWidth');
+
+    final labelWidth = getLabelWidth(parentWidth, layoutType);
+
+    return SizedBox(
+        width: labelWidth,
+        child: InkWell(
+            onTap: onPressed,
+            child: DottedBorder(
+              options: RoundedRectDottedBorderOptions(
+                color: Theme.of(context).colorScheme.primary,
+                strokeWidth: 2,
+                dashPattern: [10, 6],
+                radius: const Radius.circular(20),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: [
+                    Icon(icon, size: emptyIconSize, color: Theme.of(context).colorScheme.primary),
+                    if (showLabel) const SizedBox(width: horizontalSplitSpacing),
+                    if (showLabel) Text(label, style: Theme.of(context).textTheme.bodySmall),
+                  ],
                 ),
-                Text(label, style: Theme.of(context).textTheme.bodySmall),
+              ),
+            )));
+  }
+
+  Widget getEmptyIconAndButtonsLayout(BuildContext context, double parentWidth) {
+    final cubit = context.read<ImageSelectorCubit>();
+
+    final emptyIcon = _buildEmptyImageIcon(context, parentWidth);
+    final buttons = [
+      _buildActionButton(
+        context,
+        parentWidth,
+        icon: Icons.photo_library,
+        label: 'Gallery',
+        onPressed: () => cubit.pickImage(ImageSource.gallery),
+        layoutType: layoutType,
+      ),
+      _buildActionButton(
+        context,
+        parentWidth,
+        icon: Icons.camera_alt,
+        label: 'Camera',
+        onPressed: () => cubit.pickImage(ImageSource.camera),
+        layoutType: layoutType,
+      ),
+      if (cubit.stockAssetPaths.isNotEmpty)
+        _buildActionButton(
+          context,
+          parentWidth,
+          icon: Icons.image,
+          label: 'Stock',
+          onPressed: () {
+            context.read<ShowStockPhotosCubit>().showStockPhotos();
+          },
+          layoutType: layoutType,
+        ),
+    ];
+
+    if (layoutType == LayoutType.verticalStack) {
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          _buildEmptyImageIcon(context, parentWidth),
+          const SizedBox(height: 16),
+          ...buttons,
+        ],
+      );
+    }
+    if (layoutType == LayoutType.horizontalSplit) {
+      return Padding(
+        padding: const EdgeInsets.all(horizontalSplitPadding),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          spacing: 16,
+          children: [
+            emptyIcon,
+            const SizedBox(width: 16),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              spacing: 16,
+              children: [
+                ...buttons,
               ],
             ),
-          ),
-        ));
+          ],
+        ),
+      );
+    }
+    if (layoutType == LayoutType.imageTopRowBottom) {
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          emptyIcon,
+          const SizedBox(height: 16),
+          Row(mainAxisAlignment: MainAxisAlignment.center, spacing: 16, children: buttons),
+        ],
+      );
+    }
+    return const SizedBox.shrink();
+  }
+
+  double getLabelWidth(double parentWidth, LayoutType layoutType) {
+    if (layoutType == LayoutType.verticalStack) {
+      final labelWidth = parentWidth * 0.9;
+      print('labelWidth: $labelWidth');
+      return labelWidth;
+    }
+    if (layoutType == LayoutType.horizontalSplit) {
+      final labelWidth = parentWidth - emptyIconTotalSize - 2 * horizontalSplitPadding - horizontalSplitSpacing - 40;
+      print('labelWidth: $labelWidth');
+      return labelWidth;
+    }
+    if (layoutType == LayoutType.imageTopRowBottom) {
+      final labelWidth = 60.0;
+      return labelWidth;
+    }
+    throw Exception('Invalid layout type: $layoutType');
   }
 }

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 class StockPhotoPage extends StatefulWidget {
   const StockPhotoPage({super.key, required this.stockAssetPaths, required this.onSelected});

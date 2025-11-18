@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:app_image_selector/widgets/image_selector_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:widgetbook/widgetbook.dart';
@@ -8,12 +10,20 @@ import 'package:widgetbook_workspace/helpers/wrap_in_mocks_helper.dart';
 Widget build(BuildContext context) {
   final colorSchemeOptions = ['red', 'green', 'purple'];
   final colorScheme = context.knobs.list(label: 'Color scheme', options: colorSchemeOptions, initialOption: 'red');
+  final showImage = context.knobs.boolean(label: 'Show image', initialValue: true);
+
+  final layoutType = context.knobs.list(
+    label: 'Layout type',
+    options: LayoutType.values.map((e) => e.name).toList(),
+    initialOption: LayoutType.verticalStack.name,
+  );
 
   final widget = Theme(
     data: ThemeData(colorScheme: getColorScheme(colorScheme)),
     child: Center(
       child: ImageSelectorWidget(
-        preselectedImage: 'assets/images/baking.png',
+        layoutType: LayoutType.values.firstWhere((e) => e.name == layoutType),
+        preselectedImage: showImage ? 'assets/images/baking.png' : null,
         onImageSelected: (state) {},
         stockAssetPaths: [
           'assets/images/baking.png',
