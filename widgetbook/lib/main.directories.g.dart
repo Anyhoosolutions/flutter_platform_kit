@@ -11,19 +11,19 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:widgetbook/widgetbook.dart' as _widgetbook;
-import 'package:widgetbook_workspace/cool_button.dart'
-    as _widgetbook_workspace_cool_button;
+import 'package:widgetbook_workspace/image_selector_widget.dart'
+    as _widgetbook_workspace_image_selector_widget;
 
 final directories = <_widgetbook.WidgetbookNode>[
   _widgetbook.WidgetbookFolder(
     name: 'app_image_selector',
     children: [
       _widgetbook.WidgetbookComponent(
-        name: 'Text',
+        name: 'ImageSelectorWidget',
         useCases: [
           _widgetbook.WidgetbookUseCase(
             name: 'Default',
-            builder: _widgetbook_workspace_cool_button.build,
+            builder: _widgetbook_workspace_image_selector_widget.build,
           ),
         ],
       ),
