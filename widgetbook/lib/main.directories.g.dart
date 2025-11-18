@@ -16,7 +16,7 @@ import 'package:widgetbook_workspace/image_selector_widget.dart'
 
 final directories = <_widgetbook.WidgetbookNode>[
   _widgetbook.WidgetbookFolder(
-    name: 'app_image_selector',
+    name: 'image_selector',
     children: [
       _widgetbook.WidgetbookComponent(
         name: 'ImageSelectorWidget',

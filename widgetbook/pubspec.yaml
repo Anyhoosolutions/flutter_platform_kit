@@ -16,8 +16,8 @@ dependencies:
   image: ^4.5.4
   cross_file: ^0.3.4+2
 
-  app_image_selector:
-    path: ../packages/app_image_selector
+  image_selector:
+    path: ../packages/image_selector
 
 dev_dependencies:
   flutter_test:

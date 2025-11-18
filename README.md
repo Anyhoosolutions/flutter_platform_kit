@@ -6,7 +6,7 @@ A selection of widgets and other tools, such as a router collection, for buildin
 
 ## Packages
 
-### app_image_selector
+### image_selector
 
 A package for selecting images from the gallery or camera.
 
