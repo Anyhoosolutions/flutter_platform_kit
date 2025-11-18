@@ -1,5 +1,6 @@
 // ignore_for_file: deprecated_member_use
 
+import 'package:app_image_selector/widgets/add_stock_photo_page.dart';
 import 'package:app_image_selector/widgets/image_selector_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:widgetbook/widgetbook.dart';
@@ -23,26 +24,32 @@ Widget build(BuildContext context) {
     child: Center(
       child: SizedBox(
         width: 300,
-        height: 300,
-        child: ImageSelectorWidget(
-          layoutType: LayoutType.values.firstWhere((e) => e.name == layoutType),
-          preselectedImage: showImage ? 'assets/images/baking.png' : null,
-          onImageSelected: (state) {},
-          stockAssetPaths: [
-            'assets/images/baking.png',
-            'assets/images/casserole.png',
-            'assets/images/cocktail.png',
-            'assets/images/dessert.png',
-            'assets/images/drink.png',
-            'assets/images/pot.png',
-            'assets/images/stew.png',
-            'assets/images/baking.png',
-            'assets/images/casserole.png',
-            'assets/images/cocktail.png',
-            'assets/images/dessert.png',
-            'assets/images/drink.png',
-            'assets/images/pot.png',
-            'assets/images/stew.png',
+        height: 400,
+        child: Stack(
+          children: [
+            // Simulating how it might be used in a real app - inside a Stack
+            // This could be a form page with other widgets stacked on top
+            ImageSelectorWidget(
+              layoutType: LayoutType.values.firstWhere((e) => e.name == layoutType),
+              preselectedImage: showImage ? 'assets/images/baking.png' : null,
+              onImageSelected: (state) {},
+              stockAssetPaths: [
+                'assets/images/baking.png',
+                'assets/images/casserole.png',
+                'assets/images/cocktail.png',
+                'assets/images/dessert.png',
+                'assets/images/drink.png',
+                'assets/images/pot.png',
+                'assets/images/stew.png',
+                'assets/images/baking.png',
+                'assets/images/casserole.png',
+                'assets/images/cocktail.png',
+                'assets/images/dessert.png',
+                'assets/images/drink.png',
+                'assets/images/pot.png',
+                'assets/images/stew.png',
+              ],
+            ),
           ],
         ),
       ),

@@ -1,5 +1,3 @@
-// ignore_for_file: avoid_print
-
 import 'dart:typed_data';
 
 import 'package:app_image_selector/cubit/image_selector_state.dart';
@@ -89,7 +87,6 @@ class _ImageSelectorView extends StatelessWidget {
         if (showStockPhotos) {
           return _showStockPhotos(context, stockAssetPaths);
         }
-        print('layoutType: ${layoutType.name}');
 
         final showImage = shouldShowImage(imageSelectorState);
         return Column(
@@ -195,7 +192,6 @@ class _ImageSelectorView extends StatelessWidget {
       required VoidCallback onPressed,
       required LayoutType layoutType}) {
     final showLabel = layoutType != LayoutType.imageTopRowBottom;
-    print('parentWidth: $parentWidth');
 
     final labelWidth = getLabelWidth(parentWidth, layoutType);
 
@@ -263,7 +259,7 @@ class _ImageSelectorView extends StatelessWidget {
         children: [
           _buildEmptyImageIcon(context, parentWidth),
           const SizedBox(height: 16),
-          ...buttons,
+          ...buttons.expand((button) => [button, const SizedBox(height: 16)]),
         ],
       );
     }
@@ -303,16 +299,14 @@ class _ImageSelectorView extends StatelessWidget {
   double getLabelWidth(double parentWidth, LayoutType layoutType) {
     if (layoutType == LayoutType.verticalStack) {
       final labelWidth = parentWidth * 0.9;
-      print('labelWidth: $labelWidth');
       return labelWidth;
     }
     if (layoutType == LayoutType.horizontalSplit) {
       final labelWidth = parentWidth - emptyIconTotalSize - 2 * horizontalSplitPadding - horizontalSplitSpacing - 40;
-      print('labelWidth: $labelWidth');
       return labelWidth;
     }
     if (layoutType == LayoutType.imageTopRowBottom) {
-      final labelWidth = 60.0;
+      const labelWidth = 60.0;
       return labelWidth;
     }
     throw Exception('Invalid layout type: $layoutType');

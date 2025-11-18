@@ -15,7 +15,7 @@ class _StockPhotoPageState extends State<StockPhotoPage> {
   String? _selectedStockPhotoId;
   int _currentPage = 0;
 
-  static const int _itemsPerPage = 6; // 3 columns × 2 rows
+  static const int _itemsPerPage = 9; // 3 columns × 2 rows
 
   @override
   void dispose() {
@@ -37,26 +37,22 @@ class _StockPhotoPageState extends State<StockPhotoPage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Scaffold(
-      backgroundColor: Colors.brown, // Theme.of(context).colorScheme.surface,
-      body: Column(
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxHeight: 500),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           _buildTitle(context, theme),
-          Expanded(
-            child: Row(
-              children: [
-                _buildArrowButton(context, theme, isLeft: true),
-                Expanded(
-                  child: CustomScrollView(
-                    slivers: [
-                      _buildImageGrid(context, theme),
-                    ],
-                  ),
-                ),
-                if (_hasNextPage) _buildArrowButton(context, theme, isLeft: false),
-              ],
-            ),
+          Row(
+            children: [
+              _buildArrowButton(context, theme, isLeft: true),
+              Expanded(
+                child: _buildImageGrid(context, theme),
+              ),
+              if (_hasNextPage) _buildArrowButton(context, theme, isLeft: false),
+            ],
           ),
+          const SizedBox(height: 16),
           _buildDoneButton(context, theme),
         ],
       ),
@@ -72,73 +68,91 @@ class _StockPhotoPageState extends State<StockPhotoPage> {
 
   Widget _buildImageGrid(BuildContext context, ThemeData theme) {
     final currentItems = _currentPageItems;
+    final rows = (currentItems.length / 3).ceil();
 
-    return SliverPadding(
-      padding: const EdgeInsets.all(8.0),
-      sliver: SliverGrid(
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 3,
-          crossAxisSpacing: 12,
-          mainAxisSpacing: 12,
-          childAspectRatio: 1.0,
-        ),
-        delegate: SliverChildBuilderDelegate(
-          (context, index) {
-            final assetPath = currentItems[index];
-            final isSelected = _selectedStockPhotoId == assetPath;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final availableWidth = constraints.maxWidth - 16; // Account for padding
+        final itemWidth = (availableWidth - 24) / 3; // 3 columns, 2 gaps of 12px
+        final itemHeight = itemWidth; // Square items (childAspectRatio: 1.0)
+        final gridHeight = (rows * itemHeight) + ((rows - 1) * 12) + 16; // rows * height + spacing + padding
 
-            return GestureDetector(
-              onTap: () {
-                setState(() {
-                  _selectedStockPhotoId = isSelected ? null : assetPath;
-                });
-              },
-              child: Stack(
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: isSelected ? theme.colorScheme.primary : Colors.black,
-                        width: isSelected ? 3 : 1,
-                      ),
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(14),
-                      child: Image.asset(
-                        assetPath,
-                        fit: BoxFit.cover,
-                        width: double.infinity,
-                        height: double.infinity,
-                      ),
-                    ),
+        return SizedBox(
+          height: gridHeight,
+          child: CustomScrollView(
+            physics: const NeverScrollableScrollPhysics(),
+            slivers: [
+              SliverPadding(
+                padding: const EdgeInsets.all(8.0),
+                sliver: SliverGrid(
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3,
+                    crossAxisSpacing: 12,
+                    mainAxisSpacing: 12,
+                    childAspectRatio: 1.0,
                   ),
-                  if (isSelected)
-                    Positioned(
-                      top: 8,
-                      right: 8,
-                      child: Container(
-                        width: 24,
-                        height: 24,
-                        decoration: BoxDecoration(
-                          color: theme.colorScheme.primary,
-                          shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white, width: 2),
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      final assetPath = currentItems[index];
+                      final isSelected = _selectedStockPhotoId == assetPath;
+
+                      return GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _selectedStockPhotoId = isSelected ? null : assetPath;
+                          });
+                        },
+                        child: Stack(
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(
+                                  color: isSelected ? theme.colorScheme.primary : Colors.black,
+                                  width: isSelected ? 3 : 1,
+                                ),
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(14),
+                                child: Image.asset(
+                                  assetPath,
+                                  fit: BoxFit.cover,
+                                  width: double.infinity,
+                                  height: double.infinity,
+                                ),
+                              ),
+                            ),
+                            if (isSelected)
+                              Positioned(
+                                top: 8,
+                                right: 8,
+                                child: Container(
+                                  width: 24,
+                                  height: 24,
+                                  decoration: BoxDecoration(
+                                    color: theme.colorScheme.primary,
+                                    shape: BoxShape.circle,
+                                    border: Border.all(color: Colors.white, width: 2),
+                                  ),
+                                  child: const Icon(
+                                    Icons.check,
+                                    color: Colors.white,
+                                    size: 18,
+                                  ),
+                                ),
+                              ),
+                          ],
                         ),
-                        child: const Icon(
-                          Icons.check,
-                          color: Colors.white,
-                          size: 18,
-                        ),
-                      ),
-                    ),
-                ],
+                      );
+                    },
+                    childCount: currentItems.length,
+                  ),
+                ),
               ),
-            );
-          },
-          childCount: currentItems.length,
-        ),
-      ),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -171,7 +185,7 @@ class _StockPhotoPageState extends State<StockPhotoPage> {
 
   Widget _buildDoneButton(BuildContext context, ThemeData theme) {
     return Padding(
-      padding: const EdgeInsets.only(left: 18.0, right: 18.0, bottom: 18.0),
+      padding: const EdgeInsets.only(left: 18.0, right: 18.0),
       child: SizedBox(
         width: double.infinity,
         height: 56,
