@@ -2,6 +2,7 @@ import 'package:app_image_selector/cubit/image_selector_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:dotted_border/dotted_border.dart';
 
 import '../cubit/image_selector_cubit.dart';
 
@@ -10,12 +11,14 @@ class ImageSelectorWidget extends StatelessWidget {
   final ValueChanged<ImageSelectorState> onImageSelected;
   final List<String> stockAssetPaths;
   final String? preselectedImage;
+  final bool roundImage;
 
   const ImageSelectorWidget({
     super.key,
     required this.onImageSelected,
     this.stockAssetPaths = const [],
     this.preselectedImage,
+    this.roundImage = false,
   });
 
   @override
@@ -40,17 +43,10 @@ class _ImageSelectorView extends StatelessWidget {
   Widget build(BuildContext context) {
     final cubit = context.read<ImageSelectorCubit>();
 
-    // Listen for state changes and call the external callback
-    return BlocListener<ImageSelectorCubit, ImageSelectorState>(
-      listener: (context, state) {
-        onImageSelected(state);
-        if (state.errorMessage != null) {
-          // You might show a toast or SnackBar here
-          // ignore: avoid_print
-          print('Error: ${state.errorMessage}');
-        }
-      },
-      child: BlocBuilder<ImageSelectorCubit, ImageSelectorState>(
+    return LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) {
+      final parentWidth = constraints.maxWidth;
+
+      return BlocBuilder<ImageSelectorCubit, ImageSelectorState>(
         builder: (context, state) {
           if (state.isLoading) {
             return const Center(child: CircularProgressIndicator());
@@ -60,22 +56,24 @@ class _ImageSelectorView extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               // Display the selected image preview
-              _buildImagePreview(state),
+              _buildImagePreview(state, parentWidth),
 
               const SizedBox(height: 16),
 
               // Action buttons
-              Row(
+              Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   _buildActionButton(
                     context,
+                    parentWidth,
                     icon: Icons.photo_library,
                     label: 'Gallery',
                     onPressed: () => cubit.pickImage(ImageSource.gallery),
                   ),
                   _buildActionButton(
                     context,
+                    parentWidth,
                     icon: Icons.camera_alt,
                     label: 'Camera',
                     onPressed: () => cubit.pickImage(ImageSource.camera),
@@ -83,6 +81,7 @@ class _ImageSelectorView extends StatelessWidget {
                   if (cubit.stockAssetPaths.isNotEmpty)
                     _buildActionButton(
                       context,
+                      parentWidth,
                       icon: Icons.image,
                       label: 'Stock',
                       onPressed: () => _showStockPhotoDialog(context, cubit),
@@ -90,6 +89,7 @@ class _ImageSelectorView extends StatelessWidget {
                   if (state.sourceType != ImageSourceType.none)
                     _buildActionButton(
                       context,
+                      parentWidth,
                       icon: Icons.clear,
                       label: 'Clear',
                       onPressed: cubit.clearSelection,
@@ -99,17 +99,17 @@ class _ImageSelectorView extends StatelessWidget {
             ],
           );
         },
-      ),
-    );
+      );
+    });
   }
 
-  Widget _buildImagePreview(ImageSelectorState state) {
+  Widget _buildImagePreview(ImageSelectorState state, double parentWidth) {
     Widget image;
 
     if (state.selectedFile != null) {
-      image = Image.file(state.selectedFile!, height: 100, fit: BoxFit.cover);
+      image = Image.file(state.selectedFile!, width: parentWidth * 0.9, fit: BoxFit.cover);
     } else if (state.stockAssetPath != null) {
-      image = Image.asset(state.stockAssetPath!, height: 100, fit: BoxFit.cover);
+      image = Image.asset(state.stockAssetPath!, width: parentWidth * 0.9, fit: BoxFit.cover);
     } else {
       image = Container(
         height: 100,
@@ -118,23 +118,45 @@ class _ImageSelectorView extends StatelessWidget {
         child: const Icon(Icons.add_a_photo, size: 40, color: Colors.grey),
       );
     }
-    return image;
+    return Container(
+        decoration: BoxDecoration(
+          color: Colors.grey.shade200,
+          borderRadius: BorderRadius.circular(30),
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(30),
+          child: image,
+        ));
   }
 
-  Widget _buildActionButton(BuildContext context,
+  Widget _buildActionButton(BuildContext context, double parentWidth,
       {required IconData icon, required String label, required VoidCallback onPressed}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-      child: Column(
-        children: [
-          IconButton(
-            icon: Icon(icon),
-            onPressed: onPressed,
+    return InkWell(
+        onTap: onPressed,
+        child: Padding(
+          padding: EdgeInsets.only(
+            left: parentWidth * 0.05 + 8.0,
+            right: parentWidth * 0.05 + 8.0,
+            bottom: 16,
           ),
-          Text(label, style: Theme.of(context).textTheme.bodySmall),
-        ],
-      ),
-    );
+          child: DottedBorder(
+            options: RoundedRectDottedBorderOptions(
+              color: Theme.of(context).colorScheme.primary.withAlpha(80),
+              strokeWidth: 2,
+              dashPattern: [10, 6],
+              radius: const Radius.circular(20),
+            ),
+            child: Row(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: Icon(icon, size: 40),
+                ),
+                Text(label, style: Theme.of(context).textTheme.bodySmall),
+              ],
+            ),
+          ),
+        ));
   }
 
   void _showStockPhotoDialog(BuildContext context, ImageSelectorCubit cubit) {
