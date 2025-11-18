@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:app_image_selector/cubit/image_selector_state.dart';
 import 'package:app_image_selector/cubit/show_stock_photos_cubit.dart';
 import 'package:app_image_selector/widgets/add_stock_photo_page.dart';
@@ -72,7 +74,12 @@ class _ImageSelectorView extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             // Display the selected image preview
-            if (shouldShowImage(imageSelectorState)) _buildImagePreview(context, imageSelectorState, parentWidth),
+            if (shouldShowImage(imageSelectorState))
+              FutureBuilder<Widget>(
+                  future: _buildImagePreview(context, imageSelectorState, parentWidth),
+                  builder: (context, snapshot) {
+                    return snapshot.data ?? const SizedBox.shrink();
+                  }),
             if (!shouldShowImage(imageSelectorState))
 
               // Action buttons
@@ -131,13 +138,24 @@ class _ImageSelectorView extends StatelessWidget {
   }
 
   bool shouldShowImage(ImageSelectorState state) {
-    return state.selectedFile != null || state.stockAssetPath != null;
+    return state.selectedFile != null || state.stockAssetPath != null || state.selectedImage != null;
   }
 
-  Widget _buildImagePreview(BuildContext context, ImageSelectorState state, double parentWidth) {
+  Future<Widget> _buildImagePreview(BuildContext context, ImageSelectorState state, double parentWidth) async {
     Widget image;
 
-    if (state.selectedFile != null) {
+    Uint8List? imageBytes;
+    print('state.selectedImage: ${state.selectedImage != null}');
+    print('state.selectedFile: ${state.selectedImage != null}');
+    if (state.selectedImage != null) {
+      imageBytes = state.selectedImage;
+    } else if (state.selectedFile != null) {
+      imageBytes = await state.selectedFile!.readAsBytes();
+    }
+
+    if (imageBytes != null) {
+      image = Image.memory(imageBytes!, width: parentWidth * 0.9, fit: BoxFit.cover);
+    } else if (state.selectedFile != null) {
       image = Image.file(state.selectedFile!, width: parentWidth * 0.9, fit: BoxFit.cover);
     } else if (state.stockAssetPath != null) {
       image = Image.asset(state.stockAssetPath!, width: parentWidth * 0.9, fit: BoxFit.cover);

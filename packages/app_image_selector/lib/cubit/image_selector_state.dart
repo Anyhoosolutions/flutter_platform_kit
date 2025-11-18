@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 // --- State Class ---
 
@@ -11,6 +12,7 @@ enum ImageSourceType {
 
 class ImageSelectorState {
   final File? selectedFile;
+  final Uint8List? selectedImage;
   final String? stockAssetPath;
   final ImageSourceType sourceType;
   final bool isLoading;
@@ -18,6 +20,7 @@ class ImageSelectorState {
 
   const ImageSelectorState({
     this.selectedFile,
+    this.selectedImage,
     this.stockAssetPath,
     this.sourceType = ImageSourceType.none,
     this.isLoading = false,
@@ -27,6 +30,7 @@ class ImageSelectorState {
   // Helper method to copy/update state
   ImageSelectorState copyWith({
     File? selectedFile,
+    Uint8List? selectedImage,
     String? stockAssetPath,
     ImageSourceType? sourceType,
     bool? isLoading,
@@ -34,6 +38,7 @@ class ImageSelectorState {
   }) {
     return ImageSelectorState(
       selectedFile: selectedFile,
+      selectedImage: selectedImage,
       stockAssetPath: stockAssetPath,
       sourceType: sourceType ?? this.sourceType,
       isLoading: isLoading ?? this.isLoading,
