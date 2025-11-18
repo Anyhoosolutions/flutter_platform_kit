@@ -56,51 +56,56 @@ class _ImageSelectorView extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               // Display the selected image preview
-              _buildImagePreview(context, state, parentWidth),
+              if (shouldShowImage(state)) _buildImagePreview(context, state, parentWidth),
+              if (!shouldShowImage(state))
 
-              const SizedBox(height: 16),
-
-              // Action buttons
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  _buildActionButton(
-                    context,
-                    parentWidth,
-                    icon: Icons.photo_library,
-                    label: 'Gallery',
-                    onPressed: () => cubit.pickImage(ImageSource.gallery),
-                  ),
-                  _buildActionButton(
-                    context,
-                    parentWidth,
-                    icon: Icons.camera_alt,
-                    label: 'Camera',
-                    onPressed: () => cubit.pickImage(ImageSource.camera),
-                  ),
-                  if (cubit.stockAssetPaths.isNotEmpty)
+                // Action buttons
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _buildEmptyImageIcon(context, parentWidth),
+                    const SizedBox(height: 16),
                     _buildActionButton(
                       context,
                       parentWidth,
-                      icon: Icons.image,
-                      label: 'Stock',
-                      onPressed: () => _showStockPhotoDialog(context, cubit),
+                      icon: Icons.photo_library,
+                      label: 'Gallery',
+                      onPressed: () => cubit.pickImage(ImageSource.gallery),
                     ),
-                  if (state.sourceType != ImageSourceType.none)
                     _buildActionButton(
                       context,
                       parentWidth,
-                      icon: Icons.clear,
-                      label: 'Clear',
-                      onPressed: cubit.clearSelection,
+                      icon: Icons.camera_alt,
+                      label: 'Camera',
+                      onPressed: () => cubit.pickImage(ImageSource.camera),
                     ),
-                ],
-              ),
+                    if (cubit.stockAssetPaths.isNotEmpty)
+                      _buildActionButton(
+                        context,
+                        parentWidth,
+                        icon: Icons.image,
+                        label: 'Stock',
+                        onPressed: () => _showStockPhotoDialog(context, cubit),
+                      ),
+                    if (state.sourceType != ImageSourceType.none)
+                      _buildActionButton(
+                        context,
+                        parentWidth,
+                        icon: Icons.clear,
+                        label: 'Clear',
+                        onPressed: cubit.clearSelection,
+                      ),
+                  ],
+                ),
             ],
           );
         },
       );
     });
+  }
+
+  bool shouldShowImage(ImageSelectorState state) {
+    return state.selectedFile != null || state.stockAssetPath != null;
   }
 
   Widget _buildImagePreview(BuildContext context, ImageSelectorState state, double parentWidth) {
@@ -118,6 +123,39 @@ class _ImageSelectorView extends StatelessWidget {
         child: const Icon(Icons.add_a_photo, size: 40, color: Colors.grey),
       );
     }
+    return Stack(children: [
+      Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(30),
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(30),
+            child: image,
+          )),
+      Positioned(
+          bottom: 4,
+          right: 4,
+          child: GestureDetector(
+              onTap: () {
+                context.read<ImageSelectorCubit>().clearSelection();
+              },
+              child: Container(
+                  padding: const EdgeInsets.all(0.1),
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.cancel, size: 48)))),
+    ]);
+  }
+
+  Widget _buildEmptyImageIcon(BuildContext context, double parentWidth) {
+    final image = Container(
+      height: 100,
+      width: 100,
+      color: Colors.grey.shade200,
+      child: const Icon(Icons.add_a_photo, size: 40, color: Colors.grey),
+    );
     return Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(30),
