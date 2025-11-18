@@ -48,7 +48,7 @@ class DeviceFrameWrapper {
         // localizationsDelegates: AppLocalizations.localizationsDelegates,
         // supportedLocales: AppLocalizations.supportedLocales,
         // locale: selectedLocale,
-        home: child,
+        home: Scaffold(body: child),
       ),
     );
   }
