@@ -49,6 +49,32 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Verify CHANGELOG has been updated
+        if: github.event_name == 'pull_request'
+        run: |
+          BASE_REF="${{ github.event.pull_request.base.ref }}"
+          CHANGELOG_PATH="packages/image_selector/CHANGELOG.md"
+
+          # Fetch the base branch to compare against
+          git fetch origin $BASE_REF
+
+          # Check if the CHANGELOG has been modified
+          if git diff --quiet origin/$BASE_REF...HEAD -- "$CHANGELOG_PATH"; then
+            echo "❌ Error: $CHANGELOG_PATH has not been updated in this PR"
+            echo "Please update the CHANGELOG.md file before submitting the PR."
+            exit 1
+          else
+            echo "✅ $CHANGELOG_PATH has been updated"
+          fi
+
+      - name: Copy CHANGELOG to docs
+        if: github.event_name == 'pull_request'
+        run: |
+          cp packages/image_selector/CHANGELOG.md docs/CHANGELOG.md
+          echo "✅ Copied CHANGELOG.md to docs/CHANGELOG.md"
 
       - name: Set up Dart
         uses: dart-lang/setup-dart@v1
