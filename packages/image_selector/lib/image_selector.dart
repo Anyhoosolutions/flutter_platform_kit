@@ -5,3 +5,5 @@ library image_selector;
 
 export 'widgets/image_selector_widget.dart';
 export 'selected_image.dart';
+export 'layout_type.dart';
+export 'widgets/form_image_selector.dart';
