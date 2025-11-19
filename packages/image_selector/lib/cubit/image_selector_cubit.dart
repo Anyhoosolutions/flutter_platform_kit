@@ -14,7 +14,7 @@ class ImageSelectorCubit extends Cubit<ImageSelectorState> {
   final String? preselectedImage;
 
   ImageSelectorCubit({required this.stockAssetPaths, this.preselectedImage})
-      : super(ImageSelectorState(stockAssetPath: preselectedImage));
+      : super(ImageSelectorState(path: preselectedImage));
 
   // Handles camera and gallery picking
   Future<void> pickImage(ImageSource source) async {
@@ -52,7 +52,7 @@ class ImageSelectorCubit extends Cubit<ImageSelectorState> {
   // Handles stock photo selection
   void selectStockPhoto(String assetPath) {
     emit(ImageSelectorState(
-      stockAssetPath: assetPath,
+      path: assetPath,
       sourceType: ImageSourceType.stock,
     ));
   }

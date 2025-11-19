@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:image_selector/cubit/image_selector_state.dart';
 import 'package:image_selector/cubit/show_stock_photos_cubit.dart';
 import 'package:image_selector/widgets/add_stock_photo_page.dart';
+import 'package:image_selector/selected_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
@@ -27,8 +28,8 @@ enum LayoutType {
 }
 
 class ImageSelectorWidget extends StatelessWidget {
-  // Callback when a file is selected (null if cleared)
-  final ValueChanged<ImageSelectorState> onImageSelected;
+  // Callback when a file is selected
+  final ValueChanged<SelectedImage>? onImageSelected;
   final List<String> stockAssetPaths;
   final String? preselectedImage;
   final bool roundImage;
@@ -36,7 +37,7 @@ class ImageSelectorWidget extends StatelessWidget {
 
   const ImageSelectorWidget({
     super.key,
-    required this.onImageSelected,
+    this.onImageSelected,
     this.stockAssetPaths = const [],
     this.preselectedImage,
     this.roundImage = false,
@@ -68,7 +69,7 @@ class ImageSelectorWidget extends StatelessWidget {
 }
 
 class _ImageSelectorView extends StatelessWidget {
-  final ValueChanged<ImageSelectorState> onImageSelected;
+  final ValueChanged<SelectedImage>? onImageSelected;
   final List<String> stockAssetPaths;
   final LayoutType layoutType;
   final bool roundImage;
@@ -82,37 +83,52 @@ class _ImageSelectorView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (BuildContext context, BoxConstraints constraints) {
-        final parentWidth = constraints.maxWidth;
-
-        final imageSelectorState = context.watch<ImageSelectorCubit>().state;
-        final showStockPhotos = context.watch<ShowStockPhotosCubit>().state;
-
-        if (imageSelectorState.isLoading) {
-          return const Center(child: CircularProgressIndicator());
-        }
-
-        if (showStockPhotos) {
-          return _showStockPhotos(context, stockAssetPaths);
-        }
-
-        final showImage = shouldShowImage(imageSelectorState);
-
-        return Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Display the selected image preview
-            if (showImage)
-              FutureBuilder<Widget>(
-                  future: _buildImagePreview(context, imageSelectorState, parentWidth),
-                  builder: (context, snapshot) {
-                    return snapshot.data ?? const SizedBox.shrink();
-                  }),
-            if (!showImage) getEmptyIconAndButtonsLayout(context, parentWidth),
-          ],
+    return BlocListener<ImageSelectorCubit, ImageSelectorState>(
+      listener: (context, state) {
+        // Convert internal state to public API and call the callback
+        final selectedImage = SelectedImage(
+          path: state.path,
+          selectedFile: state.selectedFile,
+          selectedImage: state.selectedImage,
         );
+        if (onImageSelected != null) {
+          onImageSelected!(selectedImage);
+        }
       },
+      child: LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) {
+          final parentWidth = constraints.maxWidth;
+
+          final imageSelectorState = context.watch<ImageSelectorCubit>().state;
+          final showStockPhotos = context.watch<ShowStockPhotosCubit>().state;
+
+          if (imageSelectorState.isLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (showStockPhotos) {
+            return _showStockPhotos(context, stockAssetPaths);
+          }
+
+          final showImage = shouldShowImage(imageSelectorState);
+
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Display the selected image preview
+              if (showImage)
+                FutureBuilder<Widget>(
+                    future: _buildImagePreview(
+                        context, imageSelectorState, parentWidth),
+                    builder: (context, snapshot) {
+                      return snapshot.data ?? const SizedBox.shrink();
+                    }),
+              if (!showImage)
+                getEmptyIconAndButtonsLayout(context, parentWidth),
+            ],
+          );
+        },
+      ),
     );
   }
 
@@ -126,10 +142,13 @@ class _ImageSelectorView extends StatelessWidget {
   }
 
   bool shouldShowImage(ImageSelectorState state) {
-    return state.selectedFile != null || state.stockAssetPath != null || state.selectedImage != null;
+    return state.selectedFile != null ||
+        state.path != null ||
+        state.selectedImage != null;
   }
 
-  Future<Widget> _buildImagePreview(BuildContext context, ImageSelectorState state, double parentWidth) async {
+  Future<Widget> _buildImagePreview(BuildContext context,
+      ImageSelectorState state, double parentWidth) async {
     Widget image;
     Uint8List? imageBytes;
 
@@ -140,11 +159,17 @@ class _ImageSelectorView extends StatelessWidget {
     }
 
     if (imageBytes != null) {
-      image = Image.memory(imageBytes, width: parentWidth * 0.9, fit: BoxFit.cover);
+      image =
+          Image.memory(imageBytes, width: parentWidth * 0.9, fit: BoxFit.cover);
     } else if (state.selectedFile != null) {
-      image = Image.file(state.selectedFile!, width: parentWidth * 0.9, fit: BoxFit.cover);
-    } else if (state.stockAssetPath != null) {
-      image = Image.asset(state.stockAssetPath!, width: parentWidth * 0.9, fit: BoxFit.cover);
+      image = Image.file(state.selectedFile!,
+          width: parentWidth * 0.9, fit: BoxFit.cover);
+    } else if (state.path != null && state.path!.startsWith('http')) {
+      image = Image.network(state.path!,
+          width: parentWidth * 0.9, fit: BoxFit.cover);
+    } else if (state.path != null) {
+      image =
+          Image.asset(state.path!, width: parentWidth * 0.9, fit: BoxFit.cover);
     } else {
       image = Container(
         height: 100,
@@ -222,16 +247,21 @@ class _ImageSelectorView extends StatelessWidget {
                 padding: const EdgeInsets.all(8.0),
                 child: Row(
                   children: [
-                    Icon(icon, size: emptyIconSize, color: Theme.of(context).colorScheme.primary),
-                    if (showLabel) const SizedBox(width: horizontalSplitSpacing),
-                    if (showLabel) Text(label, style: Theme.of(context).textTheme.bodySmall),
+                    Icon(icon,
+                        size: emptyIconSize,
+                        color: Theme.of(context).colorScheme.primary),
+                    if (showLabel)
+                      const SizedBox(width: horizontalSplitSpacing),
+                    if (showLabel)
+                      Text(label, style: Theme.of(context).textTheme.bodySmall),
                   ],
                 ),
               ),
             )));
   }
 
-  Widget getEmptyIconAndButtonsLayout(BuildContext context, double parentWidth) {
+  Widget getEmptyIconAndButtonsLayout(
+      BuildContext context, double parentWidth) {
     final cubit = context.read<ImageSelectorCubit>();
 
     final emptyIcon = _buildEmptyImageIcon(context, parentWidth);
@@ -301,7 +331,10 @@ class _ImageSelectorView extends StatelessWidget {
         children: [
           emptyIcon,
           const SizedBox(height: 16),
-          Row(mainAxisAlignment: MainAxisAlignment.center, spacing: 16, children: buttons),
+          Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              spacing: 16,
+              children: buttons),
         ],
       );
     }
@@ -314,7 +347,11 @@ class _ImageSelectorView extends StatelessWidget {
       return labelWidth;
     }
     if (layoutType == LayoutType.horizontalSplit) {
-      final labelWidth = parentWidth - emptyIconTotalSize - 2 * horizontalSplitPadding - horizontalSplitSpacing - 40;
+      final labelWidth = parentWidth -
+          emptyIconTotalSize -
+          2 * horizontalSplitPadding -
+          horizontalSplitSpacing -
+          40;
       return labelWidth;
     }
     if (layoutType == LayoutType.imageTopRowBottom) {

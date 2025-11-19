@@ -13,7 +13,7 @@ enum ImageSourceType {
 class ImageSelectorState {
   final File? selectedFile;
   final Uint8List? selectedImage;
-  final String? stockAssetPath;
+  final String? path;
   final ImageSourceType sourceType;
   final bool isLoading;
   final String? errorMessage;
@@ -21,7 +21,7 @@ class ImageSelectorState {
   const ImageSelectorState({
     this.selectedFile,
     this.selectedImage,
-    this.stockAssetPath,
+    this.path,
     this.sourceType = ImageSourceType.none,
     this.isLoading = false,
     this.errorMessage,
@@ -31,7 +31,7 @@ class ImageSelectorState {
   ImageSelectorState copyWith({
     File? selectedFile,
     Uint8List? selectedImage,
-    String? stockAssetPath,
+    String? path,
     ImageSourceType? sourceType,
     bool? isLoading,
     String? errorMessage,
@@ -39,7 +39,7 @@ class ImageSelectorState {
     return ImageSelectorState(
       selectedFile: selectedFile,
       selectedImage: selectedImage,
-      stockAssetPath: stockAssetPath,
+      path: path,
       sourceType: sourceType ?? this.sourceType,
       isLoading: isLoading ?? this.isLoading,
       errorMessage: errorMessage, // We keep the last error unless cleared

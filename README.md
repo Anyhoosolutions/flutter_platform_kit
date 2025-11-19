@@ -6,7 +6,7 @@ A selection of widgets and other tools, such as a router collection, for buildin
 
 ## Packages
 
-### image_selector
+### [image_selector](https://github.com/Anyhoosolutions/flutter_platform_kit/tree/main/packages/image_selector)
 
 A package for selecting images from the gallery or camera.
 
