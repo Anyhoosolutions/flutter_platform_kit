@@ -1,0 +1,61 @@
+- [x] Rename and remove unrelated stuff
+- [x] Remove flavors for ios
+- [x] Rename package name
+- [x] Remove Linux, Windows, and MacOS
+- [x] Show categories in RecipeList
+- [x] Deploy hosting, rules, 
+- [x] Remove routeName in Widgetbook
+- [x] Move recipe to different group?
+- [x] Allow to change recipe image
+- [x] Recipe from web page
+- [x] Better tablet view RecipeDetailsPage
+- [x] Specify that it can skip ingredients that have a 0 quantity
+- [x] Delete recipe
+- [x] Support multiple parts for ingredients, e.g. salad and dressing
+- [x] Handle nulls in recipes better
+- [x] Handle random categories?
+- [x] Search/filter for recipes
+- [x] Deploy Android APK to Firebase App Hosting
+- [x] Deploy iOS to Firebase App Hosting
+- [x] Create Firebase project and get config files
+  - [x] New age key
+- [x] Firebase function to sync groups
+- [x] Edit groups
+- [x] Build screenshot image collage script
+- [x] Real data for profile page
+- [x] Fix google sign in (add sha-1 to Firebase)
+- [x] Allow for text instead of numbers for quantity (e.g. "1/2")
+- [x] Show error when not being able to save recipe
+
+- [ ] Update PRD
+- [ ] _onChangeUser
+- [ ] Shimmer
+
+- [ ] Deploy Android App Bundle to Firebase App Hosting
+- [ ] Firestore rules tests
+- [ ] Flutter tests
+- [ ] Update profile page
+- [ ] Fix navigation when adding a recipe etc (should probably go to the /recipes)
+- [ ] Recipe from Instagram
+- [ ] Better matching when parsing links (maybe images too?)
+- [ ] Better tablet view for AddRecipeManuallyPage
+- [ ] Crop image
+- [ ] Get image for recipe by AI option
+- [ ] Allow search for ingredients and steps (done in Firebase?)
+- [ ] Is it better to have Stock Photos in Firebase Storage?
+- [ ] Layouts for different sizes
+- [ ] Maestro test
+- [ ] Graphics for Google Play Store and App Store
+- [ ] Don't use AppTheme directly
+- [ ] Favorite recipes
+- [ ] Filter/search on category
+- [ ] Allow for free text unit
+- [ ] Send errors to crashlytics
+- [x] Debug pages
+- [ ] Take photo
+- [ ] Test Flutter in Github Actions
+- [ ] Correct (better) user handling
+- [x] Log page and update log config from remote config
+- [x] Refactor, add BlocAndServiceConstructor
+- [ ] Click on image and show in "full" view
+- [ ] Refactor how image upload and saving recipe is working

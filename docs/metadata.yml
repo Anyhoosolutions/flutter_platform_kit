@@ -1,0 +1,6 @@
+projectId: "flutter_platform_kit"
+name: "Flutter Platform Kit"
+description: A collection of widgets and other tools for building a Flutter app.
+contactName: Andreas Lidholm
+contactEmail: lidholm.andreas@gmail.com
+allowedUsers:

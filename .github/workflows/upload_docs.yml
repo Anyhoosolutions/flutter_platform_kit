@@ -1,0 +1,135 @@
+name: Upload docs
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+env:
+  # Setting an environment variable with the value of a configuration variable
+  UPLOAD_URL: ${{ vars.UPLOAD_URL }}
+
+jobs:
+  run-main:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Verify CHANGELOG has been updated
+        if: github.event_name == 'pull_request'
+        run: |
+          BASE_REF="${{ github.event.pull_request.base.ref }}"
+          CHANGELOG_PATH="packages/image_selector/CHANGELOG.md"
+
+          # Fetch the base branch to compare against
+          git fetch origin $BASE_REF
+
+          # Check if the CHANGELOG has been modified
+          if git diff --quiet origin/$BASE_REF...HEAD -- "$CHANGELOG_PATH"; then
+            echo "❌ Error: $CHANGELOG_PATH has not been updated in this PR"
+            echo "Please update the CHANGELOG.md file before submitting the PR."
+            exit 1
+          else
+            echo "✅ $CHANGELOG_PATH has been updated"
+          fi
+
+      - name: Copy CHANGELOG to docs
+        if: github.event_name == 'pull_request'
+        run: |
+          cp packages/image_selector/CHANGELOG.md docs/CHANGELOG.md
+          echo "✅ Copied CHANGELOG.md to docs/CHANGELOG.md"
+
+      - name: Set up Dart
+        uses: dart-lang/setup-dart@v1
+        with:
+          sdk: "3.5"
+
+      - name: Cache Dart packages
+        uses: actions/cache@v3
+        with:
+          path: |
+            .pub-cache/bin
+            .pub-cache/global_packages
+            .pub-cache/hosted
+            .dart_tool
+            .packages
+          key: ${{ runner.os }}-dart-${{ hashFiles('**/pubspec.yaml') }}
+
+      - name: Run main deployment
+        run: |
+          cd scripts/console
+          dart pub get --no-precompile
+          echo $UPLOAD_URL
+          dart bin/console.dart
+
+  run-non-main:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref != 'refs/heads/main')
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Verify CHANGELOG has been updated
+        if: github.event_name == 'pull_request'
+        run: |
+          BASE_REF="${{ github.event.pull_request.base.ref }}"
+          CHANGELOG_PATH="packages/image_selector/CHANGELOG.md"
+
+          # Fetch the base branch to compare against
+          git fetch origin $BASE_REF
+
+          # Check if the CHANGELOG has been modified
+          if git diff --quiet origin/$BASE_REF...HEAD -- "$CHANGELOG_PATH"; then
+            echo "❌ Error: $CHANGELOG_PATH has not been updated in this PR"
+            echo "Please update the CHANGELOG.md file before submitting the PR."
+            exit 1
+          else
+            echo "✅ $CHANGELOG_PATH has been updated"
+          fi
+
+      - name: Copy CHANGELOG to docs
+        if: github.event_name == 'pull_request'
+        run: |
+          cp packages/image_selector/CHANGELOG.md docs/CHANGELOG.md
+          echo "✅ Copied CHANGELOG.md to docs/CHANGELOG.md"
+
+      - name: Set up Dart
+        uses: dart-lang/setup-dart@v1
+        with:
+          sdk: "3.5"
+
+      - name: Cache Dart packages
+        uses: actions/cache@v3
+        with:
+          path: |
+            .pub-cache/bin
+            .pub-cache/global_packages
+            .pub-cache/hosted
+            .dart_tool
+            .packages
+          key: ${{ runner.os }}-dart-${{ hashFiles('**/pubspec.yaml') }}
+
+      - name: Run non-main deployment
+        run: |
+          cd scripts/console
+          dart pub get --no-precompile
+          export GIT_COMMIT_HASH=$(git rev-parse HEAD)
+          echo $UPLOAD_URL
+          dart bin/console.dart --commitHash=$GIT_COMMIT_HASH
+
+      - name: Build PR docs link
+        run: |
+          echo "pr_docs_link=$(git rev-parse HEAD | head -c 7)" >> $GITHUB_ENV
+
+      # - name: Comment PR
+      #   uses: thollander/actions-comment-pull-request@v3
+      #   with:
+      #     message: |
+      #       https://anywhostudios--anywhostudios-8eef2.us-central1.hosted.app/projects/${{ env.pr_docs_link }}

@@ -1,0 +1,20 @@
+{
+	"filepath": "main.md",
+	"name": "Main",
+	"title": "Main",
+	"onlyAllowedUsers": true,
+	"subpages": [
+		{
+			"filepath": "CHANGELOG.md",
+			"name": "Changelog",
+			"title": "Changelog",
+			"subpages": []
+		},
+		{
+			"filepath": "todo.md",
+			"name": "Todo",
+			"title": "Todo",
+			"subpages": []
+		}
+	]
+}
