@@ -1,5 +1,6 @@
 // ignore_for_file: deprecated_member_use
 
+import 'package:image_selector/layout_type.dart';
 import 'package:image_selector/widgets/image_selector_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:widgetbook/widgetbook.dart';
@@ -40,6 +41,7 @@ Widget build(BuildContext context) {
               layoutType: LayoutType.values.firstWhere((e) => e.name == layoutType),
               preselectedImage: image,
               onImageSelected: (selectedImage) {
+                // ignore: avoid_print
                 print('selectedImage: $selectedImage');
               },
               roundImage: roundImage,
