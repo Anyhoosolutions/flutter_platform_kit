@@ -1,0 +1,14 @@
+{
+	"filepath": "main.md",
+	"name": "Main",
+	"title": "Main",
+	"onlyAllowedUsers": true,
+	"subpages": [
+		{
+			"filepath": "todo.md",
+			"name": "Todo",
+			"title": "Todo",
+			"subpages": []
+		}
+	]
+}
