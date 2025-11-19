@@ -1,3 +1,7 @@
+## 0.0.5
+
+Fixing copying CHANGELOG.md
+
 ## 0.0.4
 
 Adding /docs, which will be uploaded to https://anyhoosolutions.web.app/documentation/flutter_platform_kit
