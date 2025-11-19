@@ -10,7 +10,14 @@ import 'package:widgetbook_workspace/helpers/wrap_in_mocks_helper.dart';
 Widget build(BuildContext context) {
   final colorSchemeOptions = ['red', 'green', 'purple'];
   final colorScheme = context.knobs.list(label: 'Color scheme', options: colorSchemeOptions, initialOption: 'red');
-  final showImage = context.knobs.boolean(label: 'Show image', initialValue: true);
+
+  final imageOptions = {'Asset': 'assets/images/baking.png', 'Web': 'https://picsum.photos/200/200', 'none': null};
+  final imageSelection = context.knobs.list(
+    label: 'Show image',
+    options: imageOptions.keys.toList(),
+    initialOption: imageOptions.keys.first,
+  );
+  final image = imageOptions[imageSelection];
   final roundImage = context.knobs.boolean(label: 'Round image', initialValue: false);
 
   final layoutType = context.knobs.list(
@@ -31,7 +38,7 @@ Widget build(BuildContext context) {
             // This could be a form page with other widgets stacked on top
             ImageSelectorWidget(
               layoutType: LayoutType.values.firstWhere((e) => e.name == layoutType),
-              preselectedImage: showImage ? 'assets/images/baking.png' : null,
+              preselectedImage: image,
               onImageSelected: (selectedImage) {
                 print('selectedImage: $selectedImage');
               },
