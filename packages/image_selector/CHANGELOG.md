@@ -1,3 +1,8 @@
+## 0.0.4
+
+Adding /docs, which will be uploaded to https://anyhoosolutions.web.app/documentation/flutter_platform_kit
+Content of CHANGELOG.md will also be copied during Github actions
+
 ## 0.0.3
 
 Expose a FormField (FlutterFormBuilder) 
