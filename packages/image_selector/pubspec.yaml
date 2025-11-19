@@ -1,0 +1,27 @@
+name: image_selector
+description: A reusable widget for selecting an image from various sources.
+version: 0.0.1
+homepage: https://github.com/anyhoosolutions/flutter_platform_kit/tree/main/packages/image_selector
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+  flutter: ">=3.10.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  # Image picking for camera/gallery
+  image_picker: ^1.0.4
+  # State management
+  flutter_bloc: ^9.1.0
+  # To hold the selected image file
+  path_provider: ^2.1.1
+  dotted_border: ^3.1.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+
+flutter:
+  uses-material-design: true
