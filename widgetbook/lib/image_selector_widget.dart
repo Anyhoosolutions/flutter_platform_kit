@@ -32,7 +32,9 @@ Widget build(BuildContext context) {
             ImageSelectorWidget(
               layoutType: LayoutType.values.firstWhere((e) => e.name == layoutType),
               preselectedImage: showImage ? 'assets/images/baking.png' : null,
-              onImageSelected: (state) {},
+              onImageSelected: (selectedImage) {
+                print('selectedImage: $selectedImage');
+              },
               roundImage: roundImage,
               stockAssetPaths: [
                 'assets/images/baking.png',

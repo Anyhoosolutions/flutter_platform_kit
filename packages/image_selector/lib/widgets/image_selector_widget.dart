@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:image_selector/cubit/image_selector_state.dart';
 import 'package:image_selector/cubit/show_stock_photos_cubit.dart';
 import 'package:image_selector/widgets/add_stock_photo_page.dart';
+import 'package:image_selector/selected_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
@@ -27,8 +28,8 @@ enum LayoutType {
 }
 
 class ImageSelectorWidget extends StatelessWidget {
-  // Callback when a file is selected (null if cleared)
-  final ValueChanged<ImageSelectorState> onImageSelected;
+  // Callback when a file is selected
+  final ValueChanged<SelectedImage> onImageSelected;
   final List<String> stockAssetPaths;
   final String? preselectedImage;
   final bool roundImage;
@@ -68,7 +69,7 @@ class ImageSelectorWidget extends StatelessWidget {
 }
 
 class _ImageSelectorView extends StatelessWidget {
-  final ValueChanged<ImageSelectorState> onImageSelected;
+  final ValueChanged<SelectedImage> onImageSelected;
   final List<String> stockAssetPaths;
   final LayoutType layoutType;
   final bool roundImage;
@@ -82,37 +83,48 @@ class _ImageSelectorView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (BuildContext context, BoxConstraints constraints) {
-        final parentWidth = constraints.maxWidth;
-
-        final imageSelectorState = context.watch<ImageSelectorCubit>().state;
-        final showStockPhotos = context.watch<ShowStockPhotosCubit>().state;
-
-        if (imageSelectorState.isLoading) {
-          return const Center(child: CircularProgressIndicator());
-        }
-
-        if (showStockPhotos) {
-          return _showStockPhotos(context, stockAssetPaths);
-        }
-
-        final showImage = shouldShowImage(imageSelectorState);
-
-        return Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Display the selected image preview
-            if (showImage)
-              FutureBuilder<Widget>(
-                  future: _buildImagePreview(context, imageSelectorState, parentWidth),
-                  builder: (context, snapshot) {
-                    return snapshot.data ?? const SizedBox.shrink();
-                  }),
-            if (!showImage) getEmptyIconAndButtonsLayout(context, parentWidth),
-          ],
+    return BlocListener<ImageSelectorCubit, ImageSelectorState>(
+      listener: (context, state) {
+        // Convert internal state to public API and call the callback
+        final selectedImage = SelectedImage(
+          stockAssetPath: state.stockAssetPath,
+          selectedFile: state.selectedFile,
+          selectedImage: state.selectedImage,
         );
+        onImageSelected(selectedImage);
       },
+      child: LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) {
+          final parentWidth = constraints.maxWidth;
+
+          final imageSelectorState = context.watch<ImageSelectorCubit>().state;
+          final showStockPhotos = context.watch<ShowStockPhotosCubit>().state;
+
+          if (imageSelectorState.isLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (showStockPhotos) {
+            return _showStockPhotos(context, stockAssetPaths);
+          }
+
+          final showImage = shouldShowImage(imageSelectorState);
+
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Display the selected image preview
+              if (showImage)
+                FutureBuilder<Widget>(
+                    future: _buildImagePreview(context, imageSelectorState, parentWidth),
+                    builder: (context, snapshot) {
+                      return snapshot.data ?? const SizedBox.shrink();
+                    }),
+              if (!showImage) getEmptyIconAndButtonsLayout(context, parentWidth),
+            ],
+          );
+        },
+      ),
     );
   }
 
