@@ -29,7 +29,55 @@ class AuthCubit<T extends AuthUser> extends Cubit<AuthState<T>> {
     emit(state.copyWith(isLoading: true, clearError: true));
 
     try {
-      final user = await authService.login(email, password);
+      final user = await authService.loginWithEmailAndPassword(email, password);
+      emit(state.copyWith(user: user, isLoading: false));
+    } catch (e) {
+      emit(state.copyWith(
+        isLoading: false,
+        errorMessage: e.toString(),
+      ));
+      rethrow;
+    }
+  }
+
+  /// Log in with Google.
+  Future<void> loginWithGoogle() async {
+    emit(state.copyWith(isLoading: true, clearError: true));
+
+    try {
+      final user = await authService.loginWithGoogle();
+      emit(state.copyWith(user: user, isLoading: false));
+    } catch (e) {
+      emit(state.copyWith(
+        isLoading: false,
+        errorMessage: e.toString(),
+      ));
+      rethrow;
+    }
+  }
+
+  /// Log in with Apple.
+  Future<void> loginWithApple() async {
+    emit(state.copyWith(isLoading: true, clearError: true));
+
+    try {
+      final user = await authService.loginWithApple();
+      emit(state.copyWith(user: user, isLoading: false));
+    } catch (e) {
+      emit(state.copyWith(
+        isLoading: false,
+        errorMessage: e.toString(),
+      ));
+      rethrow;
+    }
+  }
+
+  /// Log in with anonymous.
+  Future<void> loginWithAnonymous() async {
+    emit(state.copyWith(isLoading: true, clearError: true));
+
+    try {
+      final user = await authService.loginWithAnonymous();
       emit(state.copyWith(user: user, isLoading: false));
     } catch (e) {
       emit(state.copyWith(

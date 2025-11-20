@@ -27,7 +27,7 @@ class FirebaseAuthService<T extends AuthUser> extends AuthService<T> {
   })  : _firebaseAuth = firebaseAuth ?? firebase_auth.FirebaseAuth.instance,
         super(
           converter: converter,
-          loginFunction: _createLoginFunction(firebaseAuth ?? firebase_auth.FirebaseAuth.instance),
+          emailLoginFunction: _createLoginFunction(firebaseAuth ?? firebase_auth.FirebaseAuth.instance),
           logoutFunction: _createLogoutFunction(firebaseAuth ?? firebase_auth.FirebaseAuth.instance),
           refreshUserFunction: _createRefreshUserFunction(firebaseAuth ?? firebase_auth.FirebaseAuth.instance),
         ) {
@@ -132,6 +132,15 @@ class FirebaseAuthService<T extends AuthUser> extends AuthService<T> {
   Future<void> signInWithApple() async {
     throw UnimplementedError(
       'Apple Sign-In requires additional setup. See documentation for implementation details.',
+    );
+  }
+
+  /// Sign in with Apple (requires additional setup).
+  ///
+  /// This is a placeholder - you'll need to implement Apple Sign-In separately.
+  Future<void> signInAnonymously() async {
+    throw UnimplementedError(
+      'Anonymous Sign-In requires additional setup. See documentation for implementation details.',
     );
   }
 }

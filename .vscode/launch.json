@@ -5,32 +5,29 @@
       "name": "example_app (Chrome)",
       "request": "launch",
       "type": "dart",
-      "program": "lib/main.dart",
-      "cwd": "${workspaceFolder}/example_app",
-      "deviceId": "chrome"
+      "program": "example_app/lib/main.dart",
+      "args": ["-d", "chrome"]
     },
     {
       "name": "example_app (Android Emulator)",
       "request": "launch",
       "type": "dart",
-      "program": "lib/main.dart",
-      "cwd": "${workspaceFolder}/example_app",
-      "deviceId": "android"
+      "program": "example_app/lib/main.dart",
+      "args": ["-d", "android"]
     },
     {
       "name": "example_app (iOS Simulator)",
       "request": "launch",
       "type": "dart",
-      "program": "lib/main.dart",
-      "cwd": "${workspaceFolder}/example_app",
-      "deviceId": "ios"
+      "program": "example_app/lib/main.dart",
+      "args": ["-d", "ios"]
     },
     {
       "name": "example_app (Current Device)",
       "request": "launch",
       "type": "dart",
-      "program": "lib/main.dart",
-      "cwd": "${workspaceFolder}/example_app"
+      "program": "example_app/lib/main.dart",
+      "args": ["-d", "device"]
     }
   ]
 }

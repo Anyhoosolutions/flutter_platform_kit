@@ -8,7 +8,7 @@ import '../models/example_user_converter.dart';
 AuthService<ExampleUser> createMockAuthService() {
   return AuthService<ExampleUser>(
     converter: ExampleUserConverter(),
-    loginFunction: (email, password) async {
+    emailLoginFunction: (email, password) async {
       // Simulate API delay
       await Future.delayed(const Duration(seconds: 1));
 
