@@ -1,8 +1,21 @@
 # Create a new package
 
-## Command
+## Quick Start (Recommended)
 
-Go to the `packages` directory and run the command `flutter create --template=package <package-name>`.
+Use the automated script to create a new package with a library export file:
+
+```bash
+./scripts/create_package.sh <package-name>
+```
+
+This script will:
+1. Create the Flutter package in the `packages` directory
+2. Generate a library export file with the proper structure
+3. Set up the basic package structure
+
+## Manual Creation
+
+Alternatively, go to the `packages` directory and run the command `flutter create --template=package <package-name>`.
 It will create a simple implementation file and test file among other files.
 
 ## Library Export File
