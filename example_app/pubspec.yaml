@@ -24,11 +24,14 @@ dependencies:
     path: ../packages/image_selector
   anyhoo_firebase:
     path: ../packages/anyhoo_firebase
+  anyhoo_router:
+    path: ../packages/anyhoo_router
 
   # Required dependencies
   flutter_bloc: ^9.1.0
   logging: ^1.3.0
   cloud_firestore: ^6.1.0
+  go_router: ^17.0.0
 
 dev_dependencies:
   flutter_test:

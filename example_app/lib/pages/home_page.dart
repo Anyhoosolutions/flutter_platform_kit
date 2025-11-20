@@ -12,6 +12,7 @@ import 'package:example_app/services/mock_auth_service.dart';
 import 'package:example_app/services/mock_enhance_user_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'auth_demo_page.dart';
 import 'image_selector_demo_page.dart';
 
@@ -37,7 +38,7 @@ class HomePage extends StatelessWidget {
             description: 'Demonstrates authentication with custom user models',
             icon: Icons.login,
             onTap: () {
-              Navigator.push(context, MaterialPageRoute(builder: (_) => const AuthDemoPage()));
+              GoRouter.of(context).push('/auth');
             },
           ),
           const SizedBox(height: 16),
@@ -114,6 +115,14 @@ class HomePage extends StatelessWidget {
             icon: Icons.data_array,
             onTap: () {
               Navigator.push(context, MaterialPageRoute(builder: (_) => FirestoreDemoPage(firestore: firestore)));
+            },
+          ),
+          _DemoCard(
+            title: 'Route First Demo',
+            description: 'Demonstrates route first demo',
+            icon: Icons.route,
+            onTap: () {
+              GoRouter.of(context).push('/route-demo');
             },
           ),
         ],

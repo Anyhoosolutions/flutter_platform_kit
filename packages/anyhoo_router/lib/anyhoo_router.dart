@@ -1,10 +1,8 @@
-/// UanyhooUrouter Package
+/// Anyhoo Router Package
 ///
-/// <Brief description of what the package does>
+/// A package for creating and managing routes in a Flutter app.
+// ignore: unnecessary_library_name
 library anyhoo_router;
 
-export 'src/calculator.dart';
-
-// Add exports for all public API files
-// export 'path/to/public_file1.dart';
-// export 'path/to/public_file2.dart';
+export 'src/anyhoo_router.dart';
+export 'src/anyhoo_route.dart';
