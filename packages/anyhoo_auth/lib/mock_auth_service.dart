@@ -1,6 +1,4 @@
-import 'package:anyhoo_core/anyhoo_core.dart';
 import 'package:anyhoo_auth/auth_service.dart';
-import 'package:anyhoo_auth/models/user_converter.dart';
 
 /// Mock implementation of [AuthService] for testing and development.
 ///
@@ -14,7 +12,7 @@ import 'package:anyhoo_auth/models/user_converter.dart';
 ///   converter: MyAppUserConverter(),
 /// );
 /// ```
-class MockAuthService<T extends AuthUser> extends AuthService<T> {
+class MockAuthService extends AuthService {
   /// Default delay for login operations (1 second).
   final Duration loginDelay;
 
@@ -44,14 +42,12 @@ class MockAuthService<T extends AuthUser> extends AuthService<T> {
   /// [credentialValidator] can be used to validate test credentials.
   /// [userDataGenerator] can be used to customize mock user data.
   MockAuthService({
-    required UserConverter<T> converter,
     this.loginDelay = const Duration(seconds: 1),
     this.logoutDelay = const Duration(milliseconds: 500),
     this.refreshDelay = const Duration(milliseconds: 500),
     this.credentialValidator,
     this.userDataGenerator,
   }) : super(
-          converter: converter,
           emailLoginFunction: _createMockLoginFunction(
             loginDelay,
             credentialValidator,
@@ -138,7 +134,7 @@ class MockAuthService<T extends AuthUser> extends AuthService<T> {
   /// This provides more realistic mock behavior by preserving the current user's
   /// email and ID when refreshing, rather than using hardcoded values.
   @override
-  Future<T?> refreshUser() async {
+  Future<Map<String, dynamic>> refreshUser() async {
     if (!isAuthenticated) {
       throw StateError('Cannot refresh user: no user is logged in');
     }
@@ -147,8 +143,8 @@ class MockAuthService<T extends AuthUser> extends AuthService<T> {
     await Future.delayed(refreshDelay);
 
     // Use current user's email for more realistic mock data
-    final currentEmail = currentUser?.email ?? 'refreshed@example.com';
-    final currentId = currentUser?.id ?? 'mock_user_refreshed';
+    final currentEmail = currentUser?['email'] ?? 'refreshed@example.com';
+    final currentId = currentUser?['id'] ?? 'mock_user_refreshed';
 
     // Generate refreshed user data
     Map<String, dynamic> refreshedData;
@@ -166,15 +162,14 @@ class MockAuthService<T extends AuthUser> extends AuthService<T> {
     }
 
     // Update current user with refreshed data using setUser
-    final refreshedUser = converter.fromJson(refreshedData);
-    setUser(refreshedUser);
-    return refreshedUser;
+    setUser(refreshedData);
+    return refreshedData;
   }
 
   /// Set a mock user directly (useful for testing).
   ///
   /// This bypasses the login flow and sets the user directly.
-  void setMockUser(T user) {
+  void setMockUser(Map<String, dynamic> user) {
     setUser(user);
   }
 }

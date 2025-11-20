@@ -5,6 +5,7 @@
 // gestures. You can also use WidgetTester to find child widgets in the widget
 // tree, read text, and verify that the values of widget properties are correct.
 
+import 'package:example_app/models/example_user_converter.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:example_app/main.dart';
@@ -14,7 +15,8 @@ void main() {
   testWidgets('App loads and shows home page', (WidgetTester tester) async {
     // Build our app and trigger a frame.
     final authService = createMockAuthService();
-    await tester.pumpWidget(MyApp(authService: authService));
+    final converter = ExampleUserConverter();
+    await tester.pumpWidget(MyApp(authService: authService, converter: converter));
 
     // Verify that the home page is displayed
     expect(find.text('Anyhoo Packages Example'), findsOneWidget);

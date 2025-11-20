@@ -2,7 +2,10 @@ import 'package:anyhoo_auth/cubit/auth_cubit.dart';
 import 'package:anyhoo_auth/widgets/login_widget.dart';
 import 'package:anyhoo_core/models/auth_user.dart';
 import 'package:example_app/models/example_user.dart';
+import 'package:example_app/models/example_user_converter.dart';
+import 'package:example_app/pages/enhance_user_demo_page.dart';
 import 'package:example_app/services/mock_auth_service.dart';
+import 'package:example_app/services/mock_enhance_user_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'auth_demo_page.dart';
@@ -48,11 +51,33 @@ class HomePage extends StatelessWidget {
                         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
                       ),
                       body: BlocProvider<AuthCubit<AuthUser>>(
-                        create: (_) => AuthCubit<ExampleUser>(authService: authService),
+                        create: (_) =>
+                            AuthCubit<ExampleUser>(authService: authService, converter: ExampleUserConverter()),
                         child: LoginWidget(title: 'Example app', assetLogoPath: 'assets/images/logo.webp'),
                       ),
                     );
                   },
+                ),
+              );
+            },
+          ),
+          const SizedBox(height: 16),
+          _DemoCard(
+            title: 'Enhance User Demo',
+            description: 'Demonstrates authentication with custom user models',
+            icon: Icons.login,
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => BlocProvider(
+                    create: (_) => AuthCubit<ExampleUser>(
+                      authService: createMockAuthService(),
+                      converter: ExampleUserConverter(),
+                      enhanceUserService: createMockEnhanceUserService(),
+                    ),
+                    child: EnhanceUserDemoPage(),
+                  ),
                 ),
               );
             },

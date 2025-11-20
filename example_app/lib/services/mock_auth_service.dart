@@ -1,13 +1,10 @@
 import 'package:anyhoo_auth/anyhoo_auth.dart';
-import '../models/example_user.dart';
-import '../models/example_user_converter.dart';
 
 /// Creates a mock AuthService for demonstration purposes.
 ///
 /// In a real app, this would make actual API calls.
-AuthService<ExampleUser> createMockAuthService() {
-  return AuthService<ExampleUser>(
-    converter: ExampleUserConverter(),
+AuthService createMockAuthService() {
+  return AuthService(
     emailLoginFunction: (email, password) async {
       // Simulate API delay
       await Future.delayed(const Duration(seconds: 1));

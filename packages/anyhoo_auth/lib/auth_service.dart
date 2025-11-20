@@ -1,4 +1,3 @@
-import 'package:anyhoo_core/anyhoo_core.dart';
 import 'package:anyhoo_auth/models/user_converter.dart';
 
 /// Authentication service that handles login, logout, and user management.
@@ -8,8 +7,7 @@ import 'package:anyhoo_auth/models/user_converter.dart';
 ///
 /// Example:
 /// ```dart
-/// final authService = AuthService<MyAppUser>(
-///   converter: MyAppUserConverter(),
+/// final authService = AuthService(
 ///   loginFunction: (email, password) async {
 ///     // Your login API call
 ///     final response = await http.post(...);
@@ -17,26 +15,23 @@ import 'package:anyhoo_auth/models/user_converter.dart';
 ///   },
 /// );
 /// ```
-class AuthService<T extends AuthUser> {
-  /// Converter for transforming JSON to user objects.
-  final UserConverter<T> converter;
-
+class AuthService {
   /// Functions that performs the actual login API call.
   ///
   /// Logging in with email and password
-  /// Should return a Map with user data that can be converted by [converter].
+  /// Should return a Map with user data that can be converted by a [UserConverter].
   final Future<Map<String, dynamic>> Function(String email, String password) emailLoginFunction;
 
   /// Logging in with Google provider (optional).
-  /// Should return a Map with user data that can be converted by [converter].
+  /// Should return a Map with user data that can be converted by a [UserConverter].
   final Future<Map<String, dynamic>> Function()? googleLoginFunction;
 
   /// Logging in with Apple provider (optional).
-  /// Should return a Map with user data that can be converted by [converter].
+  /// Should return a Map with user data that can be converted by a [UserConverter].
   final Future<Map<String, dynamic>> Function()? appleLoginFunction;
 
   /// Logging in with anonymous provider (optional).
-  /// Should return a Map with user data that can be converted by [converter].
+  /// Should return a Map with user data that can be converted by a [UserConverter].
   final Future<Map<String, dynamic>> Function()? anonymousLoginFunction;
 
   /// Function that performs the logout API call (optional).
@@ -46,16 +41,15 @@ class AuthService<T extends AuthUser> {
   final Future<Map<String, dynamic>> Function()? refreshUserFunction;
 
   /// Current authenticated user, null if not logged in.
-  T? _currentUser;
+  Map<String, dynamic>? _currentUser;
 
   /// Current authenticated user, null if not logged in.
-  T? get currentUser => _currentUser;
+  Map<String, dynamic>? get currentUser => _currentUser;
 
   /// Whether a user is currently logged in.
   bool get isAuthenticated => _currentUser != null;
 
   AuthService({
-    required this.converter,
     required this.emailLoginFunction,
     this.logoutFunction,
     this.refreshUserFunction,
@@ -68,11 +62,10 @@ class AuthService<T extends AuthUser> {
   ///
   /// Returns the authenticated user on success, or null on failure.
   /// Throws an exception if login fails.
-  Future<T?> loginWithEmailAndPassword(String email, String password) async {
+  Future<Map<String, dynamic>> loginWithEmailAndPassword(String email, String password) async {
     try {
       final responseData = await emailLoginFunction(email, password);
-      _currentUser = converter.fromJson(responseData);
-      return _currentUser;
+      return responseData;
     } catch (e) {
       rethrow;
     }
@@ -82,11 +75,10 @@ class AuthService<T extends AuthUser> {
   ///
   /// Returns the authenticated user on success, or null on failure.
   /// Throws an exception if login fails.
-  Future<T?> loginWithGoogle() async {
+  Future<Map<String, dynamic>> loginWithGoogle() async {
     try {
       final responseData = await googleLoginFunction!();
-      _currentUser = converter.fromJson(responseData);
-      return _currentUser;
+      return responseData;
     } catch (e) {
       rethrow;
     }
@@ -96,11 +88,10 @@ class AuthService<T extends AuthUser> {
   ///
   /// Returns the authenticated user on success, or null on failure.
   /// Throws an exception if login fails.
-  Future<T?> loginWithApple() async {
+  Future<Map<String, dynamic>> loginWithApple() async {
     try {
       final responseData = await appleLoginFunction!();
-      _currentUser = converter.fromJson(responseData);
-      return _currentUser;
+      return responseData;
     } catch (e) {
       rethrow;
     }
@@ -110,11 +101,10 @@ class AuthService<T extends AuthUser> {
   ///
   /// Returns the authenticated user on success, or null on failure.
   /// Throws an exception if login fails.
-  Future<T?> loginWithAnonymous() async {
+  Future<Map<String, dynamic>> loginWithAnonymous() async {
     try {
       final responseData = await anonymousLoginFunction!();
-      _currentUser = converter.fromJson(responseData);
-      return _currentUser;
+      return responseData;
     } catch (e) {
       rethrow;
     }
@@ -133,7 +123,7 @@ class AuthService<T extends AuthUser> {
   /// Refresh the current user's data from the server.
   ///
   /// Updates [currentUser] with fresh data from the API.
-  Future<T?> refreshUser() async {
+  Future<Map<String, dynamic>> refreshUser() async {
     if (refreshUserFunction == null) {
       throw UnsupportedError('refreshUserFunction not provided');
     }
@@ -143,15 +133,14 @@ class AuthService<T extends AuthUser> {
 
     try {
       final responseData = await refreshUserFunction!();
-      _currentUser = converter.fromJson(responseData);
-      return _currentUser;
+      return responseData;
     } catch (e) {
       rethrow;
     }
   }
 
   /// Set the current user (useful for restoring from storage).
-  void setUser(T user) {
+  void setUser(Map<String, dynamic> user) {
     _currentUser = user;
   }
 

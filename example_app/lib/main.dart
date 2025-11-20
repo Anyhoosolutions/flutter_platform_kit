@@ -1,3 +1,4 @@
+import 'package:example_app/models/example_user_converter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:anyhoo_auth/anyhoo_auth.dart';
@@ -9,19 +10,20 @@ import 'pages/home_page.dart';
 void main() {
   // Set up the auth service with mock implementation
   final authService = createMockAuthService();
-
-  runApp(MyApp(authService: authService));
+  final converter = ExampleUserConverter();
+  runApp(MyApp(authService: authService, converter: converter));
 }
 
 class MyApp extends StatelessWidget {
-  final AuthService<ExampleUser> authService;
+  final AuthService authService;
+  final UserConverter<ExampleUser> converter;
 
-  const MyApp({super.key, required this.authService});
+  const MyApp({super.key, required this.authService, required this.converter});
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => AuthCubit<ExampleUser>(authService: authService),
+      create: (_) => AuthCubit<ExampleUser>(authService: authService, converter: converter),
       child: MaterialApp(
         title: 'Anyhoo Packages Example',
         theme: ThemeData(colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue), useMaterial3: true),
