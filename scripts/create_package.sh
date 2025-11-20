@@ -74,4 +74,5 @@ echo "Next steps:"
 echo "1. Update the library file description"
 echo "2. Add your implementation files"
 echo "3. Export them in the library file"
+echo "4. Add section to docs/toc.json"
 

@@ -1,3 +1,7 @@
+## 0.0.4
+
+* Fix docs
+
 ## 0.0.3
 
 * Adding `Arguments`
