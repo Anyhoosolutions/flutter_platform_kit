@@ -55,6 +55,18 @@
 				}]
 		},
 		{
+			"filepath": "anyhoo_router/README.md",
+			"name": "Anyhoo Router",
+			"title": "Anyhoo Router",
+			"subpages": [
+				{
+					"filepath": "anyhoo_router/CHANGELOG.md",
+					"name": "Changelog",
+					"title": "Changelog",
+					"subpages": []
+				}]
+		},
+		{
 			"filepath": "image_selector/README.md",
 			"name": "Image Selector",
 			"title": "Image Selector",
