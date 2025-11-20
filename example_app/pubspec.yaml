@@ -22,9 +22,12 @@ dependencies:
     path: ../packages/anyhoo_auth
   image_selector:
     path: ../packages/image_selector
+  anyhoo_firebase:
+    path: ../packages/anyhoo_firebase
 
   # Required dependencies
   flutter_bloc: ^9.1.0
+  logging: ^1.3.0
 
 dev_dependencies:
   flutter_test:

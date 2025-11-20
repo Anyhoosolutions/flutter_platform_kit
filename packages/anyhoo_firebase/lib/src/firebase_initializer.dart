@@ -33,6 +33,14 @@ class FirebaseInitializer {
   });
 
   Future<void> initialize(FirebaseOptions firebaseOptions) async {
+    _log.info('!! Initializing Firebase');
+    _log.info('!! useFakeData: ${arguments.useFakeData}');
+    _log.info('!! useFirebaseAuth: $useFirebaseAuth');
+    _log.info('!! useFirebaseFirestore: $useFirebaseFirestore');
+    _log.info('!! useFirebaseStorage: $useFirebaseStorage');
+    _log.info('!! hostIp: $hostIp');
+    _log.info('!! overrideUseFirebaseEmulator: $overrideUseFirebaseEmulator');
+
     if (arguments.useFakeData) {
       _log.info('!! Using fake data, skipping Firebase initialization');
       return;
@@ -66,6 +74,16 @@ class FirebaseInitializer {
       }
       if (useFirebaseStorage) {
         setupFirebaseStorage();
+      }
+
+      _log.info('!! Waiting for Firebase to be initialized');
+      while (true) {
+        if (useFirebaseFirestore) {
+          if (_firestore != null) {
+            break;
+          }
+          await Future.delayed(const Duration(milliseconds: 100));
+        }
       }
 
       _log.info('!! Firebase initialized and setup');
