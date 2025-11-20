@@ -9,7 +9,7 @@ void main() {
       final converter = _TestUserConverter();
       final service = AuthService<TestUser>(
         converter: converter,
-        loginFunction: (email, password) async => {'id': '1', 'email': email},
+        emailLoginFunction: (email, password) async => {'id': '1', 'email': email},
       );
 
       expect(service, isNotNull);

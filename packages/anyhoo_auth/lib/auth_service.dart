@@ -25,7 +25,7 @@ class AuthService<T extends AuthUser> {
   ///
   /// Logging in with email and password
   /// Should return a Map with user data that can be converted by [converter].
-  final Future<Map<String, dynamic>> Function(String email, String password) loginFunction;
+  final Future<Map<String, dynamic>> Function(String email, String password) emailLoginFunction;
 
   /// Logging in with Google provider (optional).
   /// Should return a Map with user data that can be converted by [converter].
@@ -34,6 +34,10 @@ class AuthService<T extends AuthUser> {
   /// Logging in with Apple provider (optional).
   /// Should return a Map with user data that can be converted by [converter].
   final Future<Map<String, dynamic>> Function()? appleLoginFunction;
+
+  /// Logging in with anonymous provider (optional).
+  /// Should return a Map with user data that can be converted by [converter].
+  final Future<Map<String, dynamic>> Function()? anonymousLoginFunction;
 
   /// Function that performs the logout API call (optional).
   final Future<void> Function()? logoutFunction;
@@ -52,20 +56,63 @@ class AuthService<T extends AuthUser> {
 
   AuthService({
     required this.converter,
-    required this.loginFunction,
+    required this.emailLoginFunction,
     this.logoutFunction,
     this.refreshUserFunction,
     this.googleLoginFunction,
     this.appleLoginFunction,
+    this.anonymousLoginFunction,
   });
 
   /// Log in with email and password.
   ///
   /// Returns the authenticated user on success, or null on failure.
   /// Throws an exception if login fails.
-  Future<T?> login(String email, String password) async {
+  Future<T?> loginWithEmailAndPassword(String email, String password) async {
     try {
-      final responseData = await loginFunction(email, password);
+      final responseData = await emailLoginFunction(email, password);
+      _currentUser = converter.fromJson(responseData);
+      return _currentUser;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  /// Log in with Google.
+  ///
+  /// Returns the authenticated user on success, or null on failure.
+  /// Throws an exception if login fails.
+  Future<T?> loginWithGoogle() async {
+    try {
+      final responseData = await googleLoginFunction!();
+      _currentUser = converter.fromJson(responseData);
+      return _currentUser;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  /// Log in with Apple.
+  ///
+  /// Returns the authenticated user on success, or null on failure.
+  /// Throws an exception if login fails.
+  Future<T?> loginWithApple() async {
+    try {
+      final responseData = await appleLoginFunction!();
+      _currentUser = converter.fromJson(responseData);
+      return _currentUser;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  /// Log in with anonymous.
+  ///
+  /// Returns the authenticated user on success, or null on failure.
+  /// Throws an exception if login fails.
+  Future<T?> loginWithAnonymous() async {
+    try {
+      final responseData = await anonymousLoginFunction!();
       _currentUser = converter.fromJson(responseData);
       return _currentUser;
     } catch (e) {

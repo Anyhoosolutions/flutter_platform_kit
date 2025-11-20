@@ -52,7 +52,7 @@ class MockAuthService<T extends AuthUser> extends AuthService<T> {
     this.userDataGenerator,
   }) : super(
           converter: converter,
-          loginFunction: _createMockLoginFunction(
+          emailLoginFunction: _createMockLoginFunction(
             loginDelay,
             credentialValidator,
             userDataGenerator,
