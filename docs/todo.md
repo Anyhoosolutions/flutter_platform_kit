@@ -1,5 +1,5 @@
 - [x] Router handling
-- [ ] Firebase helper functions
+- [x] Firebase helper functions
 - [ ] AppBar
 - [ ] BottomBar
 - [ ] Shimmer
@@ -8,5 +8,5 @@
 - [ ] FormBuilderSingleSelectWithAdd
 - [ ] Change user listener
 - [ ] Timezone / current time
-- [ ] Arguments for running locally
+- [x] Arguments for running locally
 

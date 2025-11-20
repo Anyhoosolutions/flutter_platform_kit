@@ -30,16 +30,16 @@ To run the android app with arguments, use `adb shell am start -n com.example.ex
 
 To run the iOS app with arguments, use `xcrun simctl launch booted com.example.myapp -location America/Pittsburg -isFooEnabled "true" -fooValue 3.14 -fooInt 42`
 
-## Supported arguments
+#### Supported arguments
 
-### bool useFakeData
+##### bool useFakeData
 
 Defines if mock services should be used. Can be helpful for working on the layout or whenever an internet connection isn't available.
 
 For android/iOS: `useFakeData`  
 --dart-define: `USE_FAKE_DATA`  
 
-### bool useDeviceEmulator
+##### bool useDeviceEmulator
 
 Can be used to specify if launch on an emulator or real device. This can then be used to know how to connect to services, such as Firebase emulator.
 
@@ -47,7 +47,7 @@ For android/iOS: `useFirebaseEmulator`
 --dart-define: `USE_FIREBASE_EMULATOR`  
 
 
-### DateTime? currentTime
+##### DateTime? currentTime
 
 Can be used to fake the current time of the app (should only be used for development and/or test)
 
@@ -56,7 +56,7 @@ Format: `2025-04-29T11:22:59.000Z`
 For android/iOS: `currentTime`  
 --dart-define: `CURRENT_TIME`  
 
-### String? location
+##### String? location
 
 Can be used to fake the location of the app (should only be used for development and/or test)
 
@@ -65,28 +65,28 @@ Format: `America/New_York`
 For android/iOS: `location`  
 --dart-define: `LOCATION`  
 
-### bool logoutAtStartup
+##### bool logoutAtStartup
 
 Can be used to automatically sign out when launching the app (should only be used for development and/or test)
 
 For android/iOS: `logout`  
 --dart-define: `LOGOUT`  
 
-### bool loginAtStartup
+##### bool loginAtStartup
 
 Can be used to automatically sign in when launching the app (should only be used for development and/or test)
 
 For android/iOS: `login`  
 --dart-define: `login`  
 
-### String? userEmail
+##### String? userEmail
 
 Can be used to automatically sign in when launching the app (should only be used for development and/or test)
 
 For android/iOS: `userEmail`  
 --dart-define: `USER_EMAIL`  
 
-### String? userPassword
+##### String? userPassword
 
 Can be used to automatically sign in when launching the app (should only be used for development and/or test)
 
