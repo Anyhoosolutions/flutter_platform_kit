@@ -1,8 +1,10 @@
 import 'package:anyhoo_auth/cubit/auth_cubit.dart';
 import 'package:anyhoo_auth/widgets/login_widget.dart';
+import 'package:anyhoo_core/models/arguments.dart';
 import 'package:anyhoo_core/models/auth_user.dart';
 import 'package:example_app/models/example_user.dart';
 import 'package:example_app/models/example_user_converter.dart';
+import 'package:example_app/pages/arguments_demo_page.dart';
 import 'package:example_app/pages/enhance_user_demo_page.dart';
 import 'package:example_app/services/mock_auth_service.dart';
 import 'package:example_app/services/mock_enhance_user_service.dart';
@@ -13,7 +15,9 @@ import 'image_selector_demo_page.dart';
 
 /// Home page that serves as a navigation hub for package demos.
 class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+  final Arguments arguments;
+
+  const HomePage({super.key, required this.arguments});
 
   @override
   Widget build(BuildContext context) {
@@ -89,6 +93,15 @@ class HomePage extends StatelessWidget {
             icon: Icons.image,
             onTap: () {
               Navigator.push(context, MaterialPageRoute(builder: (_) => const ImageSelectorDemoPage()));
+            },
+          ),
+          const SizedBox(height: 16),
+          _DemoCard(
+            title: 'Arguments Demo',
+            description: 'Demonstrates arguments passed in when launching the app',
+            icon: Icons.image,
+            onTap: () {
+              Navigator.push(context, MaterialPageRoute(builder: (_) => ArgumentsDemoPage(arguments: arguments)));
             },
           ),
         ],

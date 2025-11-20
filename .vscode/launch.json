@@ -6,28 +6,24 @@
       "request": "launch",
       "type": "dart",
       "program": "example_app/lib/main.dart",
-      "args": ["-d", "chrome"]
+      "deviceId": "chrome",
+      "args": ["--dart-define=LOCATION=America/Boston", "--dart-define=CURRENT_TIME=2025-04-29T11:22:59.000Z"]
     },
     {
       "name": "example_app (Android Emulator)",
       "request": "launch",
       "type": "dart",
       "program": "example_app/lib/main.dart",
-      "args": ["-d", "android"]
+      "deviceId": "9B271FFBA0010W",
+      "args": []
     },
     {
       "name": "example_app (iOS Simulator)",
       "request": "launch",
       "type": "dart",
       "program": "example_app/lib/main.dart",
-      "args": ["-d", "ios"]
-    },
-    {
-      "name": "example_app (Current Device)",
-      "request": "launch",
-      "type": "dart",
-      "program": "example_app/lib/main.dart",
-      "args": ["-d", "device"]
+      "deviceId": "ios",
+      "args": []
     }
   ]
 }
