@@ -1,4 +1,4 @@
-- [ ] Router handlimg
+- [x] Router handling
 - [ ] Firebase helper functions
 - [ ] AppBar
 - [ ] BottomBar
