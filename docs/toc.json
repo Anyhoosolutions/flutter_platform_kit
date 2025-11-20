@@ -11,6 +11,12 @@
 			"subpages": []
 		},
 		{
+			"filepath": "how_to_new_package.md",
+			"name": "How to new package",
+			"title": "How to new package",
+			"subpages": []
+		},
+		{
 			"filepath": "anyhoo_core/README.md",
 			"name": "Anyhoo Core",
 			"title": "Anyhoo Core",
