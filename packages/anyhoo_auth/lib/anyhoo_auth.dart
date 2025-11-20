@@ -11,3 +11,4 @@ export 'firebase_auth_service.dart';
 export 'mock_auth_service.dart';
 export 'models/user_converter.dart';
 export 'widgets/login_widget.dart';
+export 'enhance_user_service.dart';

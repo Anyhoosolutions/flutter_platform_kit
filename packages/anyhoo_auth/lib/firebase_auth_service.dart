@@ -1,4 +1,3 @@
-import 'package:anyhoo_core/anyhoo_core.dart';
 import 'package:anyhoo_auth/auth_service.dart';
 import 'package:anyhoo_auth/models/user_converter.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
@@ -14,7 +13,7 @@ import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 ///   converter: MyAppUserConverter(),
 /// );
 /// ```
-class FirebaseAuthService<T extends AuthUser> extends AuthService<T> {
+class FirebaseAuthService extends AuthService {
   final firebase_auth.FirebaseAuth _firebaseAuth;
 
   /// Creates a Firebase authentication service.
@@ -22,11 +21,10 @@ class FirebaseAuthService<T extends AuthUser> extends AuthService<T> {
   /// [converter] is required to convert Firebase user data to your app's user model.
   /// [firebaseAuth] is optional - defaults to [FirebaseAuth.instance].
   FirebaseAuthService({
-    required UserConverter<T> converter,
+    required UserConverter converter,
     firebase_auth.FirebaseAuth? firebaseAuth,
   })  : _firebaseAuth = firebaseAuth ?? firebase_auth.FirebaseAuth.instance,
         super(
-          converter: converter,
           emailLoginFunction: _createLoginFunction(firebaseAuth ?? firebase_auth.FirebaseAuth.instance),
           logoutFunction: _createLogoutFunction(firebaseAuth ?? firebase_auth.FirebaseAuth.instance),
           refreshUserFunction: _createRefreshUserFunction(firebaseAuth ?? firebase_auth.FirebaseAuth.instance),
@@ -35,7 +33,7 @@ class FirebaseAuthService<T extends AuthUser> extends AuthService<T> {
     _firebaseAuth.authStateChanges().listen((firebaseUser) {
       if (firebaseUser != null) {
         final userData = _firebaseUserToMap(firebaseUser);
-        setUser(this.converter.fromJson(userData));
+        setUser(userData);
       } else {
         clearUser();
       }

@@ -1,3 +1,5 @@
+import 'package:anyhoo_auth/enhance_user_service.dart';
+import 'package:anyhoo_auth/models/user_converter.dart';
 import 'package:anyhoo_core/anyhoo_core.dart';
 import 'package:anyhoo_auth/auth_service.dart';
 import 'package:anyhoo_auth/cubit/auth_state.dart';
@@ -20,17 +22,23 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 /// )
 /// ```
 class AuthCubit<T extends AuthUser> extends Cubit<AuthState<T>> {
-  final AuthService<T> authService;
+  final AuthService authService;
+  final UserConverter<T> converter;
+  final EnhanceUserService? enhanceUserService;
 
-  AuthCubit({required this.authService}) : super(AuthState<T>(user: authService.currentUser));
+  AuthCubit({required this.authService, required this.converter, this.enhanceUserService})
+      : super(
+            AuthState<T>(user: authService.currentUser == null ? null : converter.fromJson(authService.currentUser!)));
 
   /// Log in with email and password.
   Future<void> login(String email, String password) async {
     emit(state.copyWith(isLoading: true, clearError: true));
 
     try {
-      final user = await authService.loginWithEmailAndPassword(email, password);
-      emit(state.copyWith(user: user, isLoading: false));
+      final userData = await authService.loginWithEmailAndPassword(email, password);
+      final enhancedUserData = await enhanceUserService?.enhanceUser(userData) ?? userData;
+      final enhancedUser = converter.fromJson(enhancedUserData);
+      emit(state.copyWith(user: enhancedUser, isLoading: false));
     } catch (e) {
       emit(state.copyWith(
         isLoading: false,
@@ -45,8 +53,10 @@ class AuthCubit<T extends AuthUser> extends Cubit<AuthState<T>> {
     emit(state.copyWith(isLoading: true, clearError: true));
 
     try {
-      final user = await authService.loginWithGoogle();
-      emit(state.copyWith(user: user, isLoading: false));
+      final userData = await authService.loginWithGoogle();
+      final enhancedUserData = await enhanceUserService?.enhanceUser(userData) ?? userData;
+      final enhancedUser = converter.fromJson(enhancedUserData);
+      emit(state.copyWith(user: enhancedUser, isLoading: false));
     } catch (e) {
       emit(state.copyWith(
         isLoading: false,
@@ -61,8 +71,10 @@ class AuthCubit<T extends AuthUser> extends Cubit<AuthState<T>> {
     emit(state.copyWith(isLoading: true, clearError: true));
 
     try {
-      final user = await authService.loginWithApple();
-      emit(state.copyWith(user: user, isLoading: false));
+      final userData = await authService.loginWithApple();
+      final enhancedUserData = await enhanceUserService?.enhanceUser(userData) ?? userData;
+      final enhancedUser = converter.fromJson(enhancedUserData);
+      emit(state.copyWith(user: enhancedUser, isLoading: false));
     } catch (e) {
       emit(state.copyWith(
         isLoading: false,
@@ -77,8 +89,10 @@ class AuthCubit<T extends AuthUser> extends Cubit<AuthState<T>> {
     emit(state.copyWith(isLoading: true, clearError: true));
 
     try {
-      final user = await authService.loginWithAnonymous();
-      emit(state.copyWith(user: user, isLoading: false));
+      final userData = await authService.loginWithAnonymous();
+      final enhancedUserData = await enhanceUserService?.enhanceUser(userData) ?? userData;
+      final enhancedUser = converter.fromJson(enhancedUserData);
+      emit(state.copyWith(user: enhancedUser, isLoading: false));
     } catch (e) {
       emit(state.copyWith(
         isLoading: false,
@@ -113,8 +127,10 @@ class AuthCubit<T extends AuthUser> extends Cubit<AuthState<T>> {
     emit(state.copyWith(isLoading: true, clearError: true));
 
     try {
-      final user = await authService.refreshUser();
-      emit(state.copyWith(user: user, isLoading: false));
+      final userData = await authService.refreshUser();
+      final enhancedUserData = await enhanceUserService?.enhanceUser(userData) ?? userData;
+      final enhancedUser = converter.fromJson(enhancedUserData);
+      emit(state.copyWith(user: enhancedUser, isLoading: false));
     } catch (e) {
       emit(state.copyWith(
         isLoading: false,
@@ -125,9 +141,9 @@ class AuthCubit<T extends AuthUser> extends Cubit<AuthState<T>> {
   }
 
   /// Update the state with a user (useful for restoring from storage).
-  void setUser(T user) {
+  void setUser(Map<String, dynamic> user) {
     authService.setUser(user);
-    emit(state.copyWith(user: user));
+    emit(state.copyWith(user: converter.fromJson(user)));
   }
 
   /// Clear the current user without calling logout API.
