@@ -11,7 +11,9 @@ Use the automated script to create a new package with a library export file:
 This script will:
 1. Create the Flutter package in the `packages` directory
 2. Generate a library export file with the proper structure
-3. Set up the basic package structure
+3. Create an example `Calculator` class in `lib/src/calculator.dart`
+4. Export the Calculator from the library file
+5. Set up the basic package structure with working tests
 
 ## Manual Creation
 
