@@ -21,10 +21,19 @@ class AuthService<T extends AuthUser> {
   /// Converter for transforming JSON to user objects.
   final UserConverter<T> converter;
 
-  /// Function that performs the actual login API call.
+  /// Functions that performs the actual login API call.
   ///
+  /// Logging in with email and password
   /// Should return a Map with user data that can be converted by [converter].
   final Future<Map<String, dynamic>> Function(String email, String password) loginFunction;
+
+  /// Logging in with Google provider (optional).
+  /// Should return a Map with user data that can be converted by [converter].
+  final Future<Map<String, dynamic>> Function()? googleLoginFunction;
+
+  /// Logging in with Apple provider (optional).
+  /// Should return a Map with user data that can be converted by [converter].
+  final Future<Map<String, dynamic>> Function()? appleLoginFunction;
 
   /// Function that performs the logout API call (optional).
   final Future<void> Function()? logoutFunction;
@@ -46,6 +55,8 @@ class AuthService<T extends AuthUser> {
     required this.loginFunction,
     this.logoutFunction,
     this.refreshUserFunction,
+    this.googleLoginFunction,
+    this.appleLoginFunction,
   });
 
   /// Log in with email and password.
