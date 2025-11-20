@@ -117,7 +117,6 @@ import 'package:anyhoo_auth/anyhoo_auth.dart';
 import 'package:http/http.dart' as http;
 
 final authService = AuthService<MyAppUser>(
-  converter: MyAppUserConverter(),
   loginFunction: (email, password) async {
     final response = await http.post(
       Uri.parse('https://api.example.com/login'),
@@ -153,7 +152,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => AuthCubit<MyAppUser>(authService: authService),
+      create: (_) => AuthCubit<MyAppUser>(authService: authService, converter: MyAppUserConverter(),),
       child: MaterialApp(
         home: HomePage(),
       ),
@@ -161,6 +160,13 @@ class MyApp extends StatelessWidget {
   }
 }
 ```
+
+AuthCubit also allows for a `EnhanceUserService` that can look up more information about the user, such as reading from Firestore
+```data
+
+      create: (_) => AuthCubit<MyAppUser>(authService: authService, converter: MyAppUserConverter(), enhanceUserService: enhanceUserService),
+```
+
 
 ### 5. Use Auth State in Widgets
 

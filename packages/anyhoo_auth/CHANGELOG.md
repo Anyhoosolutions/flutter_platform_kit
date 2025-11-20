@@ -1,3 +1,7 @@
+## 0.0.3
+
+* Adding support for a EnhanceUserService. It can, after the log in, lock up user data from e.g. Firestore
+
 ## 0.0.2
 
 * Fixes
