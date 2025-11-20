@@ -28,6 +28,7 @@ dependencies:
   # Required dependencies
   flutter_bloc: ^9.1.0
   logging: ^1.3.0
+  cloud_firestore: ^6.1.0
 
 dev_dependencies:
   flutter_test:

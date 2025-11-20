@@ -30,8 +30,8 @@ class FirestoreDemoPage extends StatelessWidget {
               },
               child: const Text('Add Test Data'),
             ),
-            FutureBuilder(
-              future: firestore.collection('test').get(),
+            StreamBuilder(
+              stream: firestore.collection('test').snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const CircularProgressIndicator();
