@@ -43,6 +43,18 @@
 			]
 		},
 		{
+			"filepath": "anyhoo_firebase/README.md",
+			"name": "Anyhoo Firebase",
+			"title": "Anyhoo Firebase",
+			"subpages": [
+				{
+					"filepath": "anyhoo_firebase/CHANGELOG.md",
+					"name": "Changelog",
+					"title": "Changelog",
+					"subpages": []
+				}]
+		},
+		{
 			"filepath": "image_selector/README.md",
 			"name": "Image Selector",
 			"title": "Image Selector",
