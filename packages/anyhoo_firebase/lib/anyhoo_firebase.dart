@@ -1,10 +1,8 @@
 /// UanyhooUfirebase Package
 ///
-/// <Brief description of what the package does>
+/// A package for initializing and managing Firebase services.
+// ignore: unnecessary_library_name
 library anyhoo_firebase;
 
-export 'src/calculator.dart';
-
-// Add exports for all public API files
-// export 'path/to/public_file1.dart';
-// export 'path/to/public_file2.dart';
+export 'src/firebase_initializer.dart';
+export 'src/os_tool.dart';
