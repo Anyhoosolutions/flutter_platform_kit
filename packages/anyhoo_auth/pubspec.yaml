@@ -2,7 +2,7 @@ name: anyhoo_auth
 description: A flexible authentication package that supports custom user models using generics.
 version: 0.0.1
 publish_to: none
-homepage: https://github.com/anyhoosolutions/flutter_platform_kit/tree/main/packages/anyhoo_auth
+homepage: https://anyhoosolutions.web.app/documentation/flutter_platform_kit
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
@@ -14,7 +14,7 @@ dependencies:
   anyhoo_core:
     path: ../anyhoo_core
   flutter_bloc: ^9.1.0
-  firebase_auth: ^5.3.1
+  firebase_auth: ^6.1.2
 
 dev_dependencies:
   flutter_test:

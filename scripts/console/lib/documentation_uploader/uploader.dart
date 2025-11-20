@@ -10,15 +10,14 @@ class Uploader {
 
   String getUploadUrl() {
     final url = String.fromEnvironment('UPLOAD_URL',
-        defaultValue: Platform.environment['UPLOAD_URL'] ??
-            'UPLOAD_URL has not been set');
+        defaultValue: Platform.environment['UPLOAD_URL'] ?? 'UPLOAD_URL has not been set');
     print('UPLOAD_URL: $url');
     return url;
   }
 
   Future<int> upload() async {
     final jsonString = jsonEncode(uploadData.toJson());
-    // print(jsonString);
+    print(jsonString);
 
     final url = Uri.parse(getUploadUrl());
 

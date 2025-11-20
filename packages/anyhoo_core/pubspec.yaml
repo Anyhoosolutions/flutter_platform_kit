@@ -2,7 +2,7 @@ name: anyhoo_core
 description: Shared models and interfaces used across Anyhoo packages.
 version: 0.0.1
 publish_to: none
-homepage:
+homepage: https://anyhoosolutions.web.app/documentation/flutter_platform_kit
 
 environment:
   sdk: ^3.10.0-290.4.beta
