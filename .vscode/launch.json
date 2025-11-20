@@ -1,0 +1,37 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "example_app (Chrome)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "cwd": "${workspaceFolder}/example_app",
+      "deviceId": "chrome"
+    },
+    {
+      "name": "example_app (Android Emulator)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "cwd": "${workspaceFolder}/example_app",
+      "deviceId": "android"
+    },
+    {
+      "name": "example_app (iOS Simulator)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "cwd": "${workspaceFolder}/example_app",
+      "deviceId": "ios"
+    },
+    {
+      "name": "example_app (Current Device)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "cwd": "${workspaceFolder}/example_app"
+    }
+  ]
+}
+

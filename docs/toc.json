@@ -5,16 +5,55 @@
 	"onlyAllowedUsers": true,
 	"subpages": [
 		{
-			"filepath": "CHANGELOG.md",
-			"name": "Changelog",
-			"title": "Changelog",
-			"subpages": []
-		},
-		{
 			"filepath": "todo.md",
 			"name": "Todo",
 			"title": "Todo",
 			"subpages": []
+		},
+		{
+			"filepath": "how_to_new_package.md",
+			"name": "How to new package",
+			"title": "How to new package",
+			"subpages": []
+		},
+		{
+			"filepath": "anyhoo_core/README.md",
+			"name": "Anyhoo Core",
+			"title": "Anyhoo Core",
+			"subpages": [
+				{
+					"filepath": "anyhoo_core/CHANGELOG.md",
+					"name": "Changelog",
+					"title": "Changelog",
+					"subpages": []
+				}
+			]
+		},
+		{
+			"filepath": "anyhoo_auth/README.md",
+			"name": "Anyhoo Auth",
+			"title": "Anyhoo Auth",
+			"subpages": [
+				{
+					"filepath": "anyhoo_auth/CHANGELOG.md",
+					"name": "Changelog",
+					"title": "Changelog",
+					"subpages": []
+				}
+			]
+		},
+		{
+			"filepath": "image_selector/README.md",
+			"name": "Image Selector",
+			"title": "Image Selector",
+			"subpages": [
+				{
+					"filepath": "image_selector/CHANGELOG.md",
+					"name": "Changelog",
+					"title": "Changelog",
+					"subpages": []
+				}
+			]
 		}
 	]
 }

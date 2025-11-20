@@ -19,10 +19,21 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Copy CHANGELOG to docs
+      - name: Copy CHANGELOGs to docs
         run: |
-          cp packages/image_selector/CHANGELOG.md docs/CHANGELOG.md
-          echo "✅ Copied CHANGELOG.md to docs/CHANGELOG.md"
+          # Copy each package's CHANGELOG.md to docs/{package_name}/CHANGELOG.md
+          for package_dir in packages/*/; do
+            package_name=$(basename "$package_dir")
+            changelog_path="$package_dir/CHANGELOG.md"
+            
+            if [ -f "$changelog_path" ]; then
+              mkdir -p "docs/$package_name"
+              cp "$changelog_path" "docs/$package_name/CHANGELOG.md"
+              echo "✅ Copied $package_name/CHANGELOG.md to docs/$package_name/CHANGELOG.md"
+            else
+              echo "⚠️  No CHANGELOG.md found for $package_name"
+            fi
+          done
 
       - name: Set up Dart
         uses: dart-lang/setup-dart@v1
@@ -57,29 +68,66 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Verify CHANGELOG has been updated
+      - name: Verify CHANGELOGs have been updated
         if: github.event_name == 'pull_request'
         run: |
           BASE_REF="${{ github.event.pull_request.base.ref }}"
-          CHANGELOG_PATH="packages/image_selector/CHANGELOG.md"
 
           # Fetch the base branch to compare against
           git fetch origin $BASE_REF
 
-          # Check if the CHANGELOG has been modified
-          if git diff --quiet origin/$BASE_REF...HEAD -- "$CHANGELOG_PATH"; then
-            echo "❌ Error: $CHANGELOG_PATH has not been updated in this PR"
-            echo "Please update the CHANGELOG.md file before submitting the PR."
+          # Check which packages have been modified
+          CHANGED_PACKAGES=$(git diff --name-only origin/$BASE_REF...HEAD | grep -E '^packages/[^/]+/' | cut -d'/' -f2 | sort -u)
+
+          MISSING_CHANGELOGS=()
+
+          # For each modified package, check if its CHANGELOG was updated
+          for package in $CHANGED_PACKAGES; do
+            CHANGELOG_PATH="packages/$package/CHANGELOG.md"
+            
+            # Skip if package doesn't have a CHANGELOG
+            if [ ! -f "$CHANGELOG_PATH" ]; then
+              continue
+            fi
+            
+            # Check if CHANGELOG was modified
+            if git diff --quiet origin/$BASE_REF...HEAD -- "$CHANGELOG_PATH"; then
+              MISSING_CHANGELOGS+=("$package")
+            else
+              echo "✅ $CHANGELOG_PATH has been updated"
+            fi
+          done
+
+          # Fail if any package's CHANGELOG wasn't updated
+          if [ ${#MISSING_CHANGELOGS[@]} -gt 0 ]; then
+            echo "❌ Error: The following packages have changes but their CHANGELOG.md files have not been updated:"
+            for package in "${MISSING_CHANGELOGS[@]}"; do
+              echo "   - packages/$package/CHANGELOG.md"
+            done
+            echo "Please update the CHANGELOG.md files before submitting the PR."
             exit 1
-          else
-            echo "✅ $CHANGELOG_PATH has been updated"
           fi
 
-      - name: Copy CHANGELOG to docs
+          if [ -z "$CHANGED_PACKAGES" ]; then
+            echo "ℹ️  No package changes detected, skipping CHANGELOG verification"
+          fi
+
+      - name: Copy CHANGELOGs to docs
         if: github.event_name == 'pull_request'
         run: |
-          cp packages/image_selector/CHANGELOG.md docs/CHANGELOG.md
-          echo "✅ Copied CHANGELOG.md to docs/CHANGELOG.md"
+          # Copy each package's CHANGELOG.md to docs/{package_name}/CHANGELOG.md
+          for package_dir in packages/*/; do
+            package_name=$(basename "$package_dir")
+            changelog_path="$package_dir/CHANGELOG.md"
+            
+            if [ -f "$changelog_path" ]; then
+              mkdir -p "docs/$package_name"
+              cp "$changelog_path" "docs/$package_name/CHANGELOG.md"
+              echo "✅ Copied $package_name/CHANGELOG.md to docs/$package_name/CHANGELOG.md"
+            else
+              echo "⚠️  No CHANGELOG.md found for $package_name"
+            fi
+          done
 
       - name: Set up Dart
         uses: dart-lang/setup-dart@v1

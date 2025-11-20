@@ -7,6 +7,8 @@ build/
 .idea/
 *.iml
 .vscode/
+# But allow launch.json for shared debug configurations
+!.vscode/launch.json
 
 # OS
 .DS_Store
