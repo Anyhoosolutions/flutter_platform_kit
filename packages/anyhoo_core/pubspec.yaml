@@ -1,6 +1,7 @@
-name: anyhoo_router
-description: "A new Flutter package project."
+name: anyhoo_core
+description: Shared models and interfaces used across Anyhoo packages.
 version: 0.0.1
+publish_to: none
 homepage:
 
 environment:
