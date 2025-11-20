@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:image_selector/image_selector.dart';
-import 'package:image_selector/layout_type.dart';
 
 /// Demo page showing image selector functionality.
 class ImageSelectorDemoPage extends StatefulWidget {

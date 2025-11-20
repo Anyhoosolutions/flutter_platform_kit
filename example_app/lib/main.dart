@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:anyhoo_auth/anyhoo_auth.dart';
 
+import 'models/example_user.dart';
 import 'services/mock_auth_service.dart';
 import 'pages/home_page.dart';
 
