@@ -5,3 +5,5 @@
 library anyhoo_core;
 
 export 'models/auth_user.dart';
+export 'models/arguments.dart';
+export 'arguments_parser.dart';
