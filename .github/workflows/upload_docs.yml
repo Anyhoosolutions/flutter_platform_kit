@@ -35,6 +35,22 @@ jobs:
             fi
           done
 
+      - name: Copy READMEs to docs
+        run: |
+          # Copy each package's README.md to docs/{package_name}/README.md
+          for package_dir in packages/*/; do
+            package_name=$(basename "$package_dir")
+            readme_path="$package_dir/README.md"
+            
+            if [ -f "$readme_path" ]; then
+              mkdir -p "docs/$package_name"
+              cp "$readme_path" "docs/$package_name/README.md"
+              echo "✅ Copied $package_name/README.md to docs/$package_name/README.md"
+            else
+              echo "⚠️  No README.md found for $package_name"
+            fi
+          done
+
       - name: Set up Dart
         uses: dart-lang/setup-dart@v1
         with:
@@ -126,6 +142,23 @@ jobs:
               echo "✅ Copied $package_name/CHANGELOG.md to docs/$package_name/CHANGELOG.md"
             else
               echo "⚠️  No CHANGELOG.md found for $package_name"
+            fi
+          done
+
+      - name: Copy READMEs to docs
+        if: github.event_name == 'pull_request'
+        run: |
+          # Copy each package's README.md to docs/{package_name}/README.md
+          for package_dir in packages/*/; do
+            package_name=$(basename "$package_dir")
+            readme_path="$package_dir/README.md"
+            
+            if [ -f "$readme_path" ]; then
+              mkdir -p "docs/$package_name"
+              cp "$readme_path" "docs/$package_name/README.md"
+              echo "✅ Copied $package_name/README.md to docs/$package_name/README.md"
+            else
+              echo "⚠️  No README.md found for $package_name"
             fi
           done
 
