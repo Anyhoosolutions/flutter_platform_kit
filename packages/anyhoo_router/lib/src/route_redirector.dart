@@ -164,9 +164,9 @@ class RouteRedirector<T extends Enum> {
     // Extract path parameters (wildcards) from the route path
     final pathParameters = normalizedRoutePath.split('/').where((s) => s.startsWith(':')).toList();
 
-    // If there are no parameters, just return the redirect path as-is
+    // If there are no parameters, normalize and return the redirect path
     if (pathParameters.isEmpty) {
-      return redirect;
+      return redirect.startsWith('/') ? redirect : '/$redirect';
     }
 
     // Build a regex pattern by replacing each parameter with a capture group
@@ -185,8 +185,8 @@ class RouteRedirector<T extends Enum> {
     final match = regex.firstMatch(normalizedOriginalPath);
 
     if (match == null) {
-      // If no match, return redirect as-is (shouldn't happen in normal flow)
-      return redirect;
+      // If no match, normalize and return redirect as-is (shouldn't happen in normal flow)
+      return redirect.startsWith('/') ? redirect : '/$redirect';
     }
 
     // Extract captured values and map them to parameter names
@@ -205,6 +205,7 @@ class RouteRedirector<T extends Enum> {
       result = result.replaceAll(replacement.key, replacement.value);
     }
 
-    return result;
+    // Ensure the result has a leading slash
+    return result.startsWith('/') ? result : '/$result';
   }
 }
