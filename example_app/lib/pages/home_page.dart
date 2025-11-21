@@ -2,6 +2,8 @@ import 'package:anyhoo_auth/cubit/auth_cubit.dart';
 import 'package:anyhoo_auth/widgets/login_widget.dart';
 import 'package:anyhoo_core/models/arguments.dart';
 import 'package:anyhoo_core/models/auth_user.dart';
+import 'package:anyhoo_core/widgets/error_page.dart';
+import 'package:anyhoo_core/widgets/waiting_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:example_app/models/example_user.dart';
 import 'package:example_app/models/example_user_converter.dart';
@@ -12,7 +14,7 @@ import 'package:example_app/services/mock_auth_service.dart';
 import 'package:example_app/services/mock_enhance_user_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'auth_demo_page.dart';
+import 'package:go_router/go_router.dart';
 import 'image_selector_demo_page.dart';
 
 /// Home page that serves as a navigation hub for package demos.
@@ -37,7 +39,7 @@ class HomePage extends StatelessWidget {
             description: 'Demonstrates authentication with custom user models',
             icon: Icons.login,
             onTap: () {
-              Navigator.push(context, MaterialPageRoute(builder: (_) => const AuthDemoPage()));
+              GoRouter.of(context).push('/auth');
             },
           ),
           const SizedBox(height: 16),
@@ -114,6 +116,73 @@ class HomePage extends StatelessWidget {
             icon: Icons.data_array,
             onTap: () {
               Navigator.push(context, MaterialPageRoute(builder: (_) => FirestoreDemoPage(firestore: firestore)));
+            },
+          ),
+          _DemoCard(
+            title: 'Route First Demo',
+            description: 'Demonstrates route first demo',
+            icon: Icons.route,
+            onTap: () {
+              GoRouter.of(context).push('/route-demo');
+            },
+          ),
+          const SizedBox(height: 16),
+          _DemoCard(
+            title: 'Error Page Demo',
+            description: 'Demonstrates error page',
+            icon: Icons.error,
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => Scaffold(
+                    appBar: AppBar(
+                      title: const Text('Error Page Demo'),
+                      actions: [
+                        IconButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          icon: const Icon(Icons.close),
+                        ),
+                      ],
+                    ),
+                    body: ErrorPage(
+                      errorMessage: 'Error message',
+                      detailedError:
+                          'Detailed error message. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+
+          const SizedBox(height: 16),
+          _DemoCard(
+            title: 'Waiting Page Demo',
+            description: 'Demonstrates waiting page',
+            icon: Icons.hourglass_empty,
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => Scaffold(
+                    appBar: AppBar(
+                      title: const Text('Waiting Page Demo'),
+                      actions: [
+                        IconButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          icon: const Icon(Icons.close),
+                        ),
+                      ],
+                    ),
+                    body: WaitingPage(message: 'Loading...'),
+                  ),
+                ),
+              );
             },
           ),
         ],

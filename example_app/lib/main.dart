@@ -1,8 +1,14 @@
 import 'package:anyhoo_core/arguments_parser.dart';
 import 'package:anyhoo_core/models/arguments.dart';
 import 'package:anyhoo_firebase/anyhoo_firebase.dart';
+import 'package:anyhoo_router/anyhoo_router.dart';
 import 'package:example_app/firebase_options.dart';
 import 'package:example_app/models/example_user_converter.dart';
+import 'package:example_app/routes/auth_page_route.dart';
+import 'package:example_app/routes/home_page_route.dart';
+import 'package:example_app/routes/redirecting_demo_route.dart';
+import 'package:example_app/routes/route_first_demo_route.dart';
+import 'package:example_app/routes/route_nested_demo_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:anyhoo_auth/anyhoo_auth.dart';
@@ -10,7 +16,6 @@ import 'package:logging/logging.dart';
 
 import 'models/example_user.dart';
 import 'services/mock_auth_service.dart';
-import 'pages/home_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,9 +30,7 @@ void main() async {
 
   final authService = createMockAuthService();
   final converter = ExampleUserConverter();
-  print('!! arguments: $arguments');
   final firebaseInitializer = FirebaseInitializer(arguments: arguments, hostIp: '192.168.87.21');
-  print('!! firebaseInitializer: $firebaseInitializer');
   await firebaseInitializer.initialize(DefaultFirebaseOptions.currentPlatform);
 
   runApp(
@@ -56,13 +59,20 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final routes = [
+      HomePageRoute(arguments: arguments, firestore: firebaseInitializer.getFirestore()),
+      AuthPageRoute(),
+      RouteFirstDemoRoute(),
+      RouteNestedDemoRoute(),
+      RouteRedirectingDemoRoute(),
+    ];
+
+    final appRouter = AnyhooRouter(routes: routes).getGoRouter();
     return BlocProvider(
       create: (_) => AuthCubit<ExampleUser>(authService: authService, converter: converter),
-      child: MaterialApp(
-        title: 'Anyhoo Packages Example',
-        theme: ThemeData(colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue), useMaterial3: true),
-        home: HomePage(arguments: arguments, firestore: firebaseInitializer.getFirestore()),
-      ),
+      child: MaterialApp.router(title: 'Example app', routerConfig: appRouter),
     );
   }
 }
+
+enum AnyhooRouteName { home, auth, routeFirstDemo, routeNestedDemo, routeRedirectingDemo }
