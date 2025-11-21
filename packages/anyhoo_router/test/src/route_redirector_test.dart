@@ -3,7 +3,6 @@ import 'package:anyhoo_auth/cubit/auth_state.dart';
 import 'package:anyhoo_core/models/auth_user.dart';
 import 'package:anyhoo_router/src/route_redirector.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:anyhoo_router/anyhoo_router.dart';
