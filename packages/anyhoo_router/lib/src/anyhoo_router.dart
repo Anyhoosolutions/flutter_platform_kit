@@ -2,7 +2,7 @@ import 'package:anyhoo_auth/cubit/auth_cubit.dart';
 import 'package:anyhoo_router/src/anyhoo_route.dart';
 import 'package:anyhoo_router/src/anyhoo_route_sorter.dart';
 import 'package:anyhoo_router/src/go_router_refresh_stream.dart';
-import 'package:anyhoo_router/src/route_redirecter.dart';
+import 'package:anyhoo_router/src/route_redirector.dart';
 import 'package:anyhoo_router/src/route_stack_observer.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -23,7 +23,7 @@ class AnyhooRouter<T extends Enum> {
   GoRouter getGoRouter() {
     final routeStackObserver = RouteStackObserver();
 
-    final redirectHelper = RouteRedirecter(routes: routes);
+    final redirectHelper = RouteRedirector(routes: routes);
 
     for (final page in routes) {
       _log.info('path: $page, redirect: ${page.redirect}');

@@ -6,16 +6,17 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart';
 
-final log = Logger('RedirectHelper');
+final log = Logger('RouteRedirector');
 
-class RouteRedirecter<T extends Enum> {
+class RouteRedirector<T extends Enum> {
   final List<AnyhooRoute<T>> routes;
   final AuthCubit? authCubit;
   final String? deepLinkSchemeName;
   final String? webDeepLinkHost;
   final String loginPath;
   final String initialPath;
-  RouteRedirecter({
+
+  RouteRedirector({
     required this.routes,
     this.authCubit,
     this.deepLinkSchemeName,

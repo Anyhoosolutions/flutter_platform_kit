@@ -1,3 +1,9 @@
+## 0.0.5
+
+* Add string extensions
+* Add an Error page
+* Add a waiting page
+
 ## 0.0.4
 
 * Fix docs
