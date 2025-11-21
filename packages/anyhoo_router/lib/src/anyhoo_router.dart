@@ -1,4 +1,5 @@
 import 'package:anyhoo_auth/cubit/auth_cubit.dart';
+import 'package:anyhoo_core/widgets/error_page.dart';
 import 'package:anyhoo_router/src/anyhoo_route.dart';
 import 'package:anyhoo_router/src/anyhoo_route_sorter.dart';
 import 'package:anyhoo_router/src/go_router_refresh_stream.dart';
@@ -48,8 +49,7 @@ class AnyhooRouter<T extends Enum> {
           routes: nestedRoutes,
         ),
       ],
-      errorBuilder: (context, state) =>
-          Scaffold(body: Center(child: Text('Error: ${state.error}'))), // TODO: Error page
+      errorBuilder: (context, state) => Scaffold(body: ErrorPage(errorMessage: 'Error: ${state.error}')),
     );
     GoRouter.optionURLReflectsImperativeAPIs = true;
     return router;

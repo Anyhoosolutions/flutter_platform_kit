@@ -93,7 +93,7 @@ class _ImageSelectorView extends StatelessWidget {
           final showStockPhotos = context.watch<ShowStockPhotosCubit>().state;
 
           if (imageSelectorState.isLoading) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator()); // TODO: Shimmer
           }
 
           if (showStockPhotos) {

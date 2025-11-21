@@ -94,7 +94,11 @@ class _EnhanceUserDemoPageState extends State<EnhanceUserDemoPage> {
                   },
             style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16)),
             child: isLoading
-                ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2))
+                ? const SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ) // TODO: Shimmer
                 : const Text('Login'),
           ),
         ],

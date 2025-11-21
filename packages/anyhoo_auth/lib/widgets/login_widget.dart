@@ -128,7 +128,7 @@ class _LoginWidgetState extends State<LoginWidget> {
                             ? const SizedBox(
                                 height: 20,
                                 width: 20,
-                                child: CircularProgressIndicator(), // TODO: WaitingView()
+                                child: CircularProgressIndicator(), // TODO: Shimmer
                               )
                             : Text(_isSignUp ? 'Create Account' : 'Sign In'),
                       ),
