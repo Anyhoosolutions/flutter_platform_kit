@@ -55,11 +55,11 @@ void main() {
   group('comparePath', () {
     test('can compare path for simple path', () {
       final redirector = RouteRedirector<AnyhooTestRouteName>(routes: []);
-      final route = DummyRoute();
 
-      final isMatch = redirector.comparePath('/', route.path);
+      final isMatch = redirector.comparePath('/', '/');
       expect(isMatch, true);
     });
+
     test('can compare path for :groupId in path', () {
       final redirector = RouteRedirector<AnyhooTestRouteName>(routes: []);
 
@@ -79,6 +79,34 @@ void main() {
 
       final isMatch = redirector.comparePath('/users/:userId/addresses/:addressId', '/users/34/addresses/56');
       expect(isMatch, true);
+    });
+  });
+
+  group('getPageByPath', () {
+    final routes = [
+      DummyRoute(path: '/'),
+      DummyRoute(path: '/users/:userId', title: 'Users'),
+      DummyRoute(path: '/users/:userId/addresses/:addressId', title: 'Addresses'),
+    ];
+    test('can get page by path for simple path', () {
+      final redirector = RouteRedirector<AnyhooTestRouteName>(routes: routes);
+
+      final route = redirector.getPageByPath('/');
+      expect(route, routes[0]);
+    });
+
+    test('can get page by path for :userId in path', () {
+      final redirector = RouteRedirector<AnyhooTestRouteName>(routes: routes);
+
+      final route = redirector.getPageByPath('/users/34');
+      expect(route, routes[1]);
+    });
+
+    test('can get page by path for :userId and :addressId in path', () {
+      final redirector = RouteRedirector<AnyhooTestRouteName>(routes: routes);
+
+      final route = redirector.getPageByPath('/users/34/addresses/56');
+      expect(route, routes[2]);
     });
   });
 }
@@ -111,4 +139,7 @@ class DummyRoute extends AnyhooRoute<AnyhooTestRouteName> {
 
   @override
   bool get requireLogin => false;
+
+  @override
+  String toString() => 'DummyRoute(path: $_path, title: $_title, routeName: $_routeName)';
 }
