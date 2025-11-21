@@ -1,6 +1,5 @@
 import 'package:anyhoo_router/src/route_redirector.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:anyhoo_router/anyhoo_router.dart';
@@ -50,6 +49,36 @@ void main() {
 
         expect(redirectPath, '/users/34/addresses/56/details');
       });
+    });
+  });
+
+  group('comparePath', () {
+    test('can compare path for simple path', () {
+      final redirector = RouteRedirector<AnyhooTestRouteName>(routes: []);
+      final route = DummyRoute();
+
+      final isMatch = redirector.comparePath('/', route.path);
+      expect(isMatch, true);
+    });
+    test('can compare path for :groupId in path', () {
+      final redirector = RouteRedirector<AnyhooTestRouteName>(routes: []);
+
+      final isMatch = redirector.comparePath('/groups/:groupId', '/groups/123');
+      expect(isMatch, true);
+    });
+
+    test('can compare path for :userId in path', () {
+      final redirector = RouteRedirector<AnyhooTestRouteName>(routes: []);
+
+      final isMatch = redirector.comparePath('/users/:userId', '/users/34');
+      expect(isMatch, true);
+    });
+
+    test('can compare path for multiple ids, :userId and :addressId in path', () {
+      final redirector = RouteRedirector<AnyhooTestRouteName>(routes: []);
+
+      final isMatch = redirector.comparePath('/users/:userId/addresses/:addressId', '/users/34/addresses/56');
+      expect(isMatch, true);
     });
   });
 }

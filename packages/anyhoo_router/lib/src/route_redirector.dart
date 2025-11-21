@@ -131,18 +131,28 @@ class RouteRedirector<T extends Enum> {
     uriPath = uriPath != '/' ? uriPath.stripRight('/') : uriPath;
     String normalizedPagePath = pagePath != '/' ? pagePath.stripRight('/') : pagePath;
 
-    // Create regex pattern by replacing path parameters with regex patterns
-    String pagePathRegex = normalizedPagePath.replaceAll(':groupId', '[^\\/]+');
-    pagePathRegex = pagePathRegex.replaceAll('/', '\\/');
-    pagePathRegex = "^$pagePathRegex\$";
+    // Extract path parameters (wildcards) from the page path
+    final pathParameters = normalizedPagePath.split('/').where((s) => s.startsWith(':')).toList();
 
-    // with regex see if it matches when :groupId can be any string
+    // If there are no parameters, do a simple string comparison
+    if (pathParameters.isEmpty) {
+      return normalizedPagePath == uriPath;
+    }
+
+    // Build a regex pattern by replacing each parameter with a regex pattern
+    String pagePathRegex = normalizedPagePath;
+    for (final pathParameter in pathParameters) {
+      pagePathRegex = pagePathRegex.replaceAll(pathParameter, '[^/]+');
+    }
+
+    // Escape forward slashes in the pattern
+    pagePathRegex = pagePathRegex.replaceAll('/', r'\/');
+    pagePathRegex = '^$pagePathRegex\$';
+
+    // Match the uri path against the pattern
     // ignore: deprecated_member_use
     final regex = RegExp(pagePathRegex);
-    if (regex.hasMatch(uriPath)) {
-      return true;
-    }
-    return normalizedPagePath == uriPath;
+    return regex.hasMatch(uriPath);
   }
 
   String? getRedirect(String originalPath, AnyhooRoute<T> route, String redirect) {
