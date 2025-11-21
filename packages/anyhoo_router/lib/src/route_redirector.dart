@@ -146,18 +146,54 @@ class RouteRedirector<T extends Enum> {
   }
 
   String? getRedirect(String originalPath, AnyhooRoute<T> route, String redirect) {
-    String? groupId; // TODO: Handle other path parameters
-    if (route.path.contains(':groupId')) {
-      final pattern = route.path.replaceAll(':groupId', '([^/]+)');
-      // ignore: deprecated_member_use
-      final match = RegExp(pattern).firstMatch(originalPath);
-      if (match != null) {
-        groupId = match.group(1);
+    // Normalize paths - ensure both have leading slashes for consistent matching
+    String normalizedRoutePath = route.path.startsWith('/') ? route.path : '/${route.path}';
+    String normalizedOriginalPath = originalPath;
+
+    // Extract path parameters (wildcards) from the route path
+    final pathParameters = normalizedRoutePath.split('/').where((s) => s.startsWith(':')).toList();
+
+    // If there are no parameters, just return the redirect path as-is
+    if (pathParameters.isEmpty) {
+      return redirect;
+    }
+
+    // Build a regex pattern by replacing each parameter with a capture group
+    String pattern = normalizedRoutePath;
+    for (final pathParameter in pathParameters) {
+      pattern = pattern.replaceAll(pathParameter, '([^/]+)');
+    }
+
+    // Escape forward slashes in the pattern
+    pattern = pattern.replaceAll('/', r'\/');
+    pattern = '^$pattern\$';
+
+    // Match the original path against the pattern
+    // ignore: deprecated_member_use
+    final regex = RegExp(pattern);
+    final match = regex.firstMatch(normalizedOriginalPath);
+
+    if (match == null) {
+      // If no match, return redirect as-is (shouldn't happen in normal flow)
+      return redirect;
+    }
+
+    // Extract captured values and map them to parameter names
+    final replacements = <String, String>{};
+    for (int i = 0; i < pathParameters.length; i++) {
+      final parameterName = pathParameters[i];
+      final capturedValue = match.group(i + 1); // group(0) is the full match
+      if (capturedValue != null) {
+        replacements[parameterName] = capturedValue;
       }
     }
-    if (groupId != null) {
-      redirect = redirect.replaceAll(':groupId', groupId);
+
+    // Replace all occurrences of each parameter in the redirect path
+    String result = redirect;
+    for (final replacement in replacements.entries) {
+      result = result.replaceAll(replacement.key, replacement.value);
     }
-    return redirect;
+
+    return result;
   }
 }
