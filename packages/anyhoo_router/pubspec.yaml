@@ -17,11 +17,13 @@ dependencies:
     path: ../anyhoo_auth
   anyhoo_core:
     path: ../anyhoo_core
+  flutter_bloc: ^9.1.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
+  mocktail: ^1.0.0
 
 flutter:
   generate: true

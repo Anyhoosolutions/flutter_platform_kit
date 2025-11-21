@@ -36,7 +36,7 @@ class RouteRedirector<T extends Enum> {
     final appRouterPage = getPageByPath(originalPath);
     // log.info('appRouterPage: ${appRouterPage?.routeName}');
 
-    final user = getUser(context);
+    final user = getUser();
     // Only check authentication if AuthBloc is available
     if (user == null) {
       if (appRouterPage != null && appRouterPage.requireLogin) {
@@ -46,7 +46,7 @@ class RouteRedirector<T extends Enum> {
       }
     } else {
       if (uri.path == loginPath) {
-        return redirecting(originalPath, '/');
+        return redirecting(originalPath, initialPath);
       }
     }
 
@@ -84,7 +84,7 @@ class RouteRedirector<T extends Enum> {
     }
     if (webDeepLinkHost != null) {
       // Handle web deep links
-      if (uri.scheme == 'https' && uri.host == webDeepLinkHost) {
+      if (uri.scheme == 'https' && uri.host.toLowerCase() == webDeepLinkHost?.toLowerCase()) {
         // Return the path as-is for web links
         return redirecting(originalPath, uri.path);
       }
@@ -111,12 +111,13 @@ class RouteRedirector<T extends Enum> {
     return redirectTo;
   }
 
-  AuthUser? getUser(BuildContext context) {
-    if (authCubit?.state.user is! AuthUser) {
+  AuthUser? getUser() {
+    final user = authCubit?.state.user;
+    if (user is! AuthUser) {
       return null;
     }
 
-    return authCubit?.state.user;
+    return user;
   }
 
   AnyhooRoute<T>? getPageByPath(String originalPath) {
