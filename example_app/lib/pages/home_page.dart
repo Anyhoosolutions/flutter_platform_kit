@@ -15,7 +15,6 @@ import 'package:example_app/services/mock_enhance_user_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'auth_demo_page.dart';
 import 'image_selector_demo_page.dart';
 
 /// Home page that serves as a navigation hub for package demos.
@@ -135,7 +134,26 @@ class HomePage extends StatelessWidget {
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => const ErrorPage(errorMessage: 'Error message')),
+                MaterialPageRoute(
+                  builder: (_) => Scaffold(
+                    appBar: AppBar(
+                      title: const Text('Error Page Demo'),
+                      actions: [
+                        IconButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          icon: const Icon(Icons.close),
+                        ),
+                      ],
+                    ),
+                    body: ErrorPage(
+                      errorMessage: 'Error message',
+                      detailedError:
+                          'Detailed error message. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+                    ),
+                  ),
+                ),
               );
             },
           ),
@@ -146,7 +164,25 @@ class HomePage extends StatelessWidget {
             description: 'Demonstrates waiting page',
             icon: Icons.hourglass_empty,
             onTap: () {
-              Navigator.push(context, MaterialPageRoute(builder: (_) => const WaitingPage(message: 'Loading...')));
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => Scaffold(
+                    appBar: AppBar(
+                      title: const Text('Waiting Page Demo'),
+                      actions: [
+                        IconButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          icon: const Icon(Icons.close),
+                        ),
+                      ],
+                    ),
+                    body: WaitingPage(message: 'Loading...'),
+                  ),
+                ),
+              );
             },
           ),
         ],

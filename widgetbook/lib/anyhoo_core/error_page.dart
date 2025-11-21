@@ -8,8 +8,8 @@ import 'package:widgetbook_workspace/helpers/wrap_in_mocks_helper.dart';
 
 @widgetbook.UseCase(name: 'ErrorPage', type: ErrorPage)
 Widget build(BuildContext context) {
-  final colorSchemeOptions = ['red', 'green', 'purple'];
-  final colorScheme = context.knobs.list(label: 'Color scheme', options: colorSchemeOptions, initialOption: 'red');
+  final colorSchemeOptions = ['green', 'purple', 'red'];
+  final colorScheme = context.knobs.list(label: 'Color scheme', options: colorSchemeOptions, initialOption: 'purple');
 
   final widget = Theme(
     data: ThemeData(colorScheme: getColorScheme(colorScheme)),
