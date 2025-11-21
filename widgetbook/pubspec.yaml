@@ -18,6 +18,8 @@ dependencies:
 
   image_selector:
     path: ../packages/image_selector
+  anyhoo_core:
+    path: ../packages/anyhoo_core
 
 dev_dependencies:
   flutter_test:

@@ -2,6 +2,8 @@ import 'package:anyhoo_auth/cubit/auth_cubit.dart';
 import 'package:anyhoo_auth/widgets/login_widget.dart';
 import 'package:anyhoo_core/models/arguments.dart';
 import 'package:anyhoo_core/models/auth_user.dart';
+import 'package:anyhoo_core/widgets/error_page.dart';
+import 'package:anyhoo_core/widgets/waiting_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:example_app/models/example_user.dart';
 import 'package:example_app/models/example_user_converter.dart';
@@ -123,6 +125,28 @@ class HomePage extends StatelessWidget {
             icon: Icons.route,
             onTap: () {
               GoRouter.of(context).push('/route-demo');
+            },
+          ),
+          const SizedBox(height: 16),
+          _DemoCard(
+            title: 'Error Page Demo',
+            description: 'Demonstrates error page',
+            icon: Icons.error,
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const ErrorPage(errorMessage: 'Error message')),
+              );
+            },
+          ),
+
+          const SizedBox(height: 16),
+          _DemoCard(
+            title: 'Waiting Page Demo',
+            description: 'Demonstrates waiting page',
+            icon: Icons.hourglass_empty,
+            onTap: () {
+              Navigator.push(context, MaterialPageRoute(builder: (_) => const WaitingPage(message: 'Loading...')));
             },
           ),
         ],
