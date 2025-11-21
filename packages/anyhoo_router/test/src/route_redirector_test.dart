@@ -211,7 +211,7 @@ class DummyRoute extends AnyhooRoute<AnyhooTestRouteName> {
     String title = 'Home',
     AnyhooTestRouteName routeName = AnyhooTestRouteName.home,
     bool requireLogin = true,
-    String? redirect = null,
+    String? redirect,
   }) : _path = path,
        _title = title,
        _routeName = routeName,

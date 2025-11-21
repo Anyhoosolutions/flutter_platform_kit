@@ -24,10 +24,7 @@ class _ErrorPageState extends State<ErrorPage> {
         data: ThemeData(colorScheme: colorScheme),
         child: Container(
           margin: const EdgeInsets.all(24),
-          constraints: BoxConstraints(
-            maxWidth: 400,
-            maxHeight: MediaQuery.sizeOf(context).height * 0.9,
-          ),
+          constraints: BoxConstraints(maxWidth: 400, maxHeight: MediaQuery.sizeOf(context).height * 0.9),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(16),
@@ -92,7 +89,7 @@ class _ErrorPageState extends State<ErrorPage> {
                                   _showDetails = value;
                                 });
                               },
-                              activeColor: colorScheme.primary,
+                              activeThumbColor: colorScheme.primary,
                             ),
                           ],
                         ),

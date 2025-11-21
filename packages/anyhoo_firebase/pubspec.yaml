@@ -19,6 +19,8 @@ dependencies:
   logging: ^1.3.0
   anyhoo_core:
     path: ../anyhoo_core
+  firebase_analytics: ^12.0.4
+  firebase_remote_config: ^6.1.2
 
 dev_dependencies:
   flutter_test:

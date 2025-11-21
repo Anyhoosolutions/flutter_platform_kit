@@ -1,11 +1,14 @@
 import 'package:anyhoo_core/models/arguments.dart';
+import 'package:anyhoo_core/widgets/error_display_widget.dart';
 import 'package:anyhoo_firebase/src/os_tool.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 
 class FirebaseInitializer {
@@ -67,24 +70,16 @@ class FirebaseInitializer {
       _firebaseApp = firebase;
 
       if (useFirebaseAuth) {
-        setupFirebaseAuth();
+        _setupFirebaseAuth();
       }
       if (useFirebaseFirestore) {
-        setupFirebaseFirestore();
+        _setupFirebaseFirestore();
       }
       if (useFirebaseStorage) {
-        setupFirebaseStorage();
+        _setupFirebaseStorage();
       }
 
-      _log.info('!! Waiting for Firebase to be initialized');
-      while (true) {
-        if (useFirebaseFirestore) {
-          if (_firestore != null) {
-            break;
-          }
-          await Future.delayed(const Duration(milliseconds: 100));
-        }
-      }
+      _setupErrorHandling();
 
       _log.info('!! Firebase initialized and setup');
     } catch (e, stackTrace) {
@@ -106,7 +101,7 @@ class FirebaseInitializer {
     }
   }
 
-  bool isEmulatorEnabled() {
+  bool _isEmulatorEnabled() {
     if (overrideUseFirebaseEmulator != null) {
       _log.info('Firebase emulator is ${overrideUseFirebaseEmulator! ? 'enabled' : 'disabled'}');
       return overrideUseFirebaseEmulator!;
@@ -116,7 +111,7 @@ class FirebaseInitializer {
     return isEnabled;
   }
 
-  Future<void> setupFirebaseAuth() async {
+  Future<void> _setupFirebaseAuth() async {
     _log.info('!! Setting up Firebase Auth');
     if (arguments.useFakeData) {
       _log.info('!! Using fake data, skipping Firebase Auth setup');
@@ -128,8 +123,8 @@ class FirebaseInitializer {
     }
     try {
       _auth = FirebaseAuth.instance;
-      if (isEmulatorEnabled()) {
-        final host = getHost();
+      if (_isEmulatorEnabled()) {
+        final host = _getHost();
         if (host != null) {
           _log.info('!! Configuring Auth emulator with host: $host, port: 9099');
           await _auth!.useAuthEmulator(host, 9099);
@@ -160,7 +155,7 @@ class FirebaseInitializer {
     return _auth!;
   }
 
-  Future<void> setupFirebaseFirestore() async {
+  Future<void> _setupFirebaseFirestore() async {
     _log.info('!! Setting up Firebase Firestore');
     if (arguments.useFakeData) {
       _log.info('!! Using fake data, skipping Firebase Firestore setup');
@@ -173,8 +168,8 @@ class FirebaseInitializer {
 
     try {
       _firestore = FirebaseFirestore.instance;
-      if (isEmulatorEnabled()) {
-        final host = getHost();
+      if (_isEmulatorEnabled()) {
+        final host = _getHost();
         if (host != null) {
           _firestore!.useFirestoreEmulator(host, 8080);
           _log.info('!! Successfully configured Firestore emulator');
@@ -198,7 +193,7 @@ class FirebaseInitializer {
     return _firestore!;
   }
 
-  String? getHost() {
+  String? _getHost() {
     if (hostIp == null) {
       _log.info("!! hostIp is null, using 'localhost'");
       return 'localhost';
@@ -234,7 +229,7 @@ class FirebaseInitializer {
     }
   }
 
-  Future<void> setupFirebaseStorage() async {
+  Future<void> _setupFirebaseStorage() async {
     _log.info('!! Setting up Firebase Storage');
     if (arguments.useFakeData) {
       _log.info('!! Using fake data, skipping Firebase Storage setup');
@@ -247,8 +242,8 @@ class FirebaseInitializer {
 
     try {
       _storage = FirebaseStorage.instance;
-      if (isEmulatorEnabled()) {
-        final host = getHost();
+      if (_isEmulatorEnabled()) {
+        final host = _getHost();
         if (host != null) {
           _storage!.useStorageEmulator(host, 9199);
           _log.info('!! Successfully configured Storage emulator');
@@ -270,5 +265,45 @@ class FirebaseInitializer {
       throw Exception('Storage not initialized');
     }
     return _storage!;
+  }
+
+  void _setupErrorHandling() async {
+    // Set up custom error widget builder to show detailed error information on screen
+    // This replaces the red error screen with a custom error display
+    ErrorWidget.builder = (FlutterErrorDetails errorDetails) {
+      _log.severe(
+        'ErrorWidget.builder caught error: ${errorDetails.exception}',
+        errorDetails.exception,
+        errorDetails.stack,
+      );
+      return ErrorDisplayWidget(errorDetails: errorDetails);
+    };
+
+    // Pass all uncaught asynchronous errors that aren't handled by the Flutter framework to Crashlytics
+    PlatformDispatcher.instance.onError = (error, stack) {
+      if (!kDebugMode && !kIsWeb) {
+        FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+      }
+      return true;
+    };
+
+    try {
+      if (kIsWeb) {
+        _log.info('XX Firebase Analytics disabled on web');
+      } else {
+        _log.info('XX Initializing Firebase Analytics...');
+        if (!kDebugMode) {
+          final analytics = FirebaseAnalytics.instance;
+          await analytics.setAnalyticsCollectionEnabled(true);
+          await analytics.setSessionTimeoutDuration(const Duration(minutes: 30));
+          await analytics.logAppOpen();
+          _log.info('XX Firebase Analytics initialized successfully');
+        } else {
+          _log.info('XX Firebase Analytics disabled in maestro test');
+        }
+      }
+    } catch (e) {
+      _log.severe('XX Failed to initialize Firebase Analytics: $e');
+    }
   }
 }
