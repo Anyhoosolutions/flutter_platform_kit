@@ -92,3 +92,12 @@ Can be used to automatically sign in when launching the app (should only be used
 
 For android/iOS: `userPassword`  
 --dart-define: `USER_PASSWORD`  
+
+##### bool useFirebaseAnalytics
+
+Can be used to specify if analytics should be used or not. Typically it is not being used in debug mode (kDebugMode), 
+but can be turned on for specific debugging purposes.
+
+For android/iOS: `useFirebaseAnalytics`  
+--dart-define: `USE_FIREBASE_ANALYTICS`  
+

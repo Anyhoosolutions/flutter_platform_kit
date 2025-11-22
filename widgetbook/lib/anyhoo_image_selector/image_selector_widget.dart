@@ -7,7 +7,7 @@ import 'package:widgetbook/widgetbook.dart';
 import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
 import 'package:widgetbook_workspace/helpers/wrap_in_mocks_helper.dart';
 
-@widgetbook.UseCase(name: 'Default', type: ImageSelectorWidget, path: 'image_selector')
+@widgetbook.UseCase(name: 'Default', type: ImageSelectorWidget, path: 'anyhoo_image_selector')
 Widget build(BuildContext context) {
   final colorSchemeOptions = ['red', 'green', 'purple'];
   final colorScheme = context.knobs.list(label: 'Color scheme', options: colorSchemeOptions, initialOption: 'red');

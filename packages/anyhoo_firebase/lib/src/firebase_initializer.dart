@@ -281,7 +281,7 @@ class FirebaseInitializer {
 
     // Pass all uncaught asynchronous errors that aren't handled by the Flutter framework to Crashlytics
     PlatformDispatcher.instance.onError = (error, stack) {
-      if (!kDebugMode && !kIsWeb) {
+      if ((!kDebugMode && !kIsWeb) || (arguments.useFirebaseAnalytics ?? false)) {
         FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
       }
       return true;
@@ -292,7 +292,7 @@ class FirebaseInitializer {
         _log.info('XX Firebase Analytics disabled on web');
       } else {
         _log.info('XX Initializing Firebase Analytics...');
-        if (!kDebugMode) {
+        if (!kDebugMode || (arguments.useFirebaseAnalytics ?? false)) {
           final analytics = FirebaseAnalytics.instance;
           await analytics.setAnalyticsCollectionEnabled(true);
           await analytics.setSessionTimeoutDuration(const Duration(minutes: 30));

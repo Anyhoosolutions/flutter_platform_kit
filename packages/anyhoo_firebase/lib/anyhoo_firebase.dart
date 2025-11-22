@@ -6,3 +6,4 @@ library anyhoo_firebase;
 
 export 'src/firebase_initializer.dart';
 export 'src/os_tool.dart';
+export 'src/widgets/firebase_analytics_page.dart';
