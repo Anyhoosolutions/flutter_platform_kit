@@ -6,7 +6,7 @@ import 'package:widgetbook/widgetbook.dart';
 import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
 import 'package:widgetbook_workspace/helpers/wrap_in_mocks_helper.dart';
 
-@widgetbook.UseCase(name: 'ErrorPage', type: ErrorPage)
+@widgetbook.UseCase(name: 'ErrorPage', type: ErrorPage, path: '/anyhoo_core')
 Widget build(BuildContext context) {
   final colorSchemeOptions = ['green', 'purple', 'red'];
   final colorScheme = context.knobs.list(label: 'Color scheme', options: colorSchemeOptions, initialOption: 'purple');
@@ -14,16 +14,12 @@ Widget build(BuildContext context) {
   final widget = Theme(
     data: ThemeData(colorScheme: getColorScheme(colorScheme)),
     child: Center(
-      child: SizedBox(
-        width: 300,
-        height: 400,
-        child: Stack(
-          children: [
-            // Simulating how it might be used in a real app - inside a Stack
-            // This could be a form page with other widgets stacked on top
-            ErrorPage(errorMessage: "Couldn't load the page", detailedError: "Detailed error message"),
-          ],
-        ),
+      child: Stack(
+        children: [
+          // Simulating how it might be used in a real app - inside a Stack
+          // This could be a form page with other widgets stacked on top
+          ErrorPage(errorMessage: "Couldn't load the page", detailedError: "Detailed error message"),
+        ],
       ),
     ),
   );

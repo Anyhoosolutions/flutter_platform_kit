@@ -20,6 +20,7 @@ sealed class Arguments with _$Arguments {
     @Default(false) bool loginAtStartup,
     @Default(null) String? userEmail,
     @Default(null) String? userPassword,
+    bool? useFirebaseAnalytics,
     bool? useFirebaseEmulator,
   }) = _Arguments;
 

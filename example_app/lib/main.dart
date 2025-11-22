@@ -4,6 +4,8 @@ import 'package:anyhoo_firebase/anyhoo_firebase.dart';
 import 'package:anyhoo_router/anyhoo_router.dart';
 import 'package:example_app/firebase_options.dart';
 import 'package:example_app/models/example_user_converter.dart';
+import 'package:example_app/pages/analytics_demo_route.dart';
+import 'package:example_app/routes/analytics_demo_route.dart';
 import 'package:example_app/routes/auth_page_route.dart';
 import 'package:example_app/routes/home_page_route.dart';
 import 'package:example_app/routes/redirecting_demo_route.dart';
@@ -65,6 +67,7 @@ class MyApp extends StatelessWidget {
       RouteFirstDemoRoute(),
       RouteNestedDemoRoute(),
       RouteRedirectingDemoRoute(),
+      AnalyticsDemoRoute(),
     ];
 
     final appRouter = AnyhooRouter(routes: routes).getGoRouter();
@@ -75,4 +78,4 @@ class MyApp extends StatelessWidget {
   }
 }
 
-enum AnyhooRouteName { home, auth, routeFirstDemo, routeNestedDemo, routeRedirectingDemo }
+enum AnyhooRouteName { home, auth, routeFirstDemo, routeNestedDemo, routeRedirectingDemo, analytics }

@@ -93,6 +93,15 @@ class HomePage extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           _DemoCard(
+            title: 'Analytics & Crashlytics Demo',
+            description: 'Demonstrates Firebase Analytics and Crashlytics',
+            icon: Icons.analytics,
+            onTap: () {
+              GoRouter.of(context).push('/analytics');
+            },
+          ),
+          const SizedBox(height: 16),
+          _DemoCard(
             title: 'Image Selector Demo',
             description: 'Demonstrates image selection from gallery, camera, or stock photos',
             icon: Icons.image,
@@ -118,6 +127,8 @@ class HomePage extends StatelessWidget {
               Navigator.push(context, MaterialPageRoute(builder: (_) => FirestoreDemoPage(firestore: firestore)));
             },
           ),
+          const SizedBox(height: 16),
+
           _DemoCard(
             title: 'Route First Demo',
             description: 'Demonstrates route first demo',
@@ -157,7 +168,6 @@ class HomePage extends StatelessWidget {
               );
             },
           ),
-
           const SizedBox(height: 16),
           _DemoCard(
             title: 'Waiting Page Demo',

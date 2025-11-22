@@ -1,31 +1,19 @@
 // ignore_for_file: deprecated_member_use
 
-import 'package:anyhoo_core/widgets/waiting_page.dart';
+import 'package:anyhoo_firebase/anyhoo_firebase.dart';
 import 'package:flutter/material.dart';
 import 'package:widgetbook/widgetbook.dart';
 import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
 import 'package:widgetbook_workspace/helpers/wrap_in_mocks_helper.dart';
 
-@widgetbook.UseCase(name: 'WaitingPage', type: WaitingPage, path: '/anyhoo_core')
+@widgetbook.UseCase(name: 'FirebaseAnalyticsPage', type: FirebaseAnalyticsPage, path: '/anyhoo_firebase')
 Widget build(BuildContext context) {
-  final colorSchemeOptions = ['red', 'green', 'purple'];
+  final colorSchemeOptions = ['green', 'purple', 'red'];
   final colorScheme = context.knobs.list(label: 'Color scheme', options: colorSchemeOptions, initialOption: 'purple');
 
   final widget = Theme(
     data: ThemeData(colorScheme: getColorScheme(colorScheme)),
-    child: Center(
-      child: SizedBox(
-        width: 300,
-        height: 400,
-        child: Stack(
-          children: [
-            // Simulating how it might be used in a real app - inside a Stack
-            // This could be a form page with other widgets stacked on top
-            WaitingPage(message: "Loading the page"),
-          ],
-        ),
-      ),
-    ),
+    child: FirebaseAnalyticsPage(),
   );
 
   return WrapInMocksHelper().wrapInMocks(context, widget);

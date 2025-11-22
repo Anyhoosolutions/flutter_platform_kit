@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 mixin _$Arguments implements DiagnosticableTreeMixin {
 
 // @Default(false) bool useTestDb,
- bool get useFakeData; bool get useDeviceEmulator; DateTime? get currentTime; String? get location; bool get enableDebugMode; bool get logoutAtStartup; bool get loginAtStartup; String? get userEmail; String? get userPassword; bool? get useFirebaseEmulator;
+ bool get useFakeData; bool get useDeviceEmulator; DateTime? get currentTime; String? get location; bool get logoutAtStartup; bool get loginAtStartup; String? get userEmail; String? get userPassword; bool? get useFirebaseAnalytics; bool? get useFirebaseEmulator;
 /// Create a copy of Arguments
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -27,21 +27,21 @@ $ArgumentsCopyWith<Arguments> get copyWith => _$ArgumentsCopyWithImpl<Arguments>
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
   properties
     ..add(DiagnosticsProperty('type', 'Arguments'))
-    ..add(DiagnosticsProperty('useFakeData', useFakeData))..add(DiagnosticsProperty('useDeviceEmulator', useDeviceEmulator))..add(DiagnosticsProperty('currentTime', currentTime))..add(DiagnosticsProperty('location', location))..add(DiagnosticsProperty('enableDebugMode', enableDebugMode))..add(DiagnosticsProperty('logoutAtStartup', logoutAtStartup))..add(DiagnosticsProperty('loginAtStartup', loginAtStartup))..add(DiagnosticsProperty('userEmail', userEmail))..add(DiagnosticsProperty('userPassword', userPassword))..add(DiagnosticsProperty('useFirebaseEmulator', useFirebaseEmulator));
+    ..add(DiagnosticsProperty('useFakeData', useFakeData))..add(DiagnosticsProperty('useDeviceEmulator', useDeviceEmulator))..add(DiagnosticsProperty('currentTime', currentTime))..add(DiagnosticsProperty('location', location))..add(DiagnosticsProperty('logoutAtStartup', logoutAtStartup))..add(DiagnosticsProperty('loginAtStartup', loginAtStartup))..add(DiagnosticsProperty('userEmail', userEmail))..add(DiagnosticsProperty('userPassword', userPassword))..add(DiagnosticsProperty('useFirebaseAnalytics', useFirebaseAnalytics))..add(DiagnosticsProperty('useFirebaseEmulator', useFirebaseEmulator));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Arguments&&(identical(other.useFakeData, useFakeData) || other.useFakeData == useFakeData)&&(identical(other.useDeviceEmulator, useDeviceEmulator) || other.useDeviceEmulator == useDeviceEmulator)&&(identical(other.currentTime, currentTime) || other.currentTime == currentTime)&&(identical(other.location, location) || other.location == location)&&(identical(other.enableDebugMode, enableDebugMode) || other.enableDebugMode == enableDebugMode)&&(identical(other.logoutAtStartup, logoutAtStartup) || other.logoutAtStartup == logoutAtStartup)&&(identical(other.loginAtStartup, loginAtStartup) || other.loginAtStartup == loginAtStartup)&&(identical(other.userEmail, userEmail) || other.userEmail == userEmail)&&(identical(other.userPassword, userPassword) || other.userPassword == userPassword)&&(identical(other.useFirebaseEmulator, useFirebaseEmulator) || other.useFirebaseEmulator == useFirebaseEmulator));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Arguments&&(identical(other.useFakeData, useFakeData) || other.useFakeData == useFakeData)&&(identical(other.useDeviceEmulator, useDeviceEmulator) || other.useDeviceEmulator == useDeviceEmulator)&&(identical(other.currentTime, currentTime) || other.currentTime == currentTime)&&(identical(other.location, location) || other.location == location)&&(identical(other.logoutAtStartup, logoutAtStartup) || other.logoutAtStartup == logoutAtStartup)&&(identical(other.loginAtStartup, loginAtStartup) || other.loginAtStartup == loginAtStartup)&&(identical(other.userEmail, userEmail) || other.userEmail == userEmail)&&(identical(other.userPassword, userPassword) || other.userPassword == userPassword)&&(identical(other.useFirebaseAnalytics, useFirebaseAnalytics) || other.useFirebaseAnalytics == useFirebaseAnalytics)&&(identical(other.useFirebaseEmulator, useFirebaseEmulator) || other.useFirebaseEmulator == useFirebaseEmulator));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,useFakeData,useDeviceEmulator,currentTime,location,enableDebugMode,logoutAtStartup,loginAtStartup,userEmail,userPassword,useFirebaseEmulator);
+int get hashCode => Object.hash(runtimeType,useFakeData,useDeviceEmulator,currentTime,location,logoutAtStartup,loginAtStartup,userEmail,userPassword,useFirebaseAnalytics,useFirebaseEmulator);
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'Arguments(useFakeData: $useFakeData, useDeviceEmulator: $useDeviceEmulator, currentTime: $currentTime, location: $location, enableDebugMode: $enableDebugMode, logoutAtStartup: $logoutAtStartup, loginAtStartup: $loginAtStartup, userEmail: $userEmail, userPassword: $userPassword, useFirebaseEmulator: $useFirebaseEmulator)';
+  return 'Arguments(useFakeData: $useFakeData, useDeviceEmulator: $useDeviceEmulator, currentTime: $currentTime, location: $location, logoutAtStartup: $logoutAtStartup, loginAtStartup: $loginAtStartup, userEmail: $userEmail, userPassword: $userPassword, useFirebaseAnalytics: $useFirebaseAnalytics, useFirebaseEmulator: $useFirebaseEmulator)';
 }
 
 
@@ -52,7 +52,7 @@ abstract mixin class $ArgumentsCopyWith<$Res>  {
   factory $ArgumentsCopyWith(Arguments value, $Res Function(Arguments) _then) = _$ArgumentsCopyWithImpl;
 @useResult
 $Res call({
- bool useFakeData, bool useDeviceEmulator, DateTime? currentTime, String? location, bool enableDebugMode, bool logoutAtStartup, bool loginAtStartup, String? userEmail, String? userPassword, bool? useFirebaseEmulator
+ bool useFakeData, bool useDeviceEmulator, DateTime? currentTime, String? location, bool logoutAtStartup, bool loginAtStartup, String? userEmail, String? userPassword, bool? useFirebaseAnalytics, bool? useFirebaseEmulator
 });
 
 
@@ -69,18 +69,18 @@ class _$ArgumentsCopyWithImpl<$Res>
 
 /// Create a copy of Arguments
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? useFakeData = null,Object? useDeviceEmulator = null,Object? currentTime = freezed,Object? location = freezed,Object? enableDebugMode = null,Object? logoutAtStartup = null,Object? loginAtStartup = null,Object? userEmail = freezed,Object? userPassword = freezed,Object? useFirebaseEmulator = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? useFakeData = null,Object? useDeviceEmulator = null,Object? currentTime = freezed,Object? location = freezed,Object? logoutAtStartup = null,Object? loginAtStartup = null,Object? userEmail = freezed,Object? userPassword = freezed,Object? useFirebaseAnalytics = freezed,Object? useFirebaseEmulator = freezed,}) {
   return _then(_self.copyWith(
 useFakeData: null == useFakeData ? _self.useFakeData : useFakeData // ignore: cast_nullable_to_non_nullable
 as bool,useDeviceEmulator: null == useDeviceEmulator ? _self.useDeviceEmulator : useDeviceEmulator // ignore: cast_nullable_to_non_nullable
 as bool,currentTime: freezed == currentTime ? _self.currentTime : currentTime // ignore: cast_nullable_to_non_nullable
 as DateTime?,location: freezed == location ? _self.location : location // ignore: cast_nullable_to_non_nullable
-as String?,enableDebugMode: null == enableDebugMode ? _self.enableDebugMode : enableDebugMode // ignore: cast_nullable_to_non_nullable
-as bool,logoutAtStartup: null == logoutAtStartup ? _self.logoutAtStartup : logoutAtStartup // ignore: cast_nullable_to_non_nullable
+as String?,logoutAtStartup: null == logoutAtStartup ? _self.logoutAtStartup : logoutAtStartup // ignore: cast_nullable_to_non_nullable
 as bool,loginAtStartup: null == loginAtStartup ? _self.loginAtStartup : loginAtStartup // ignore: cast_nullable_to_non_nullable
 as bool,userEmail: freezed == userEmail ? _self.userEmail : userEmail // ignore: cast_nullable_to_non_nullable
 as String?,userPassword: freezed == userPassword ? _self.userPassword : userPassword // ignore: cast_nullable_to_non_nullable
-as String?,useFirebaseEmulator: freezed == useFirebaseEmulator ? _self.useFirebaseEmulator : useFirebaseEmulator // ignore: cast_nullable_to_non_nullable
+as String?,useFirebaseAnalytics: freezed == useFirebaseAnalytics ? _self.useFirebaseAnalytics : useFirebaseAnalytics // ignore: cast_nullable_to_non_nullable
+as bool?,useFirebaseEmulator: freezed == useFirebaseEmulator ? _self.useFirebaseEmulator : useFirebaseEmulator // ignore: cast_nullable_to_non_nullable
 as bool?,
   ));
 }
@@ -163,10 +163,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( bool useFakeData,  bool useDeviceEmulator,  DateTime? currentTime,  String? location,  bool enableDebugMode,  bool logoutAtStartup,  bool loginAtStartup,  String? userEmail,  String? userPassword,  bool? useFirebaseEmulator)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( bool useFakeData,  bool useDeviceEmulator,  DateTime? currentTime,  String? location,  bool logoutAtStartup,  bool loginAtStartup,  String? userEmail,  String? userPassword,  bool? useFirebaseAnalytics,  bool? useFirebaseEmulator)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Arguments() when $default != null:
-return $default(_that.useFakeData,_that.useDeviceEmulator,_that.currentTime,_that.location,_that.enableDebugMode,_that.logoutAtStartup,_that.loginAtStartup,_that.userEmail,_that.userPassword,_that.useFirebaseEmulator);case _:
+return $default(_that.useFakeData,_that.useDeviceEmulator,_that.currentTime,_that.location,_that.logoutAtStartup,_that.loginAtStartup,_that.userEmail,_that.userPassword,_that.useFirebaseAnalytics,_that.useFirebaseEmulator);case _:
   return orElse();
 
 }
@@ -184,10 +184,10 @@ return $default(_that.useFakeData,_that.useDeviceEmulator,_that.currentTime,_tha
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( bool useFakeData,  bool useDeviceEmulator,  DateTime? currentTime,  String? location,  bool enableDebugMode,  bool logoutAtStartup,  bool loginAtStartup,  String? userEmail,  String? userPassword,  bool? useFirebaseEmulator)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( bool useFakeData,  bool useDeviceEmulator,  DateTime? currentTime,  String? location,  bool logoutAtStartup,  bool loginAtStartup,  String? userEmail,  String? userPassword,  bool? useFirebaseAnalytics,  bool? useFirebaseEmulator)  $default,) {final _that = this;
 switch (_that) {
 case _Arguments():
-return $default(_that.useFakeData,_that.useDeviceEmulator,_that.currentTime,_that.location,_that.enableDebugMode,_that.logoutAtStartup,_that.loginAtStartup,_that.userEmail,_that.userPassword,_that.useFirebaseEmulator);}
+return $default(_that.useFakeData,_that.useDeviceEmulator,_that.currentTime,_that.location,_that.logoutAtStartup,_that.loginAtStartup,_that.userEmail,_that.userPassword,_that.useFirebaseAnalytics,_that.useFirebaseEmulator);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -201,10 +201,10 @@ return $default(_that.useFakeData,_that.useDeviceEmulator,_that.currentTime,_tha
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( bool useFakeData,  bool useDeviceEmulator,  DateTime? currentTime,  String? location,  bool enableDebugMode,  bool logoutAtStartup,  bool loginAtStartup,  String? userEmail,  String? userPassword,  bool? useFirebaseEmulator)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( bool useFakeData,  bool useDeviceEmulator,  DateTime? currentTime,  String? location,  bool logoutAtStartup,  bool loginAtStartup,  String? userEmail,  String? userPassword,  bool? useFirebaseAnalytics,  bool? useFirebaseEmulator)?  $default,) {final _that = this;
 switch (_that) {
 case _Arguments() when $default != null:
-return $default(_that.useFakeData,_that.useDeviceEmulator,_that.currentTime,_that.location,_that.enableDebugMode,_that.logoutAtStartup,_that.loginAtStartup,_that.userEmail,_that.userPassword,_that.useFirebaseEmulator);case _:
+return $default(_that.useFakeData,_that.useDeviceEmulator,_that.currentTime,_that.location,_that.logoutAtStartup,_that.loginAtStartup,_that.userEmail,_that.userPassword,_that.useFirebaseAnalytics,_that.useFirebaseEmulator);case _:
   return null;
 
 }
@@ -216,7 +216,7 @@ return $default(_that.useFakeData,_that.useDeviceEmulator,_that.currentTime,_tha
 
 
 class _Arguments extends Arguments with DiagnosticableTreeMixin {
-  const _Arguments({this.useFakeData = false, this.useDeviceEmulator = false, this.currentTime = null, this.location = null, this.enableDebugMode = false, this.logoutAtStartup = false, this.loginAtStartup = false, this.userEmail = null, this.userPassword = null, this.useFirebaseEmulator}): super._();
+  const _Arguments({this.useFakeData = false, this.useDeviceEmulator = false, this.currentTime = null, this.location = null, this.logoutAtStartup = false, this.loginAtStartup = false, this.userEmail = null, this.userPassword = null, this.useFirebaseAnalytics, this.useFirebaseEmulator}): super._();
   
 
 // @Default(false) bool useTestDb,
@@ -224,11 +224,11 @@ class _Arguments extends Arguments with DiagnosticableTreeMixin {
 @override@JsonKey() final  bool useDeviceEmulator;
 @override@JsonKey() final  DateTime? currentTime;
 @override@JsonKey() final  String? location;
-@override@JsonKey() final  bool enableDebugMode;
 @override@JsonKey() final  bool logoutAtStartup;
 @override@JsonKey() final  bool loginAtStartup;
 @override@JsonKey() final  String? userEmail;
 @override@JsonKey() final  String? userPassword;
+@override final  bool? useFirebaseAnalytics;
 @override final  bool? useFirebaseEmulator;
 
 /// Create a copy of Arguments
@@ -242,21 +242,21 @@ _$ArgumentsCopyWith<_Arguments> get copyWith => __$ArgumentsCopyWithImpl<_Argume
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
   properties
     ..add(DiagnosticsProperty('type', 'Arguments'))
-    ..add(DiagnosticsProperty('useFakeData', useFakeData))..add(DiagnosticsProperty('useDeviceEmulator', useDeviceEmulator))..add(DiagnosticsProperty('currentTime', currentTime))..add(DiagnosticsProperty('location', location))..add(DiagnosticsProperty('enableDebugMode', enableDebugMode))..add(DiagnosticsProperty('logoutAtStartup', logoutAtStartup))..add(DiagnosticsProperty('loginAtStartup', loginAtStartup))..add(DiagnosticsProperty('userEmail', userEmail))..add(DiagnosticsProperty('userPassword', userPassword))..add(DiagnosticsProperty('useFirebaseEmulator', useFirebaseEmulator));
+    ..add(DiagnosticsProperty('useFakeData', useFakeData))..add(DiagnosticsProperty('useDeviceEmulator', useDeviceEmulator))..add(DiagnosticsProperty('currentTime', currentTime))..add(DiagnosticsProperty('location', location))..add(DiagnosticsProperty('logoutAtStartup', logoutAtStartup))..add(DiagnosticsProperty('loginAtStartup', loginAtStartup))..add(DiagnosticsProperty('userEmail', userEmail))..add(DiagnosticsProperty('userPassword', userPassword))..add(DiagnosticsProperty('useFirebaseAnalytics', useFirebaseAnalytics))..add(DiagnosticsProperty('useFirebaseEmulator', useFirebaseEmulator));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Arguments&&(identical(other.useFakeData, useFakeData) || other.useFakeData == useFakeData)&&(identical(other.useDeviceEmulator, useDeviceEmulator) || other.useDeviceEmulator == useDeviceEmulator)&&(identical(other.currentTime, currentTime) || other.currentTime == currentTime)&&(identical(other.location, location) || other.location == location)&&(identical(other.enableDebugMode, enableDebugMode) || other.enableDebugMode == enableDebugMode)&&(identical(other.logoutAtStartup, logoutAtStartup) || other.logoutAtStartup == logoutAtStartup)&&(identical(other.loginAtStartup, loginAtStartup) || other.loginAtStartup == loginAtStartup)&&(identical(other.userEmail, userEmail) || other.userEmail == userEmail)&&(identical(other.userPassword, userPassword) || other.userPassword == userPassword)&&(identical(other.useFirebaseEmulator, useFirebaseEmulator) || other.useFirebaseEmulator == useFirebaseEmulator));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Arguments&&(identical(other.useFakeData, useFakeData) || other.useFakeData == useFakeData)&&(identical(other.useDeviceEmulator, useDeviceEmulator) || other.useDeviceEmulator == useDeviceEmulator)&&(identical(other.currentTime, currentTime) || other.currentTime == currentTime)&&(identical(other.location, location) || other.location == location)&&(identical(other.logoutAtStartup, logoutAtStartup) || other.logoutAtStartup == logoutAtStartup)&&(identical(other.loginAtStartup, loginAtStartup) || other.loginAtStartup == loginAtStartup)&&(identical(other.userEmail, userEmail) || other.userEmail == userEmail)&&(identical(other.userPassword, userPassword) || other.userPassword == userPassword)&&(identical(other.useFirebaseAnalytics, useFirebaseAnalytics) || other.useFirebaseAnalytics == useFirebaseAnalytics)&&(identical(other.useFirebaseEmulator, useFirebaseEmulator) || other.useFirebaseEmulator == useFirebaseEmulator));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,useFakeData,useDeviceEmulator,currentTime,location,enableDebugMode,logoutAtStartup,loginAtStartup,userEmail,userPassword,useFirebaseEmulator);
+int get hashCode => Object.hash(runtimeType,useFakeData,useDeviceEmulator,currentTime,location,logoutAtStartup,loginAtStartup,userEmail,userPassword,useFirebaseAnalytics,useFirebaseEmulator);
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'Arguments(useFakeData: $useFakeData, useDeviceEmulator: $useDeviceEmulator, currentTime: $currentTime, location: $location, enableDebugMode: $enableDebugMode, logoutAtStartup: $logoutAtStartup, loginAtStartup: $loginAtStartup, userEmail: $userEmail, userPassword: $userPassword, useFirebaseEmulator: $useFirebaseEmulator)';
+  return 'Arguments(useFakeData: $useFakeData, useDeviceEmulator: $useDeviceEmulator, currentTime: $currentTime, location: $location, logoutAtStartup: $logoutAtStartup, loginAtStartup: $loginAtStartup, userEmail: $userEmail, userPassword: $userPassword, useFirebaseAnalytics: $useFirebaseAnalytics, useFirebaseEmulator: $useFirebaseEmulator)';
 }
 
 
@@ -267,7 +267,7 @@ abstract mixin class _$ArgumentsCopyWith<$Res> implements $ArgumentsCopyWith<$Re
   factory _$ArgumentsCopyWith(_Arguments value, $Res Function(_Arguments) _then) = __$ArgumentsCopyWithImpl;
 @override @useResult
 $Res call({
- bool useFakeData, bool useDeviceEmulator, DateTime? currentTime, String? location, bool enableDebugMode, bool logoutAtStartup, bool loginAtStartup, String? userEmail, String? userPassword, bool? useFirebaseEmulator
+ bool useFakeData, bool useDeviceEmulator, DateTime? currentTime, String? location, bool logoutAtStartup, bool loginAtStartup, String? userEmail, String? userPassword, bool? useFirebaseAnalytics, bool? useFirebaseEmulator
 });
 
 
@@ -284,18 +284,18 @@ class __$ArgumentsCopyWithImpl<$Res>
 
 /// Create a copy of Arguments
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? useFakeData = null,Object? useDeviceEmulator = null,Object? currentTime = freezed,Object? location = freezed,Object? enableDebugMode = null,Object? logoutAtStartup = null,Object? loginAtStartup = null,Object? userEmail = freezed,Object? userPassword = freezed,Object? useFirebaseEmulator = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? useFakeData = null,Object? useDeviceEmulator = null,Object? currentTime = freezed,Object? location = freezed,Object? logoutAtStartup = null,Object? loginAtStartup = null,Object? userEmail = freezed,Object? userPassword = freezed,Object? useFirebaseAnalytics = freezed,Object? useFirebaseEmulator = freezed,}) {
   return _then(_Arguments(
 useFakeData: null == useFakeData ? _self.useFakeData : useFakeData // ignore: cast_nullable_to_non_nullable
 as bool,useDeviceEmulator: null == useDeviceEmulator ? _self.useDeviceEmulator : useDeviceEmulator // ignore: cast_nullable_to_non_nullable
 as bool,currentTime: freezed == currentTime ? _self.currentTime : currentTime // ignore: cast_nullable_to_non_nullable
 as DateTime?,location: freezed == location ? _self.location : location // ignore: cast_nullable_to_non_nullable
-as String?,enableDebugMode: null == enableDebugMode ? _self.enableDebugMode : enableDebugMode // ignore: cast_nullable_to_non_nullable
-as bool,logoutAtStartup: null == logoutAtStartup ? _self.logoutAtStartup : logoutAtStartup // ignore: cast_nullable_to_non_nullable
+as String?,logoutAtStartup: null == logoutAtStartup ? _self.logoutAtStartup : logoutAtStartup // ignore: cast_nullable_to_non_nullable
 as bool,loginAtStartup: null == loginAtStartup ? _self.loginAtStartup : loginAtStartup // ignore: cast_nullable_to_non_nullable
 as bool,userEmail: freezed == userEmail ? _self.userEmail : userEmail // ignore: cast_nullable_to_non_nullable
 as String?,userPassword: freezed == userPassword ? _self.userPassword : userPassword // ignore: cast_nullable_to_non_nullable
-as String?,useFirebaseEmulator: freezed == useFirebaseEmulator ? _self.useFirebaseEmulator : useFirebaseEmulator // ignore: cast_nullable_to_non_nullable
+as String?,useFirebaseAnalytics: freezed == useFirebaseAnalytics ? _self.useFirebaseAnalytics : useFirebaseAnalytics // ignore: cast_nullable_to_non_nullable
+as bool?,useFirebaseEmulator: freezed == useFirebaseEmulator ? _self.useFirebaseEmulator : useFirebaseEmulator // ignore: cast_nullable_to_non_nullable
 as bool?,
   ));
 }

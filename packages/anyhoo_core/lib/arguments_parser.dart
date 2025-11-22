@@ -18,6 +18,7 @@ class ArgumentsParser {
       userPassword: await getUserPassword(fla),
       useFakeData: await getUseFakeData(fla),
       useFirebaseEmulator: await getUseFirebaseEmulator(fla),
+      useFirebaseAnalytics: await getUseFirebaseAnalytics(fla),
     );
     _log.info('!! Arguments: $arguments');
     _log.info('!! shouldUseFirebaseEmulator(): ${arguments.shouldUseFirebaseEmulator()}');
@@ -111,5 +112,16 @@ class ArgumentsParser {
       }
     }
     return useFirebaseEmulator;
+  }
+
+  static Future<bool?> getUseFirebaseAnalytics(FlutterLaunchArguments? fla) async {
+    var useFirebaseAnalytics = await fla?.getBool('useFirebaseAnalytics');
+    if (useFirebaseAnalytics == null) {
+      const tmp = String.fromEnvironment('USE_FIREBASE_ANALYTICS');
+      if (tmp.isNotEmpty) {
+        useFirebaseAnalytics = tmp == 'true';
+      }
+    }
+    return useFirebaseAnalytics;
   }
 }

@@ -1,3 +1,7 @@
+## 0.0.6
+
+* useFirebaseAnalytics in Arguments
+
 ## 0.0.5
 
 * Add string extensions
