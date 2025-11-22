@@ -10,12 +10,11 @@ class FirebaseRemoteConfigService implements RemoteConfigService {
   final _log = Logger('FirebaseRemoteConfigService');
 
   final RemoteConfigValues remoteConfigValues;
-  final Map<String, String> valuesToFetch;
 
   // Stream controller for config updates
   final _configUpdateController = StreamController<void>.broadcast();
 
-  FirebaseRemoteConfigService({required this.remoteConfigValues, required this.valuesToFetch});
+  FirebaseRemoteConfigService({required this.remoteConfigValues});
 
   @override
   Future<void> setupRemoteConfig() async {
@@ -47,7 +46,7 @@ class FirebaseRemoteConfigService implements RemoteConfigService {
   @override
   Future<void> getAll() async {
     final remoteConfig = FirebaseRemoteConfig.instance;
-    final allValues = remoteConfig.getAll();
+    final allValues = remoteConfig.getAll().map((key, value) => MapEntry(key, value.asString()));
     _log.info('All remote config: $allValues');
     remoteConfigValues.fromMap(allValues);
   }

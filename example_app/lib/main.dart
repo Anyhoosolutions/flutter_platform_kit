@@ -8,6 +8,7 @@ import 'package:example_app/routes/analytics_demo_route.dart';
 import 'package:example_app/routes/auth_page_route.dart';
 import 'package:example_app/routes/home_page_route.dart';
 import 'package:example_app/routes/redirecting_demo_route.dart';
+import 'package:example_app/routes/remote_config_demo_route.dart';
 import 'package:example_app/routes/route_first_demo_route.dart';
 import 'package:example_app/routes/route_nested_demo_route.dart';
 import 'package:flutter/material.dart';
@@ -67,6 +68,7 @@ class MyApp extends StatelessWidget {
       RouteNestedDemoRoute(),
       RouteRedirectingDemoRoute(),
       AnalyticsDemoRoute(),
+      RemoteConfigDemoRoute(),
     ];
 
     final appRouter = AnyhooRouter(routes: routes).getGoRouter();
@@ -77,4 +79,4 @@ class MyApp extends StatelessWidget {
   }
 }
 
-enum AnyhooRouteName { home, auth, routeFirstDemo, routeNestedDemo, routeRedirectingDemo, analytics }
+enum AnyhooRouteName { home, auth, routeFirstDemo, routeNestedDemo, routeRedirectingDemo, analytics, remoteConfig }

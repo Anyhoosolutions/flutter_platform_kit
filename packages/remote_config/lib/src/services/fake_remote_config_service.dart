@@ -14,18 +14,20 @@ class FakeRemoteConfigService implements RemoteConfigService {
   Stream<void> getConfigUpdatesStream() {
     return Stream.value(null);
   }
-
-  @override
-  RemoteConfigValues getRemoteConfigValues() {
-    return FakeRemoteConfigValues();
-  }
-
-  @override
-  Map<String, String> getLogConfigValues() {
-    return {};
-  }
 }
 
 class FakeRemoteConfigValues implements RemoteConfigValues {
   FakeRemoteConfigValues();
+  final Map<String, String> values = {};
+
+  @override
+  void fromMap(Map<String, dynamic> map) {
+    values.clear();
+    values.addAll(map.cast<String, String>());
+  }
+
+  @override
+  Map<String, dynamic> toMap() {
+    return values.cast<String, dynamic>();
+  }
 }
