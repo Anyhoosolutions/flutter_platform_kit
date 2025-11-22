@@ -5,8 +5,7 @@
 // ignore: unnecessary_library_name
 library remote_config;
 
-export 'src/calculator.dart';
-
-// Add exports for all public API files
-// export 'path/to/public_file1.dart';
-// export 'path/to/public_file2.dart';
+export 'src/interface/remote_config_values.dart';
+export 'src/services/remote_config_service.dart';
+export 'src/services/firebase_remote_config_service.dart';
+export 'src/services/fake_remote_config_service.dart';
