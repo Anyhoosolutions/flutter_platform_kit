@@ -78,6 +78,19 @@
 					"subpages": []
 				}
 			]
+		},
+		{
+			"filepath": "remote_config/README.md",
+			"name": "Remote Config",
+			"title": "Remote Config",
+			"subpages": [
+				{
+					"filepath": "remote_config/CHANGELOG.md",
+					"name": "Changelog",
+					"title": "Changelog",
+					"subpages": []
+				}
+			]
 		}
 	]
 }
