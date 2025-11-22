@@ -1,0 +1,24 @@
+name: remote_config
+description: "A package for managing remote config in a Flutter app."
+version: 0.0.1
+homepage: https://github.com/anyhoosolutions/flutter_platform_kit/tree/main/packages/remote_config
+publish_to: none
+
+environment:
+  sdk: ^3.10.0-290.4.beta
+  flutter: ">=1.17.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  firebase_remote_config: ^6.1.2
+  logging: ^1.3.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  generate: true
+  uses-material-design: true

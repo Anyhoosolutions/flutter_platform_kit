@@ -143,6 +143,7 @@ class FirebaseAnalyticsPage extends StatelessWidget {
           runZonedGuarded(() {
             Future<void>.delayed(const Duration(seconds: 2), () {
               final list = <int>[];
+              // ignore: avoid_print
               print(list[100]);
             });
           }, FirebaseCrashlytics.instance.recordError);

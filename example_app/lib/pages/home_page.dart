@@ -111,6 +111,15 @@ class HomePage extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           _DemoCard(
+            title: 'Remote Config Demo',
+            description: 'Demonstrates remote config',
+            icon: Icons.settings,
+            onTap: () {
+              GoRouter.of(context).push('/remote-config');
+            },
+          ),
+          const SizedBox(height: 16),
+          _DemoCard(
             title: 'Arguments Demo',
             description: 'Demonstrates arguments passed in when launching the app',
             icon: Icons.image,

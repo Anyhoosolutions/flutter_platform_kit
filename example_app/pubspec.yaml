@@ -26,6 +26,8 @@ dependencies:
     path: ../packages/anyhoo_firebase
   anyhoo_router:
     path: ../packages/anyhoo_router
+  remote_config:
+    path: ../packages/remote_config
 
   # Required dependencies
   flutter_bloc: ^9.1.0

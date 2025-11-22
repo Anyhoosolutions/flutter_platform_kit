@@ -22,6 +22,8 @@ dependencies:
     path: ../packages/anyhoo_core
   anyhoo_firebase:
     path: ../packages/anyhoo_firebase
+  remote_config:
+    path: ../packages/remote_config
 
 dev_dependencies:
   flutter_test:
