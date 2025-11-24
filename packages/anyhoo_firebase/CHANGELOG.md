@@ -1,3 +1,7 @@
+## 0.0.4
+
+* Revert to have references using path
+
 ## 0.0.3
 
 * Reference anyhoo_core using Git

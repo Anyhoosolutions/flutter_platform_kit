@@ -12,10 +12,7 @@ dependencies:
   flutter:
     sdk: flutter
   anyhoo_core:
-    git:
-      url: https://github.com/Anyhoosolutions/flutter_platform_kit.git
-      path: packages/anyhoo_core
-      ref: main_0.0.5
+    path: ../anyhoo_core
   flutter_bloc: ^9.1.0
   firebase_auth: ^6.1.2
   flutter_form_builder: ^10.2.0
