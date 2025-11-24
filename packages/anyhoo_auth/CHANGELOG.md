@@ -1,3 +1,7 @@
+## 0.0.5
+
+* Reference anyhoo_core using Git
+
 ## 0.0.4
 
 * Google sign in
