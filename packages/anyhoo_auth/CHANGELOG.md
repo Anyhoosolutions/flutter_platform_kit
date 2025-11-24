@@ -1,4 +1,8 @@
-## 0.0.3  
+## 0.0.4
+
+* Google sign in
+
+## 0.0.3
 
 * Adding support for a EnhanceUserService. It can, after the log in, lock up user data from e.g. Firestore
 * Adding a `FirebaseEnhanceUserService`
