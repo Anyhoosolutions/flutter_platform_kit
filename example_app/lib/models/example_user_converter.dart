@@ -7,7 +7,9 @@ import 'example_user.dart';
 class ExampleUserConverter implements UserConverter<ExampleUser> {
   @override
   ExampleUser fromJson(Map<String, dynamic> json) {
-    return ExampleUser.fromJson(json);
+    final values = {'name': json['name'] ?? 'No name at all', 'avatarUrl': json['photoURL'], ...json};
+
+    return ExampleUser.fromJson(values);
   }
 
   @override

@@ -1,6 +1,7 @@
 import 'package:anyhoo_auth/auth_service.dart';
 import 'package:anyhoo_auth/models/user_converter.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
@@ -27,16 +28,11 @@ class FirebaseAuthService extends AuthService {
     firebase_auth.FirebaseAuth? firebaseAuth,
   })  : _firebaseAuth = firebaseAuth ?? firebase_auth.FirebaseAuth.instance,
         super(
-          emailLoginFunction: _createLoginFunction(
-              firebaseAuth ?? firebase_auth.FirebaseAuth.instance),
-          logoutFunction: _createLogoutFunction(
-              firebaseAuth ?? firebase_auth.FirebaseAuth.instance),
-          refreshUserFunction: _createRefreshUserFunction(
-              firebaseAuth ?? firebase_auth.FirebaseAuth.instance),
-          googleLoginFunction: _createGoogleLoginFunction(
-              firebaseAuth ?? firebase_auth.FirebaseAuth.instance),
-          appleLoginFunction: _createAppleLoginFunction(
-              firebaseAuth ?? firebase_auth.FirebaseAuth.instance),
+          emailLoginFunction: _createLoginFunction(firebaseAuth ?? firebase_auth.FirebaseAuth.instance),
+          logoutFunction: _createLogoutFunction(firebaseAuth ?? firebase_auth.FirebaseAuth.instance),
+          refreshUserFunction: _createRefreshUserFunction(firebaseAuth ?? firebase_auth.FirebaseAuth.instance),
+          googleLoginFunction: _createGoogleLoginFunction(firebaseAuth ?? firebase_auth.FirebaseAuth.instance),
+          appleLoginFunction: _createAppleLoginFunction(firebaseAuth ?? firebase_auth.FirebaseAuth.instance),
         ) {
     // Listen to auth state changes and update current user
     _firebaseAuth.authStateChanges().listen((firebaseUser) {
@@ -50,8 +46,7 @@ class FirebaseAuthService extends AuthService {
   }
 
   /// Creates a login function that uses Firebase Authentication.
-  static Future<Map<String, dynamic>> Function(String, String)
-      _createLoginFunction(
+  static Future<Map<String, dynamic>> Function(String, String) _createLoginFunction(
     firebase_auth.FirebaseAuth firebaseAuth,
   ) {
     return (String email, String password) async {
@@ -94,41 +89,44 @@ class FirebaseAuthService extends AuthService {
   ) {
     return () async {
       try {
-        // Trigger the authentication flow
-        final googleSignIn = GoogleSignIn.instance;
-        // Ensure initialized (required in v7)
-        // We catch errors in case it's already initialized or fails, though usually it's idempotent.
-        // However, to be safe against "already initialized" if that's an error, we could wrap it.
-        // But standard practice is usually just to call it.
-        // If it throws, the outer try-catch will handle it, which might be confusing if it's just "already initialized".
-        // But documentation says "must call... before using".
-        // I'll assume it's safe.
-        // Note: initialize() returns Future<void> (or similar).
-        // We await it.
-        // But wait, if we are just logging in, maybe we don't need to re-initialize if already done?
-        // But we don't know if it's done.
-        // I'll just call it.
-        // Actually, I'll check if there is a way to check.
-        // No, I'll just call it.
-        await googleSignIn.initialize();
+        if (kIsWeb) {
+          // For web, check if we're returning from a redirect
+          final redirectResult = await firebaseAuth.getRedirectResult();
+          if (redirectResult.user != null) {
+            // User just returned from redirect, use that result
+            return _firebaseUserToMap(redirectResult.user!);
+          }
 
-        final googleUser = await googleSignIn.authenticate();
+          // Otherwise, initiate a new sign-in with redirect
+          final googleProvider = firebase_auth.GoogleAuthProvider();
+          await firebaseAuth.signInWithRedirect(googleProvider);
+          // The redirect will happen, and when the user returns,
+          // getRedirectResult() will be called again on the next page load
+          throw Exception('Google Sign-In redirect initiated. Please complete sign-in in the popup/redirect.');
+        } else {
+          // For mobile platforms (iOS/Android), use google_sign_in package
+          final googleSignIn = GoogleSignIn.instance;
 
-        // Obtain the auth details from the request
-        final googleAuth = googleUser.authentication;
+          // Initialize (required in v7)
+          await googleSignIn.initialize();
 
-        // Create a new credential
-        // In v7, accessToken is not available in authentication.
-        // We pass null for accessToken as idToken is sufficient for Firebase Auth identity.
-        final credential = firebase_auth.GoogleAuthProvider.credential(
-          accessToken: null,
-          idToken: googleAuth.idToken,
-        );
+          // Sign in using authenticate() method
+          final googleUser = await googleSignIn.authenticate();
 
-        // Once signed in, return the UserCredential
-        final userCredential =
-            await firebaseAuth.signInWithCredential(credential);
-        return _firebaseUserToMap(userCredential.user!);
+          // Obtain the auth details from the request
+          final googleAuth = googleUser.authentication;
+
+          // Create a new credential
+          // Note: In google_sign_in v7, accessToken may not be available
+          // Firebase Auth can work with just idToken for Google Sign-In
+          final credential = firebase_auth.GoogleAuthProvider.credential(
+            idToken: googleAuth.idToken,
+          );
+
+          // Once signed in, return the UserCredential
+          final userCredential = await firebaseAuth.signInWithCredential(credential);
+          return _firebaseUserToMap(userCredential.user!);
+        }
       } catch (e) {
         throw Exception('Google Sign-In failed: $e');
       }
@@ -153,15 +151,13 @@ class FirebaseAuthService extends AuthService {
         accessToken: appleCredential.authorizationCode,
       );
 
-      final userCredential =
-          await firebaseAuth.signInWithCredential(credential);
+      final userCredential = await firebaseAuth.signInWithCredential(credential);
       return _firebaseUserToMap(userCredential.user!);
     };
   }
 
   /// Converts a Firebase User to a Map that can be used by the converter.
-  static Map<String, dynamic> _firebaseUserToMap(
-      firebase_auth.User firebaseUser) {
+  static Map<String, dynamic> _firebaseUserToMap(firebase_auth.User firebaseUser) {
     return {
       'id': firebaseUser.uid,
       'email': firebaseUser.email ?? '',
@@ -171,8 +167,7 @@ class FirebaseAuthService extends AuthService {
       'phoneNumber': firebaseUser.phoneNumber,
       'metadata': {
         'creationTime': firebaseUser.metadata.creationTime?.toIso8601String(),
-        'lastSignInTime':
-            firebaseUser.metadata.lastSignInTime?.toIso8601String(),
+        'lastSignInTime': firebaseUser.metadata.lastSignInTime?.toIso8601String(),
       },
     };
   }

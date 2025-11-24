@@ -11,13 +11,14 @@ import 'package:example_app/routes/redirecting_demo_route.dart';
 import 'package:example_app/routes/remote_config_demo_route.dart';
 import 'package:example_app/routes/route_first_demo_route.dart';
 import 'package:example_app/routes/route_nested_demo_route.dart';
+import 'package:example_app/services/firebase_auth_service.dart' hide ExampleUserConverter;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:anyhoo_auth/anyhoo_auth.dart';
 import 'package:logging/logging.dart';
 
 import 'models/example_user.dart';
-import 'services/mock_auth_service.dart';
+// import 'services/mock_auth_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,9 +31,10 @@ void main() async {
 
   final arguments = await ArgumentsParser.getArguments();
 
-  final authService = createMockAuthService();
+  // final authService = createMockAuthService();
+  final authService = await createFirebaseAuthService();
   final converter = ExampleUserConverter();
-  final firebaseInitializer = FirebaseInitializer(arguments: arguments, hostIp: '192.168.87.21');
+  final firebaseInitializer = FirebaseInitializer(arguments: arguments, hostIp: '192.168.86.27');
   await firebaseInitializer.initialize(DefaultFirebaseOptions.currentPlatform);
 
   runApp(
