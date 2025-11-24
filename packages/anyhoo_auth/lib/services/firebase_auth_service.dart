@@ -1,6 +1,9 @@
-import 'package:anyhoo_auth/auth_service.dart';
+import 'package:anyhoo_auth/services/auth_service.dart';
 import 'package:anyhoo_auth/models/user_converter.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 /// Firebase implementation of [AuthService].
 ///
@@ -28,6 +31,8 @@ class FirebaseAuthService extends AuthService {
           emailLoginFunction: _createLoginFunction(firebaseAuth ?? firebase_auth.FirebaseAuth.instance),
           logoutFunction: _createLogoutFunction(firebaseAuth ?? firebase_auth.FirebaseAuth.instance),
           refreshUserFunction: _createRefreshUserFunction(firebaseAuth ?? firebase_auth.FirebaseAuth.instance),
+          googleLoginFunction: _createGoogleLoginFunction(firebaseAuth ?? firebase_auth.FirebaseAuth.instance),
+          appleLoginFunction: _createAppleLoginFunction(firebaseAuth ?? firebase_auth.FirebaseAuth.instance),
         ) {
     // Listen to auth state changes and update current user
     _firebaseAuth.authStateChanges().listen((firebaseUser) {
@@ -78,6 +83,79 @@ class FirebaseAuthService extends AuthService {
     };
   }
 
+  /// Creates a Google login function that uses Firebase Authentication.
+  static Future<Map<String, dynamic>> Function() _createGoogleLoginFunction(
+    firebase_auth.FirebaseAuth firebaseAuth,
+  ) {
+    return () async {
+      try {
+        if (kIsWeb) {
+          // For web, check if we're returning from a redirect
+          final redirectResult = await firebaseAuth.getRedirectResult();
+          if (redirectResult.user != null) {
+            // User just returned from redirect, use that result
+            return _firebaseUserToMap(redirectResult.user!);
+          }
+
+          // Otherwise, initiate a new sign-in with redirect
+          final googleProvider = firebase_auth.GoogleAuthProvider();
+          await firebaseAuth.signInWithRedirect(googleProvider);
+          // The redirect will happen, and when the user returns,
+          // getRedirectResult() will be called again on the next page load
+          throw Exception('Google Sign-In redirect initiated. Please complete sign-in in the popup/redirect.');
+        } else {
+          // For mobile platforms (iOS/Android), use google_sign_in package
+          final googleSignIn = GoogleSignIn.instance;
+
+          // Initialize (required in v7)
+          await googleSignIn.initialize();
+
+          // Sign in using authenticate() method
+          final googleUser = await googleSignIn.authenticate();
+
+          // Obtain the auth details from the request
+          final googleAuth = googleUser.authentication;
+
+          // Create a new credential
+          // Note: In google_sign_in v7, accessToken may not be available
+          // Firebase Auth can work with just idToken for Google Sign-In
+          final credential = firebase_auth.GoogleAuthProvider.credential(
+            idToken: googleAuth.idToken,
+          );
+
+          // Once signed in, return the UserCredential
+          final userCredential = await firebaseAuth.signInWithCredential(credential);
+          return _firebaseUserToMap(userCredential.user!);
+        }
+      } catch (e) {
+        throw Exception('Google Sign-In failed: $e');
+      }
+    };
+  }
+
+  /// Creates an Apple login function that uses Firebase Authentication.
+  static Future<Map<String, dynamic>> Function() _createAppleLoginFunction(
+    firebase_auth.FirebaseAuth firebaseAuth,
+  ) {
+    return () async {
+      final appleCredential = await SignInWithApple.getAppleIDCredential(
+        scopes: [
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ],
+      );
+
+      final oauthProvider = firebase_auth.OAuthProvider('apple.com');
+      final credential = oauthProvider.credential(
+        idToken: appleCredential.identityToken,
+        accessToken: appleCredential.authorizationCode,
+      );
+
+      final userCredential = await firebaseAuth.signInWithCredential(credential);
+      return _firebaseUserToMap(userCredential.user!);
+    };
+  }
+
   /// Converts a Firebase User to a Map that can be used by the converter.
   static Map<String, dynamic> _firebaseUserToMap(firebase_auth.User firebaseUser) {
     return {
@@ -100,42 +178,16 @@ class FirebaseAuthService extends AuthService {
   firebase_auth.FirebaseAuth get firebaseAuth => _firebaseAuth;
 
   /// Sign in with Google (requires additional setup with google_sign_in package).
-  ///
-  /// This is a placeholder - you'll need to implement Google Sign-In separately
-  /// and then call [setUser] with the converted user data.
-  ///
-  /// Example:
-  /// ```dart
-  /// final googleSignIn = GoogleSignIn();
-  /// final googleUser = await googleSignIn.signIn();
-  /// if (googleUser != null) {
-  ///   final googleAuth = await googleUser.authentication;
-  ///   final credential = GoogleAuthProvider.credential(
-  ///     accessToken: googleAuth.accessToken,
-  ///     idToken: googleAuth.idToken,
-  ///   );
-  ///   final firebaseCredential = await firebaseAuth.signInWithCredential(credential);
-  ///   // User will be automatically set via authStateChanges listener
-  /// }
-  /// ```
   Future<void> signInWithGoogle() async {
-    throw UnimplementedError(
-      'Google Sign-In requires additional setup. See documentation for implementation details.',
-    );
+    await loginWithGoogle();
   }
 
   /// Sign in with Apple (requires additional setup).
-  ///
-  /// This is a placeholder - you'll need to implement Apple Sign-In separately.
   Future<void> signInWithApple() async {
-    throw UnimplementedError(
-      'Apple Sign-In requires additional setup. See documentation for implementation details.',
-    );
+    await loginWithApple();
   }
 
-  /// Sign in with Apple (requires additional setup).
-  ///
-  /// This is a placeholder - you'll need to implement Apple Sign-In separately.
+  /// Sign in anonymously (requires additional setup).
   Future<void> signInAnonymously() async {
     throw UnimplementedError(
       'Anonymous Sign-In requires additional setup. See documentation for implementation details.',

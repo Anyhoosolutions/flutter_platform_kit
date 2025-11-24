@@ -1,7 +1,7 @@
-import 'package:anyhoo_auth/enhance_user_service.dart';
+import 'package:anyhoo_auth/services/enhance_user_service.dart';
 import 'package:anyhoo_auth/models/user_converter.dart';
 import 'package:anyhoo_core/anyhoo_core.dart';
-import 'package:anyhoo_auth/auth_service.dart';
+import 'package:anyhoo_auth/services/auth_service.dart';
 import 'package:anyhoo_auth/cubit/auth_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 

@@ -3,10 +3,10 @@
 - [ ] AppBar
 - [ ] BottomBar
 - [ ] Shimmer
-- [ ] RemoteConfig
+- [x] RemoteConfig
 - [ ] FormBuilderMultiSelect
 - [ ] FormBuilderSingleSelectWithAdd
 - [ ] Change user listener
 - [ ] Timezone / current time
 - [x] Arguments for running locally
-
+- [ ] Google sign in / Apple sign in
