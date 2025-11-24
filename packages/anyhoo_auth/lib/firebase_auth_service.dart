@@ -1,6 +1,8 @@
 import 'package:anyhoo_auth/auth_service.dart';
 import 'package:anyhoo_auth/models/user_converter.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 /// Firebase implementation of [AuthService].
 ///
@@ -28,6 +30,8 @@ class FirebaseAuthService extends AuthService {
           emailLoginFunction: _createLoginFunction(firebaseAuth ?? firebase_auth.FirebaseAuth.instance),
           logoutFunction: _createLogoutFunction(firebaseAuth ?? firebase_auth.FirebaseAuth.instance),
           refreshUserFunction: _createRefreshUserFunction(firebaseAuth ?? firebase_auth.FirebaseAuth.instance),
+          googleLoginFunction: _createGoogleLoginFunction(firebaseAuth ?? firebase_auth.FirebaseAuth.instance),
+          appleLoginFunction: _createAppleLoginFunction(firebaseAuth ?? firebase_auth.FirebaseAuth.instance),
         ) {
     // Listen to auth state changes and update current user
     _firebaseAuth.authStateChanges().listen((firebaseUser) {
@@ -78,6 +82,57 @@ class FirebaseAuthService extends AuthService {
     };
   }
 
+  /// Creates a Google login function that uses Firebase Authentication.
+  static Future<Map<String, dynamic>> Function() _createGoogleLoginFunction(
+    firebase_auth.FirebaseAuth firebaseAuth,
+  ) {
+    return () async {
+      // Trigger the authentication flow
+      final googleSignIn = GoogleSignIn();
+      final googleUser = await googleSignIn.signIn();
+
+      if (googleUser == null) {
+        throw Exception('Google Sign-In canceled by user');
+      }
+
+      // Obtain the auth details from the request
+      final googleAuth = await googleUser.authentication;
+
+      // Create a new credential
+      final credential = firebase_auth.GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      // Once signed in, return the UserCredential
+      final userCredential = await firebaseAuth.signInWithCredential(credential);
+      return _firebaseUserToMap(userCredential.user!);
+    };
+  }
+
+  /// Creates an Apple login function that uses Firebase Authentication.
+  static Future<Map<String, dynamic>> Function() _createAppleLoginFunction(
+    firebase_auth.FirebaseAuth firebaseAuth,
+  ) {
+    return () async {
+      final appleCredential = await SignInWithApple.getAppleIDCredential(
+        scopes: [
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ],
+      );
+
+      final oauthProvider = firebase_auth.OAuthProvider('apple.com');
+      final credential = oauthProvider.credential(
+        idToken: appleCredential.identityToken,
+        accessToken: appleCredential.authorizationCode,
+      );
+
+      final userCredential = await firebaseAuth.signInWithCredential(credential);
+      return _firebaseUserToMap(userCredential.user!);
+    };
+  }
+
   /// Converts a Firebase User to a Map that can be used by the converter.
   static Map<String, dynamic> _firebaseUserToMap(firebase_auth.User firebaseUser) {
     return {
@@ -100,42 +155,16 @@ class FirebaseAuthService extends AuthService {
   firebase_auth.FirebaseAuth get firebaseAuth => _firebaseAuth;
 
   /// Sign in with Google (requires additional setup with google_sign_in package).
-  ///
-  /// This is a placeholder - you'll need to implement Google Sign-In separately
-  /// and then call [setUser] with the converted user data.
-  ///
-  /// Example:
-  /// ```dart
-  /// final googleSignIn = GoogleSignIn();
-  /// final googleUser = await googleSignIn.signIn();
-  /// if (googleUser != null) {
-  ///   final googleAuth = await googleUser.authentication;
-  ///   final credential = GoogleAuthProvider.credential(
-  ///     accessToken: googleAuth.accessToken,
-  ///     idToken: googleAuth.idToken,
-  ///   );
-  ///   final firebaseCredential = await firebaseAuth.signInWithCredential(credential);
-  ///   // User will be automatically set via authStateChanges listener
-  /// }
-  /// ```
   Future<void> signInWithGoogle() async {
-    throw UnimplementedError(
-      'Google Sign-In requires additional setup. See documentation for implementation details.',
-    );
+    await loginWithGoogle();
   }
 
   /// Sign in with Apple (requires additional setup).
-  ///
-  /// This is a placeholder - you'll need to implement Apple Sign-In separately.
   Future<void> signInWithApple() async {
-    throw UnimplementedError(
-      'Apple Sign-In requires additional setup. See documentation for implementation details.',
-    );
+    await loginWithApple();
   }
 
-  /// Sign in with Apple (requires additional setup).
-  ///
-  /// This is a placeholder - you'll need to implement Apple Sign-In separately.
+  /// Sign in anonymously (requires additional setup).
   Future<void> signInAnonymously() async {
     throw UnimplementedError(
       'Anonymous Sign-In requires additional setup. See documentation for implementation details.',
