@@ -1,4 +1,4 @@
-import 'package:anyhoo_auth/auth_service.dart';
+import 'package:anyhoo_auth/services/auth_service.dart';
 import 'package:anyhoo_auth/models/user_converter.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:flutter/foundation.dart' show kIsWeb;

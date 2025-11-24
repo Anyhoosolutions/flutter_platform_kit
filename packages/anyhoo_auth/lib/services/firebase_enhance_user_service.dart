@@ -1,4 +1,4 @@
-import 'package:anyhoo_auth/enhance_user_service.dart';
+import 'package:anyhoo_auth/services/enhance_user_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class FirebaseEnhanceUserService extends EnhanceUserService {

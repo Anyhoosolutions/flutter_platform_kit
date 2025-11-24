@@ -1,4 +1,4 @@
-import 'package:anyhoo_auth/auth_service.dart';
+import 'package:anyhoo_auth/services/auth_service.dart';
 
 /// Mock implementation of [AuthService] for testing and development.
 ///
