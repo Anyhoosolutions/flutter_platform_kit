@@ -18,7 +18,10 @@ dependencies:
   firebase_crashlytics: ^5.0.5
   logging: ^1.3.0
   anyhoo_core:
-    path: ../anyhoo_core
+    git:
+      url: https://github.com/Anyhoosolutions/flutter_platform_kit.git
+      path: packages/anyhoo_core
+      ref: main_0.0.5
   firebase_analytics: ^12.0.4
   firebase_remote_config: ^6.1.2
 
