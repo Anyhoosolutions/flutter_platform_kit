@@ -7,14 +7,17 @@
       "type": "dart",
       "program": "example_app/lib/main.dart",
       "deviceId": "chrome",
-      "args": ["--dart-define=LOCATION=America/Boston", "--dart-define=CURRENT_TIME=2025-04-29T11:22:59.000Z"]
+      "args": [
+        "--dart-define=LOCATION=America/Boston",
+        "--dart-define=CURRENT_TIME=2025-04-29T11:22:59.000Z"
+      ]
     },
     {
       "name": "example_app (Android Emulator)",
       "request": "launch",
       "type": "dart",
       "program": "example_app/lib/main.dart",
-      "deviceId": "9B271FFBA0010W",
+      "deviceId": "emulator-5554",
       "args": []
     },
     {
@@ -27,4 +30,3 @@
     }
   ]
 }
-

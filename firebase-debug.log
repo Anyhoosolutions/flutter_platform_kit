@@ -66,3 +66,33 @@
 [debug] [2025-11-24T17:07:19.576Z] > authorizing via signed-in user (lidholm.andreas@gmail.com)
 [debug] [2025-11-24T17:07:20.114Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
 [debug] [2025-11-24T17:07:20.115Z] > authorizing via signed-in user (lidholm.andreas@gmail.com)
+[debug] [2025-11-24T17:17:45.162Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-11-24T17:17:45.163Z] > authorizing via signed-in user (lidholm.andreas@gmail.com)
+[debug] [2025-11-24T17:17:56.756Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-11-24T17:17:56.756Z] > authorizing via signed-in user (lidholm.andreas@gmail.com)
+[debug] [2025-11-24T17:17:57.378Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-11-24T17:17:57.378Z] > authorizing via signed-in user (lidholm.andreas@gmail.com)
+[debug] [2025-11-24T17:17:57.379Z] Checked if tokens are valid: true, expires at: 1764007637024
+[debug] [2025-11-24T17:17:57.379Z] Checked if tokens are valid: true, expires at: 1764007637024
+[debug] [2025-11-24T17:17:57.380Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects pageSize=1000
+[debug] [2025-11-24T17:17:58.004Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects 200
+[debug] [2025-11-24T17:17:58.004Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects [omitted]
+[debug] [2025-11-24T17:18:04.315Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-11-24T17:18:04.315Z] > authorizing via signed-in user (lidholm.andreas@gmail.com)
+[debug] [2025-11-24T17:18:04.875Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-11-24T17:18:04.876Z] > authorizing via signed-in user (lidholm.andreas@gmail.com)
+[debug] [2025-11-24T17:18:04.876Z] Checked if tokens are valid: true, expires at: 1764007637024
+[debug] [2025-11-24T17:18:04.877Z] Checked if tokens are valid: true, expires at: 1764007637024
+[debug] [2025-11-24T17:18:04.877Z] >>> [apiv2][query] GET https://cloudresourcemanager.googleapis.com/v1/projects/flutterplatformkit [none]
+[debug] [2025-11-24T17:18:05.183Z] <<< [apiv2][status] GET https://cloudresourcemanager.googleapis.com/v1/projects/flutterplatformkit 200
+[debug] [2025-11-24T17:18:05.184Z] <<< [apiv2][body] GET https://cloudresourcemanager.googleapis.com/v1/projects/flutterplatformkit {"projectNumber":"366512631366","projectId":"flutterplatformkit","lifecycleState":"ACTIVE","name":"flutterplatformkit","labels":{"firebase":"enabled","firebase-core":"disabled"},"createTime":"2025-11-20T17:00:47.363809Z"}
+[info] Now using project flutterplatformkit
+[debug] [2025-11-24T17:18:13.749Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-11-24T17:18:13.749Z] > authorizing via signed-in user (lidholm.andreas@gmail.com)
+[debug] [2025-11-24T17:18:14.359Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-11-24T17:18:14.360Z] > authorizing via signed-in user (lidholm.andreas@gmail.com)
+[debug] [2025-11-24T17:18:14.360Z] Checked if tokens are valid: true, expires at: 1764007637024
+[debug] [2025-11-24T17:18:14.360Z] Checked if tokens are valid: true, expires at: 1764007637024
+[debug] [2025-11-24T17:18:14.361Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/flutterplatformkit/androidApps pageSize=100
+[debug] [2025-11-24T17:18:14.585Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/flutterplatformkit/androidApps 200
+[debug] [2025-11-24T17:18:14.585Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/flutterplatformkit/androidApps {"apps":[{"name":"projects/flutterplatformkit/androidApps/1:366512631366:android:dcce44f8481bea08d22447","appId":"1:366512631366:android:dcce44f8481bea08d22447","displayName":"example_app (android)","projectId":"flutterplatformkit","packageName":"com.example.example_app","apiKeyId":"3ed5450d-d272-4a25-a09d-0effc62e15e7","state":"ACTIVE","expireTime":"1970-01-01T00:00:00Z","etag":"1_6cb21c1c-ef32-490a-9fe6-2a386f844018"}]}
