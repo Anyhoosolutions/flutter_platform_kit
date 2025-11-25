@@ -1,3 +1,7 @@
+## 0.0.7
+
+* Change class names
+
 ## 0.0.6
 
 * useFirebaseAnalytics in Arguments

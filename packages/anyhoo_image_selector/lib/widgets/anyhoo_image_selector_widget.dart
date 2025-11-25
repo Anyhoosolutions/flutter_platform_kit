@@ -17,7 +17,7 @@ const emptyIconTotalSize = 100.0;
 const horizontalSplitSpacing = 16.0;
 const horizontalSplitPadding = 16.0;
 
-class ImageSelectorWidget extends StatelessWidget {
+class AnyhooImageSelectorWidget extends StatelessWidget {
   // Callback when a file is selected
   final ValueChanged<SelectedImage>? onImageSelected;
   final List<String> stockAssetPaths;
@@ -25,7 +25,7 @@ class ImageSelectorWidget extends StatelessWidget {
   final bool roundImage;
   final LayoutType layoutType;
 
-  const ImageSelectorWidget({
+  const AnyhooImageSelectorWidget({
     super.key,
     this.onImageSelected,
     this.stockAssetPaths = const [],
