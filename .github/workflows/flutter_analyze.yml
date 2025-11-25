@@ -20,7 +20,7 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: "3.35.6"
+          # flutter-version: "3.38.0"
           channel: "stable"
 
       - name: Show Flutter version
@@ -31,12 +31,17 @@ jobs:
         uses: actions/cache@v3
         with:
           path: |
-            .pub-cache/bin
-            .pub-cache/global_packages
-            .pub-cache/hosted
-            .dart_tool
-            .packages
+            ~/.pub-cache
+            **/.dart_tool
           key: ${{ runner.os }}-flutter-${{ hashFiles('**/pubspec.yaml') }}
+
+      - name: Get dependencies
+        run: |
+          for package in packages/*/; do
+            cd $package
+            flutter pub get
+            cd ../..
+          done
 
       - name: Run "flutter analyze" in each package
         run: |
