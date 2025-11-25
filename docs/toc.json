@@ -67,12 +67,12 @@
 				}]
 		},
 		{
-			"filepath": "image_selector/README.md",
-			"name": "Image Selector",
-			"title": "Image Selector",
+			"filepath": "anyhoo_image_selector/README.md",
+			"name": "Anyhoo Image Selector",
+			"title": "Anyhoo Image Selector",
 			"subpages": [
 				{
-					"filepath": "image_selector/CHANGELOG.md",
+					"filepath": "anyhoo_image_selector/CHANGELOG.md",
 					"name": "Changelog",
 					"title": "Changelog",
 					"subpages": []
