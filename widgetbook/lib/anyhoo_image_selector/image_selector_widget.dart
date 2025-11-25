@@ -1,13 +1,13 @@
 // ignore_for_file: deprecated_member_use
 
-import 'package:image_selector/layout_type.dart';
-import 'package:image_selector/widgets/image_selector_widget.dart';
+import 'package:anyhoo_image_selector/layout_type.dart';
+import 'package:anyhoo_image_selector/widgets/anyhoo_image_selector_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:widgetbook/widgetbook.dart';
 import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
 import 'package:widgetbook_workspace/helpers/wrap_in_mocks_helper.dart';
 
-@widgetbook.UseCase(name: 'Default', type: ImageSelectorWidget, path: 'anyhoo_image_selector')
+@widgetbook.UseCase(name: 'Default', type: AnyhooImageSelectorWidget, path: 'anyhoo_image_selector')
 Widget build(BuildContext context) {
   final colorSchemeOptions = ['red', 'green', 'purple'];
   final colorScheme = context.knobs.list(label: 'Color scheme', options: colorSchemeOptions, initialOption: 'red');
@@ -37,7 +37,7 @@ Widget build(BuildContext context) {
           children: [
             // Simulating how it might be used in a real app - inside a Stack
             // This could be a form page with other widgets stacked on top
-            ImageSelectorWidget(
+            AnyhooImageSelectorWidget(
               layoutType: LayoutType.values.firstWhere((e) => e.name == layoutType),
               preselectedImage: image,
               onImageSelected: (selectedImage) {

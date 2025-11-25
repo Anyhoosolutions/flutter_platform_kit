@@ -1,5 +1,7 @@
+import 'package:anyhoo_image_selector/layout_type.dart';
+import 'package:anyhoo_image_selector/widgets/anyhoo_image_selector_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:image_selector/image_selector.dart';
+import 'package:anyhoo_image_selector/selected_image.dart';
 
 /// Demo page showing image selector functionality.
 class ImageSelectorDemoPage extends StatefulWidget {
@@ -34,9 +36,9 @@ class _ImageSelectorDemoPageState extends State<ImageSelectorDemoPage> {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 32),
-            ImageSelectorWidget(
+            AnyhooImageSelectorWidget(
               stockAssetPaths: _stockPhotos,
-              layoutType: LayoutType.horizontalSplit,
+              layoutType: LayoutType.verticalStack,
               roundImage: false,
               onImageSelected: (image) {
                 setState(() {
