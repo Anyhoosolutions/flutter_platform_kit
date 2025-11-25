@@ -1,10 +1,10 @@
-import 'package:anyhoo_auth/cubit/auth_cubit.dart';
+import 'package:anyhoo_auth/cubit/anyhoo_auth_cubit.dart';
 import 'package:anyhoo_core/widgets/error_page.dart';
 import 'package:anyhoo_router/src/anyhoo_route.dart';
 import 'package:anyhoo_router/src/anyhoo_route_sorter.dart';
 import 'package:anyhoo_router/src/go_router_refresh_stream.dart';
-import 'package:anyhoo_router/src/route_redirector.dart';
-import 'package:anyhoo_router/src/route_stack_observer.dart';
+import 'package:anyhoo_router/src/anyhoo_route_redirector.dart';
+import 'package:anyhoo_router/src/anyhoo_route_stack_observer.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart';
@@ -15,16 +15,16 @@ class AnyhooRouter<T extends Enum> {
   final List<AnyhooRoute<T>> routes;
   final List<RouteBase> nestedRoutes;
   // final AnyhooRouteSorter<T> _routeSorter;
-  final AuthCubit? authCubit;
+  final AnyhooAuthCubit? authCubit;
 
   AnyhooRouter({required this.routes, AnyhooRouteSorter<T>? routeSorter, this.authCubit})
     // : _routeSorter = routeSorter ?? AnyhooRouteSorter<T>(routes),
     : nestedRoutes = (routeSorter ?? AnyhooRouteSorter<T>(routes)).getRoutes();
 
   GoRouter getGoRouter() {
-    final routeStackObserver = RouteStackObserver();
+    final routeStackObserver = AnyhooRouteStackObserver();
 
-    final redirectHelper = RouteRedirector(routes: routes);
+    final redirectHelper = AnyhooRouteRedirector(routes: routes);
 
     for (final page in routes) {
       _log.info('path: $page, redirect: ${page.redirect}');

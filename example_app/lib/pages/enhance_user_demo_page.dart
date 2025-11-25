@@ -26,7 +26,7 @@ class _EnhanceUserDemoPageState extends State<EnhanceUserDemoPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Auth Demo')),
-      body: BlocListener<AuthCubit<ExampleUser>, AuthState<ExampleUser>>(
+      body: BlocListener<AnyhooAuthCubit<ExampleUser>, AnyhooAuthState<ExampleUser>>(
         listener: (context, state) {
           if (state.errorMessage != null) {
             ScaffoldMessenger.of(
@@ -34,7 +34,7 @@ class _EnhanceUserDemoPageState extends State<EnhanceUserDemoPage> {
             ).showSnackBar(SnackBar(content: Text(state.errorMessage!), backgroundColor: Colors.red));
           }
         },
-        child: BlocBuilder<AuthCubit<ExampleUser>, AuthState<ExampleUser>>(
+        child: BlocBuilder<AnyhooAuthCubit<ExampleUser>, AnyhooAuthState<ExampleUser>>(
           builder: (context, state) {
             if (state.isAuthenticated) {
               return _buildAuthenticatedView(context, state.user!);
@@ -90,7 +90,7 @@ class _EnhanceUserDemoPageState extends State<EnhanceUserDemoPage> {
             onPressed: isLoading
                 ? null
                 : () {
-                    context.read<AuthCubit<ExampleUser>>().login(_emailController.text, _passwordController.text);
+                    context.read<AnyhooAuthCubit<ExampleUser>>().login(_emailController.text, _passwordController.text);
                   },
             style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16)),
             child: isLoading
@@ -135,7 +135,7 @@ class _EnhanceUserDemoPageState extends State<EnhanceUserDemoPage> {
           const SizedBox(height: 24),
           ElevatedButton.icon(
             onPressed: () {
-              context.read<AuthCubit<ExampleUser>>().refreshUser();
+              context.read<AnyhooAuthCubit<ExampleUser>>().refreshUser();
             },
             icon: const Icon(Icons.refresh),
             label: const Text('Refresh User'),
@@ -144,7 +144,7 @@ class _EnhanceUserDemoPageState extends State<EnhanceUserDemoPage> {
           const SizedBox(height: 16),
           OutlinedButton.icon(
             onPressed: () {
-              context.read<AuthCubit<ExampleUser>>().logout();
+              context.read<AnyhooAuthCubit<ExampleUser>>().logout();
             },
             icon: const Icon(Icons.logout),
             label: const Text('Logout'),

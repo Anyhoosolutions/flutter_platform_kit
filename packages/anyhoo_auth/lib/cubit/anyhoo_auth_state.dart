@@ -1,7 +1,7 @@
 import 'package:anyhoo_core/anyhoo_core.dart';
 
 /// State for authentication.
-class AuthState<T extends AuthUser> {
+class AnyhooAuthState<T extends AnyhooUser> {
   /// Current authenticated user, null if not logged in.
   final T? user;
 
@@ -11,7 +11,7 @@ class AuthState<T extends AuthUser> {
   /// Error message if an operation failed, null otherwise.
   final String? errorMessage;
 
-  const AuthState({
+  const AnyhooAuthState({
     this.user,
     this.isLoading = false,
     this.errorMessage,
@@ -21,13 +21,13 @@ class AuthState<T extends AuthUser> {
   bool get isAuthenticated => user != null;
 
   /// Create a copy of this state with updated values.
-  AuthState<T> copyWith({
+  AnyhooAuthState<T> copyWith({
     T? user,
     bool? isLoading,
     String? errorMessage,
     bool clearError = false,
   }) {
-    return AuthState<T>(
+    return AnyhooAuthState<T>(
       user: user ?? this.user,
       isLoading: isLoading ?? this.isLoading,
       errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),

@@ -1,6 +1,6 @@
-import 'package:anyhoo_auth/cubit/auth_cubit.dart';
-import 'package:anyhoo_auth/cubit/auth_state.dart';
-import 'package:anyhoo_core/models/auth_user.dart';
+import 'package:anyhoo_auth/cubit/anyhoo_auth_cubit.dart';
+import 'package:anyhoo_auth/cubit/anyhoo_auth_state.dart';
+import 'package:anyhoo_core/anyhoo_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
@@ -29,9 +29,9 @@ class _LoginWidgetState extends State<LoginWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<AuthCubit, AuthState>(
+    return BlocListener<AnyhooAuthCubit, AnyhooAuthState>(
       listener: (context, state) {
-        if (state is AuthUser) {
+        if (state is AnyhooUser) {
           // Navigate to main app or show success
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -305,9 +305,9 @@ class _LoginWidgetState extends State<LoginWidget> {
 
       try {
         if (_isSignUp) {
-          context.read<AuthCubit>().login(email, password); // TODO: Create account
+          context.read<AnyhooAuthCubit>().login(email, password); // TODO: Create account
         } else {
-          context.read<AuthCubit>().login(email, password);
+          context.read<AnyhooAuthCubit>().login(email, password);
         }
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -330,7 +330,7 @@ class _LoginWidgetState extends State<LoginWidget> {
     });
 
     try {
-      context.read<AuthCubit>().loginWithGoogle();
+      context.read<AnyhooAuthCubit>().loginWithGoogle();
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -351,7 +351,7 @@ class _LoginWidgetState extends State<LoginWidget> {
     });
 
     try {
-      context.read<AuthCubit>().loginWithApple();
+      context.read<AnyhooAuthCubit>().loginWithApple();
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -372,7 +372,7 @@ class _LoginWidgetState extends State<LoginWidget> {
     });
 
     try {
-      context.read<AuthCubit>().loginWithAnonymous();
+      context.read<AnyhooAuthCubit>().loginWithAnonymous();
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

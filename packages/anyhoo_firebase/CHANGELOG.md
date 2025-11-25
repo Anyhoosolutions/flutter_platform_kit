@@ -1,3 +1,7 @@
+## 0.0.5
+
+* Change class names
+
 ## 0.0.4
 
 * Revert to have references using path

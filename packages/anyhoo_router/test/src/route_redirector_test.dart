@@ -1,7 +1,7 @@
-import 'package:anyhoo_auth/cubit/auth_cubit.dart';
-import 'package:anyhoo_auth/cubit/auth_state.dart';
-import 'package:anyhoo_core/models/auth_user.dart';
-import 'package:anyhoo_router/src/route_redirector.dart';
+import 'package:anyhoo_auth/cubit/anyhoo_auth_cubit.dart';
+import 'package:anyhoo_auth/cubit/anyhoo_auth_state.dart';
+import 'package:anyhoo_core/models/anyhoo_user.dart';
+import 'package:anyhoo_router/src/anyhoo_route_redirector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -15,7 +15,7 @@ void main() {
   group('RouteRedirector', () {
     group('getRedirect', () {
       test('can redirect for simple path', () {
-        final redirector = RouteRedirector<AnyhooTestRouteName>(routes: []);
+        final redirector = AnyhooRouteRedirector<AnyhooTestRouteName>(routes: []);
         final route = DummyRoute();
 
         final redirectPath = redirector.getRedirect('/', route, '/next');
@@ -24,7 +24,7 @@ void main() {
       });
 
       test('can redirect for :groupId in path', () {
-        final redirector = RouteRedirector<AnyhooTestRouteName>(routes: []);
+        final redirector = AnyhooRouteRedirector<AnyhooTestRouteName>(routes: []);
         final route = DummyRoute(path: 'groups/:groupId');
 
         final redirectPath = redirector.getRedirect('/groups/123', route, '/groups/:groupId/details');
@@ -33,7 +33,7 @@ void main() {
       });
 
       test('can redirect for :userId in path', () {
-        final redirector = RouteRedirector<AnyhooTestRouteName>(routes: []);
+        final redirector = AnyhooRouteRedirector<AnyhooTestRouteName>(routes: []);
         final route = DummyRoute(path: 'users/:userId');
 
         final redirectPath = redirector.getRedirect('/users/34', route, '/users/:userId/details');
@@ -42,7 +42,7 @@ void main() {
       });
 
       test('can redirect for multiple ids, :userId and :addressId in path', () {
-        final redirector = RouteRedirector<AnyhooTestRouteName>(routes: []);
+        final redirector = AnyhooRouteRedirector<AnyhooTestRouteName>(routes: []);
         final route = DummyRoute(path: 'users/:userId/addresses/:addressId');
 
         final redirectPath = redirector.getRedirect(
@@ -58,28 +58,28 @@ void main() {
 
   group('comparePath', () {
     test('can compare path for simple path', () {
-      final redirector = RouteRedirector<AnyhooTestRouteName>(routes: []);
+      final redirector = AnyhooRouteRedirector<AnyhooTestRouteName>(routes: []);
 
       final isMatch = redirector.comparePath('/', '/');
       expect(isMatch, true);
     });
 
     test('can compare path for :groupId in path', () {
-      final redirector = RouteRedirector<AnyhooTestRouteName>(routes: []);
+      final redirector = AnyhooRouteRedirector<AnyhooTestRouteName>(routes: []);
 
       final isMatch = redirector.comparePath('/groups/:groupId', '/groups/123');
       expect(isMatch, true);
     });
 
     test('can compare path for :userId in path', () {
-      final redirector = RouteRedirector<AnyhooTestRouteName>(routes: []);
+      final redirector = AnyhooRouteRedirector<AnyhooTestRouteName>(routes: []);
 
       final isMatch = redirector.comparePath('/users/:userId', '/users/34');
       expect(isMatch, true);
     });
 
     test('can compare path for multiple ids, :userId and :addressId in path', () {
-      final redirector = RouteRedirector<AnyhooTestRouteName>(routes: []);
+      final redirector = AnyhooRouteRedirector<AnyhooTestRouteName>(routes: []);
 
       final isMatch = redirector.comparePath('/users/:userId/addresses/:addressId', '/users/34/addresses/56');
       expect(isMatch, true);
@@ -93,21 +93,21 @@ void main() {
       DummyRoute(path: '/users/:userId/addresses/:addressId', title: 'Addresses'),
     ];
     test('can get page by path for simple path', () {
-      final redirector = RouteRedirector<AnyhooTestRouteName>(routes: routes);
+      final redirector = AnyhooRouteRedirector<AnyhooTestRouteName>(routes: routes);
 
       final route = redirector.getPageByPath('/');
       expect(route, routes[0]);
     });
 
     test('can get page by path for :userId in path', () {
-      final redirector = RouteRedirector<AnyhooTestRouteName>(routes: routes);
+      final redirector = AnyhooRouteRedirector<AnyhooTestRouteName>(routes: routes);
 
       final route = redirector.getPageByPath('/users/34');
       expect(route, routes[1]);
     });
 
     test('can get page by path for :userId and :addressId in path', () {
-      final redirector = RouteRedirector<AnyhooTestRouteName>(routes: routes);
+      final redirector = AnyhooRouteRedirector<AnyhooTestRouteName>(routes: routes);
 
       final route = redirector.getPageByPath('/users/34/addresses/56');
       expect(route, routes[2]);
@@ -126,10 +126,10 @@ void main() {
     final state = MockState();
     final user = TestUser(id: '123', email: 'test@test.com');
     final authCubit = MockAuthCubit();
-    final authState = AuthState<TestUser>(user: user);
+    final authState = AnyhooAuthState<TestUser>(user: user);
 
     test('do not have to redirect, when not logged in but does not require login', () {
-      final redirector = RouteRedirector<AnyhooTestRouteName>(routes: routes);
+      final redirector = AnyhooRouteRedirector<AnyhooTestRouteName>(routes: routes);
       when(() => state.uri).thenReturn(Uri.parse('/'));
 
       final redirectPath = redirector.redirect(context, state);
@@ -137,7 +137,7 @@ void main() {
     });
 
     test('does redirect to login, when not logged in but requires login', () {
-      final redirector = RouteRedirector<AnyhooTestRouteName>(routes: routes);
+      final redirector = AnyhooRouteRedirector<AnyhooTestRouteName>(routes: routes);
       when(() => state.uri).thenReturn(Uri.parse('/users/123'));
 
       final redirectPath = redirector.redirect(context, state);
@@ -145,7 +145,7 @@ void main() {
     });
 
     test('does redirect to /, when logged in and on login page', () {
-      final redirector = RouteRedirector<AnyhooTestRouteName>(routes: routes, authCubit: authCubit);
+      final redirector = AnyhooRouteRedirector<AnyhooTestRouteName>(routes: routes, authCubit: authCubit);
       when(() => state.uri).thenReturn(Uri.parse('/login'));
       when(() => authCubit.state).thenReturn(authState);
 
@@ -154,7 +154,7 @@ void main() {
     });
 
     test('does not redirect when logged in and on a page that requires login', () {
-      final redirector = RouteRedirector<AnyhooTestRouteName>(routes: routes, authCubit: authCubit);
+      final redirector = AnyhooRouteRedirector<AnyhooTestRouteName>(routes: routes, authCubit: authCubit);
       when(() => state.uri).thenReturn(Uri.parse('/users/123'));
       when(() => authCubit.state).thenReturn(authState);
 
@@ -163,7 +163,7 @@ void main() {
     });
 
     test('does redirect for deep link', () {
-      final redirector = RouteRedirector<AnyhooTestRouteName>(
+      final redirector = AnyhooRouteRedirector<AnyhooTestRouteName>(
         routes: routes,
         authCubit: authCubit,
         deepLinkSchemeName: 'myapp',
@@ -176,7 +176,7 @@ void main() {
     });
 
     test('does redirect for https deep link', () {
-      final redirector = RouteRedirector<AnyhooTestRouteName>(
+      final redirector = AnyhooRouteRedirector<AnyhooTestRouteName>(
         routes: routes,
         authCubit: authCubit,
         webDeepLinkHost: 'myapp.com',
@@ -189,7 +189,7 @@ void main() {
     });
 
     test('does redirect for https deep link', () {
-      final redirector = RouteRedirector<AnyhooTestRouteName>(routes: routes, authCubit: authCubit);
+      final redirector = AnyhooRouteRedirector<AnyhooTestRouteName>(routes: routes, authCubit: authCubit);
       when(() => state.uri).thenReturn(Uri.parse('/profiles'));
       when(() => authCubit.state).thenReturn(authState);
 
@@ -203,7 +203,7 @@ class MockContext extends Mock implements BuildContext {}
 
 class MockState extends Mock implements GoRouterState {}
 
-class MockAuthCubit extends Mock implements AuthCubit<TestUser> {}
+class MockAuthCubit extends Mock implements AnyhooAuthCubit<TestUser> {}
 
 class DummyRoute extends AnyhooRoute<AnyhooTestRouteName> {
   DummyRoute({
@@ -247,7 +247,7 @@ class DummyRoute extends AnyhooRoute<AnyhooTestRouteName> {
   String toString() => 'DummyRoute(path: $_path, title: $_title, routeName: $_routeName)';
 }
 
-class TestUser extends AuthUser {
+class TestUser extends AnyhooUser {
   @override
   final String id;
   @override

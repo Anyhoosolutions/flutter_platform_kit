@@ -3,7 +3,7 @@ import 'package:anyhoo_core/anyhoo_core.dart';
 /// Example user model for the demo app.
 ///
 /// This demonstrates how apps can extend AuthUser with their own fields.
-class ExampleUser extends AuthUser {
+class ExampleUser extends AnyhooUser {
   @override
   final String id;
   @override

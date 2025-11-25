@@ -1,3 +1,7 @@
+## 0.0.6
+
+* Change class names
+
 ## 0.0.5  
 
 Fixing copying CHANGELOG.md

@@ -1,8 +1,8 @@
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:image_selector/layout_type.dart';
-import 'package:image_selector/selected_image.dart';
+import 'package:anyhoo_image_selector/layout_type.dart';
+import 'package:anyhoo_image_selector/selected_image.dart';
 import 'package:flutter/material.dart';
-import 'package:image_selector/widgets/image_selector_widget.dart';
+import 'package:anyhoo_image_selector/widgets/anyhoo_image_selector_widget.dart';
 
 class FormImageSelector extends StatelessWidget {
   final List<String> stockAssetPaths;
@@ -31,7 +31,7 @@ class FormImageSelector extends StatelessWidget {
         name: fieldName,
         initialValue: initialValue,
         builder: (field) {
-          return ImageSelectorWidget(
+          return AnyhooImageSelectorWidget(
             onImageSelected: (image) {
               field.didChange(image);
             },

@@ -4,7 +4,7 @@ import 'example_user.dart';
 /// Converter for ExampleUser.
 ///
 /// This demonstrates how apps implement UserConverter for their custom user type.
-class ExampleUserConverter implements UserConverter<ExampleUser> {
+class ExampleUserConverter implements AnyhooUserConverter<ExampleUser> {
   @override
   ExampleUser fromJson(Map<String, dynamic> json) {
     final values = {'name': json['name'] ?? 'No name at all', 'avatarUrl': json['photoURL'], ...json};

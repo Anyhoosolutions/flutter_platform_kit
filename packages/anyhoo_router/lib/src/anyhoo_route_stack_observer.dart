@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class RouteStackObserver extends NavigatorObserver {
+class AnyhooRouteStackObserver extends NavigatorObserver {
   final List<Route<dynamic>> routeStack = [];
   final List<String> routeStackNames = [];
 

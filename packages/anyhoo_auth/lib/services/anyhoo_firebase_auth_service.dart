@@ -1,11 +1,11 @@
-import 'package:anyhoo_auth/services/auth_service.dart';
-import 'package:anyhoo_auth/models/user_converter.dart';
+import 'package:anyhoo_auth/services/anyhoo_auth_service.dart';
+import 'package:anyhoo_auth/models/anyhoo_user_converter.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
-/// Firebase implementation of [AuthService].
+/// Firebase implementation of [AnyhooAuthService].
 ///
 /// Provides a ready-to-use authentication service that integrates with Firebase Authentication.
 /// Handles email/password login, logout, user refresh, and listens to auth state changes.
@@ -16,15 +16,15 @@ import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 ///   converter: MyAppUserConverter(),
 /// );
 /// ```
-class FirebaseAuthService extends AuthService {
+class AnyhooFirebaseAuthService extends AnyhooAuthService {
   final firebase_auth.FirebaseAuth _firebaseAuth;
 
   /// Creates a Firebase authentication service.
   ///
   /// [converter] is required to convert Firebase user data to your app's user model.
   /// [firebaseAuth] is optional - defaults to [FirebaseAuth.instance].
-  FirebaseAuthService({
-    required UserConverter converter,
+  AnyhooFirebaseAuthService({
+    required AnyhooUserConverter converter,
     firebase_auth.FirebaseAuth? firebaseAuth,
   })  : _firebaseAuth = firebaseAuth ?? firebase_auth.FirebaseAuth.instance,
         super(

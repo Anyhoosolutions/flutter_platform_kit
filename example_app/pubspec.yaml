@@ -20,8 +20,8 @@ dependencies:
     path: ../packages/anyhoo_core
   anyhoo_auth:
     path: ../packages/anyhoo_auth
-  image_selector:
-    path: ../packages/image_selector
+  anyhoo_image_selector:
+    path: ../packages/anyhoo_image_selector
   anyhoo_firebase:
     path: ../packages/anyhoo_firebase
   anyhoo_router:

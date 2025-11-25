@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'package:image_selector/cubit/image_selector_state.dart';
+import 'package:anyhoo_image_selector/cubit/image_selector_state.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
