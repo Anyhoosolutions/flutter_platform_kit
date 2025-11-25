@@ -1,0 +1,26 @@
+name: Check Version
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  check-version:
+    name: Flutter analyze
+    runs-on: ubuntu-latest
+
+    # Skip if PR title contains "WIP: "
+    if: ${{ !contains(github.event.pull_request.title, 'WIP') }}
+
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+
+      - name: Run "flutter analyze" in each package
+        run: |
+          for package in packages/*/; do
+            cd $package
+            flutter analyze
+            cd ../..
+          done
