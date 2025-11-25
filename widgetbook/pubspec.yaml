@@ -24,6 +24,8 @@ dependencies:
     path: ../packages/anyhoo_firebase
   remote_config:
     path: ../packages/remote_config
+  anyhoo_shimmer:
+    path: ../packages/anyhoo_shimmer
 
 dev_dependencies:
   flutter_test:

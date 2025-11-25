@@ -72,7 +72,7 @@ class _AnyhooAppBarState extends State<AnyhooAppBar> {
       pinned: true,
       leading: _getBackButton(context),
       actions: _getActionButtons(),
-      flexibleSpace: DefaultShimmer(
+      flexibleSpace: AnyhooShimmer(
         child: FlexibleSpaceBar(centerTitle: true, title: _getTitle(), background: _getBackgroundImage()),
       ),
     );
