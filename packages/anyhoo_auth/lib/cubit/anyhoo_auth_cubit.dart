@@ -1,13 +1,13 @@
-import 'package:anyhoo_auth/services/enhance_user_service.dart';
-import 'package:anyhoo_auth/models/user_converter.dart';
+import 'package:anyhoo_auth/services/anyhoo_enhance_user_service.dart';
+import 'package:anyhoo_auth/models/anyhoo_user_converter.dart';
 import 'package:anyhoo_core/anyhoo_core.dart';
-import 'package:anyhoo_auth/services/auth_service.dart';
-import 'package:anyhoo_auth/cubit/auth_state.dart';
+import 'package:anyhoo_auth/services/anyhoo_auth_service.dart';
+import 'package:anyhoo_auth/cubit/anyhoo_auth_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 /// Cubit for managing authentication state.
 ///
-/// Provides a reactive interface to the [AuthService] using BLoC pattern.
+/// Provides a reactive interface to the [AnyhooAuthService] using BLoC pattern.
 ///
 /// Example:
 /// ```dart
@@ -21,14 +21,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 ///   child: YourWidget(),
 /// )
 /// ```
-class AuthCubit<T extends AuthUser> extends Cubit<AuthState<T>> {
-  final AuthService authService;
-  final UserConverter<T> converter;
-  final EnhanceUserService? enhanceUserService;
+class AnyhooAuthCubit<T extends AnyhooUser> extends Cubit<AnyhooAuthState<T>> {
+  final AnyhooAuthService authService;
+  final AnyhooUserConverter<T> converter;
+  final AnyhooEnhanceUserService? enhanceUserService;
 
-  AuthCubit({required this.authService, required this.converter, this.enhanceUserService})
-      : super(
-            AuthState<T>(user: authService.currentUser == null ? null : converter.fromJson(authService.currentUser!)));
+  AnyhooAuthCubit({required this.authService, required this.converter, this.enhanceUserService})
+      : super(AnyhooAuthState<T>(
+            user: authService.currentUser == null ? null : converter.fromJson(authService.currentUser!)));
 
   /// Log in with email and password.
   Future<void> login(String email, String password) async {

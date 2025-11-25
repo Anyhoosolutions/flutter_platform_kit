@@ -3,8 +3,8 @@ import 'package:anyhoo_auth/anyhoo_auth.dart';
 /// Creates a mock AuthService for demonstration purposes.
 ///
 /// In a real app, this would make actual API calls.
-AuthService createMockAuthService() {
-  return AuthService(
+AnyhooAuthService createMockAuthService() {
+  return AnyhooAuthService(
     emailLoginFunction: (email, password) async {
       // Simulate API delay
       await Future.delayed(const Duration(seconds: 1));

@@ -1,9 +1,4 @@
-import 'package:anyhoo_auth/models/user_converter.dart';
-
 /// Authentication service that handles login, logout, and user management.
-///
-/// Uses generics to support custom user types. Apps must provide a [UserConverter]
-/// to convert API responses to their user model.
 ///
 /// Example:
 /// ```dart
@@ -15,7 +10,7 @@ import 'package:anyhoo_auth/models/user_converter.dart';
 ///   },
 /// );
 /// ```
-class AuthService {
+class AnyhooAuthService {
   /// Functions that performs the actual login API call.
   ///
   /// Logging in with email and password
@@ -49,7 +44,7 @@ class AuthService {
   /// Whether a user is currently logged in.
   bool get isAuthenticated => _currentUser != null;
 
-  AuthService({
+  AnyhooAuthService({
     required this.emailLoginFunction,
     this.logoutFunction,
     this.refreshUserFunction,

@@ -26,7 +26,7 @@ class _AuthDemoPageState extends State<AuthDemoPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Auth Demo')),
-      body: BlocListener<AuthCubit<ExampleUser>, AuthState<ExampleUser>>(
+      body: BlocListener<AnyhooAuthCubit<ExampleUser>, AnyhooAuthState<ExampleUser>>(
         listener: (context, state) {
           if (state.errorMessage != null) {
             ScaffoldMessenger.of(
@@ -34,7 +34,7 @@ class _AuthDemoPageState extends State<AuthDemoPage> {
             ).showSnackBar(SnackBar(content: Text(state.errorMessage!), backgroundColor: Colors.red));
           }
         },
-        child: BlocBuilder<AuthCubit<ExampleUser>, AuthState<ExampleUser>>(
+        child: BlocBuilder<AnyhooAuthCubit<ExampleUser>, AnyhooAuthState<ExampleUser>>(
           builder: (context, state) {
             if (state.isAuthenticated) {
               return _buildAuthenticatedView(context, state.user!);
@@ -90,7 +90,7 @@ class _AuthDemoPageState extends State<AuthDemoPage> {
             onPressed: isLoading
                 ? null
                 : () {
-                    context.read<AuthCubit<ExampleUser>>().login(_emailController.text, _passwordController.text);
+                    context.read<AnyhooAuthCubit<ExampleUser>>().login(_emailController.text, _passwordController.text);
                   },
             style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16)),
             child: isLoading
@@ -114,7 +114,7 @@ class _AuthDemoPageState extends State<AuthDemoPage> {
             onPressed: isLoading
                 ? null
                 : () {
-                    context.read<AuthCubit<ExampleUser>>().loginWithGoogle();
+                    context.read<AnyhooAuthCubit<ExampleUser>>().loginWithGoogle();
                   },
             icon: const Icon(Icons.g_mobiledata, size: 28),
             label: const Text('Sign in with Google'),
@@ -125,7 +125,7 @@ class _AuthDemoPageState extends State<AuthDemoPage> {
             onPressed: isLoading
                 ? null
                 : () {
-                    context.read<AuthCubit<ExampleUser>>().loginWithApple();
+                    context.read<AnyhooAuthCubit<ExampleUser>>().loginWithApple();
                   },
             icon: const Icon(Icons.apple, size: 28),
             label: const Text('Sign in with Apple'),
@@ -163,7 +163,7 @@ class _AuthDemoPageState extends State<AuthDemoPage> {
           const SizedBox(height: 24),
           ElevatedButton.icon(
             onPressed: () {
-              context.read<AuthCubit<ExampleUser>>().refreshUser();
+              context.read<AnyhooAuthCubit<ExampleUser>>().refreshUser();
             },
             icon: const Icon(Icons.refresh),
             label: const Text('Refresh User'),
@@ -172,7 +172,7 @@ class _AuthDemoPageState extends State<AuthDemoPage> {
           const SizedBox(height: 16),
           OutlinedButton.icon(
             onPressed: () {
-              context.read<AuthCubit<ExampleUser>>().logout();
+              context.read<AnyhooAuthCubit<ExampleUser>>().logout();
             },
             icon: const Icon(Icons.logout),
             label: const Text('Logout'),

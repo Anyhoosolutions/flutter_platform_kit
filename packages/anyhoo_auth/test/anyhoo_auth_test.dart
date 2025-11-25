@@ -6,7 +6,7 @@ import 'package:anyhoo_core/anyhoo_core.dart';
 void main() {
   group('AuthService', () {
     test('can be instantiated with a converter', () {
-      final service = AuthService(
+      final service = AnyhooAuthService(
         emailLoginFunction: (email, password) async => {'id': '1', 'email': email},
       );
 
@@ -17,7 +17,7 @@ void main() {
 }
 
 // Test implementations
-class TestUser extends AuthUser {
+class TestUser extends AnyhooUser {
   @override
   final String id;
   @override

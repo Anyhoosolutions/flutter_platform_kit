@@ -1,6 +1,6 @@
-import 'package:anyhoo_auth/cubit/auth_cubit.dart';
-import 'package:anyhoo_core/extensions/string_extensions.dart';
-import 'package:anyhoo_core/models/auth_user.dart';
+import 'package:anyhoo_auth/cubit/anyhoo_auth_cubit.dart';
+import 'package:anyhoo_core/extensions/anyhoo_string_extensions.dart';
+import 'package:anyhoo_core/models/anyhoo_user.dart';
 import 'package:anyhoo_router/src/anyhoo_route.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -8,15 +8,15 @@ import 'package:logging/logging.dart';
 
 final log = Logger('RouteRedirector');
 
-class RouteRedirector<T extends Enum> {
+class AnyhooRouteRedirector<T extends Enum> {
   final List<AnyhooRoute<T>> routes;
-  final AuthCubit? authCubit;
+  final AnyhooAuthCubit? authCubit;
   final String? deepLinkSchemeName;
   final String? webDeepLinkHost;
   final String loginPath;
   final String initialPath;
 
-  RouteRedirector({
+  AnyhooRouteRedirector({
     required this.routes,
     this.authCubit,
     this.deepLinkSchemeName,
@@ -111,9 +111,9 @@ class RouteRedirector<T extends Enum> {
     return redirectTo;
   }
 
-  AuthUser? getUser() {
+  AnyhooUser? getUser() {
     final user = authCubit?.state.user;
-    if (user is! AuthUser) {
+    if (user is! AnyhooUser) {
       return null;
     }
 

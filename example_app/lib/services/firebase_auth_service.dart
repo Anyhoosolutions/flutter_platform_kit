@@ -7,13 +7,13 @@ import 'package:example_app/models/example_user.dart';
 /// Creates a mock AuthService for demonstration purposes.
 ///
 /// In a real app, this would make actual API calls.
-Future<AuthService> createFirebaseAuthService() async {
+Future<AnyhooAuthService> createFirebaseAuthService() async {
   FirebaseInitializer firebaseInitializer = FirebaseInitializer(arguments: Arguments(), hostIp: '192.168.87.21');
   await firebaseInitializer.initialize(DefaultFirebaseOptions.currentPlatform);
-  return FirebaseAuthService(converter: ExampleUserConverter(), firebaseAuth: firebaseInitializer.getAuth());
+  return AnyhooFirebaseAuthService(converter: ExampleUserConverter(), firebaseAuth: firebaseInitializer.getAuth());
 }
 
-class ExampleUserConverter implements UserConverter<ExampleUser> {
+class ExampleUserConverter implements AnyhooUserConverter<ExampleUser> {
   @override
   ExampleUser fromJson(Map<String, dynamic> json) {
     return ExampleUser.fromJson(json);

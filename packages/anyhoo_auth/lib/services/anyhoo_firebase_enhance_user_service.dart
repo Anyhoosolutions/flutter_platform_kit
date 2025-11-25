@@ -1,8 +1,8 @@
-import 'package:anyhoo_auth/services/enhance_user_service.dart';
+import 'package:anyhoo_auth/services/anyhoo_enhance_user_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class FirebaseEnhanceUserService extends EnhanceUserService {
-  FirebaseEnhanceUserService({required this.path, FirebaseFirestore? firestore})
+class AnyhooFirebaseEnhanceUserService extends AnyhooEnhanceUserService {
+  AnyhooFirebaseEnhanceUserService({required this.path, FirebaseFirestore? firestore})
       : super(enhanceUserFunction: _createEnhanceUserFunction(firestore ?? FirebaseFirestore.instance, path));
 
   final String path;

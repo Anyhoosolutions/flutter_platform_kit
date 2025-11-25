@@ -48,8 +48,8 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
-  final AuthService authService;
-  final UserConverter<ExampleUser> converter;
+  final AnyhooAuthService authService;
+  final AnyhooUserConverter<ExampleUser> converter;
   final Arguments arguments;
   final FirebaseInitializer firebaseInitializer;
 
@@ -75,7 +75,7 @@ class MyApp extends StatelessWidget {
 
     final appRouter = AnyhooRouter(routes: routes).getGoRouter();
     return BlocProvider(
-      create: (_) => AuthCubit<ExampleUser>(authService: authService, converter: converter),
+      create: (_) => AnyhooAuthCubit<ExampleUser>(authService: authService, converter: converter),
       child: MaterialApp.router(title: 'Example app', routerConfig: appRouter),
     );
   }

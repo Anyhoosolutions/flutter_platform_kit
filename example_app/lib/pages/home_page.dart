@@ -1,7 +1,6 @@
-import 'package:anyhoo_auth/cubit/auth_cubit.dart';
+import 'package:anyhoo_auth/cubit/anyhoo_auth_cubit.dart';
 import 'package:anyhoo_auth/widgets/login_widget.dart';
 import 'package:anyhoo_core/models/arguments.dart';
-import 'package:anyhoo_core/models/auth_user.dart';
 import 'package:anyhoo_core/widgets/error_page.dart';
 import 'package:anyhoo_core/widgets/waiting_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -59,9 +58,9 @@ class HomePage extends StatelessWidget {
                         title: const Text('Login Widget Demo'),
                         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
                       ),
-                      body: BlocProvider<AuthCubit<AuthUser>>(
+                      body: BlocProvider<AnyhooAuthCubit<ExampleUser>>(
                         create: (_) =>
-                            AuthCubit<ExampleUser>(authService: authService, converter: ExampleUserConverter()),
+                            AnyhooAuthCubit<ExampleUser>(authService: authService, converter: ExampleUserConverter()),
                         child: LoginWidget(title: 'Example app', assetLogoPath: 'assets/images/logo.webp'),
                       ),
                     );
@@ -80,7 +79,7 @@ class HomePage extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (_) => BlocProvider(
-                    create: (_) => AuthCubit<ExampleUser>(
+                    create: (_) => AnyhooAuthCubit<ExampleUser>(
                       authService: createMockAuthService(),
                       converter: ExampleUserConverter(),
                       enhanceUserService: createMockEnhanceUserService(),

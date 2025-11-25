@@ -15,6 +15,7 @@ class RemoteConfigDemoRoute extends AnyhooRoute<AnyhooRouteName> {
     remoteConfigService.setupRemoteConfig();
 
     remoteConfigService.getConfigUpdatesStream().listen((event) {
+      // ignore: avoid_print
       print('Remote config updated');
     });
 
@@ -48,6 +49,7 @@ class RRemoteConfigValues implements RemoteConfigValues {
 
   RRemoteConfigValues({required Map<String, dynamic> values}) {
     this.values.addAll(values);
+    // ignore: avoid_print
     print('RRemoteConfigValues: $values');
   }
   @override

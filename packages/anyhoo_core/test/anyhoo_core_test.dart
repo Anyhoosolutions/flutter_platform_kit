@@ -13,7 +13,7 @@ void main() {
 }
 
 // Test implementation
-class TestUser extends AuthUser {
+class TestUser extends AnyhooUser {
   @override
   final String id;
   @override

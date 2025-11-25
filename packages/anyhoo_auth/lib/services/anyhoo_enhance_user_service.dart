@@ -1,7 +1,7 @@
-class EnhanceUserService {
+class AnyhooEnhanceUserService {
   final Future Function(Map<String, dynamic> user) enhanceUserFunction;
 
-  EnhanceUserService({required this.enhanceUserFunction});
+  AnyhooEnhanceUserService({required this.enhanceUserFunction});
 
   /// Log in with email and password.
   ///

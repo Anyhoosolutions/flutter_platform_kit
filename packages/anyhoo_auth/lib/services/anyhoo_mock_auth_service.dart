@@ -1,6 +1,6 @@
-import 'package:anyhoo_auth/services/auth_service.dart';
+import 'package:anyhoo_auth/services/anyhoo_auth_service.dart';
 
-/// Mock implementation of [AuthService] for testing and development.
+/// Mock implementation of [AnyhooAuthService] for testing and development.
 ///
 /// Provides a ready-to-use authentication service that simulates API calls
 /// without requiring actual backend services. Useful for development, testing,
@@ -12,7 +12,7 @@ import 'package:anyhoo_auth/services/auth_service.dart';
 ///   converter: MyAppUserConverter(),
 /// );
 /// ```
-class MockAuthService extends AuthService {
+class AnyhooMockAuthService extends AnyhooAuthService {
   /// Default delay for login operations (1 second).
   final Duration loginDelay;
 
@@ -41,7 +41,7 @@ class MockAuthService extends AuthService {
   /// [loginDelay], [logoutDelay], and [refreshDelay] control simulation delays.
   /// [credentialValidator] can be used to validate test credentials.
   /// [userDataGenerator] can be used to customize mock user data.
-  MockAuthService({
+  AnyhooMockAuthService({
     this.loginDelay = const Duration(seconds: 1),
     this.logoutDelay = const Duration(milliseconds: 500),
     this.refreshDelay = const Duration(milliseconds: 500),
