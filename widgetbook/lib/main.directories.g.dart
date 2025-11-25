@@ -21,6 +21,8 @@ import 'package:widgetbook_workspace/anyhoo_firebase/firebase_analytics_page.dar
     as _widgetbook_workspace_anyhoo_firebase_firebase_analytics_page;
 import 'package:widgetbook_workspace/anyhoo_image_selector/image_selector_widget.dart'
     as _widgetbook_workspace_anyhoo_image_selector_image_selector_widget;
+import 'package:widgetbook_workspace/anyhoo_shimmer/shimmer.dart'
+    as _widgetbook_workspace_anyhoo_shimmer_shimmer;
 
 final directories = <_widgetbook.WidgetbookNode>[
   _widgetbook.WidgetbookFolder(
@@ -75,13 +77,27 @@ final directories = <_widgetbook.WidgetbookNode>[
           ),
         ],
       ),
+      _widgetbook.WidgetbookFolder(
+        name: 'anyhoo_shimmer',
+        children: [
+          _widgetbook.WidgetbookComponent(
+            name: 'AnyhooShimmer',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Shimmer',
+                builder: _widgetbook_workspace_anyhoo_shimmer_shimmer.build,
+              ),
+            ],
+          ),
+        ],
+      ),
     ],
   ),
   _widgetbook.WidgetbookFolder(
     name: 'anyhoo_image_selector',
     children: [
       _widgetbook.WidgetbookComponent(
-        name: 'ImageSelectorWidget',
+        name: 'AnyhooImageSelectorWidget',
         useCases: [
           _widgetbook.WidgetbookUseCase(
             name: 'Default',

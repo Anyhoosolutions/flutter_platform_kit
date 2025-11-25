@@ -91,6 +91,19 @@
 					"subpages": []
 				}
 			]
+		},
+		{
+			"filepath": "anyhoo_shimmer/README.md",
+			"name": "Anyhoo Shimmer",
+			"title": "Anyhoo Shimmer",
+			"subpages": [
+				{
+					"filepath": "anyhoo_shimmer/CHANGELOG.md",
+					"name": "Changelog",
+					"title": "Changelog",
+					"subpages": []
+				}
+			]
 		}
 	]
 }

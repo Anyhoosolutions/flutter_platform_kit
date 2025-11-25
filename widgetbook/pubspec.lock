@@ -54,6 +54,13 @@ packages:
       relative: true
     source: path
     version: "0.0.1"
+  anyhoo_shimmer:
+    dependency: "direct main"
+    description:
+      path: "../packages/anyhoo_shimmer"
+      relative: true
+    source: path
+    version: "0.0.1"
   archive:
     dependency: transitive
     description:
@@ -509,14 +516,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  freezed:
-    dependency: transitive
-    description:
-      name: freezed
-      sha256: "13065f10e135263a4f5a4391b79a8efc5fb8106f8dd555a9e49b750b45393d77"
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.2.3"
   freezed_annotation:
     dependency: transitive
     description:
