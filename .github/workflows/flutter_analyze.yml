@@ -1,4 +1,4 @@
-name: Check Version
+name: Flutter analyze
 
 on:
   pull_request:
@@ -16,6 +16,27 @@ jobs:
     steps:
       - name: Checkout PR branch
         uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.35.6"
+          channel: "stable"
+
+      - name: Show Flutter version
+        run: |
+          flutter --version
+
+      - name: Cache Flutter dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            .pub-cache/bin
+            .pub-cache/global_packages
+            .pub-cache/hosted
+            .dart_tool
+            .packages
+          key: ${{ runner.os }}-flutter-${{ hashFiles('**/pubspec.yaml') }}
 
       - name: Run "flutter analyze" in each package
         run: |
