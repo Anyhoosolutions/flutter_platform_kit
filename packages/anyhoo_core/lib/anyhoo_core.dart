@@ -9,3 +9,4 @@ export 'models/arguments.dart';
 export 'arguments_parser.dart';
 export 'widgets/error_page.dart';
 export 'widgets/waiting_page.dart';
+export 'observers/simple_bloc_observer.dart';
