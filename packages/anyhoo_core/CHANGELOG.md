@@ -1,4 +1,8 @@
-## 0.0.7 
+## 0.0.8
+
+* SimpleBlocObserver
+
+## 0.0.7
 
 * Change class names
 
