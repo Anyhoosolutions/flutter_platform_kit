@@ -12,19 +12,18 @@ class AnyhooAppBar extends StatefulWidget {
     required this.imageUrl,
     required this.actionButtons,
     this.scrollController,
-    this.alwaysCollapsed = false,
     this.backButtonIcon,
     this.isLoading = false,
+    this.backgroundColor,
   });
   final bool hasBackButton;
   final String? title;
   final String? imageUrl;
   final List<ActionButtonInfo> actionButtons;
-  final bool alwaysCollapsed;
   final IconData? backButtonIcon;
   final ScrollController? scrollController;
   final bool isLoading;
-
+  final Color? backgroundColor;
   @override
   State<AnyhooAppBar> createState() => _AnyhooAppBarState();
 }
@@ -44,7 +43,7 @@ class _AnyhooAppBarState extends State<AnyhooAppBar> {
   @override
   void initState() {
     super.initState();
-    showTitleText = widget.alwaysCollapsed;
+    showTitleText = widget.imageUrl == null;
 
     // Try to attach listener after the first frame
     if (widget.scrollController != null) {
@@ -144,7 +143,7 @@ class _AnyhooAppBarState extends State<AnyhooAppBar> {
   }
 
   void _onScroll() {
-    if (widget.alwaysCollapsed) {
+    if (widget.imageUrl == null) {
       return;
     }
     if (widget.scrollController!.position.pixels > collapsedPosition) {
@@ -164,9 +163,13 @@ class _AnyhooAppBarState extends State<AnyhooAppBar> {
 
   @override
   Widget build(BuildContext context) {
+    final backgroundColor = widget.backgroundColor ?? Theme.of(context).colorScheme.primary;
     return SliverAppBar(
       expandedHeight: _getExpandedHeight(),
       pinned: true,
+      backgroundColor: backgroundColor,
+      surfaceTintColor: Colors.transparent,
+      scrolledUnderElevation: 0,
       leading: _getBackButton(context),
       actions: _getActionButtons(),
       flexibleSpace: AnyhooShimmer(
@@ -176,7 +179,7 @@ class _AnyhooAppBarState extends State<AnyhooAppBar> {
   }
 
   double _getExpandedHeight() {
-    if (widget.alwaysCollapsed) {
+    if (widget.imageUrl == null) {
       return collapsedHeight;
     }
     return expandedHeight;
@@ -261,7 +264,7 @@ class _AnyhooAppBarState extends State<AnyhooAppBar> {
   }
 
   Widget? _getBackgroundImage() {
-    if (widget.alwaysCollapsed) {
+    if (widget.imageUrl == null) {
       return null;
     }
     if (widget.isLoading) {
@@ -293,9 +296,6 @@ class _AnyhooAppBarState extends State<AnyhooAppBar> {
   }
 
   Widget _getFallbackBackground() {
-    return Container(
-      color: Colors.grey[300],
-      child: const Icon(Icons.restaurant, size: 64, color: Colors.grey),
-    );
+    return Container(color: Colors.red);
   }
 }

@@ -12,7 +12,16 @@ Widget build(BuildContext context) {
   final colorScheme = context.knobs.list(label: 'Color scheme', options: colorSchemeOptions, initialOption: 'purple');
 
   final isLoading = context.knobs.boolean(label: 'Is loading', initialValue: false);
-  final alwaysCollapsed = context.knobs.boolean(label: 'Always collapsed', initialValue: false);
+  final useImage = context.knobs.boolean(label: 'Use image', initialValue: false);
+
+  final backgroundColorOptions = {'none': null, 'brown': Colors.brown, 'orange': Colors.orange};
+  final backgroundColor = context.knobs.list(
+    label: 'Background color',
+    options: backgroundColorOptions.keys.toList(),
+    initialOption: 'none',
+  );
+  final backgroundColorValue = backgroundColor == 'none' ? null : backgroundColorOptions[backgroundColor];
+
   final imgUrl = 'https://picsum.photos/600/800';
 
   final scrollController = ScrollController();
@@ -27,10 +36,10 @@ Widget build(BuildContext context) {
             scrollController: scrollController,
             hasBackButton: true,
             title: 'Example App Bar',
-            imageUrl: imgUrl,
+            imageUrl: useImage ? imgUrl : null,
             actionButtons: [],
             isLoading: isLoading,
-            alwaysCollapsed: alwaysCollapsed,
+            backgroundColor: backgroundColorValue,
           ),
           SliverList.builder(
             itemCount: 100,
