@@ -1,6 +1,8 @@
 import 'package:anyhoo_app_bar/src/action_button_info.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart';
+import 'package:anyhoo_shimmer/anyhoo_shimmer.dart';
 
 class AnyhooAppBar extends StatefulWidget {
   const AnyhooAppBar({
@@ -35,15 +37,110 @@ class _AnyhooAppBarState extends State<AnyhooAppBar> {
   final expandedHeight = 300.0;
   bool showTitleText = false;
   final collapsedPosition = 245;
+  bool _listenerAdded = false;
+  bool _retryScheduled = false;
+  ScrollController? _currentController;
 
   @override
   void initState() {
     super.initState();
+    showTitleText = widget.alwaysCollapsed;
+
+    // Try to attach listener after the first frame
     if (widget.scrollController != null) {
-      widget.scrollController!.addListener(_onScroll);
+      _currentController = widget.scrollController;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _tryAttachListener();
+      });
+    }
+  }
+
+  void _tryAttachListener() {
+    if (!mounted || widget.scrollController == null) {
+      return;
     }
 
-    showTitleText = widget.alwaysCollapsed;
+    // Only add listener if not already added to this controller
+    if (_listenerAdded && _currentController == widget.scrollController) {
+      return;
+    }
+
+    if (widget.scrollController!.hasClients) {
+      // Remove listener from previous controller if it changed
+      if (_listenerAdded && _currentController != null && _currentController != widget.scrollController) {
+        try {
+          _currentController!.removeListener(_onScroll);
+        } catch (e) {
+          // Ignore errors when removing from disposed controller
+        }
+      }
+
+      // Add listener to current controller
+      if (!_listenerAdded || _currentController != widget.scrollController) {
+        try {
+          widget.scrollController!.addListener(_onScroll);
+          _listenerAdded = true;
+          _currentController = widget.scrollController;
+          _retryScheduled = false;
+        } catch (e) {
+          // Ignore errors
+        }
+      }
+    } else {
+      // Retry after the next frame, but only if we haven't already scheduled a retry
+      if (!_retryScheduled) {
+        _retryScheduled = true;
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _retryScheduled = false;
+          if (mounted) {
+            _tryAttachListener();
+          }
+        });
+      }
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Also try here in case the controller gets attached during build
+    if (widget.scrollController != null && !_listenerAdded) {
+      _tryAttachListener();
+    }
+  }
+
+  @override
+  void didUpdateWidget(AnyhooAppBar oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Handle scrollController changes
+    if (oldWidget.scrollController != widget.scrollController) {
+      // Remove listener from old controller
+      if (_listenerAdded && oldWidget.scrollController != null) {
+        try {
+          oldWidget.scrollController!.removeListener(_onScroll);
+        } catch (e) {
+          // Ignore errors when removing from disposed controller
+        }
+        _listenerAdded = false;
+      }
+      _currentController = widget.scrollController;
+      _retryScheduled = false;
+      // Add listener to new controller
+      if (widget.scrollController != null) {
+        _tryAttachListener();
+      }
+    } else if (widget.scrollController != null && !_listenerAdded) {
+      // Controller is the same but listener wasn't added, try again
+      _tryAttachListener();
+    }
+  }
+
+  @override
+  void dispose() {
+    if (_listenerAdded && widget.scrollController != null) {
+      widget.scrollController!.removeListener(_onScroll);
+    }
+    super.dispose();
   }
 
   void _onScroll() {
@@ -96,7 +193,7 @@ class _AnyhooAppBarState extends State<AnyhooAppBar> {
         decoration: BoxDecoration(color: Colors.black.withValues(alpha: 0.3), shape: BoxShape.circle),
         child: Icon(widget.backButtonIcon ?? Icons.arrow_back, color: Colors.white),
       ),
-      onPressed: () => context.pop(),
+      onPressed: () => GoRouter.of(context).pop(),
     );
   }
 
@@ -160,7 +257,7 @@ class _AnyhooAppBarState extends State<AnyhooAppBar> {
     if (widget.title == null || !showTitleText) {
       return null;
     }
-    return Text(widget.title!, style: TextStyle(color: AppTheme.appBarTextColor));
+    return Text(widget.title!, style: TextStyle(color: Theme.of(context).colorScheme.onSurface));
   }
 
   Widget? _getBackgroundImage() {
