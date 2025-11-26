@@ -223,25 +223,18 @@ class _AnyhooAppBarState extends State<AnyhooAppBar> {
   }
 
   Widget? _getOverflowActionButtons() {
-    if (widget.actionButtons.whereType<OverflowActionButtonInfo>().isEmpty) {
+    if (widget.actionButtons.whereType<OverflowActionButtonInfo>().isEmpty &&
+        widget.actionButtons.whereType<DividerActionButtonInfo>().isEmpty) {
       return null;
     }
 
     final entries = widget.actionButtons
-        .whereType<OverflowActionButtonInfo>()
-        .map(
-          (ab) => PopupMenuItem<String>(
-            value: ab.title,
-            child: Semantics(
-              label: ab.title,
-              child: Row(children: [Icon(ab.icon), SizedBox(width: 8), Text(ab.title)]),
-            ),
-          ),
-        )
+        .where((ab) => ab is OverflowActionButtonInfo || ab is DividerActionButtonInfo)
+        .map((ab) => createPopupMenuEntry(ab))
         .toList();
 
     return PopupMenuButton<String>(
-      icon: const Icon(Icons.more_vert), // The standard overflow icon
+      icon: const Icon(Icons.more_vert, color: Colors.black), // TDOO: Should pick the color from the theme
       onSelected: (String result) {
         final actionButton = widget.actionButtons.whereType<OverflowActionButtonInfo>().firstWhere(
           (ab) => ab.title == result,
@@ -251,6 +244,22 @@ class _AnyhooAppBarState extends State<AnyhooAppBar> {
       },
       itemBuilder: (BuildContext context) => entries,
     );
+  }
+
+  PopupMenuEntry<String> createPopupMenuEntry(ActionButtonInfo ab) {
+    if (ab is OverflowActionButtonInfo) {
+      return PopupMenuItem<String>(
+        value: ab.title,
+        child: Semantics(
+          label: ab.title,
+          child: Row(children: [Icon(ab.icon), SizedBox(width: 8), Text(ab.title)]),
+        ),
+      );
+    }
+    if (ab is DividerActionButtonInfo) {
+      return PopupMenuDivider();
+    }
+    throw Exception('Unknown action button type: ${ab.runtimeType}');
   }
 
   Widget? _getTitle() {

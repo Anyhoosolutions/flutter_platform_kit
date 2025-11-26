@@ -15,5 +15,5 @@ sealed class ActionButtonInfo with _$ActionButtonInfo {
     required Null Function() onTap,
     required String title,
   }) = OverflowActionButtonInfo;
-  // TODO: Add divider
+  const factory ActionButtonInfo.divider() = DividerActionButtonInfo;
 }
