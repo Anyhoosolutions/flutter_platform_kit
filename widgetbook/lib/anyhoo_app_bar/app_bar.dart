@@ -21,10 +21,21 @@ Widget build(BuildContext context) {
     initialOption: 'none',
   );
   final backgroundColorValue = backgroundColor == 'none' ? null : backgroundColorOptions[backgroundColor];
+  final showActionButtons = context.knobs.boolean(label: 'Show action buttons', initialValue: true);
+  final showBackButton = context.knobs.boolean(label: 'Show back button', initialValue: true);
 
   final imgUrl = 'https://picsum.photos/600/800';
 
   final scrollController = ScrollController();
+
+  final actionButtons = showActionButtons
+      ? [
+          ActionButtonInfo.normal(icon: Icons.search, onTap: () {}, name: 'Search'),
+          ActionButtonInfo.overflow(icon: Icons.info, onTap: () {}, title: 'About'),
+          ActionButtonInfo.divider(),
+          ActionButtonInfo.overflow(icon: Icons.settings, onTap: () {}, title: 'Settings'),
+        ]
+      : <ActionButtonInfo>[];
 
   final widget = Theme(
     data: ThemeData(colorScheme: getColorScheme(colorScheme)),
@@ -34,10 +45,10 @@ Widget build(BuildContext context) {
         slivers: [
           AnyhooAppBar(
             scrollController: scrollController,
-            hasBackButton: true,
+            hasBackButton: showBackButton,
             title: 'Example App Bar',
             imageUrl: useImage ? imgUrl : null,
-            actionButtons: [],
+            actionButtons: showActionButtons ? actionButtons : [],
             isLoading: isLoading,
             backgroundColor: backgroundColorValue,
           ),
