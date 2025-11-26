@@ -1,6 +1,8 @@
 ## 0.0.8
 
 * SimpleBlocObserver
+* CurrentTimeRepository
+* TimezoneRepository
 
 ## 0.0.7
 
