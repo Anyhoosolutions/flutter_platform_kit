@@ -6,7 +6,7 @@ import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
 import 'package:widgetbook_workspace/helpers/wrap_in_mocks_helper.dart';
 import 'package:anyhoo_shimmer/anyhoo_shimmer.dart';
 
-@widgetbook.UseCase(name: 'Shimmer', type: AnyhooShimmer, path: '/anyhoo_shimmer')
+@widgetbook.UseCase(name: 'Shimmer', type: AnyhooShimmer, path: 'anyhoo_shimmer')
 Widget build(BuildContext context) {
   final colorSchemeOptions = ['green', 'purple', 'red'];
   final colorScheme = context.knobs.list(label: 'Color scheme', options: colorSchemeOptions, initialOption: 'purple');

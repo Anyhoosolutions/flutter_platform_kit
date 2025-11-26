@@ -6,7 +6,7 @@ import 'package:widgetbook/widgetbook.dart';
 import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
 import 'package:widgetbook_workspace/helpers/wrap_in_mocks_helper.dart';
 
-@widgetbook.UseCase(name: 'WaitingPage', type: WaitingPage, path: '/anyhoo_core')
+@widgetbook.UseCase(name: 'WaitingPage', type: WaitingPage, path: 'anyhoo_core')
 Widget build(BuildContext context) {
   final colorSchemeOptions = ['red', 'green', 'purple'];
   final colorScheme = context.knobs.list(label: 'Color scheme', options: colorSchemeOptions, initialOption: 'purple');

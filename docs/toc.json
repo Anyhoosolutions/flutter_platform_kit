@@ -104,6 +104,19 @@
 					"subpages": []
 				}
 			]
+		},
+		{
+			"filepath": "anyhoo_app_bar/README.md",
+			"name": "Anyhoo App Bar",
+			"title": "Anyhoo App Bar",
+			"subpages": [
+				{
+					"filepath": "anyhoo_app_bar/CHANGELOG.md",
+					"name": "Changelog",
+					"title": "Changelog",
+					"subpages": []
+				}
+			]
 		}
 	]
 }

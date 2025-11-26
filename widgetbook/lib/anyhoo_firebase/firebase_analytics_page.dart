@@ -6,7 +6,7 @@ import 'package:widgetbook/widgetbook.dart';
 import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
 import 'package:widgetbook_workspace/helpers/wrap_in_mocks_helper.dart';
 
-@widgetbook.UseCase(name: 'FirebaseAnalyticsPage', type: FirebaseAnalyticsPage, path: '/anyhoo_firebase')
+@widgetbook.UseCase(name: 'FirebaseAnalyticsPage', type: FirebaseAnalyticsPage, path: 'anyhoo_firebase')
 Widget build(BuildContext context) {
   final colorSchemeOptions = ['green', 'purple', 'red'];
   final colorScheme = context.knobs.list(label: 'Color scheme', options: colorSchemeOptions, initialOption: 'purple');
