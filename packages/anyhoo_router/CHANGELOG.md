@@ -1,3 +1,7 @@
+## 0.0.5
+
+* Logging listener
+
 ## 0.0.4
 
 * Change class names

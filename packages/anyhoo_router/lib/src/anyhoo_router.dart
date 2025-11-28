@@ -52,6 +52,14 @@ class AnyhooRouter<T extends Enum> {
       errorBuilder: (context, state) => Scaffold(body: ErrorPage(errorMessage: 'Error: ${state.error}')),
     );
     GoRouter.optionURLReflectsImperativeAPIs = true;
+
+    addLoggingListener(router);
     return router;
+  }
+
+  void addLoggingListener(GoRouter router) {
+    router.routerDelegate.addListener(() {
+      _log.info('Route changed: ${router.routeInformationProvider.value.uri}');
+    });
   }
 }
