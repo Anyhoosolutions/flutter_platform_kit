@@ -1,3 +1,7 @@
+## 0.0.9
+
+* Logging for changing state
+
 ## 0.0.8
 
 * UpdatableForAnyhooUser

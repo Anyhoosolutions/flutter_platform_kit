@@ -3,7 +3,10 @@ import 'package:anyhoo_auth/models/anyhoo_user_converter.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:logging/logging.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
+
+final _log = Logger('AnyhooFirebaseAuthService');
 
 /// Firebase implementation of [AnyhooAuthService].
 ///
@@ -37,7 +40,9 @@ class AnyhooFirebaseAuthService extends AnyhooAuthService {
     // Listen to auth state changes and update current user
     _firebaseAuth.authStateChanges().listen((firebaseUser) {
       if (firebaseUser != null) {
+        _log.info('Auth state changed (uid): ${firebaseUser.uid}');
         final userData = _firebaseUserToMap(firebaseUser);
+        _log.info('Auth state changed (name): ${userData['displayName']}');
         setUser(userData);
       } else {
         clearUser();
