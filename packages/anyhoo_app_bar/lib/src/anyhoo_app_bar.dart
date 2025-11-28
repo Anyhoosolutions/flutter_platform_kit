@@ -223,8 +223,7 @@ class _AnyhooAppBarState extends State<AnyhooAppBar> {
   }
 
   Widget? _getOverflowActionButtons() {
-    if (widget.actionButtons.whereType<OverflowActionButtonInfo>().isEmpty &&
-        widget.actionButtons.whereType<DividerActionButtonInfo>().isEmpty) {
+    if (widget.actionButtons.whereType<OverflowActionButtonInfo>().isEmpty) {
       return null;
     }
 
