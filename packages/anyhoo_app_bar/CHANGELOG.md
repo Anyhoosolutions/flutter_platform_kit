@@ -1,3 +1,7 @@
+## 0.0.4
+
+* AnyhooBottomBar
+
 ## 0.0.3
 
 * Don't care about dividers for showing overflow menu
