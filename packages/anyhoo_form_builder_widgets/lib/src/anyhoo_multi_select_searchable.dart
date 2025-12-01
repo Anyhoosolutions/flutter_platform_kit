@@ -59,7 +59,7 @@ class _AnyhooMultiSelectSearchableState extends State<AnyhooMultiSelectSearchabl
 
   List<Widget> _buildSelectedItemsChips(ThemeData theme) {
     if (_selectedItems.isEmpty) {
-      return [Text('Select items...', style: TextStyle(color: theme.colorScheme.primary.withValues(alpha: 0.8)))];
+      return [Text('Select items...', style: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.8)))];
     }
     const maxChips = 3;
 
@@ -67,7 +67,9 @@ class _AnyhooMultiSelectSearchableState extends State<AnyhooMultiSelectSearchabl
 
     final chips = itemsToShow.map((item) {
       return Chip(
-        label: Text(item),
+        backgroundColor: theme.colorScheme.primary,
+        label: Text(item, style: TextStyle(color: theme.colorScheme.onPrimary)),
+        deleteIconColor: theme.colorScheme.onPrimary,
         onDeleted: () {
           setState(() {
             _selectedItems.remove(item);
@@ -127,6 +129,7 @@ class _AnyhooMultiSelectSearchableState extends State<AnyhooMultiSelectSearchabl
               offset: Offset(0, _inputDecoratorHeight + 5),
               child: Material(
                 elevation: 4,
+                color: theme.colorScheme.surface,
                 child: SizedBox(
                   width: MediaQuery.of(context).size.width - 32, // Adjust as needed
                   child: Column(
