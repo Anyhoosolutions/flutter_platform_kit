@@ -1,4 +1,5 @@
 import 'package:anyhoo_app_bar/src/anyhoo_bottom_bar_item.dart';
+import 'package:anyhoo_router/anyhoo_router.dart';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 
@@ -57,7 +58,7 @@ class _AnyhooBottomBarState extends State<AnyhooBottomBar> {
   ) {
     return GestureDetector(
       onTap: () {
-        // goRouterWrapper.push(context, url);
+        GoRouterWrapper.push(context, url);
       },
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
