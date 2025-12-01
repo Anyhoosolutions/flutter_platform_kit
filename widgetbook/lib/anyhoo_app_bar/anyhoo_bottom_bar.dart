@@ -1,6 +1,6 @@
 // ignore_for_file: deprecated_member_use
 
-import 'package:anyhoo_app_bar/anyhoo_app_bar.dart' show AnyhooBottomBar, BottomBarNavItems;
+import 'package:anyhoo_app_bar/anyhoo_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:widgetbook/widgetbook.dart';
 import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
@@ -11,9 +11,6 @@ Widget build(BuildContext context) {
   final colorSchemeOptions = ['green', 'purple', 'red'];
   final colorScheme = context.knobs.list(label: 'Color scheme', options: colorSchemeOptions, initialOption: 'purple');
 
-  final isLoading = context.knobs.boolean(label: 'Is loading', initialValue: false);
-  final useImage = context.knobs.boolean(label: 'Use image', initialValue: false);
-
   final backgroundColorOptions = {'none': null, 'brown': Colors.brown, 'orange': Colors.orange};
   final backgroundColor = context.knobs.list(
     label: 'Background color',
@@ -23,6 +20,11 @@ Widget build(BuildContext context) {
   final backgroundColorValue = backgroundColor == 'none' ? null : backgroundColorOptions[backgroundColor];
   final scrollController = ScrollController();
 
+  final items = [
+    AnyhooBottomBarItem(key: 'recipes', icon: Icons.book_outlined, label: 'Recipes', route: '/recipes'),
+    AnyhooBottomBarItem(key: 'favorites', icon: Icons.favorite_outlined, label: 'Favorites', route: '/favorites'),
+    AnyhooBottomBarItem(key: 'profile', icon: Icons.person_outlined, label: 'Profile', route: '/profile'),
+  ];
   final widget = Theme(
     data: ThemeData(colorScheme: getColorScheme(colorScheme)),
     child: Scaffold(
@@ -39,8 +41,8 @@ Widget build(BuildContext context) {
       ),
       bottomNavigationBar: AnyhooBottomBar(
         backgroundColor: backgroundColorValue,
-        items: [BottomBarNavItems.recipes, BottomBarNavItems.favorites, BottomBarNavItems.profile],
-        selected: BottomBarNavItems.recipes,
+        items: items,
+        selectedItemKey: items.first.key,
       ),
     ),
   );
