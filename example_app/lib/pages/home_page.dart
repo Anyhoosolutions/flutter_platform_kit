@@ -35,6 +35,8 @@ class HomePage extends StatelessWidget {
         children: [
           _authDemoButton(context),
           const SizedBox(height: 16),
+          _loggingPageDemoButton(context),
+          const SizedBox(height: 16),
           _loginButtonconst(context),
           SizedBox(height: 16),
           _enhancedUserDemoButton(context),
@@ -54,8 +56,6 @@ class HomePage extends StatelessWidget {
           _errorPageDemoButton(context),
           const SizedBox(height: 16),
           _waitingPageDemoButton(context),
-          const SizedBox(height: 16),
-          _loggingPageDemoButton(context),
         ],
       ),
     );

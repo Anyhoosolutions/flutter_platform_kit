@@ -1,21 +1,15 @@
 import 'package:logging/logging.dart';
+import 'package:logging/logging.dart' as logging;
 
 class LoggingConfiguration {
-  final String logLevel;
-  final List<String> loggersAtInfo;
-  final List<String> loggersAtWarning;
-  final List<String> loggersAtSevere;
-
-  LoggingConfiguration({
-    required this.logLevel,
-    required this.loggersAtInfo,
-    required this.loggersAtWarning,
-    required this.loggersAtSevere,
+  static void setupLogging({
+    required String logLevel,
+    required List<String> loggersAtInfo,
+    required List<String> loggersAtWarning,
+    required List<String> loggersAtSevere,
   }) {
-    _setupLogging();
-  }
+    logging.hierarchicalLoggingEnabled = true;
 
-  void _setupLogging() {
     final level = switch (logLevel) {
       'ALL' => Level.ALL,
       'FINEST' => Level.FINEST,
