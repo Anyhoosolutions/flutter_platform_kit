@@ -1,12 +1,14 @@
 - [x] Router handling
 - [x] Firebase helper functions
-- [ ] AppBar
-- [ ] BottomBar
-- [ ] Shimmer
+- [x] AppBar
+- [x] BottomBar
+- [x] Shimmer
 - [x] RemoteConfig
-- [ ] FormBuilderMultiSelect
-- [ ] FormBuilderSingleSelectWithAdd
-- [ ] Change user listener
-- [ ] Timezone / current time
+- [x] FormBuilderMultiSelect
+- [x] FormBuilderSingleSelectWithAdd
+- [x] Change user listener
+- [x] Timezone / current time
 - [x] Arguments for running locally
-- [ ] Google sign in / Apple sign in
+- [x] Google sign in 
+- [ ] Apple sign in
+- [ ] Admin role
