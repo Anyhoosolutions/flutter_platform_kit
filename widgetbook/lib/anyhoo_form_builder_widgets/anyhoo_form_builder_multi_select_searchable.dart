@@ -12,7 +12,7 @@ Widget build(BuildContext context) {
   final colorSchemeOptions = ['red', 'green', 'purple'];
   final colorScheme = context.knobs.list(label: 'Color scheme', options: colorSchemeOptions, initialOption: 'red');
 
-  final _formKey = GlobalKey<FormBuilderState>();
+  final formKey = GlobalKey<FormBuilderState>();
 
   final widget = Theme(
     data: ThemeData(colorScheme: getColorScheme(colorScheme)),
@@ -20,7 +20,7 @@ Widget build(BuildContext context) {
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: FormBuilder(
-          key: _formKey,
+          key: formKey,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -33,8 +33,9 @@ Widget build(BuildContext context) {
               ),
               ElevatedButton(
                 onPressed: () {
-                  _formKey.currentState?.save();
-                  print(_formKey.currentState?.value);
+                  formKey.currentState?.save();
+                  // ignore: avoid_print
+                  print(formKey.currentState?.value);
                 },
                 child: Text('Save'),
               ),

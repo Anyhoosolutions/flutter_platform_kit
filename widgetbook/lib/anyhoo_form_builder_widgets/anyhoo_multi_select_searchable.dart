@@ -21,6 +21,7 @@ Widget build(BuildContext context) {
           hintText: 'Select a string',
           selectedItems: ['Third', 'Second'],
           onChanged: (items) {
+            // ignore: avoid_print
             print('items: $items');
           },
         ),
