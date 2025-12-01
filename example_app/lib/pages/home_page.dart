@@ -33,178 +33,234 @@ class HomePage extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          _DemoCard(
-            title: 'Auth Demo',
-            description: 'Demonstrates authentication with custom user models',
-            icon: Icons.login,
-            onTap: () {
-              GoRouter.of(context).push('/auth');
-            },
-          ),
+          _authDemoButton(context),
           const SizedBox(height: 16),
-          _DemoCard(
-            title: 'Login Widget Demo',
-            description: 'Demonstrates the login widget',
-            icon: Icons.login,
-            onTap: () {
-              final authService = createMockAuthService();
-
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) {
-                    return Scaffold(
-                      appBar: AppBar(
-                        title: const Text('Login Widget Demo'),
-                        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-                      ),
-                      body: BlocProvider<AnyhooAuthCubit<ExampleUser>>(
-                        create: (_) =>
-                            AnyhooAuthCubit<ExampleUser>(authService: authService, converter: ExampleUserConverter()),
-                        child: LoginWidget(title: 'Example app', assetLogoPath: 'assets/images/logo.webp'),
-                      ),
-                    );
-                  },
-                ),
-              );
-            },
-          ),
+          _loginButtonconst(context),
+          SizedBox(height: 16),
+          _enhancedUserDemoButton(context),
           const SizedBox(height: 16),
-          _DemoCard(
-            title: 'Enhance User Demo',
-            description: 'Demonstrates authentication with custom user models',
-            icon: Icons.login,
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => BlocProvider(
-                    create: (_) => AnyhooAuthCubit<ExampleUser>(
-                      authService: createMockAuthService(),
-                      converter: ExampleUserConverter(),
-                      enhanceUserService: createMockEnhanceUserService(),
-                    ),
-                    child: EnhanceUserDemoPage(),
-                  ),
-                ),
-              );
-            },
-          ),
+          _analyticsDemoButton(context),
           const SizedBox(height: 16),
-          _DemoCard(
-            title: 'Analytics & Crashlytics Demo',
-            description: 'Demonstrates Firebase Analytics and Crashlytics',
-            icon: Icons.analytics,
-            onTap: () {
-              GoRouter.of(context).push('/analytics');
-            },
-          ),
+          _imageSelectorDemoButton(context),
           const SizedBox(height: 16),
-          _DemoCard(
-            title: 'Image Selector Demo',
-            description: 'Demonstrates image selection from gallery, camera, or stock photos',
-            icon: Icons.image,
-            onTap: () {
-              Navigator.push(context, MaterialPageRoute(builder: (_) => const ImageSelectorDemoPage()));
-            },
-          ),
+          _remoteConfigDemoButton(context),
           const SizedBox(height: 16),
-          _DemoCard(
-            title: 'Remote Config Demo',
-            description: 'Demonstrates remote config',
-            icon: Icons.settings,
-            onTap: () {
-              GoRouter.of(context).push('/remote-config');
-            },
-          ),
+          _argumentsDemoButton(context),
           const SizedBox(height: 16),
-          _DemoCard(
-            title: 'Arguments Demo',
-            description: 'Demonstrates arguments passed in when launching the app',
-            icon: Icons.image,
-            onTap: () {
-              Navigator.push(context, MaterialPageRoute(builder: (_) => ArgumentsDemoPage(arguments: arguments)));
-            },
-          ),
+          _firestoreDemoButton(context),
           const SizedBox(height: 16),
-          _DemoCard(
-            title: 'Firestore Demo',
-            description: 'Demonstrates Firestore usage',
-            icon: Icons.data_array,
-            onTap: () {
-              Navigator.push(context, MaterialPageRoute(builder: (_) => FirestoreDemoPage(firestore: firestore)));
-            },
-          ),
+          _routeDemoButton(context),
           const SizedBox(height: 16),
-
-          _DemoCard(
-            title: 'Route First Demo',
-            description: 'Demonstrates route first demo',
-            icon: Icons.route,
-            onTap: () {
-              GoRouter.of(context).push('/route-demo');
-            },
-          ),
+          _errorPageDemoButton(context),
           const SizedBox(height: 16),
-          _DemoCard(
-            title: 'Error Page Demo',
-            description: 'Demonstrates error page',
-            icon: Icons.error,
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => Scaffold(
-                    appBar: AppBar(
-                      title: const Text('Error Page Demo'),
-                      actions: [
-                        IconButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                          icon: const Icon(Icons.close),
-                        ),
-                      ],
-                    ),
-                    body: ErrorPage(
-                      errorMessage: 'Error message',
-                      detailedError:
-                          'Detailed error message. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-                    ),
-                  ),
-                ),
-              );
-            },
-          ),
+          _waitingPageDemoButton(context),
           const SizedBox(height: 16),
-          _DemoCard(
-            title: 'Waiting Page Demo',
-            description: 'Demonstrates waiting page',
-            icon: Icons.hourglass_empty,
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => Scaffold(
-                    appBar: AppBar(
-                      title: const Text('Waiting Page Demo'),
-                      actions: [
-                        IconButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                          icon: const Icon(Icons.close),
-                        ),
-                      ],
-                    ),
-                    body: WaitingPage(message: 'Loading...'),
-                  ),
-                ),
-              );
-            },
-          ),
+          _loggingPageDemoButton(context),
         ],
       ),
+    );
+  }
+
+  _DemoCard _authDemoButton(BuildContext context) {
+    return _DemoCard(
+      title: 'Auth Demo',
+      description: 'Demonstrates authentication with custom user models',
+      icon: Icons.login,
+      onTap: () {
+        GoRouter.of(context).push('/auth');
+      },
+    );
+  }
+
+  _DemoCard _loginButtonconst(BuildContext context) {
+    return _DemoCard(
+      title: 'Login Widget Demo',
+      description: 'Demonstrates the login widget',
+      icon: Icons.login,
+      onTap: () {
+        final authService = createMockAuthService();
+
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) {
+              return Scaffold(
+                appBar: AppBar(
+                  title: const Text('Login Widget Demo'),
+                  backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+                ),
+                body: BlocProvider<AnyhooAuthCubit<ExampleUser>>(
+                  create: (_) =>
+                      AnyhooAuthCubit<ExampleUser>(authService: authService, converter: ExampleUserConverter()),
+                  child: LoginWidget(title: 'Example app', assetLogoPath: 'assets/images/logo.webp'),
+                ),
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
+
+  _DemoCard _enhancedUserDemoButton(BuildContext context) {
+    return _DemoCard(
+      title: 'Enhance User Demo',
+      description: 'Demonstrates authentication with custom user models',
+      icon: Icons.login,
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => BlocProvider(
+              create: (_) => AnyhooAuthCubit<ExampleUser>(
+                authService: createMockAuthService(),
+                converter: ExampleUserConverter(),
+                enhanceUserService: createMockEnhanceUserService(),
+              ),
+              child: EnhanceUserDemoPage(),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  _DemoCard _analyticsDemoButton(BuildContext context) {
+    return _DemoCard(
+      title: 'Analytics & Crashlytics Demo',
+      description: 'Demonstrates Firebase Analytics and Crashlytics',
+      icon: Icons.analytics,
+      onTap: () {
+        GoRouter.of(context).push('/analytics');
+      },
+    );
+  }
+
+  _DemoCard _imageSelectorDemoButton(BuildContext context) {
+    return _DemoCard(
+      title: 'Image Selector Demo',
+      description: 'Demonstrates image selection from gallery, camera, or stock photos',
+      icon: Icons.image,
+      onTap: () {
+        Navigator.push(context, MaterialPageRoute(builder: (_) => const ImageSelectorDemoPage()));
+      },
+    );
+  }
+
+  _DemoCard _remoteConfigDemoButton(BuildContext context) {
+    return _DemoCard(
+      title: 'Remote Config Demo',
+      description: 'Demonstrates remote config',
+      icon: Icons.settings,
+      onTap: () {
+        GoRouter.of(context).push('/remote-config');
+      },
+    );
+  }
+
+  _DemoCard _argumentsDemoButton(BuildContext context) {
+    return _DemoCard(
+      title: 'Arguments Demo',
+      description: 'Demonstrates arguments passed in when launching the app',
+      icon: Icons.image,
+      onTap: () {
+        Navigator.push(context, MaterialPageRoute(builder: (_) => ArgumentsDemoPage(arguments: arguments)));
+      },
+    );
+  }
+
+  _DemoCard _firestoreDemoButton(BuildContext context) {
+    return _DemoCard(
+      title: 'Firestore Demo',
+      description: 'Demonstrates Firestore usage',
+      icon: Icons.data_array,
+      onTap: () {
+        Navigator.push(context, MaterialPageRoute(builder: (_) => FirestoreDemoPage(firestore: firestore)));
+      },
+    );
+  }
+
+  _DemoCard _routeDemoButton(BuildContext context) {
+    return _DemoCard(
+      title: 'Route First Demo',
+      description: 'Demonstrates route first demo',
+      icon: Icons.route,
+      onTap: () {
+        GoRouter.of(context).push('/route-demo');
+      },
+    );
+  }
+
+  _DemoCard _errorPageDemoButton(BuildContext context) {
+    return _DemoCard(
+      title: 'Error Page Demo',
+      description: 'Demonstrates error page',
+      icon: Icons.error,
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => Scaffold(
+              appBar: AppBar(
+                title: const Text('Error Page Demo'),
+                actions: [
+                  IconButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    icon: const Icon(Icons.close),
+                  ),
+                ],
+              ),
+              body: ErrorPage(
+                errorMessage: 'Error message',
+                detailedError:
+                    'Detailed error message. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  _DemoCard _waitingPageDemoButton(BuildContext context) {
+    return _DemoCard(
+      title: 'Waiting Page Demo',
+      description: 'Demonstrates waiting page',
+      icon: Icons.hourglass_empty,
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => Scaffold(
+              appBar: AppBar(
+                title: const Text('Waiting Page Demo'),
+                actions: [
+                  IconButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    icon: const Icon(Icons.close),
+                  ),
+                ],
+              ),
+              body: WaitingPage(message: 'Loading...'),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  _DemoCard _loggingPageDemoButton(BuildContext context) {
+    return _DemoCard(
+      title: 'Logging Demo',
+      description: 'Demonstrates logging',
+      icon: Icons.text_snippet,
+      onTap: () {
+        GoRouter.of(context).push('/logging');
+      },
     );
   }
 }
