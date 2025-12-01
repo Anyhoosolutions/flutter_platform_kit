@@ -1,6 +1,7 @@
 import 'package:anyhoo_core/arguments_parser.dart';
 import 'package:anyhoo_core/models/arguments.dart';
 import 'package:anyhoo_firebase/anyhoo_firebase.dart';
+import 'package:anyhoo_logging/anyhoo_logging.dart';
 import 'package:anyhoo_router/anyhoo_router.dart';
 import 'package:example_app/firebase_options.dart';
 import 'package:example_app/models/example_user_converter.dart';
@@ -13,6 +14,7 @@ import 'package:example_app/routes/remote_config_demo_route.dart';
 import 'package:example_app/routes/route_first_demo_route.dart';
 import 'package:example_app/routes/route_nested_demo_route.dart';
 import 'package:example_app/services/firebase_auth_service.dart' hide ExampleUserConverter;
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:anyhoo_auth/anyhoo_auth.dart';
@@ -23,12 +25,13 @@ import 'models/example_user.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  Logger.root.level = Level.ALL;
-  Logger.root.onRecord.listen((record) {
-    final str = '${record.loggerName}: ${record.level.name}: ${record.time}: ${record.message}';
-    // ignore: avoid_print
-    print('LOG: $str');
-  });
+
+  final loggingConfiguration = LoggingConfiguration(
+    logLevel: kDebugMode ? Level.ALL : Level.WARNING,
+    loggersAtInfo: [],
+    loggersAtWarning: [],
+    loggersAtSevere: [],
+  );
 
   final arguments = await ArgumentsParser.getArguments();
 
@@ -44,6 +47,7 @@ void main() async {
       converter: converter,
       arguments: arguments,
       firebaseInitializer: firebaseInitializer,
+      loggingConfiguration: loggingConfiguration,
     ),
   );
 }
@@ -53,6 +57,7 @@ class MyApp extends StatelessWidget {
   final AnyhooUserConverter<ExampleUser> converter;
   final Arguments arguments;
   final FirebaseInitializer firebaseInitializer;
+  final LoggingConfiguration loggingConfiguration;
 
   const MyApp({
     super.key,
@@ -60,6 +65,7 @@ class MyApp extends StatelessWidget {
     required this.converter,
     required this.arguments,
     required this.firebaseInitializer,
+    required this.loggingConfiguration,
   });
 
   @override
@@ -76,9 +82,12 @@ class MyApp extends StatelessWidget {
     ];
 
     final appRouter = AnyhooRouter(routes: routes).getGoRouter();
-    return BlocProvider(
-      create: (_) => AnyhooAuthCubit<ExampleUser>(authService: authService, converter: converter),
-      child: MaterialApp.router(title: 'Example app', routerConfig: appRouter),
+    return RepositoryProvider<LoggingConfiguration>(
+      create: (context) => loggingConfiguration,
+      child: BlocProvider(
+        create: (_) => AnyhooAuthCubit<ExampleUser>(authService: authService, converter: converter),
+        child: MaterialApp.router(title: 'Example app', routerConfig: appRouter),
+      ),
     );
   }
 }

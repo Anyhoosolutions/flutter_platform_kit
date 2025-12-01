@@ -1,12 +1,28 @@
 import 'package:logging/logging.dart';
 
 class LoggingConfiguration {
-  static void setupLogging({
-    Level logLevel = Level.WARNING,
+  final Level logLevel;
+  final Map<String, Level> loggers = {};
+
+  LoggingConfiguration({
+    required this.logLevel,
     required List<String> loggersAtInfo,
     required List<String> loggersAtWarning,
     required List<String> loggersAtSevere,
   }) {
+    for (final logger in loggersAtInfo) {
+      loggers[logger] = Level.INFO;
+    }
+    for (final logger in loggersAtWarning) {
+      loggers[logger] = Level.WARNING;
+    }
+    for (final logger in loggersAtSevere) {
+      loggers[logger] = Level.SEVERE;
+    }
+    _setupLogging();
+  }
+
+  void _setupLogging() {
     hierarchicalLoggingEnabled = true;
 
     Logger.root.level = logLevel;
@@ -21,16 +37,42 @@ class LoggingConfiguration {
       // }
     });
 
-    for (final logger in loggersAtSevere) {
-      Logger(logger).level = Level.SEVERE;
-    }
+    _updateLoggers();
+  }
 
-    for (final logger in loggersAtWarning) {
-      Logger(logger).level = Level.WARNING;
+  void _updateLoggers() {
+    for (final logger in loggers.keys) {
+      Logger(logger).level = loggers[logger] ?? Level.OFF;
     }
+  }
 
-    for (final logger in loggersAtInfo) {
-      Logger(logger).level = Level.INFO;
-    }
+  void addInfoLogger(String loggerName) {
+    loggers[loggerName] = Level.INFO;
+    _updateLoggers();
+  }
+
+  void addWarningLogger(String loggerName) {
+    loggers[loggerName] = Level.WARNING;
+    _updateLoggers();
+  }
+
+  void addSevereLogger(String loggerName) {
+    loggers[loggerName] = Level.SEVERE;
+    _updateLoggers();
+  }
+
+  void removeInfoLogger(String loggerName) {
+    loggers.remove(loggerName);
+    _updateLoggers();
+  }
+
+  void removeWarningLogger(String loggerName) {
+    loggers.remove(loggerName);
+    _updateLoggers();
+  }
+
+  void removeSevereLogger(String loggerName) {
+    loggers.remove(loggerName);
+    _updateLoggers();
   }
 }

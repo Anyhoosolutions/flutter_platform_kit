@@ -1,5 +1,6 @@
 import 'package:anyhoo_logging/anyhoo_logging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:logging/logging.dart';
 
 final _log = Logger('LoggingPage');
@@ -10,6 +11,8 @@ class LoggingPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loggingConfiguration = context.read<LoggingConfiguration>();
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Anyhoo Packages Example'),
@@ -23,8 +26,8 @@ class LoggingPage extends StatelessWidget {
             SizedBox(height: 16),
             Divider(indent: 40, endIndent: 40, thickness: 1),
             SizedBox(height: 56),
-            _configToAllowInfoLoggingButton(),
-            _configToOnlyAllowSevereLoggingButton(),
+            _configToAllowInfoLoggingButton(loggingConfiguration),
+            _configToOnlyAllowSevereLoggingButton(loggingConfiguration),
             SizedBox(height: 32),
 
             _logInfoButton(),
@@ -35,29 +38,19 @@ class LoggingPage extends StatelessWidget {
     );
   }
 
-  Widget _configToAllowInfoLoggingButton() {
+  Widget _configToAllowInfoLoggingButton(LoggingConfiguration loggingConfiguration) {
     return OutlinedButton(
       onPressed: () {
-        LoggingConfiguration.setupLogging(
-          logLevel: 'INFO',
-          loggersAtInfo: ['LoggingPage'],
-          loggersAtWarning: [],
-          loggersAtSevere: [],
-        );
+        loggingConfiguration.addInfoLogger('LoggingPage');
       },
       child: Text('Config to allow info logging'),
     );
   }
 
-  Widget _configToOnlyAllowSevereLoggingButton() {
+  Widget _configToOnlyAllowSevereLoggingButton(LoggingConfiguration loggingConfiguration) {
     return OutlinedButton(
       onPressed: () {
-        LoggingConfiguration.setupLogging(
-          logLevel: 'INFO',
-          loggersAtInfo: [],
-          loggersAtWarning: [],
-          loggersAtSevere: ['LoggingPage'],
-        );
+        loggingConfiguration.addSevereLogger('LoggingPage');
       },
       child: Text('Config to only allow severe logging'),
     );
