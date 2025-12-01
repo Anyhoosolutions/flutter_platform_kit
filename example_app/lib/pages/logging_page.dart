@@ -20,6 +20,7 @@ class LoggingPage extends StatelessWidget {
           mainAxisAlignment: .center,
           children: [
             Text('Logging Page'),
+            SizedBox(height: 16),
             Divider(indent: 40, endIndent: 40, thickness: 1),
             SizedBox(height: 56),
             _configToAllowInfoLoggingButton(),
@@ -52,7 +53,7 @@ class LoggingPage extends StatelessWidget {
     return OutlinedButton(
       onPressed: () {
         LoggingConfiguration.setupLogging(
-          logLevel: 'SEVERE',
+          logLevel: 'INFO',
           loggersAtInfo: [],
           loggersAtWarning: [],
           loggersAtSevere: ['LoggingPage'],

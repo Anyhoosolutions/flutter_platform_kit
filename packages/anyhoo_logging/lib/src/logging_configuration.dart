@@ -1,30 +1,25 @@
 import 'package:logging/logging.dart';
-import 'package:logging/logging.dart' as logging;
 
 class LoggingConfiguration {
   static void setupLogging({
-    required String logLevel,
+    Level logLevel = Level.WARNING,
     required List<String> loggersAtInfo,
     required List<String> loggersAtWarning,
     required List<String> loggersAtSevere,
   }) {
-    logging.hierarchicalLoggingEnabled = true;
+    hierarchicalLoggingEnabled = true;
 
-    final level = switch (logLevel) {
-      'ALL' => Level.ALL,
-      'FINEST' => Level.FINEST,
-      'FINER' => Level.FINER,
-      'FINE' => Level.FINE,
-      'CONFIG' => Level.CONFIG,
-      'INFO' => Level.INFO,
-      'WARNING' => Level.WARNING,
-      'SEVERE' => Level.SEVERE,
-      'SHOUT' => Level.SHOUT,
-      'OFF' => Level.OFF,
-      _ => throw Exception('Invalid log level: $logLevel'),
-    };
+    Logger.root.level = logLevel;
 
-    Logger.root.level = level;
+    Logger.root.onRecord.listen((record) {
+      final str = '${record.loggerName}: ${record.level.name}: ${record.time}: ${record.message}';
+      // ignore: avoid_print
+      print('LOG: $str');
+
+      // if (profile?.trackLogs ?? false) {
+      //   loggingBloc.add(LoggingEvent.addLog(str));
+      // }
+    });
 
     for (final logger in loggersAtSevere) {
       Logger(logger).level = Level.SEVERE;
