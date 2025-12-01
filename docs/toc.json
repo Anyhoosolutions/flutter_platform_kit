@@ -117,6 +117,19 @@
 					"subpages": []
 				}
 			]
+		},
+		{
+			"filepath": "anyhoo_form_builder_widgets/README.md",
+			"name": "Form Builder Widgets",
+			"title": "Form Builder Widgets",
+			"subpages": [
+				{
+					"filepath": "anyhoo_form_builder_widgets/CHANGELOG.md",
+					"name": "Changelog",
+					"title": "Changelog",
+					"subpages": []
+				}
+			]
 		}
 	]
 }
