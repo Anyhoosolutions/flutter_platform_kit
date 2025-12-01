@@ -11,8 +11,10 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:widgetbook/widgetbook.dart' as _widgetbook;
-import 'package:widgetbook_workspace/anyhoo_app_bar/app_bar.dart'
-    as _widgetbook_workspace_anyhoo_app_bar_app_bar;
+import 'package:widgetbook_workspace/anyhoo_app_bar/anyhoo_app_bar.dart'
+    as _widgetbook_workspace_anyhoo_app_bar_anyhoo_app_bar;
+import 'package:widgetbook_workspace/anyhoo_app_bar/anyhoo_bottom_bar.dart'
+    as _widgetbook_workspace_anyhoo_app_bar_anyhoo_bottom_bar;
 import 'package:widgetbook_workspace/anyhoo_core/error_display_widget.dart'
     as _widgetbook_workspace_anyhoo_core_error_display_widget;
 import 'package:widgetbook_workspace/anyhoo_core/error_page.dart'
@@ -35,7 +37,17 @@ final directories = <_widgetbook.WidgetbookNode>[
         useCases: [
           _widgetbook.WidgetbookUseCase(
             name: 'AnyhooAppBar',
-            builder: _widgetbook_workspace_anyhoo_app_bar_app_bar.build,
+            builder: _widgetbook_workspace_anyhoo_app_bar_anyhoo_app_bar.build,
+          ),
+        ],
+      ),
+      _widgetbook.WidgetbookComponent(
+        name: 'AnyhooBottomBar',
+        useCases: [
+          _widgetbook.WidgetbookUseCase(
+            name: 'AnyhooBottomBar',
+            builder:
+                _widgetbook_workspace_anyhoo_app_bar_anyhoo_bottom_bar.build,
           ),
         ],
       ),

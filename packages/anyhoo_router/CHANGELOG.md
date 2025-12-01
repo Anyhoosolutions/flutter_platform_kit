@@ -1,3 +1,8 @@
+## 0.0.5
+
+* Logging listener
+* GoRouterWrapper
+
 ## 0.0.4
 
 * Change class names

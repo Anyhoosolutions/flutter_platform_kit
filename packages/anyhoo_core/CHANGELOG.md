@@ -1,5 +1,9 @@
 ## 0.0.8
 
+* DeviceUtils
+
+## 0.0.8
+
 * SimpleBlocObserver
 * CurrentTimeRepository
 * TimezoneRepository

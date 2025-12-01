@@ -1,5 +1,8 @@
 import 'package:anyhoo_auth/services/anyhoo_enhance_user_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:logging/logging.dart';
+
+final _log = Logger('AnyhooFirebaseEnhanceUserService');
 
 class AnyhooFirebaseEnhanceUserService extends AnyhooEnhanceUserService {
   AnyhooFirebaseEnhanceUserService({required this.path, FirebaseFirestore? firestore})
@@ -11,6 +14,9 @@ class AnyhooFirebaseEnhanceUserService extends AnyhooEnhanceUserService {
       FirebaseFirestore firestore, String path) {
     return (Map<String, dynamic> user) async {
       final id = user['id'] ?? user['uid'] ?? '';
+      _log.info('Enhancing user (id): $id');
+      _log.info('user values: ${user.entries}');
+
       if (id.isEmpty) {
         throw Exception('User map must contain either "id" or "uid" field');
       }
