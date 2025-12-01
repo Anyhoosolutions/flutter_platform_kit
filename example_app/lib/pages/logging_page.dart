@@ -28,6 +28,9 @@ class LoggingPage extends StatelessWidget {
             SizedBox(height: 56),
             _configToAllowInfoLoggingButton(loggingConfiguration),
             _configToOnlyAllowSevereLoggingButton(loggingConfiguration),
+
+            SizedBox(height: 32),
+            Divider(indent: 120, endIndent: 120, thickness: 1),
             SizedBox(height: 32),
 
             _logInfoButton(),
