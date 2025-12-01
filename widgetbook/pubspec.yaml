@@ -28,6 +28,8 @@ dependencies:
     path: ../packages/anyhoo_shimmer
   anyhoo_app_bar:
     path: ../packages/anyhoo_app_bar
+  anyhoo_form_builder_widgets:
+    path: ../packages/anyhoo_form_builder_widgets
 
 dev_dependencies:
   flutter_test:

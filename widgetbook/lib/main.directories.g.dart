@@ -23,6 +23,8 @@ import 'package:widgetbook_workspace/anyhoo_core/waiting_page.dart'
     as _widgetbook_workspace_anyhoo_core_waiting_page;
 import 'package:widgetbook_workspace/anyhoo_firebase/firebase_analytics_page.dart'
     as _widgetbook_workspace_anyhoo_firebase_firebase_analytics_page;
+import 'package:widgetbook_workspace/anyhoo_form_builder_widgets/anyhoo_form_builder_multi_select.dart'
+    as _widgetbook_workspace_anyhoo_form_builder_widgets_anyhoo_form_builder_multi_select;
 import 'package:widgetbook_workspace/anyhoo_image_selector/image_selector_widget.dart'
     as _widgetbook_workspace_anyhoo_image_selector_image_selector_widget;
 import 'package:widgetbook_workspace/anyhoo_shimmer/shimmer.dart'
@@ -96,6 +98,22 @@ final directories = <_widgetbook.WidgetbookNode>[
             name: 'FirebaseAnalyticsPage',
             builder:
                 _widgetbook_workspace_anyhoo_firebase_firebase_analytics_page
+                    .build,
+          ),
+        ],
+      ),
+    ],
+  ),
+  _widgetbook.WidgetbookFolder(
+    name: 'anyhoo_form_builder_widgets',
+    children: [
+      _widgetbook.WidgetbookComponent(
+        name: 'AnyhooFormBuilderMultiSelect',
+        useCases: [
+          _widgetbook.WidgetbookUseCase(
+            name: 'Default',
+            builder:
+                _widgetbook_workspace_anyhoo_form_builder_widgets_anyhoo_form_builder_multi_select
                     .build,
           ),
         ],
