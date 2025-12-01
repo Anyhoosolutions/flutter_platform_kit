@@ -7,7 +7,7 @@ import 'package:widgetbook/widgetbook.dart';
 import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
 import 'package:widgetbook_workspace/helpers/wrap_in_mocks_helper.dart';
 
-@widgetbook.UseCase(name: 'Default', type: AnyhooFormBuilderMultiSelect, path: 'anyhoo_form_builder_widgets')
+@widgetbook.UseCase(name: 'Default', type: AnyhooFormBuilderMultiSelectSearchable, path: 'anyhoo_form_builder_widgets')
 Widget build(BuildContext context) {
   final colorSchemeOptions = ['red', 'green', 'purple'];
   final colorScheme = context.knobs.list(label: 'Color scheme', options: colorSchemeOptions, initialOption: 'red');
@@ -25,15 +25,11 @@ Widget build(BuildContext context) {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              AnyhooFormBuilderMultiSelect<String>(
-                formFieldKey: 'number',
+              AnyhooFormBuilderMultiSelectSearchable(
                 items: ['First', 'Second', 'Third'],
-                labelExtractor: (Object item) {
-                  return item.toString();
-                },
                 hintText: 'Select a string',
-                itemTypeText: 'Number',
-                initialValue: ['Third', 'Second'],
+                selectedItems: ['Third', 'Second'],
+                formFieldKey: 'number',
               ),
               ElevatedButton(
                 onPressed: () {
@@ -53,11 +49,17 @@ Widget build(BuildContext context) {
 }
 
 ColorScheme getColorScheme(String colorScheme) {
-  final cs = ColorScheme.fromSeed(seedColor: Colors.white);
+  final color = switch (colorScheme) {
+    'red' => Colors.red,
+    'green' => Colors.green,
+    'purple' => Colors.purple,
+    _ => Colors.white,
+  };
+  final cs = ColorScheme.fromSeed(seedColor: color);
   return switch (colorScheme) {
-    'red' => cs.copyWith(primary: Colors.red),
-    'green' => cs.copyWith(primary: Colors.green),
-    'purple' => cs.copyWith(primary: Colors.purple),
+    'red' => cs.copyWith(primary: Colors.red, brightness: Brightness.dark),
+    'green' => cs.copyWith(primary: Colors.green, brightness: Brightness.dark),
+    'purple' => cs.copyWith(primary: Colors.purple, brightness: Brightness.dark),
     _ => cs,
   };
 }
