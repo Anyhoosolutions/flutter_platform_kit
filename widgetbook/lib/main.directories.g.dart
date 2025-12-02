@@ -31,6 +31,8 @@ import 'package:widgetbook_workspace/anyhoo_form_builder_widgets/anyhoo_multi_se
     as _widgetbook_workspace_anyhoo_form_builder_widgets_anyhoo_multi_select_searchable;
 import 'package:widgetbook_workspace/anyhoo_image_selector/image_selector_widget.dart'
     as _widgetbook_workspace_anyhoo_image_selector_image_selector_widget;
+import 'package:widgetbook_workspace/anyhoo_search_bar/anyhoo_search_bar.dart'
+    as _widgetbook_workspace_anyhoo_search_bar_anyhoo_search_bar;
 import 'package:widgetbook_workspace/anyhoo_shimmer/shimmer.dart'
     as _widgetbook_workspace_anyhoo_shimmer_shimmer;
 
@@ -157,6 +159,21 @@ final directories = <_widgetbook.WidgetbookNode>[
             builder:
                 _widgetbook_workspace_anyhoo_image_selector_image_selector_widget
                     .build,
+          ),
+        ],
+      ),
+    ],
+  ),
+  _widgetbook.WidgetbookFolder(
+    name: 'anyhoo_search_bar',
+    children: [
+      _widgetbook.WidgetbookComponent(
+        name: 'AnyhooSearchBar',
+        useCases: [
+          _widgetbook.WidgetbookUseCase(
+            name: 'Default',
+            builder:
+                _widgetbook_workspace_anyhoo_search_bar_anyhoo_search_bar.build,
           ),
         ],
       ),

@@ -1,10 +1,8 @@
-/// UanyhooUsearchUbar Package
+/// anyhoo_search_bar Package
 ///
-/// <Brief description of what the package does>
+/// A package for a search bar
+
+// ignore: unnecessary_library_name
 library anyhoo_search_bar;
 
-export 'src/calculator.dart';
-
-// Add exports for all public API files
-// export 'path/to/public_file1.dart';
-// export 'path/to/public_file2.dart';
+export 'src/anyhoo_search_bar.dart';
