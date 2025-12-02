@@ -84,6 +84,23 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Check for version in pubspec.yaml
+        run: |
+          for package_dir in packages/*/; do
+            package_name=$(basename "$package_dir")
+            pubspec_version=$(cat "$package_dir/pubspec.yaml" | grep "version:" | awk '{print $2}')
+
+            CHANGELOG_PATH="$package_dir/CHANGELOG.md"
+            changelog_version=$(cat "$CHANGELOG_PATH" | grep "## " | head -n 1 | awk '{print $2}')
+
+            
+            if [ "$pubspec_version" != "$changelog_version" ]; then
+            echo "❌ Error: The version in the pubspec.yaml does not match the version in the CHANGELOG.md"
+            echo "   Package: $package_name, Version: $pubspec_version, Changelog Version: $changelog_version"
+              exit 1
+            fi
+          done
+
       - name: Verify CHANGELOGs have been updated
         if: github.event_name == 'pull_request'
         run: |
