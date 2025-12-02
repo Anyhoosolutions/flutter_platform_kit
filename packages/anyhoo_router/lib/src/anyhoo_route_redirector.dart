@@ -99,8 +99,13 @@ class AnyhooRouteRedirector<T extends Enum> {
         return redirecting(originalPath, null);
       }
 
-      // Follow the redirect chain recursively to handle nested redirects
-      // This ensures that if the redirected path also redirects, we follow it
+      // TODO: At some point this should be working in GoRouter
+
+      // Follow the redirect chain recursively to handle nested redirects.
+      // While GoRouter's redirect function should be called again after a redirect,
+      // in practice it may not happen immediately in the same navigation cycle.
+      // This ensures redirect chains are resolved in a single call, preventing
+      // the need to wait for multiple navigation cycles.
       final finalRedirect = _followRedirectChain(redirectUri, <String>{originalPath});
       return redirecting(originalPath, finalRedirect);
     }

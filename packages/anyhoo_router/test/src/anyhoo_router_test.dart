@@ -7,7 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mocktail/mocktail.dart';
 
-enum AnyhooTestRouteName { home, login, users, profiles, accounts }
+enum AnyhooTestRouteName { home, login, users, profiles, accounts, usersDetails, accountsDetails, profilesDetails }
 
 void main() {
   group('AnyhooRouter', () {
@@ -54,30 +54,48 @@ void main() {
       expect(goRouter.routeInformationProvider.value.uri.path, '/users');
     });
 
-    // Note: This test is currently skipped due to route naming conflicts with path parameters.
-    // Routes with path parameters create nested routes that may have duplicate names.
-    // This needs to be fixed in the route sorter or route structure.
     testWidgets('should redirect recursively with path parameters', (WidgetTester tester) async {
       final routes = [
         DummyRoute(path: '/', title: 'Home', routeName: AnyhooTestRouteName.home, requireLogin: false, redirect: null),
         DummyRoute(
+          path: '/users',
+          title: 'Users',
+          routeName: AnyhooTestRouteName.users,
+          requireLogin: false,
+          redirect: null,
+        ),
+        DummyRoute(
           path: '/users/:userId',
           title: 'User Details',
-          routeName: AnyhooTestRouteName.users,
+          routeName: AnyhooTestRouteName.usersDetails,
+          requireLogin: false,
+          redirect: null,
+        ),
+        DummyRoute(
+          path: '/profiles',
+          title: 'Profiles',
+          routeName: AnyhooTestRouteName.profiles,
           requireLogin: false,
           redirect: null,
         ),
         DummyRoute(
           path: '/profiles/:userId',
           title: 'Profile',
-          routeName: AnyhooTestRouteName.profiles,
+          routeName: AnyhooTestRouteName.profilesDetails,
           redirect: '/users/:userId',
           requireLogin: false,
         ),
         DummyRoute(
+          path: '/accounts',
+          title: 'Accounts',
+          routeName: AnyhooTestRouteName.accounts,
+          requireLogin: false,
+          redirect: null,
+        ),
+        DummyRoute(
           path: '/accounts/:userId',
           title: 'Account',
-          routeName: AnyhooTestRouteName.accounts,
+          routeName: AnyhooTestRouteName.accountsDetails,
           redirect: '/profiles/:userId',
           requireLogin: false,
         ),
