@@ -1,3 +1,4 @@
+import 'package:anyhoo_core/extensions/anyhoo_string_extensions.dart';
 import 'package:anyhoo_logging/anyhoo_logging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -18,7 +19,7 @@ class LoggingPage extends StatelessWidget {
         title: const Text('Anyhoo Packages Example'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       ),
-      body: Center(
+      body: SingleChildScrollView(
         child: Column(
           mainAxisAlignment: .center,
           children: [
@@ -35,6 +36,24 @@ class LoggingPage extends StatelessWidget {
 
             _logInfoButton(),
             _logSevereButton(),
+
+            SizedBox(height: 32),
+            Divider(indent: 120, endIndent: 120, thickness: 1),
+            SizedBox(height: 32),
+
+            Text('Logs:'),
+            Column(
+              children: loggingConfiguration.loggingCubit!.state.map((e) {
+                return Row(
+                  children: [
+                    SizedBox(width: 16),
+                    Text(e.loggerName.substringSafe(0, 12).padRight(20)),
+                    SizedBox(width: 8),
+                    Text(e.message.substringSafe(0, 30)),
+                  ],
+                );
+              }).toList(),
+            ),
           ],
         ),
       ),

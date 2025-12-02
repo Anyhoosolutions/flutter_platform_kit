@@ -6,3 +6,4 @@
 library anyhoo_logging;
 
 export 'src/logging_configuration.dart';
+export 'src/logging_cubit.dart';

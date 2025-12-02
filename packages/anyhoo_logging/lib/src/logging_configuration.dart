@@ -1,14 +1,17 @@
+import 'package:anyhoo_logging/src/logging_cubit.dart';
 import 'package:logging/logging.dart';
 
 class LoggingConfiguration {
   final Level logLevel;
   final Map<String, Level> loggers = {};
+  final LoggingCubit? loggingCubit;
 
   LoggingConfiguration({
     required this.logLevel,
     required List<String> loggersAtInfo,
     required List<String> loggersAtWarning,
     required List<String> loggersAtSevere,
+    this.loggingCubit,
   }) {
     for (final logger in loggersAtInfo) {
       loggers[logger] = Level.INFO;
@@ -33,8 +36,9 @@ class LoggingConfiguration {
       print('LOG: $str');
 
       // if (profile?.trackLogs ?? false) {
-      //   loggingBloc.add(LoggingEvent.addLog(str));
-      // }
+      if (loggingCubit != null) {
+        loggingCubit!.log(record);
+      }
     });
 
     _updateLoggers();
@@ -47,32 +51,36 @@ class LoggingConfiguration {
   }
 
   void addInfoLogger(String loggerName) {
-    loggers[loggerName] = Level.INFO;
-    _updateLoggers();
+    addLogger(loggerName, Level.INFO);
   }
 
   void addWarningLogger(String loggerName) {
-    loggers[loggerName] = Level.WARNING;
-    _updateLoggers();
+    addLogger(loggerName, Level.WARNING);
   }
 
   void addSevereLogger(String loggerName) {
-    loggers[loggerName] = Level.SEVERE;
+    addLogger(loggerName, Level.SEVERE);
+  }
+
+  void addLogger(String loggerName, Level level) {
+    loggers[loggerName] = level;
+    _updateLoggers();
+  }
+
+  void removeLogger(String loggerName) {
+    loggers.remove(loggerName);
     _updateLoggers();
   }
 
   void removeInfoLogger(String loggerName) {
-    loggers.remove(loggerName);
-    _updateLoggers();
+    removeLogger(loggerName);
   }
 
   void removeWarningLogger(String loggerName) {
-    loggers.remove(loggerName);
-    _updateLoggers();
+    removeLogger(loggerName);
   }
 
   void removeSevereLogger(String loggerName) {
-    loggers.remove(loggerName);
-    _updateLoggers();
+    removeLogger(loggerName);
   }
 }

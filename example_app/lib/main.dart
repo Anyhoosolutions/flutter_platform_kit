@@ -26,11 +26,13 @@ import 'models/example_user.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  final loggingCubit = LoggingCubit(maxLogs: 10);
   final loggingConfiguration = LoggingConfiguration(
     logLevel: kDebugMode ? Level.ALL : Level.WARNING,
     loggersAtInfo: [],
     loggersAtWarning: [],
     loggersAtSevere: [],
+    loggingCubit: loggingCubit,
   );
 
   final arguments = await ArgumentsParser.getArguments();
@@ -84,8 +86,13 @@ class MyApp extends StatelessWidget {
     final appRouter = AnyhooRouter(routes: routes).getGoRouter();
     return RepositoryProvider<LoggingConfiguration>(
       create: (context) => loggingConfiguration,
-      child: BlocProvider(
-        create: (_) => AnyhooAuthCubit<ExampleUser>(authService: authService, converter: converter),
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider(create: (_) => loggingConfiguration.loggingCubit!),
+          BlocProvider(
+            create: (_) => AnyhooAuthCubit<ExampleUser>(authService: authService, converter: converter),
+          ),
+        ],
         child: MaterialApp.router(title: 'Example app', routerConfig: appRouter),
       ),
     );

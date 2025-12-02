@@ -15,4 +15,17 @@ extension StringExtension on String {
   String repeat(int n) {
     return List.generate(n, (index) => this).join();
   }
+
+  String substringSafe(int start, int end) {
+    if (start < 0) {
+      start = 0;
+    }
+    if (end > length) {
+      end = length;
+    }
+    if (start > end) {
+      return '';
+    }
+    return substring(start, end);
+  }
 }
