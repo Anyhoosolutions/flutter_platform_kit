@@ -1,3 +1,7 @@
+## 0.0.6
+ 
+* Fix nested redirects
+
 ## 0.0.5
  
 * Logging listener
