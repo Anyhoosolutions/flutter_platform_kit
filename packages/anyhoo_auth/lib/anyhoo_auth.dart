@@ -12,3 +12,5 @@ export 'services/anyhoo_mock_auth_service.dart';
 export 'models/anyhoo_user_converter.dart';
 export 'widgets/login_widget.dart';
 export 'services/anyhoo_enhance_user_service.dart';
+export 'updater/anyhoo_user_updater.dart';
+export 'updater/updatable_for_anyhoo_user.dart';

@@ -1,3 +1,7 @@
+## 0.0.10
+ 
+* Export updater classes
+
 ## 0.0.9
  
 * Logging for changing state
