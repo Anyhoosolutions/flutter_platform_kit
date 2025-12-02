@@ -42,17 +42,21 @@ class LoggingPage extends StatelessWidget {
             SizedBox(height: 32),
 
             Text('Logs:'),
-            Column(
-              children: loggingConfiguration.loggingCubit!.state.map((e) {
-                return Row(
-                  children: [
-                    SizedBox(width: 16),
-                    Text(e.loggerName.substringSafe(0, 12).padRight(20)),
-                    SizedBox(width: 8),
-                    Text(e.message.substringSafe(0, 30)),
-                  ],
+            BlocBuilder<LoggingCubit, List<LogRecord>>(
+              builder: (context, logs) {
+                return Column(
+                  children: logs.map((e) {
+                    return Row(
+                      children: [
+                        SizedBox(width: 16),
+                        Text(e.loggerName.substringSafe(0, 12).padRight(20)),
+                        SizedBox(width: 8),
+                        Text(e.message.substringSafe(0, 30)),
+                      ],
+                    );
+                  }).toList(),
                 );
-              }).toList(),
+              },
             ),
           ],
         ),

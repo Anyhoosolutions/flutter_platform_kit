@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:remote_config/remote_config.dart';
+import 'package:anyhoo_remote_config/anyhoo_remote_config.dart';
 
 class RemoteConfigDemoPage extends StatelessWidget {
-  final RemoteConfigValues remoteConfigValues;
+  final AnyhooRemoteConfigValues remoteConfigValues;
 
   const RemoteConfigDemoPage({super.key, required this.remoteConfigValues});
 

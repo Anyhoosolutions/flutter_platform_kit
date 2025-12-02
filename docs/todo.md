@@ -12,3 +12,4 @@
 - [x] Google sign in 
 - [ ] Apple sign in
 - [ ] Admin role
+- [ ] Check for version in pubspec.yaml

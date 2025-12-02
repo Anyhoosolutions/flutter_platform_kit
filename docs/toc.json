@@ -80,12 +80,12 @@
 			]
 		},
 		{
-			"filepath": "remote_config/README.md",
-			"name": "Remote Config",
-			"title": "Remote Config",
+			"filepath": "anyhoo_remote_config/README.md",
+			"name": "Anyhoo Remote Config",
+			"title": "Anyhoo Remote Config",
 			"subpages": [
 				{
-					"filepath": "remote_config/CHANGELOG.md",
+					"filepath": "anyhoo_remote_config/CHANGELOG.md",
 					"name": "Changelog",
 					"title": "Changelog",
 					"subpages": []

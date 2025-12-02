@@ -1,8 +1,7 @@
-import 'package:remote_config/src/interface/remote_config_values.dart';
-import 'package:remote_config/src/services/remote_config_service.dart';
+import 'package:anyhoo_remote_config/anyhoo_remote_config.dart';
 
-class FakeRemoteConfigService implements RemoteConfigService {
-  FakeRemoteConfigService();
+class FakeAnyhooRemoteConfigService implements AnyhooRemoteConfigService {
+  FakeAnyhooRemoteConfigService();
 
   @override
   Future<void> setupRemoteConfig() async {}
@@ -16,8 +15,8 @@ class FakeRemoteConfigService implements RemoteConfigService {
   }
 }
 
-class FakeRemoteConfigValues implements RemoteConfigValues {
-  FakeRemoteConfigValues();
+class FakeAnyhooRemoteConfigValues implements AnyhooRemoteConfigValues {
+  FakeAnyhooRemoteConfigValues();
   final Map<String, String> values = {};
 
   @override

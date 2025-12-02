@@ -22,14 +22,15 @@ dependencies:
     path: ../packages/anyhoo_core
   anyhoo_firebase:
     path: ../packages/anyhoo_firebase
-  remote_config:
-    path: ../packages/remote_config
+  anyhoo_remote_config:
+    path: ../packages/anyhoo_remote_config
   anyhoo_shimmer:
     path: ../packages/anyhoo_shimmer
   anyhoo_app_bar:
     path: ../packages/anyhoo_app_bar
   anyhoo_form_builder_widgets:
     path: ../packages/anyhoo_form_builder_widgets
+
   flutter_form_builder: ^10.2.0
 
 dev_dependencies:
