@@ -75,6 +75,13 @@ packages:
       relative: true
     source: path
     version: "0.0.1"
+  anyhoo_remote_config:
+    dependency: "direct main"
+    description:
+      path: "../packages/anyhoo_remote_config"
+      relative: true
+    source: path
+    version: "0.0.1"
   anyhoo_router:
     dependency: transitive
     description:
@@ -1005,13 +1012,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.5.0"
-  remote_config:
-    dependency: "direct main"
-    description:
-      path: "../packages/remote_config"
-      relative: true
-    source: path
-    version: "0.0.1"
   resizable_widget:
     dependency: transitive
     description:

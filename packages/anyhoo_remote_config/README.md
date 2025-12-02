@@ -1,5 +1,5 @@
 
-# remote_config
+# anyhoo_remote_config
 
 ## Introduction
 

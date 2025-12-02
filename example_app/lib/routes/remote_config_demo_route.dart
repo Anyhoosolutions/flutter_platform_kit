@@ -3,15 +3,15 @@ import 'package:example_app/main.dart';
 import 'package:example_app/pages/remote_config_demo_page.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:remote_config/remote_config.dart';
+import 'package:anyhoo_remote_config/anyhoo_remote_config.dart';
 
 class RemoteConfigDemoRoute extends AnyhooRoute<AnyhooRouteName> {
   RemoteConfigDemoRoute();
 
   @override
   Widget? Function(BuildContext, GoRouterState)? get builder {
-    final remoteConfigValues = RRemoteConfigValues(values: {'fruit': 'pear'});
-    final remoteConfigService = FirebaseRemoteConfigService(remoteConfigValues: remoteConfigValues);
+    final remoteConfigValues = RemoteConfigValues(values: {'fruit': 'pear'});
+    final remoteConfigService = FirebaseAnyhooRemoteConfigService(remoteConfigValues: remoteConfigValues);
     remoteConfigService.setupRemoteConfig();
 
     remoteConfigService.getConfigUpdatesStream().listen((event) {
@@ -44,10 +44,10 @@ class RemoteConfigDemoRoute extends AnyhooRoute<AnyhooRouteName> {
   String get title => 'Remote Config Demo';
 }
 
-class RRemoteConfigValues implements RemoteConfigValues {
+class RemoteConfigValues implements AnyhooRemoteConfigValues {
   final Map<String, dynamic> values = {};
 
-  RRemoteConfigValues({required Map<String, dynamic> values}) {
+  RemoteConfigValues({required Map<String, dynamic> values}) {
     this.values.addAll(values);
     // ignore: avoid_print
     print('RRemoteConfigValues: $values');
