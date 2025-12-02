@@ -24,7 +24,7 @@ class AnyhooRouter<T extends Enum> {
   GoRouter getGoRouter() {
     final routeStackObserver = AnyhooRouteStackObserver();
 
-    final redirectHelper = AnyhooRouteRedirector(routes: routes);
+    final redirectHelper = AnyhooRouteRedirector(routes: routes, authCubit: authCubit);
 
     for (final page in routes) {
       _log.info('path: $page, redirect: ${page.redirect}');

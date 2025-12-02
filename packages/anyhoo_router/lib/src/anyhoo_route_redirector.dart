@@ -28,13 +28,13 @@ class AnyhooRouteRedirector<T extends Enum> {
   String? redirect(BuildContext context, GoRouterState state) {
     final uri = state.uri;
     final originalPath = uri.path;
-    log.info('originalPath: $originalPath');
+    log.info('redirect called for originalPath: $originalPath');
 
     // Debug logging
     // log.fine('AuthBloc state: ${authBloc.state.runtimeType}');
 
     final appRouterPage = getPageByPath(originalPath);
-    // log.info('appRouterPage: ${appRouterPage?.routeName}');
+    log.info('appRouterPage found: ${appRouterPage?.routeName}, redirect: ${appRouterPage?.redirect}');
 
     final user = getUser();
     // Only check authentication if AuthBloc is available
@@ -91,14 +91,51 @@ class AnyhooRouteRedirector<T extends Enum> {
     }
 
     if (appRouterPage != null && appRouterPage.redirect != null) {
-      log.info('Should redirect ${appRouterPage.routeName} to ${appRouterPage.redirect}');
+      log.info('Should redirect ${appRouterPage.routeName} from $originalPath to ${appRouterPage.redirect}');
       final redirectUri = getRedirect(originalPath, appRouterPage, appRouterPage.redirect!);
-      // log.info('redirectUri: $redirectUri');
-      return redirecting(originalPath, redirectUri);
+      log.info('Computed redirectUri: $redirectUri');
+
+      if (redirectUri == null) {
+        return redirecting(originalPath, null);
+      }
+
+      // TODO: At some point this should be working in GoRouter
+
+      // Follow the redirect chain recursively to handle nested redirects.
+      // While GoRouter's redirect function should be called again after a redirect,
+      // in practice it may not happen immediately in the same navigation cycle.
+      // This ensures redirect chains are resolved in a single call, preventing
+      // the need to wait for multiple navigation cycles.
+      final finalRedirect = _followRedirectChain(redirectUri, <String>{originalPath});
+      return redirecting(originalPath, finalRedirect);
     }
 
     // No redirect needed for normal routes
     return redirecting(originalPath, null);
+  }
+
+  /// Follows a redirect chain recursively, preventing infinite loops
+  String? _followRedirectChain(String redirectPath, Set<String> visitedPaths) {
+    // Prevent infinite redirect loops
+    if (visitedPaths.contains(redirectPath)) {
+      log.warning('Redirect loop detected: $visitedPaths -> $redirectPath');
+      return redirectPath; // Return the current path to break the loop
+    }
+
+    // Check if the redirected path also has a redirect
+    final redirectedPage = getPageByPath(redirectPath);
+    if (redirectedPage != null && redirectedPage.redirect != null) {
+      log.info('Following redirect chain: $redirectPath -> ${redirectedPage.redirect}');
+      final nextRedirect = getRedirect(redirectPath, redirectedPage, redirectedPage.redirect!);
+      if (nextRedirect == null) {
+        return redirectPath;
+      }
+      // Recursively follow the chain
+      return _followRedirectChain(nextRedirect, {...visitedPaths, redirectPath});
+    }
+
+    // No more redirects in the chain
+    return redirectPath;
   }
 
   String? redirecting(String originalPath, String? redirectTo) {
