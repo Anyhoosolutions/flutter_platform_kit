@@ -21,7 +21,6 @@ import 'package:anyhoo_auth/anyhoo_auth.dart';
 import 'package:logging/logging.dart';
 
 import 'models/example_user.dart';
-// import 'services/mock_auth_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
