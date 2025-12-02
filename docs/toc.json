@@ -143,6 +143,19 @@
 					"subpages": []
 				}
 			]
+		},
+		{
+			"filepath": "anyhoo_search_bar/README.md",
+			"name": "Anyhoo Search Bar",
+			"title": "Anyhoo Search Bar",
+			"subpages": [
+				{
+					"filepath": "anyhoo_search_bar/CHANGELOG.md",
+					"name": "Changelog",
+					"title": "Changelog",
+					"subpages": []
+				}
+			]
 		}
 	]
 }
