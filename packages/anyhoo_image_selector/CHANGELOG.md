@@ -1,3 +1,7 @@
+## 0.0.7
+
+* Renaming in library
+
 ## 0.0.6
 
 * Change class names
