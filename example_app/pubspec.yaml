@@ -30,6 +30,8 @@ dependencies:
     path: ../packages/remote_config
   anyhoo_shimmer:
     path: ../packages/anyhoo_shimmer
+  anyhoo_logging:
+    path: ../packages/anyhoo_logging
 
   # Required dependencies
   flutter_bloc: ^9.1.0
