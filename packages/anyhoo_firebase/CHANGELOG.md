@@ -1,3 +1,7 @@
+## 0.0.6
+ 
+* Export firestore_service.dart
+
 ## 0.0.5
  
 * Change class names
