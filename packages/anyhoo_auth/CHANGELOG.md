@@ -1,13 +1,13 @@
 ## 0.0.11
- 
+
 * Specify T extends AnyhooUser for AnyhooAuthService and AnyhooFirebaseAuthService
 
 ## 0.0.10
- 
+
 * Export updater classes
 
 ## 0.0.9
- 
+
 * Logging for changing state
 
 ## 0.0.8
