@@ -1,6 +1,6 @@
 ## 0.0.7
  
-* Add test for basic GoRouter functionality
+* Refactor to use AnyhooRouter everywhere in the example app
 
 ## 0.0.6
  
