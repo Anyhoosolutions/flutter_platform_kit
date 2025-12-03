@@ -44,7 +44,6 @@ part 'routes.g.dart';
     TypedGoRoute<ErrorPageDemoRoute>(path: 'error-page-demo'),
     TypedGoRoute<WaitingPageDemoRoute>(path: 'waiting-page-demo'),
     TypedGoRoute<LoginRoute>(path: 'login'),
-    TypedGoRoute<AboutRoute>(path: 'about'),
   ],
   name: 'home',
 )
@@ -188,15 +187,7 @@ class RouteRedirectingDemoRoute extends GoRouteData with $RouteRedirectingDemoRo
 
   @override
   String? redirect(BuildContext context, GoRouterState state) {
-    return 'route-demo/nested';
-  }
-}
-
-@immutable
-class AboutRoute extends GoRouteData with $AboutRoute {
-  @override
-  Widget build(BuildContext context, GoRouterState state) {
-    return Text('About');
+    return '/route-demo/nested';
   }
 }
 

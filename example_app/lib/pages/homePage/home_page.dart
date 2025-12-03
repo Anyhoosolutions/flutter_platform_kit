@@ -153,7 +153,7 @@ class HomePage extends StatelessWidget {
       description: 'Demonstrates error page',
       icon: Icons.error,
       onTap: () {
-        GoRouter.of(context).push('/error');
+        GoRouter.of(context).push('/error-page-demo');
       },
     );
   }
@@ -164,7 +164,7 @@ class HomePage extends StatelessWidget {
       description: 'Demonstrates waiting page',
       icon: Icons.hourglass_empty,
       onTap: () {
-        GoRouter.of(context).push('/waiting');
+        GoRouter.of(context).push('/waiting-page-demo');
       },
     );
   }
