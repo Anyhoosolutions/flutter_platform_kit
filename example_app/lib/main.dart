@@ -7,6 +7,7 @@ import 'package:example_app/firebase_options.dart';
 import 'package:example_app/models/example_user_converter.dart';
 import 'package:example_app/pages/analyticsDemo/analytics_demo_route.dart';
 import 'package:example_app/pages/authDemo/auth_page_route.dart';
+import 'package:example_app/pages/enhanceUserDemo/enhance_user_demo_page_route.dart';
 import 'package:example_app/pages/homePage/home_page_route.dart';
 import 'package:example_app/pages/imageSelectorDemo/image_selector_page_route.dart';
 import 'package:example_app/pages/loggingPage/logging_page_route.dart';
@@ -82,6 +83,7 @@ class MyApp extends StatelessWidget {
       RemoteConfigDemoRoute(),
       LoggingPageRoute(),
       ImageSelectorPageRoute(),
+      EnhanceUserDemoPageRoute(),
     ];
 
     final appRouter = AnyhooRouter(routes: routes).getGoRouter();
@@ -110,4 +112,5 @@ enum AnyhooRouteName {
   remoteConfig,
   logging,
   imageSelector,
+  enhanceUser,
 }

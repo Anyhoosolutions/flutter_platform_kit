@@ -14,8 +14,6 @@ class ImageSelectorPageRoute extends AnyhooRoute<AnyhooRouteName> {
 
   @override
   Widget? Function(BuildContext, GoRouterState)? get builder => (context, state) {
-    // return ImageSelectorDemoPage();
-
     final authService = createMockAuthService();
 
     return Scaffold(

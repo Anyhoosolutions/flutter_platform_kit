@@ -1,18 +1,11 @@
-import 'package:anyhoo_auth/cubit/anyhoo_auth_cubit.dart';
 import 'package:anyhoo_core/models/arguments.dart';
 import 'package:anyhoo_core/widgets/error_page.dart';
 import 'package:anyhoo_core/widgets/waiting_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:example_app/models/example_user.dart';
-import 'package:example_app/models/example_user_converter.dart';
 import 'package:example_app/pages/argumentsDemo/arguments_demo_page.dart';
-import 'package:example_app/pages/enhanceUserDemo/enhance_user_demo_page.dart';
 import 'package:example_app/pages/firestoreDemo/firestore_demo_page.dart';
 import 'package:example_app/pages/imageSelectorDemo/image_selector_demo_page.dart';
-import 'package:example_app/services/mock_auth_service.dart';
-import 'package:example_app/services/mock_enhance_user_service.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 /// Home page that serves as a navigation hub for package demos.
@@ -88,19 +81,7 @@ class HomePage extends StatelessWidget {
       description: 'Demonstrates authentication with custom user models',
       icon: Icons.login,
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => BlocProvider(
-              create: (_) => AnyhooAuthCubit<ExampleUser>(
-                authService: createMockAuthService(),
-                converter: ExampleUserConverter(),
-                enhanceUserService: createMockEnhanceUserService(),
-              ),
-              child: EnhanceUserDemoPage(),
-            ),
-          ),
-        );
+        GoRouter.of(context).push('/enhance-user');
       },
     );
   }
