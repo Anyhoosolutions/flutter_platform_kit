@@ -1,7 +1,9 @@
 import 'package:anyhoo_auth/cubit/anyhoo_auth_cubit.dart';
+import 'package:anyhoo_auth/cubit/anyhoo_auth_state.dart';
 import 'package:anyhoo_core/models/anyhoo_user.dart';
 import 'package:anyhoo_router/anyhoo_router.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mocktail/mocktail.dart';
@@ -20,11 +22,33 @@ void main() {
           builder: (context, state) => Text('Home'),
           routes: [
             GoRoute(path: 'users', builder: (context, state) => Text('Users')),
-            GoRoute(path: 'profiles', builder: (context, state) => Text('Profiles')),
+            GoRoute(path: 'login', builder: (context, state) => Text('Login')),
+            GoRoute(
+              path: 'profiles',
+              builder: (context, state) => Text('Profiles'),
+              redirect: (context, state) => '/users',
+            ),
             GoRoute(
               path: 'accounts',
               builder: (context, state) => Text('Accounts'),
               redirect: (context, state) => '/profiles',
+            ),
+            GoRoute(path: 'people/:id', builder: (context, state) => Text('People')),
+            GoRoute(
+              path: 'persons/:id',
+              builder: (context, state) => Text('Persons'),
+              redirect: (context, state) => '/people/${state.pathParameters['id']}',
+            ),
+            GoRoute(
+              path: 'protected',
+              builder: (context, state) => Text('Protected'),
+              redirect: (context, state) {
+                final user = context.read<AnyhooAuthCubit<TestUser>>().state.user;
+                if (user == null) {
+                  return '/login';
+                }
+                return null;
+              },
             ),
           ],
         ),
@@ -46,125 +70,89 @@ void main() {
       expect(find.text('Users'), findsOneWidget);
     });
 
-    // testWidgets('should redirect recursively: /accounts -> /profiles -> /users', (WidgetTester tester) async {
-    //   final routes = [
-    //     GoRoute(
-    //       path: '/',
-    //       builder: (context, state) => Text('Home'),
-    //       routes: [
-    //         GoRoute(path: 'users', builder: (context, state) => Text('Users')),
-    //         GoRoute(path: 'profiles', builder: (context, state) => Text('Profiles')),
-    //         GoRoute(path: 'accounts', builder: (context, state) => Text('Accounts')),
-    //       ],
-    //     ),
-    //   ];
+    testWidgets('should redirect: /profiles -> /users', (WidgetTester tester) async {
+      await tester.pumpWidget(MaterialApp.router(routerConfig: goRouter));
 
-    //   final router = AnyhooRouter<AnyhooTestRouteName>(routes: routes);
-    //   final goRouter = router.getGoRouter();
+      // Navigate to /accounts which should redirect to /profiles, then to /users
+      goRouter.go('/profiles');
+      await tester.pumpAndSettle();
 
-    //   await tester.pumpWidget(MaterialApp.router(routerConfig: goRouter));
+      // Verify we ended up at /users (the final destination after recursive redirects)
+      expect(goRouter.routeInformationProvider.value.uri.path, '/users');
+      expect(find.text('Users'), findsOneWidget);
+    });
 
-    //   // Navigate to /accounts which should redirect to /profiles, then to /users
-    //   goRouter.go('/accounts');
-    //   await tester.pumpAndSettle();
+    testWidgets('should redirect recursively: /accounts -> /profiles -> /users', (WidgetTester tester) async {
+      await tester.pumpWidget(MaterialApp.router(routerConfig: goRouter));
 
-    //   // Verify we ended up at /users (the final destination after recursive redirects)
-    //   expect(goRouter.routeInformationProvider.value.uri.path, '/users');
-    // });
+      // Navigate to /accounts which should redirect to /profiles, then to /users
+      goRouter.go('/accounts');
+      await tester.pumpAndSettle();
 
-    // testWidgets('should redirect recursively with path parameters', (WidgetTester tester) async {
-    //   final routes = [
-    //     DummyRoute(path: '/', title: 'Home', routeName: AnyhooTestRouteName.home, requireLogin: false, redirect: null),
-    //     DummyRoute(
-    //       path: '/users',
-    //       title: 'Users',
-    //       routeName: AnyhooTestRouteName.users,
-    //       requireLogin: false,
-    //       redirect: null,
-    //     ),
-    //     DummyRoute(
-    //       path: '/users/:userId',
-    //       title: 'User Details',
-    //       routeName: AnyhooTestRouteName.usersDetails,
-    //       requireLogin: false,
-    //       redirect: null,
-    //     ),
-    //     DummyRoute(
-    //       path: '/profiles',
-    //       title: 'Profiles',
-    //       routeName: AnyhooTestRouteName.profiles,
-    //       requireLogin: false,
-    //       redirect: null,
-    //     ),
-    //     DummyRoute(
-    //       path: '/profiles/:userId',
-    //       title: 'Profile',
-    //       routeName: AnyhooTestRouteName.profilesDetails,
-    //       redirect: '/users/:userId',
-    //       requireLogin: false,
-    //     ),
-    //     DummyRoute(
-    //       path: '/accounts',
-    //       title: 'Accounts',
-    //       routeName: AnyhooTestRouteName.accounts,
-    //       requireLogin: false,
-    //       redirect: null,
-    //     ),
-    //     DummyRoute(
-    //       path: '/accounts/:userId',
-    //       title: 'Account',
-    //       routeName: AnyhooTestRouteName.accountsDetails,
-    //       redirect: '/profiles/:userId',
-    //       requireLogin: false,
-    //     ),
-    //   ];
+      // Verify we ended up at /users (the final destination after recursive redirects)
+      expect(goRouter.routeInformationProvider.value.uri.path, '/users');
+      expect(find.text('Users'), findsOneWidget);
+    });
 
-    //   final router = AnyhooRouter<AnyhooTestRouteName>(routes: routes);
-    //   final goRouter = router.getGoRouter();
+    testWidgets('should redirect recursively with path parameters', (WidgetTester tester) async {
+      await tester.pumpWidget(MaterialApp.router(routerConfig: goRouter));
 
-    //   await tester.pumpWidget(MaterialApp.router(routerConfig: goRouter));
+      goRouter.go('/persons/123');
+      await tester.pumpAndSettle();
 
-    //   // Navigate to /accounts/123 which should redirect to /profiles/123, then to /users/123
-    //   goRouter.go('/accounts/123');
-    //   await tester.pumpAndSettle();
+      expect(goRouter.routeInformationProvider.value.uri.path, '/people/123');
+    });
 
-    //   // Verify we ended up at /users/123 (the final destination after recursive redirects)
-    //   expect(goRouter.routeInformationProvider.value.uri.path, '/users/123');
-    // });
+    testWidgets('should redirect to login when not authenticated and route requires login', (
+      WidgetTester tester,
+    ) async {
+      final authCubit = MockAuthCubit();
+      final authState = AnyhooAuthState<TestUser>(user: null);
 
-    // testWidgets('should redirect to login when not authenticated and route requires login', (
-    //   WidgetTester tester,
-    // ) async {
-    //   final routes = [
-    //     DummyRoute(path: '/', title: 'Home', routeName: AnyhooTestRouteName.home, requireLogin: false, redirect: null),
-    //     DummyRoute(
-    //       path: '/login',
-    //       title: 'Login',
-    //       routeName: AnyhooTestRouteName.login,
-    //       requireLogin: false,
-    //       redirect: null,
-    //     ),
-    //     DummyRoute(
-    //       path: '/users/:userId',
-    //       title: 'Users',
-    //       routeName: AnyhooTestRouteName.users,
-    //       requireLogin: true,
-    //       redirect: null,
-    //     ),
-    //   ];
+      when(() => authCubit.state).thenReturn(authState);
+      when(() => authCubit.stream).thenAnswer((_) => Stream.value(authState));
 
-    //   final router = AnyhooRouter<AnyhooTestRouteName>(routes: routes);
-    //   final goRouter = router.getGoRouter();
+      await tester.pumpWidget(
+        BlocProvider<AnyhooAuthCubit<TestUser>>.value(
+          value: authCubit,
+          child: MaterialApp.router(routerConfig: goRouter),
+        ),
+      );
 
-    //   await tester.pumpWidget(MaterialApp.router(routerConfig: goRouter));
+      goRouter.go('/protected');
+      await tester.pumpAndSettle();
 
-    //   // Navigate to /users/123 which requires login
-    //   goRouter.go('/users/123');
-    //   await tester.pumpAndSettle();
+      // Verify we ended up at /users (the final destination after recursive redirects)
+      expect(goRouter.routeInformationProvider.value.uri.path, '/login');
+      expect(find.text('Login'), findsOneWidget);
+    });
 
-    //   // Verify we were redirected to /login
-    //   expect(goRouter.routeInformationProvider.value.uri.path, '/login');
-    // });
+    testWidgets('should NOT redirect to login when authenticated and route requires login', (
+      WidgetTester tester,
+    ) async {
+      final authCubit = MockAuthCubit();
+      final authState = AnyhooAuthState<TestUser>(
+        user: TestUser(id: '123', email: 'test@test.com'),
+      );
+
+      when(() => authCubit.state).thenReturn(authState);
+      when(() => authCubit.stream).thenAnswer((_) => Stream.value(authState));
+
+      await tester.pumpWidget(
+        BlocProvider<AnyhooAuthCubit<TestUser>>.value(
+          value: authCubit,
+          child: MaterialApp.router(routerConfig: goRouter),
+        ),
+      );
+
+      // Navigate to /users/123 which requires login
+      goRouter.go('/protected');
+      await tester.pumpAndSettle();
+
+      // Verify we were redirected to /login
+      expect(goRouter.routeInformationProvider.value.uri.path, '/protected');
+      expect(find.text('Protected'), findsOneWidget);
+    });
 
     // testWidgets('should redirect to home when authenticated and on login page', (WidgetTester tester) async {
     //   final user = TestUser(id: '123', email: 'test@test.com');
