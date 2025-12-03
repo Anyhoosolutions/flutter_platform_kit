@@ -12,8 +12,8 @@ class EnhanceUserDemoPage extends StatefulWidget {
 }
 
 class _EnhanceUserDemoPageState extends State<EnhanceUserDemoPage> {
-  final _emailController = TextEditingController(text: 'demo@example.com');
-  final _passwordController = TextEditingController(text: 'password123');
+  final _emailController = TextEditingController(text: 'testuserbob@email.com');
+  final _passwordController = TextEditingController(text: 'test1234');
 
   @override
   void dispose() {

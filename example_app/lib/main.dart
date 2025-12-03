@@ -7,6 +7,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:example_app/firebase_options.dart';
 import 'package:example_app/models/example_user_converter.dart';
 import 'package:example_app/routes/routes.dart';
+import 'package:example_app/services/mock_enhance_user_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -67,7 +68,11 @@ class MyApp extends StatelessWidget {
         providers: [
           BlocProvider(create: (_) => loggingConfiguration.loggingCubit!),
           BlocProvider<AnyhooAuthCubit<ExampleUser>>(
-            create: (_) => AnyhooAuthCubit<ExampleUser>(authService: authService, converter: converter),
+            create: (_) => AnyhooAuthCubit<ExampleUser>(
+              authService: authService,
+              converter: converter,
+              enhanceUserService: createMockEnhanceUserService(),
+            ),
           ),
         ],
         child: MaterialApp.router(title: 'Example app', routerConfig: appRouter),
