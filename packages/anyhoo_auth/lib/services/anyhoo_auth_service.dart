@@ -1,3 +1,5 @@
+import 'package:anyhoo_core/models/anyhoo_user.dart';
+
 /// Authentication service that handles login, logout, and user management.
 ///
 /// Example:
@@ -10,7 +12,7 @@
 ///   },
 /// );
 /// ```
-class AnyhooAuthService {
+class AnyhooAuthService<T extends AnyhooUser> {
   /// Functions that performs the actual login API call.
   ///
   /// Logging in with email and password
