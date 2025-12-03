@@ -1,3 +1,8 @@
+## 0.0.12
+
+* Refactor AuthService to be an interface
+* Fix logging out with Firebase Auth
+
 ## 0.0.11
 
 * Specify T extends AnyhooUser for AnyhooAuthService and AnyhooFirebaseAuthService
