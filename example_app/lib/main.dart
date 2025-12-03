@@ -53,7 +53,6 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final converter = ExampleUserConverter();
     final AnyhooAuthService authService = AnyhooFirebaseAuthService(
-      converter: converter,
       firebaseAuth: firebaseInitializer.getAuth(),
     );
 
