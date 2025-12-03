@@ -1,4 +1,5 @@
 import 'package:anyhoo_core/arguments_parser.dart';
+import 'package:anyhoo_core/models/anyhoo_user.dart';
 import 'package:anyhoo_core/models/arguments.dart';
 import 'package:anyhoo_firebase/anyhoo_firebase.dart';
 import 'package:anyhoo_logging/anyhoo_logging.dart';
@@ -14,6 +15,7 @@ import 'package:example_app/pages/firestoreDemo/firestore_demo_page_route.dart';
 import 'package:example_app/pages/homePage/home_page_route.dart';
 import 'package:example_app/pages/imageSelectorDemo/image_selector_page_route.dart';
 import 'package:example_app/pages/loggingPage/logging_page_route.dart';
+import 'package:example_app/pages/login/login_route.dart';
 import 'package:example_app/pages/routeDemo/redirecting_demo_route.dart';
 import 'package:example_app/pages/remoteConfigDemo/remote_config_demo_route.dart';
 import 'package:example_app/pages/routeDemo/route_first_demo_route.dart';
@@ -78,6 +80,7 @@ class MyApp extends StatelessWidget {
       FirestoreDemoPageRoute(),
       ErrorPageDemoPageRoute(),
       WaitingPageDemoPageRoute(),
+      LoginRoute(),
     ];
 
     final converter = ExampleUserConverter();
@@ -94,7 +97,7 @@ class MyApp extends StatelessWidget {
         providers: [
           BlocProvider(create: (_) => loggingConfiguration.loggingCubit!),
           BlocProvider(
-            create: (_) => AnyhooAuthCubit<ExampleUser>(authService: authService, converter: converter),
+            create: (_) => AnyhooAuthCubit<AnyhooUser>(authService: authService, converter: converter),
           ),
         ],
         child: MaterialApp.router(title: 'Example app', routerConfig: appRouter),
@@ -118,4 +121,5 @@ enum AnyhooRouteName {
   firestore,
   error,
   waiting,
+  login,
 }
