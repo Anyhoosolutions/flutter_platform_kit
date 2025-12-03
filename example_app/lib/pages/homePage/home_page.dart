@@ -1,6 +1,9 @@
+import 'package:anyhoo_auth/cubit/anyhoo_auth_cubit.dart';
 import 'package:anyhoo_core/models/arguments.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:example_app/models/example_user.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 /// Home page that serves as a navigation hub for package demos.
@@ -12,6 +15,26 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final user = context.watch<AnyhooAuthCubit<ExampleUser>>().state.user;
+
+    Widget loggedInInfoWidget = Text('Not logged in');
+
+    if (user != null) {
+      loggedInInfoWidget = Row(
+        mainAxisAlignment: .center,
+        crossAxisAlignment: .center,
+        children: [
+          Text('Logged in as: ${user.email}'),
+          IconButton(
+            onPressed: () {
+              context.read<AnyhooAuthCubit<ExampleUser>>().logout();
+            },
+            icon: Icon(Icons.logout),
+          ),
+        ],
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Anyhoo Packages Example'),
@@ -20,6 +43,10 @@ class HomePage extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          Center(child: loggedInInfoWidget),
+          const SizedBox(height: 16),
+          Divider(indent: 40, endIndent: 40, color: Colors.grey[400]),
+          const SizedBox(height: 16),
           _authDemoButton(context),
           const SizedBox(height: 16),
           _loginButton(context),

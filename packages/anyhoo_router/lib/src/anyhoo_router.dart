@@ -20,10 +20,6 @@ class AnyhooRouter<T extends Enum> {
 
     final redirectHelper = AnyhooRouteRedirector(routes: routes, authCubit: authCubit);
 
-    for (final page in routes) {
-      _log.info('path: $page, redirect: ${page.redirect}');
-    }
-
     // Create unique GlobalKeys for each router instance
     final rootNavigatorKey = GlobalKey<NavigatorState>();
     final navDrawerShellNavigatorKey = GlobalKey<NavigatorState>();
