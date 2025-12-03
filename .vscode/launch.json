@@ -21,6 +21,14 @@
       "args": []
     },
     {
+      "name": "example_app (Android Device - Pixel 4)",
+      "request": "launch",
+      "type": "dart",
+      "program": "example_app/lib/main.dart",
+      "deviceId": "9B271FFBA0010W",
+      "args": []
+    },
+    {
       "name": "example_app (iOS Simulator)",
       "request": "launch",
       "type": "dart",
