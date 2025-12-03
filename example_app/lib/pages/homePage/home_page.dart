@@ -52,6 +52,8 @@ class HomePage extends StatelessWidget {
           _loginButton(context),
           SizedBox(height: 16),
           _enhancedUserDemoButton(context),
+          SizedBox(height: 16),
+          _notLoggedInRedirectorButton(context),
           const SizedBox(height: 16),
           Divider(indent: 40, endIndent: 40, color: Colors.grey[400]),
           const SizedBox(height: 16),
@@ -109,6 +111,17 @@ class HomePage extends StatelessWidget {
       icon: Icons.login,
       onTap: () {
         GoRouter.of(context).push('/enhance-user');
+      },
+    );
+  }
+
+  _DemoCard _notLoggedInRedirectorButton(BuildContext context) {
+    return _DemoCard(
+      title: 'Not Logged In Redirector Demo',
+      description: 'Demonstrates not logged in redirector',
+      icon: Icons.login,
+      onTap: () {
+        GoRouter.of(context).push('/not-logged-in-redirector');
       },
     );
   }

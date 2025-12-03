@@ -44,6 +44,7 @@ part 'routes.g.dart';
     TypedGoRoute<ErrorPageDemoRoute>(path: 'error-page-demo'),
     TypedGoRoute<WaitingPageDemoRoute>(path: 'waiting-page-demo'),
     TypedGoRoute<LoginRoute>(path: 'login'),
+    TypedGoRoute<NotLoggedInRedirectorRoute>(path: 'not-logged-in-redirector'),
   ],
   name: 'home',
 )
@@ -188,6 +189,41 @@ class RouteRedirectingDemoRoute extends GoRouteData with $RouteRedirectingDemoRo
   @override
   String? redirect(BuildContext context, GoRouterState state) {
     return '/route-demo/nested';
+  }
+}
+
+@immutable
+class NotLoggedInRedirectorRoute extends GoRouteData with $NotLoggedInRedirectorRoute {
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Not Logged In Redirector')),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text('User is already logged in'),
+            Text('This page is allowed to be accessed by logged in users'),
+            IconButton(
+              onPressed: () {
+                context.read<AnyhooAuthCubit<ExampleUser>>().logout();
+              },
+              icon: Icon(Icons.logout),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  String? redirect(BuildContext context, GoRouterState state) {
+    final user = context.read<AnyhooAuthCubit<ExampleUser>>().state.user;
+    if (user == null) {
+      return '/login';
+    }
+    return null;
   }
 }
 

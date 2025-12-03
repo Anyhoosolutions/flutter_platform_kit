@@ -53,6 +53,10 @@ RouteBase get $homeScreenRoute => GoRouteData.$route(
       factory: $WaitingPageDemoRoute._fromState,
     ),
     GoRouteData.$route(path: 'login', factory: $LoginRoute._fromState),
+    GoRouteData.$route(
+      path: 'not-logged-in-redirector',
+      factory: $NotLoggedInRedirectorRoute._fromState,
+    ),
   ],
 );
 
@@ -351,6 +355,27 @@ mixin $LoginRoute on GoRouteData {
 
   @override
   String get location => GoRouteData.$location('/login');
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+mixin $NotLoggedInRedirectorRoute on GoRouteData {
+  static NotLoggedInRedirectorRoute _fromState(GoRouterState state) =>
+      NotLoggedInRedirectorRoute();
+
+  @override
+  String get location => GoRouteData.$location('/not-logged-in-redirector');
 
   @override
   void go(BuildContext context) => context.go(location);
