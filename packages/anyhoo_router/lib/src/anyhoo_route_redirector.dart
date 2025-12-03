@@ -132,7 +132,7 @@ class AnyhooRouteRedirector {
 
   static List<String> getAllPaths(List<RouteBase> routes) {
     List<String> paths = [];
-    routes.forEach((route) {
+    for (var route in routes) {
       final r = route as GoRoute;
       String p = r.path.toLowerCase();
       if (p.endsWith('/')) {
@@ -144,7 +144,7 @@ class AnyhooRouteRedirector {
       paths.add(p);
 
       paths.addAll(getAllPaths(r.routes));
-    });
+    }
     return paths;
   }
 }

@@ -18,7 +18,8 @@ void main() {
 
     setUp(() {
       Logger.root.onRecord.listen((record) {
-        print('${record.level.name}: ${record.time}: ${record.message}');
+        // ignore: avoid_print
+        // print('${record.level.name}: ${record.time}: ${record.message}');
       });
 
       final routes = [
