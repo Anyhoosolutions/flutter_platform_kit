@@ -22,11 +22,13 @@ class HomePage extends StatelessWidget {
         children: [
           _authDemoButton(context),
           const SizedBox(height: 16),
-          _loggingPageDemoButton(context),
-          const SizedBox(height: 16),
           _loginButton(context),
           SizedBox(height: 16),
           _enhancedUserDemoButton(context),
+          const SizedBox(height: 16),
+          Divider(indent: 40, endIndent: 40, color: Colors.grey[400]),
+          const SizedBox(height: 16),
+          _loggingPageDemoButton(context),
           const SizedBox(height: 16),
           _analyticsDemoButton(context),
           const SizedBox(height: 16),
@@ -40,9 +42,12 @@ class HomePage extends StatelessWidget {
           const SizedBox(height: 16),
           _routeDemoButton(context),
           const SizedBox(height: 16),
+          Divider(indent: 40, endIndent: 40, color: Colors.grey[400]),
+          const SizedBox(height: 16),
           _errorPageDemoButton(context),
           const SizedBox(height: 16),
           _waitingPageDemoButton(context),
+          const SizedBox(height: 48),
         ],
       ),
     );
@@ -51,7 +56,7 @@ class HomePage extends StatelessWidget {
   _DemoCard _authDemoButton(BuildContext context) {
     return _DemoCard(
       title: 'Auth Demo',
-      description: 'Demonstrates authentication with custom user models',
+      description: 'Demonstrates custom authentication with custom user models',
       icon: Icons.login,
       onTap: () {
         GoRouter.of(context).push('/auth');
@@ -62,7 +67,7 @@ class HomePage extends StatelessWidget {
   _DemoCard _loginButton(BuildContext context) {
     return _DemoCard(
       title: 'Login Widget Demo',
-      description: 'Demonstrates the login widget',
+      description: 'Demonstrates the login widget from the anyhoo_auth package',
       icon: Icons.login,
       onTap: () {
         GoRouter.of(context).push('/login');
