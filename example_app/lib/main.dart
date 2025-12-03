@@ -12,7 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:anyhoo_auth/anyhoo_auth.dart';
 import 'package:logging/logging.dart';
-
+import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'models/example_user.dart';
 
 void main() async {
@@ -52,9 +52,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final converter = ExampleUserConverter();
-    final AnyhooAuthService authService = AnyhooFirebaseAuthService(
-      firebaseAuth: firebaseInitializer.getAuth(),
-    );
+    final AnyhooAuthService authService = AnyhooFirebaseAuthService(firebaseAuth: firebaseInitializer.getAuth());
 
     final appRouter = AnyhooRouter(routes: $appRoutes).getGoRouter();
 
@@ -63,6 +61,7 @@ class MyApp extends StatelessWidget {
         RepositoryProvider<LoggingConfiguration>(create: (context) => loggingConfiguration),
         RepositoryProvider<Arguments>(create: (context) => arguments),
         RepositoryProvider<FirebaseFirestore>(create: (context) => firebaseInitializer.getFirestore()),
+        RepositoryProvider<firebase_auth.FirebaseAuth>(create: (context) => firebaseInitializer.getAuth()),
       ],
       child: MultiBlocProvider(
         providers: [

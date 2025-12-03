@@ -42,18 +42,23 @@ class AnyhooAuthCubit<T extends AnyhooUser> extends Cubit<AnyhooAuthState<T>> {
   void init() {
     _authStateSubscription = authService.authStateChanges.listen(
       (user) {
-        final convertedUser = user == null ? null : converter.fromJson(user);
-        _log.info('Auth state changed (user): ${convertedUser?.id ?? 'null'}');
+        if (user == null) {
+          _log.info('Auth state changed (user): null');
+          emit(state.copyWith(clearUser: true, isLoading: false));
+        } else {
+          final convertedUser = converter.fromJson(user);
+          _log.info('Auth state changed (user): ${convertedUser.id}');
 
-        //   final enhancedUserData = await enhanceUserService?.enhanceUser(userData) ?? userData;
-        // final enhancedUser = converter.fromJson(enhancedUserData);
-        // emit(state.copyWith(user: enhancedUser, isLoading: false));
+          //   final enhancedUserData = await enhanceUserService?.enhanceUser(userData) ?? userData;
+          // final enhancedUser = converter.fromJson(enhancedUserData);
+          // emit(state.copyWith(user: enhancedUser, isLoading: false));
 
-        emit(state.copyWith(user: convertedUser));
+          emit(state.copyWith(user: convertedUser, isLoading: false));
+        }
       },
       onError: (error) {
         _log.severe('Error in auth state stream', error);
-        emit(state.copyWith(errorMessage: error.toString()));
+        emit(state.copyWith(errorMessage: error.toString(), isLoading: false));
       },
     );
   }
@@ -143,7 +148,8 @@ class AnyhooAuthCubit<T extends AnyhooUser> extends Cubit<AnyhooAuthState<T>> {
 
     try {
       await authService.logout();
-      emit(state.copyWith(user: null, isLoading: false));
+      // Don't manually emit user: null here - let the authStateChanges stream handle it
+      // The stream listener will emit the updated state with user: null and isLoading: false
     } catch (e) {
       _log.severe('Error logging out', e);
       emit(state.copyWith(

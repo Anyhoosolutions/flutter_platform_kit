@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:anyhoo_auth/anyhoo_auth.dart';
@@ -24,6 +25,8 @@ class _AuthDemoPageState extends State<AuthDemoPage> {
 
   @override
   Widget build(BuildContext context) {
+    final firebaseAuth = context.read<FirebaseAuth>();
+
     return Scaffold(
       appBar: AppBar(title: const Text('Auth Demo')),
       body: BlocListener<AnyhooAuthCubit<ExampleUser>, AnyhooAuthState<ExampleUser>>(
@@ -37,9 +40,9 @@ class _AuthDemoPageState extends State<AuthDemoPage> {
         child: BlocBuilder<AnyhooAuthCubit<ExampleUser>, AnyhooAuthState<ExampleUser>>(
           builder: (context, state) {
             if (state.isAuthenticated) {
-              return _buildAuthenticatedView(context, state.user!);
+              return _buildAuthenticatedView(context, state.user!, firebaseAuth);
             } else {
-              return _buildLoginView(context, state.isLoading);
+              return _buildLoginView(context, state.isLoading, firebaseAuth);
             }
           },
         ),
@@ -47,7 +50,7 @@ class _AuthDemoPageState extends State<AuthDemoPage> {
     );
   }
 
-  Widget _buildLoginView(BuildContext context, bool isLoading) {
+  Widget _buildLoginView(BuildContext context, bool isLoading, FirebaseAuth firebaseAuth) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
       child: Column(
@@ -131,12 +134,28 @@ class _AuthDemoPageState extends State<AuthDemoPage> {
             label: const Text('Sign in with Apple'),
             style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 12)),
           ),
+          const Divider(),
+          SizedBox(height: 16),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 80.0),
+            child: ElevatedButton(
+              onPressed: () {
+                // ignore: avoid_print
+                print('current user uid: ${firebaseAuth.currentUser?.uid}');
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(firebaseAuth.currentUser?.uid ?? 'No user'), backgroundColor: Colors.green),
+                );
+              },
+              child: const Text('Check user'),
+            ),
+          ),
+          const Divider(),
         ],
       ),
     );
   }
 
-  Widget _buildAuthenticatedView(BuildContext context, ExampleUser user) {
+  Widget _buildAuthenticatedView(BuildContext context, ExampleUser user, FirebaseAuth firebaseAuth) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
       child: Column(
@@ -160,6 +179,22 @@ class _AuthDemoPageState extends State<AuthDemoPage> {
               ),
             ),
           ),
+          const Divider(),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 80.0),
+            child: ElevatedButton(
+              onPressed: () {
+                // ignore: avoid_print
+                print('current user uid: ${firebaseAuth.currentUser?.uid}');
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(firebaseAuth.currentUser?.uid ?? 'No user'), backgroundColor: Colors.green),
+                );
+              },
+              child: const Text('Check user'),
+            ),
+          ),
+          const Divider(),
+
           const SizedBox(height: 16),
           OutlinedButton.icon(
             onPressed: () {

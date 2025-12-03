@@ -19,13 +19,9 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final authState = context.watch<AnyhooAuthCubit<ExampleUser>>().state;
-    _log.info('authState: $authState');
     final user = authState.user;
-    // _log.info('user: $user');
     final isLoading = authState.isLoading;
-    // _log.info('isLoading: $isLoading');
     final error = authState.errorMessage;
-    // _log.info('error: $error');
 
     Widget loggedInInfoWidget = Text('Not logged in');
 
