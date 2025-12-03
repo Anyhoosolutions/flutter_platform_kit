@@ -103,7 +103,7 @@ class HomePage extends StatelessWidget {
       description: 'Demonstrates image selection from gallery, camera, or stock photos',
       icon: Icons.image,
       onTap: () {
-        Navigator.push(context, MaterialPageRoute(builder: (_) => const ImageSelectorDemoPage()));
+        GoRouter.of(context).push('/image-selector');
       },
     );
   }
@@ -125,7 +125,7 @@ class HomePage extends StatelessWidget {
       description: 'Demonstrates arguments passed in when launching the app',
       icon: Icons.image,
       onTap: () {
-        Navigator.push(context, MaterialPageRoute(builder: (_) => ArgumentsDemoPage(arguments: arguments)));
+        GoRouter.of(context).push('/arguments', extra: arguments);
       },
     );
   }
