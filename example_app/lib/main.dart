@@ -9,6 +9,7 @@ import 'package:example_app/pages/analyticsDemo/analytics_demo_route.dart';
 import 'package:example_app/pages/argumentsDemo/arguments_demo_page_route.dart';
 import 'package:example_app/pages/authDemo/auth_page_route.dart';
 import 'package:example_app/pages/enhanceUserDemo/enhance_user_demo_page_route.dart';
+import 'package:example_app/pages/firestoreDemo/firestore_demo_page_route.dart';
 import 'package:example_app/pages/homePage/home_page_route.dart';
 import 'package:example_app/pages/imageSelectorDemo/image_selector_page_route.dart';
 import 'package:example_app/pages/loggingPage/logging_page_route.dart';
@@ -86,6 +87,7 @@ class MyApp extends StatelessWidget {
       ImageSelectorPageRoute(),
       EnhanceUserDemoPageRoute(),
       ArgumentsDemoPageRoute(),
+      FirestoreDemoPageRoute(),
     ];
 
     final appRouter = AnyhooRouter(routes: routes).getGoRouter();
@@ -116,4 +118,5 @@ enum AnyhooRouteName {
   imageSelector,
   enhanceUser,
   arguments,
+  firestore,
 }

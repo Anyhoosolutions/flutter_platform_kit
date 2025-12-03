@@ -2,9 +2,6 @@ import 'package:anyhoo_core/models/arguments.dart';
 import 'package:anyhoo_core/widgets/error_page.dart';
 import 'package:anyhoo_core/widgets/waiting_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:example_app/pages/argumentsDemo/arguments_demo_page.dart';
-import 'package:example_app/pages/firestoreDemo/firestore_demo_page.dart';
-import 'package:example_app/pages/imageSelectorDemo/image_selector_demo_page.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -136,7 +133,7 @@ class HomePage extends StatelessWidget {
       description: 'Demonstrates Firestore usage',
       icon: Icons.data_array,
       onTap: () {
-        Navigator.push(context, MaterialPageRoute(builder: (_) => FirestoreDemoPage(firestore: firestore)));
+        GoRouter.of(context).push('/firestore', extra: firestore);
       },
     );
   }
