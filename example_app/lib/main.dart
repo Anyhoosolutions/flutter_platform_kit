@@ -19,7 +19,6 @@ import 'package:example_app/pages/remoteConfigDemo/remote_config_demo_route.dart
 import 'package:example_app/pages/routeDemo/route_first_demo_route.dart';
 import 'package:example_app/pages/routeDemo/route_nested_demo_route.dart';
 import 'package:example_app/pages/waitingPageDemo/waiting_page_demo_page_route.dart';
-import 'package:example_app/services/firebase_auth_service.dart' hide ExampleUserConverter;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -42,34 +41,21 @@ void main() async {
 
   final arguments = await ArgumentsParser.getArguments();
 
-  // final authService = createMockAuthService();
-  final authService = await createFirebaseAuthService();
-  final converter = ExampleUserConverter();
   final firebaseInitializer = FirebaseInitializer(arguments: arguments, hostIp: '192.168.86.27');
   await firebaseInitializer.initialize(DefaultFirebaseOptions.currentPlatform);
 
   runApp(
-    MyApp(
-      authService: authService,
-      converter: converter,
-      arguments: arguments,
-      firebaseInitializer: firebaseInitializer,
-      loggingConfiguration: loggingConfiguration,
-    ),
+    MyApp(arguments: arguments, firebaseInitializer: firebaseInitializer, loggingConfiguration: loggingConfiguration),
   );
 }
 
 class MyApp extends StatelessWidget {
-  final AnyhooAuthService authService;
-  final AnyhooUserConverter<ExampleUser> converter;
   final Arguments arguments;
   final FirebaseInitializer firebaseInitializer;
   final LoggingConfiguration loggingConfiguration;
 
   const MyApp({
     super.key,
-    required this.authService,
-    required this.converter,
     required this.arguments,
     required this.firebaseInitializer,
     required this.loggingConfiguration,
@@ -94,7 +80,14 @@ class MyApp extends StatelessWidget {
       WaitingPageDemoPageRoute(),
     ];
 
+    final converter = ExampleUserConverter();
+    final AnyhooAuthService authService = AnyhooFirebaseAuthService(
+      converter: converter,
+      firebaseAuth: firebaseInitializer.getAuth(),
+    );
+
     final appRouter = AnyhooRouter(routes: routes).getGoRouter();
+
     return RepositoryProvider<LoggingConfiguration>(
       create: (context) => loggingConfiguration,
       child: MultiBlocProvider(

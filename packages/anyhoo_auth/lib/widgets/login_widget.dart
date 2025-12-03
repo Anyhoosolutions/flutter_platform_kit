@@ -7,7 +7,7 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 
-class LoginWidget extends StatefulWidget {
+class LoginWidget<T extends AnyhooUser> extends StatefulWidget {
   const LoginWidget({
     super.key,
     required this.title,

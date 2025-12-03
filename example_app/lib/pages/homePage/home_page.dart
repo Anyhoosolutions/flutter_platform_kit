@@ -65,7 +65,7 @@ class HomePage extends StatelessWidget {
       description: 'Demonstrates the login widget',
       icon: Icons.login,
       onTap: () {
-        GoRouter.of(context).push('/image-selector');
+        GoRouter.of(context).push('/login');
       },
     );
   }
