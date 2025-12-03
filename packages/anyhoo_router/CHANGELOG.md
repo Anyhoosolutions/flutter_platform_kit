@@ -1,3 +1,7 @@
+## 0.0.7
+ 
+* Add test for basic GoRouter functionality
+
 ## 0.0.6
  
 * Fix nested redirects
