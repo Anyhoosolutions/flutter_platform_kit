@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:anyhoo_auth/services/anyhoo_auth_service.dart';
 
 /// Mock implementation of [AnyhooAuthService] for testing and development.
@@ -36,11 +37,38 @@ class AnyhooMockAuthService implements AnyhooAuthService {
   /// Current authenticated user, null if not logged in.
   Map<String, dynamic>? _currentUser;
 
+  /// Stream controller for auth state changes.
+  final StreamController<Map<String, dynamic>?> _authStateController =
+      StreamController<Map<String, dynamic>?>.broadcast();
+
   @override
   Map<String, dynamic>? get currentUser => _currentUser;
 
   @override
   bool get isAuthenticated => currentUser != null;
+
+  @override
+  Stream<Map<String, dynamic>?> get authStateChanges {
+    // Return a stream that starts with the current value, then continues with updates
+    return Stream.multi((controller) {
+      // Emit current value immediately
+      controller.add(_currentUser);
+      // Then listen to future changes
+      _authStateController.stream.listen(
+        controller.add,
+        onError: controller.addError,
+        onDone: controller.close,
+        cancelOnError: false,
+      );
+    });
+  }
+
+  /// Emits the current user state to the stream.
+  void _emitAuthState() {
+    if (!_authStateController.isClosed) {
+      _authStateController.add(_currentUser);
+    }
+  }
 
   /// Creates a mock authentication service.
   ///
@@ -86,6 +114,7 @@ class AnyhooMockAuthService implements AnyhooAuthService {
     }
 
     _currentUser = userData;
+    _emitAuthState();
     return userData;
   }
 
@@ -100,6 +129,7 @@ class AnyhooMockAuthService implements AnyhooAuthService {
       'emailVerified': true,
     };
     _currentUser = userData;
+    _emitAuthState();
     return userData;
   }
 
@@ -114,6 +144,7 @@ class AnyhooMockAuthService implements AnyhooAuthService {
       'emailVerified': true,
     };
     _currentUser = userData;
+    _emitAuthState();
     return userData;
   }
 
@@ -128,6 +159,7 @@ class AnyhooMockAuthService implements AnyhooAuthService {
       'emailVerified': false,
     };
     _currentUser = userData;
+    _emitAuthState();
     return userData;
   }
 
@@ -136,6 +168,7 @@ class AnyhooMockAuthService implements AnyhooAuthService {
     // Simulate API delay
     await Future.delayed(logoutDelay);
     _currentUser = null;
+    _emitAuthState();
   }
 
   @override
@@ -168,17 +201,27 @@ class AnyhooMockAuthService implements AnyhooAuthService {
 
     // Update current user with refreshed data
     _currentUser = refreshedData;
+    _emitAuthState();
     return refreshedData;
   }
 
   @override
   void setUser(Map<String, dynamic> user) {
     _currentUser = user;
+    _emitAuthState();
   }
 
   @override
   void clearUser() {
     _currentUser = null;
+    _emitAuthState();
+  }
+
+  /// Dispose the stream controller.
+  ///
+  /// Call this when the service is no longer needed to free resources.
+  void dispose() {
+    _authStateController.close();
   }
 
   /// Set a mock user directly (useful for testing).

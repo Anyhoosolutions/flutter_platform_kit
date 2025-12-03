@@ -51,6 +51,16 @@ class AnyhooFirebaseAuthService implements AnyhooAuthService {
   }
 
   @override
+  Stream<Map<String, dynamic>?> get authStateChanges {
+    return _firebaseAuth.authStateChanges().map((firebaseUser) {
+      if (firebaseUser != null) {
+        return _firebaseUserToMap(firebaseUser);
+      }
+      return null;
+    });
+  }
+
+  @override
   Future<Map<String, dynamic>> loginWithEmailAndPassword(String email, String password) async {
     try {
       final credential = await _firebaseAuth.signInWithEmailAndPassword(

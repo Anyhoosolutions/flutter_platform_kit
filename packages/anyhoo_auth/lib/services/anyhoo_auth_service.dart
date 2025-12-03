@@ -21,6 +21,8 @@ abstract class AnyhooAuthService {
   /// Whether a user is currently logged in.
   bool get isAuthenticated => currentUser != null;
 
+  Stream<Map<String, dynamic>?> get authStateChanges;
+
   /// Log in with email and password.
   ///
   /// Returns a Map with user data that can be converted by a [UserConverter].
