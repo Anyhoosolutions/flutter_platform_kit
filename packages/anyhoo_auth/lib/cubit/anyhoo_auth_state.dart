@@ -26,9 +26,10 @@ class AnyhooAuthState<T extends AnyhooUser> {
     bool? isLoading,
     String? errorMessage,
     bool clearError = false,
+    bool clearUser = false,
   }) {
     return AnyhooAuthState<T>(
-      user: user ?? this.user,
+      user: clearUser ? null : (user ?? this.user),
       isLoading: isLoading ?? this.isLoading,
       errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
     );

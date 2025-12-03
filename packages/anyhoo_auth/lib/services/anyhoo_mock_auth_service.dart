@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:anyhoo_auth/services/anyhoo_auth_service.dart';
 
 /// Mock implementation of [AnyhooAuthService] for testing and development.
@@ -8,11 +9,9 @@ import 'package:anyhoo_auth/services/anyhoo_auth_service.dart';
 ///
 /// Example:
 /// ```dart
-/// final mockAuthService = MockAuthService<MyAppUser>(
-///   converter: MyAppUserConverter(),
-/// );
+/// final mockAuthService = AnyhooMockAuthService();
 /// ```
-class AnyhooMockAuthService extends AnyhooAuthService {
+class AnyhooMockAuthService implements AnyhooAuthService {
   /// Default delay for login operations (1 second).
   final Duration loginDelay;
 
@@ -35,9 +34,44 @@ class AnyhooMockAuthService extends AnyhooAuthService {
   /// If null, a default mock user structure will be used.
   final Map<String, dynamic> Function(String email)? userDataGenerator;
 
+  /// Current authenticated user, null if not logged in.
+  Map<String, dynamic>? _currentUser;
+
+  /// Stream controller for auth state changes.
+  final StreamController<Map<String, dynamic>?> _authStateController =
+      StreamController<Map<String, dynamic>?>.broadcast();
+
+  @override
+  Map<String, dynamic>? get currentUser => _currentUser;
+
+  @override
+  bool get isAuthenticated => currentUser != null;
+
+  @override
+  Stream<Map<String, dynamic>?> get authStateChanges {
+    // Return a stream that starts with the current value, then continues with updates
+    return Stream.multi((controller) {
+      // Emit current value immediately
+      controller.add(_currentUser);
+      // Then listen to future changes
+      _authStateController.stream.listen(
+        controller.add,
+        onError: controller.addError,
+        onDone: controller.close,
+        cancelOnError: false,
+      );
+    });
+  }
+
+  /// Emits the current user state to the stream.
+  void _emitAuthState() {
+    if (!_authStateController.isClosed) {
+      _authStateController.add(_currentUser);
+    }
+  }
+
   /// Creates a mock authentication service.
   ///
-  /// [converter] is required to convert mock user data to your app's user model.
   /// [loginDelay], [logoutDelay], and [refreshDelay] control simulation delays.
   /// [credentialValidator] can be used to validate test credentials.
   /// [userDataGenerator] can be used to customize mock user data.
@@ -47,123 +81,113 @@ class AnyhooMockAuthService extends AnyhooAuthService {
     this.refreshDelay = const Duration(milliseconds: 500),
     this.credentialValidator,
     this.userDataGenerator,
-  }) : super(
-          emailLoginFunction: _createMockLoginFunction(
-            loginDelay,
-            credentialValidator,
-            userDataGenerator,
-          ),
-          logoutFunction: _createMockLogoutFunction(logoutDelay),
-          refreshUserFunction: _createMockRefreshUserFunction(
-            refreshDelay,
-            userDataGenerator,
-          ),
-        );
+  });
 
-  /// Creates a mock login function.
-  static Future<Map<String, dynamic>> Function(String, String) _createMockLoginFunction(
-    Duration delay,
-    bool Function(String, String)? validator,
-    Map<String, dynamic> Function(String)? dataGenerator,
-  ) {
-    return (String email, String password) async {
-      // Simulate API delay
-      await Future.delayed(delay);
+  @override
+  Future<Map<String, dynamic>> loginWithEmailAndPassword(String email, String password) async {
+    // Simulate API delay
+    await Future.delayed(loginDelay);
 
-      // Validate credentials
-      if (email.isEmpty || password.isEmpty) {
-        throw Exception('Email and password are required');
-      }
+    // Validate credentials
+    if (email.isEmpty || password.isEmpty) {
+      throw Exception('Email and password are required');
+    }
 
-      // Use custom validator if provided, otherwise accept any non-empty credentials
-      if (validator != null && !validator(email, password)) {
-        throw Exception('Invalid email or password');
-      }
+    // Use custom validator if provided, otherwise accept any non-empty credentials
+    if (credentialValidator != null && !credentialValidator!(email, password)) {
+      throw Exception('Invalid email or password');
+    }
 
-      // Generate user data
-      if (dataGenerator != null) {
-        return dataGenerator(email);
-      }
-
+    // Generate user data
+    Map<String, dynamic> userData;
+    if (userDataGenerator != null) {
+      userData = userDataGenerator!(email);
+    } else {
       // Default mock user data
-      return {
+      userData = {
         'id': 'mock_user_${DateTime.now().millisecondsSinceEpoch}',
         'email': email,
         'displayName': email.split('@').first,
         'photoURL': null,
         'emailVerified': true,
       };
-    };
+    }
+
+    _currentUser = userData;
+    _emitAuthState();
+    return userData;
   }
 
-  /// Creates a mock logout function.
-  static Future<void> Function() _createMockLogoutFunction(Duration delay) {
-    return () async {
-      // Simulate API delay
-      await Future.delayed(delay);
-    };
-  }
-
-  /// Creates a mock refresh user function.
-  static Future<Map<String, dynamic>> Function() _createMockRefreshUserFunction(
-    Duration delay,
-    Map<String, dynamic> Function(String)? dataGenerator,
-  ) {
-    return () async {
-      // Simulate API delay
-      await Future.delayed(delay);
-
-      // Generate refreshed user data
-      if (dataGenerator != null) {
-        return dataGenerator('refreshed@example.com');
-      }
-
-      // Default refreshed user data
-      return {
-        'id': 'mock_user_refreshed',
-        'email': 'refreshed@example.com',
-        'displayName': 'Refreshed User',
-        'photoURL': null,
-        'emailVerified': true,
-      };
-    };
-  }
-
-  /// Override refreshUser to use current user's email if available.
-  ///
-  /// This provides more realistic mock behavior by preserving the current user's
-  /// email and ID when refreshing, rather than using hardcoded values.
   @override
-  Future<Map<String, dynamic>> refreshUser() async {
-    if (!isAuthenticated) {
-      throw StateError('Cannot refresh user: no user is logged in');
-    }
+  Future<Map<String, dynamic>> loginWithGoogle() async {
+    await Future.delayed(loginDelay);
+    final userData = {
+      'id': 'mock_google_user_${DateTime.now().millisecondsSinceEpoch}',
+      'email': 'google.user@example.com',
+      'displayName': 'Google User',
+      'photoURL': null,
+      'emailVerified': true,
+    };
+    _currentUser = userData;
+    _emitAuthState();
+    return userData;
+  }
 
+  @override
+  Future<Map<String, dynamic>> loginWithApple() async {
+    await Future.delayed(loginDelay);
+    final userData = {
+      'id': 'mock_apple_user_${DateTime.now().millisecondsSinceEpoch}',
+      'email': 'apple.user@example.com',
+      'displayName': 'Apple User',
+      'photoURL': null,
+      'emailVerified': true,
+    };
+    _currentUser = userData;
+    _emitAuthState();
+    return userData;
+  }
+
+  @override
+  Future<Map<String, dynamic>> loginWithAnonymous() async {
+    await Future.delayed(loginDelay);
+    final userData = {
+      'id': 'mock_anonymous_user_${DateTime.now().millisecondsSinceEpoch}',
+      'email': '',
+      'displayName': 'Anonymous User',
+      'photoURL': null,
+      'emailVerified': false,
+    };
+    _currentUser = userData;
+    _emitAuthState();
+    return userData;
+  }
+
+  @override
+  Future<void> logout() async {
     // Simulate API delay
-    await Future.delayed(refreshDelay);
+    await Future.delayed(logoutDelay);
+    _currentUser = null;
+    _emitAuthState();
+  }
 
-    // Use current user's email for more realistic mock data
-    final currentEmail = currentUser?['email'] ?? 'refreshed@example.com';
-    final currentId = currentUser?['id'] ?? 'mock_user_refreshed';
+  @override
+  void setUser(Map<String, dynamic> user) {
+    _currentUser = user;
+    _emitAuthState();
+  }
 
-    // Generate refreshed user data
-    Map<String, dynamic> refreshedData;
-    if (userDataGenerator != null) {
-      refreshedData = userDataGenerator!(currentEmail);
-    } else {
-      // Default refreshed user data, preserving current user's email and ID
-      refreshedData = {
-        'id': currentId,
-        'email': currentEmail,
-        'displayName': currentEmail.split('@').first,
-        'photoURL': null,
-        'emailVerified': true,
-      };
-    }
+  @override
+  void clearUser() {
+    _currentUser = null;
+    _emitAuthState();
+  }
 
-    // Update current user with refreshed data using setUser
-    setUser(refreshedData);
-    return refreshedData;
+  /// Dispose the stream controller.
+  ///
+  /// Call this when the service is no longer needed to free resources.
+  void dispose() {
+    _authStateController.close();
   }
 
   /// Set a mock user directly (useful for testing).

@@ -1,3 +1,7 @@
+## 0.0.8
+ 
+* Refactor AnyhooRouter to use GoRoute or TypedGoRoute directly
+
 ## 0.0.7
  
 * Refactor to use AnyhooRouter everywhere in the example app

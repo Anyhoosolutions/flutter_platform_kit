@@ -1,9 +1,12 @@
+import 'dart:async';
+
 import 'package:anyhoo_auth/services/anyhoo_enhance_user_service.dart';
 import 'package:anyhoo_auth/models/anyhoo_user_converter.dart';
 import 'package:anyhoo_core/anyhoo_core.dart';
 import 'package:anyhoo_auth/services/anyhoo_auth_service.dart';
 import 'package:anyhoo_auth/cubit/anyhoo_auth_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:logging/logging.dart';
 
 /// Cubit for managing authentication state.
 ///
@@ -21,25 +24,58 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 ///   child: YourWidget(),
 /// )
 /// ```
+///
+final _log = Logger('AnyhooAuthCubit');
+
 class AnyhooAuthCubit<T extends AnyhooUser> extends Cubit<AnyhooAuthState<T>> {
   final AnyhooAuthService authService;
   final AnyhooUserConverter<T> converter;
   final AnyhooEnhanceUserService? enhanceUserService;
+  StreamSubscription<Map<String, dynamic>?>? _authStateSubscription;
 
   AnyhooAuthCubit({required this.authService, required this.converter, this.enhanceUserService})
       : super(AnyhooAuthState<T>(
-            user: authService.currentUser == null ? null : converter.fromJson(authService.currentUser!)));
+            user: authService.currentUser == null ? null : converter.fromJson(authService.currentUser!))) {
+    init();
+  }
+
+  void init() {
+    _authStateSubscription = authService.authStateChanges.listen(
+      (user) async {
+        if (user == null) {
+          _log.info('Auth state changed (user): null');
+          emit(state.copyWith(clearUser: true, isLoading: false));
+        } else {
+          final enhancedUserData = await enhanceUserService?.enhanceUser(user) ?? user;
+          final convertedUser = converter.fromJson(enhancedUserData);
+          _log.info('Auth state changed (user): ${convertedUser.id}');
+
+          emit(state.copyWith(user: convertedUser, isLoading: false));
+        }
+      },
+      onError: (error) {
+        _log.severe('Error in auth state stream', error);
+        emit(state.copyWith(errorMessage: error.toString(), isLoading: false));
+      },
+    );
+  }
+
+  @override
+  Future<void> close() {
+    _authStateSubscription?.cancel();
+    return super.close();
+  }
 
   /// Log in with email and password.
   Future<void> login(String email, String password) async {
+    _log.info('Logging in with email and password');
+
     emit(state.copyWith(isLoading: true, clearError: true));
 
     try {
-      final userData = await authService.loginWithEmailAndPassword(email, password);
-      final enhancedUserData = await enhanceUserService?.enhanceUser(userData) ?? userData;
-      final enhancedUser = converter.fromJson(enhancedUserData);
-      emit(state.copyWith(user: enhancedUser, isLoading: false));
+      await authService.loginWithEmailAndPassword(email, password);
     } catch (e) {
+      _log.severe('Error logging in with email and password', e);
       emit(state.copyWith(
         isLoading: false,
         errorMessage: e.toString(),
@@ -50,14 +86,14 @@ class AnyhooAuthCubit<T extends AnyhooUser> extends Cubit<AnyhooAuthState<T>> {
 
   /// Log in with Google.
   Future<void> loginWithGoogle() async {
+    _log.info('Logging in with Google');
+
     emit(state.copyWith(isLoading: true, clearError: true));
 
     try {
-      final userData = await authService.loginWithGoogle();
-      final enhancedUserData = await enhanceUserService?.enhanceUser(userData) ?? userData;
-      final enhancedUser = converter.fromJson(enhancedUserData);
-      emit(state.copyWith(user: enhancedUser, isLoading: false));
+      await authService.loginWithGoogle();
     } catch (e) {
+      _log.severe('Error logging in with Google', e);
       emit(state.copyWith(
         isLoading: false,
         errorMessage: e.toString(),
@@ -68,14 +104,14 @@ class AnyhooAuthCubit<T extends AnyhooUser> extends Cubit<AnyhooAuthState<T>> {
 
   /// Log in with Apple.
   Future<void> loginWithApple() async {
+    _log.info('Logging in with Apple');
+
     emit(state.copyWith(isLoading: true, clearError: true));
 
     try {
-      final userData = await authService.loginWithApple();
-      final enhancedUserData = await enhanceUserService?.enhanceUser(userData) ?? userData;
-      final enhancedUser = converter.fromJson(enhancedUserData);
-      emit(state.copyWith(user: enhancedUser, isLoading: false));
+      await authService.loginWithApple();
     } catch (e) {
+      _log.severe('Error logging in with Apple', e);
       emit(state.copyWith(
         isLoading: false,
         errorMessage: e.toString(),
@@ -86,14 +122,14 @@ class AnyhooAuthCubit<T extends AnyhooUser> extends Cubit<AnyhooAuthState<T>> {
 
   /// Log in with anonymous.
   Future<void> loginWithAnonymous() async {
+    _log.info('Logging in with anonymous');
+
     emit(state.copyWith(isLoading: true, clearError: true));
 
     try {
-      final userData = await authService.loginWithAnonymous();
-      final enhancedUserData = await enhanceUserService?.enhanceUser(userData) ?? userData;
-      final enhancedUser = converter.fromJson(enhancedUserData);
-      emit(state.copyWith(user: enhancedUser, isLoading: false));
+      await authService.loginWithAnonymous();
     } catch (e) {
+      _log.severe('Error logging in with anonymous', e);
       emit(state.copyWith(
         isLoading: false,
         errorMessage: e.toString(),
@@ -104,51 +140,20 @@ class AnyhooAuthCubit<T extends AnyhooUser> extends Cubit<AnyhooAuthState<T>> {
 
   /// Log out the current user.
   Future<void> logout() async {
+    _log.info('Logging out');
     emit(state.copyWith(isLoading: true, clearError: true));
 
     try {
       await authService.logout();
-      emit(state.copyWith(user: null, isLoading: false));
+      // Don't manually emit user: null here - let the authStateChanges stream handle it
+      // The stream listener will emit the updated state with user: null and isLoading: false
     } catch (e) {
+      _log.severe('Error logging out', e);
       emit(state.copyWith(
         isLoading: false,
         errorMessage: e.toString(),
       ));
       rethrow;
     }
-  }
-
-  /// Refresh the current user's data.
-  Future<void> refreshUser() async {
-    if (!state.isAuthenticated) {
-      return;
-    }
-
-    emit(state.copyWith(isLoading: true, clearError: true));
-
-    try {
-      final userData = await authService.refreshUser();
-      final enhancedUserData = await enhanceUserService?.enhanceUser(userData) ?? userData;
-      final enhancedUser = converter.fromJson(enhancedUserData);
-      emit(state.copyWith(user: enhancedUser, isLoading: false));
-    } catch (e) {
-      emit(state.copyWith(
-        isLoading: false,
-        errorMessage: e.toString(),
-      ));
-      // Don't rethrow - refresh failures shouldn't break the app
-    }
-  }
-
-  /// Update the state with a user (useful for restoring from storage).
-  void setUser(Map<String, dynamic> user) {
-    authService.setUser(user);
-    emit(state.copyWith(user: converter.fromJson(user)));
-  }
-
-  /// Clear the current user without calling logout API.
-  void clearUser() {
-    authService.clearUser();
-    emit(state.copyWith(user: null));
   }
 }

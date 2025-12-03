@@ -46,7 +46,7 @@ packages:
       path: "../packages/anyhoo_auth"
       relative: true
     source: path
-    version: "0.0.10"
+    version: "0.0.11"
   anyhoo_core:
     dependency: "direct main"
     description:

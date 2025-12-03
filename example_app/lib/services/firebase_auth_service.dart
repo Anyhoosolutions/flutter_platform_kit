@@ -10,7 +10,7 @@ import 'package:example_app/models/example_user.dart';
 Future<AnyhooAuthService> createFirebaseAuthService() async {
   FirebaseInitializer firebaseInitializer = FirebaseInitializer(arguments: Arguments(), hostIp: '192.168.87.21');
   await firebaseInitializer.initialize(DefaultFirebaseOptions.currentPlatform);
-  return AnyhooFirebaseAuthService(converter: ExampleUserConverter(), firebaseAuth: firebaseInitializer.getAuth());
+  return AnyhooFirebaseAuthService(firebaseAuth: firebaseInitializer.getAuth());
 }
 
 class ExampleUserConverter implements AnyhooUserConverter<ExampleUser> {
