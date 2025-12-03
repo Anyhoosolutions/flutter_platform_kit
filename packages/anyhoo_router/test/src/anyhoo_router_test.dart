@@ -214,7 +214,7 @@ class DummyRoute extends AnyhooRoute<AnyhooTestRouteName> {
   String get path => _path;
 
   @override
-  String get title => _title;
+  String get name => _title;
 
   @override
   AnyhooTestRouteName get routeName => _routeName;

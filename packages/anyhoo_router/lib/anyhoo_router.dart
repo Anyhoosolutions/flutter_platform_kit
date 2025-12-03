@@ -5,5 +5,4 @@
 library anyhoo_router;
 
 export 'src/anyhoo_router.dart';
-export 'src/anyhoo_route.dart';
 export 'src/go_router_wrapper.dart';
