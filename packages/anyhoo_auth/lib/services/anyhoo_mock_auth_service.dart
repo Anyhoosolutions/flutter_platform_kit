@@ -172,40 +172,6 @@ class AnyhooMockAuthService implements AnyhooAuthService {
   }
 
   @override
-  Future<Map<String, dynamic>> refreshUser() async {
-    if (!isAuthenticated) {
-      throw StateError('Cannot refresh user: no user is logged in');
-    }
-
-    // Simulate API delay
-    await Future.delayed(refreshDelay);
-
-    // Use current user's email for more realistic mock data
-    final currentEmail = currentUser?['email'] ?? 'refreshed@example.com';
-    final currentId = currentUser?['id'] ?? 'mock_user_refreshed';
-
-    // Generate refreshed user data
-    Map<String, dynamic> refreshedData;
-    if (userDataGenerator != null) {
-      refreshedData = userDataGenerator!(currentEmail);
-    } else {
-      // Default refreshed user data, preserving current user's email and ID
-      refreshedData = {
-        'id': currentId,
-        'email': currentEmail,
-        'displayName': currentEmail.split('@').first,
-        'photoURL': null,
-        'emailVerified': true,
-      };
-    }
-
-    // Update current user with refreshed data
-    _currentUser = refreshedData;
-    _emitAuthState();
-    return refreshedData;
-  }
-
-  @override
   void setUser(Map<String, dynamic> user) {
     _currentUser = user;
     _emitAuthState();

@@ -132,15 +132,6 @@ class _EnhanceUserDemoPageState extends State<EnhanceUserDemoPage> {
               ),
             ),
           ),
-          const SizedBox(height: 24),
-          ElevatedButton.icon(
-            onPressed: () {
-              context.read<AnyhooAuthCubit<ExampleUser>>().refreshUser();
-            },
-            icon: const Icon(Icons.refresh),
-            label: const Text('Refresh User'),
-            style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16)),
-          ),
           const SizedBox(height: 16),
           OutlinedButton.icon(
             onPressed: () {

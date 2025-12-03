@@ -25,38 +25,29 @@ abstract class AnyhooAuthService {
 
   /// Log in with email and password.
   ///
-  /// Returns a Map with user data that can be converted by a [UserConverter].
   /// Throws an exception if login fails.
-  Future<Map<String, dynamic>> loginWithEmailAndPassword(String email, String password);
+  Future<void> loginWithEmailAndPassword(String email, String password);
 
   /// Log in with Google.
   ///
-  /// Returns a Map with user data that can be converted by a [UserConverter].
   /// Throws an exception if login fails or if Google login is not supported.
-  Future<Map<String, dynamic>> loginWithGoogle();
+  Future<void> loginWithGoogle();
 
   /// Log in with Apple.
   ///
-  /// Returns a Map with user data that can be converted by a [UserConverter].
   /// Throws an exception if login fails or if Apple login is not supported.
-  Future<Map<String, dynamic>> loginWithApple();
+  Future<void> loginWithApple();
 
   /// Log in with anonymous provider.
   ///
   /// Returns a Map with user data that can be converted by a [UserConverter].
   /// Throws an exception if login fails or if anonymous login is not supported.
-  Future<Map<String, dynamic>> loginWithAnonymous();
+  Future<void> loginWithAnonymous();
 
   /// Log out the current user.
   ///
   /// Clears the current user and optionally calls the logout API.
   Future<void> logout();
-
-  /// Refresh the current user's data from the server.
-  ///
-  /// Updates [currentUser] with fresh data from the API.
-  /// Throws an exception if refresh fails or if no user is logged in.
-  Future<Map<String, dynamic>> refreshUser();
 
   /// Set the current user (useful for restoring from storage).
   void setUser(Map<String, dynamic> user);

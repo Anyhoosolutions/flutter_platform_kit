@@ -38,9 +38,10 @@ class AnyhooFirebaseAuthService implements AnyhooAuthService {
     firebase_auth.FirebaseAuth? firebaseAuth,
   }) : _firebaseAuth = firebaseAuth ?? firebase_auth.FirebaseAuth.instance {
     // Listen to auth state changes and update current user
+
     _firebaseAuth.authStateChanges().listen((firebaseUser) {
+      _log.info('Auth state changed (uid): ${firebaseUser?.uid ?? 'null'}');
       if (firebaseUser != null) {
-        _log.info('Auth state changed (uid): ${firebaseUser.uid}');
         final userData = _firebaseUserToMap(firebaseUser);
         _log.info('Auth state changed (name): ${userData['displayName']}');
         setUser(userData);
@@ -53,6 +54,7 @@ class AnyhooFirebaseAuthService implements AnyhooAuthService {
   @override
   Stream<Map<String, dynamic>?> get authStateChanges {
     return _firebaseAuth.authStateChanges().map((firebaseUser) {
+      _log.info('Auth state changed (uid): ${firebaseUser?.uid ?? 'null'}');
       if (firebaseUser != null) {
         return _firebaseUserToMap(firebaseUser);
       }
@@ -61,31 +63,28 @@ class AnyhooFirebaseAuthService implements AnyhooAuthService {
   }
 
   @override
-  Future<Map<String, dynamic>> loginWithEmailAndPassword(String email, String password) async {
+  Future<void> loginWithEmailAndPassword(String email, String password) async {
     try {
-      final credential = await _firebaseAuth.signInWithEmailAndPassword(
+      await _firebaseAuth.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
-      final userData = _firebaseUserToMap(credential.user!);
-      _currentUser = userData;
-      return userData;
     } catch (e) {
+      _log.severe('Error logging in with email and password', e);
       rethrow;
     }
   }
 
   @override
-  Future<Map<String, dynamic>> loginWithGoogle() async {
+  Future<void> loginWithGoogle() async {
     try {
       if (kIsWeb) {
         // For web, check if we're returning from a redirect
         final redirectResult = await _firebaseAuth.getRedirectResult();
         if (redirectResult.user != null) {
           // User just returned from redirect, use that result
-          final userData = _firebaseUserToMap(redirectResult.user!);
-          _currentUser = userData;
-          return userData;
+          _log.info('Google Sign-In successful (user): ${redirectResult.user?.displayName}');
+          return;
         }
 
         // Otherwise, initiate a new sign-in with redirect
@@ -117,16 +116,17 @@ class AnyhooFirebaseAuthService implements AnyhooAuthService {
         // Once signed in, return the UserCredential
         final userCredential = await _firebaseAuth.signInWithCredential(credential);
         final userData = _firebaseUserToMap(userCredential.user!);
-        _currentUser = userData;
-        return userData;
+        _log.info('Google Sign-In successful (user): ${userData['displayName']}');
+        return;
       }
     } catch (e) {
+      _log.severe('Error logging in with Google', e);
       throw Exception('Google Sign-In failed: $e');
     }
   }
 
   @override
-  Future<Map<String, dynamic>> loginWithApple() async {
+  Future<void> loginWithApple() async {
     try {
       final appleCredential = await SignInWithApple.getAppleIDCredential(
         scopes: [
@@ -140,18 +140,18 @@ class AnyhooFirebaseAuthService implements AnyhooAuthService {
         idToken: appleCredential.identityToken,
         accessToken: appleCredential.authorizationCode,
       );
-
       final userCredential = await _firebaseAuth.signInWithCredential(credential);
       final userData = _firebaseUserToMap(userCredential.user!);
-      _currentUser = userData;
-      return userData;
+      _log.info('Apple Sign-In successful (user): ${userData['displayName']}');
+      return;
     } catch (e) {
+      _log.severe('Error logging in with Apple', e);
       rethrow;
     }
   }
 
   @override
-  Future<Map<String, dynamic>> loginWithAnonymous() async {
+  Future<void> loginWithAnonymous() async {
     throw UnimplementedError(
       'Anonymous Sign-In requires additional setup. See documentation for implementation details.',
     );
@@ -159,22 +159,13 @@ class AnyhooFirebaseAuthService implements AnyhooAuthService {
 
   @override
   Future<void> logout() async {
-    await _firebaseAuth.signOut();
-    _currentUser = null;
-  }
-
-  @override
-  Future<Map<String, dynamic>> refreshUser() async {
-    final user = _firebaseAuth.currentUser;
-    if (user == null) {
-      throw StateError('No user is currently logged in');
+    _log.info('Logging out');
+    try {
+      await _firebaseAuth.signOut();
+    } catch (e) {
+      _log.severe('Error logging out', e);
+      rethrow;
     }
-    // Refresh the user's token and data
-    await user.reload();
-    final refreshedUser = _firebaseAuth.currentUser!;
-    final userData = _firebaseUserToMap(refreshedUser);
-    _currentUser = userData;
-    return userData;
   }
 
   @override
@@ -201,25 +192,5 @@ class AnyhooFirebaseAuthService implements AnyhooAuthService {
         'lastSignInTime': firebaseUser.metadata.lastSignInTime?.toIso8601String(),
       },
     };
-  }
-
-  /// Get the underlying Firebase Auth instance.
-  ///
-  /// Useful for accessing Firebase-specific features like OAuth providers.
-  firebase_auth.FirebaseAuth get firebaseAuth => _firebaseAuth;
-
-  /// Sign in with Google (convenience method).
-  Future<void> signInWithGoogle() async {
-    await loginWithGoogle();
-  }
-
-  /// Sign in with Apple (convenience method).
-  Future<void> signInWithApple() async {
-    await loginWithApple();
-  }
-
-  /// Sign in anonymously (convenience method).
-  Future<void> signInAnonymously() async {
-    await loginWithAnonymous();
   }
 }

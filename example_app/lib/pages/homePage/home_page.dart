@@ -5,6 +5,9 @@ import 'package:example_app/models/example_user.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:logging/logging.dart';
+
+final _log = Logger('HomePage');
 
 /// Home page that serves as a navigation hub for package demos.
 class HomePage extends StatelessWidget {
@@ -15,24 +18,39 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final user = context.watch<AnyhooAuthCubit<ExampleUser>>().state.user;
+    final authState = context.watch<AnyhooAuthCubit<ExampleUser>>().state;
+    _log.info('authState: $authState');
+    final user = authState.user;
+    // _log.info('user: $user');
+    final isLoading = authState.isLoading;
+    // _log.info('isLoading: $isLoading');
+    final error = authState.errorMessage;
+    // _log.info('error: $error');
 
     Widget loggedInInfoWidget = Text('Not logged in');
 
-    if (user != null) {
-      loggedInInfoWidget = Row(
-        mainAxisAlignment: .center,
-        crossAxisAlignment: .center,
-        children: [
-          Text('Logged in as: ${user.email}'),
-          IconButton(
-            onPressed: () {
-              context.read<AnyhooAuthCubit<ExampleUser>>().logout();
-            },
-            icon: Icon(Icons.logout),
-          ),
-        ],
-      );
+    if (error != null) {
+      loggedInInfoWidget = Text('Error: $error');
+    } else {
+      if (isLoading) {
+        loggedInInfoWidget = const CircularProgressIndicator();
+      } else {
+        if (user != null) {
+          loggedInInfoWidget = Row(
+            mainAxisAlignment: .center,
+            crossAxisAlignment: .center,
+            children: [
+              Text('Logged in as: ${user.email}'),
+              IconButton(
+                onPressed: () {
+                  context.read<AnyhooAuthCubit<ExampleUser>>().logout();
+                },
+                icon: Icon(Icons.logout),
+              ),
+            ],
+          );
+        }
+      }
     }
 
     return Scaffold(

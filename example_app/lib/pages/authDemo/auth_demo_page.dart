@@ -12,8 +12,8 @@ class AuthDemoPage extends StatefulWidget {
 }
 
 class _AuthDemoPageState extends State<AuthDemoPage> {
-  final _emailController = TextEditingController(text: 'demo@example.com');
-  final _passwordController = TextEditingController(text: 'password123');
+  final _emailController = TextEditingController(text: 'testuserbob@email.com');
+  final _passwordController = TextEditingController(text: 'test1234');
 
   @override
   void dispose() {
@@ -159,15 +159,6 @@ class _AuthDemoPageState extends State<AuthDemoPage> {
                 ],
               ),
             ),
-          ),
-          const SizedBox(height: 24),
-          ElevatedButton.icon(
-            onPressed: () {
-              context.read<AnyhooAuthCubit<ExampleUser>>().refreshUser();
-            },
-            icon: const Icon(Icons.refresh),
-            label: const Text('Refresh User'),
-            style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16)),
           ),
           const SizedBox(height: 16),
           OutlinedButton.icon(
