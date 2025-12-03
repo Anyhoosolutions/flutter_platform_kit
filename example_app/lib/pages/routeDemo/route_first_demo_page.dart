@@ -18,7 +18,7 @@ class RouteFirstDemoPage extends StatelessWidget {
               onPressed: () {
                 GoRouter.of(context).push('/route-demo/nested');
               },
-              child: const Text('Go to Auth'),
+              child: const Text('Go to Nested Route'),
             ),
           ],
         ),

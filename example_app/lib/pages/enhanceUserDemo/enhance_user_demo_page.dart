@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:anyhoo_auth/anyhoo_auth.dart';
-import '../models/example_user.dart';
+import '../../models/example_user.dart';
 
 /// Demo page showing authentication functionality.
-class AuthDemoPage extends StatefulWidget {
-  const AuthDemoPage({super.key});
+class EnhanceUserDemoPage extends StatefulWidget {
+  const EnhanceUserDemoPage({super.key});
 
   @override
-  State<AuthDemoPage> createState() => _AuthDemoPageState();
+  State<EnhanceUserDemoPage> createState() => _EnhanceUserDemoPageState();
 }
 
-class _AuthDemoPageState extends State<AuthDemoPage> {
+class _EnhanceUserDemoPageState extends State<EnhanceUserDemoPage> {
   final _emailController = TextEditingController(text: 'demo@example.com');
   final _passwordController = TextEditingController(text: 'password123');
 
@@ -101,36 +101,6 @@ class _AuthDemoPageState extends State<AuthDemoPage> {
                   ) // TODO: Shimmer
                 : const Text('Login'),
           ),
-          const SizedBox(height: 24),
-          const Row(
-            children: [
-              Expanded(child: Divider()),
-              Padding(padding: EdgeInsets.symmetric(horizontal: 16), child: Text('OR')),
-              Expanded(child: Divider()),
-            ],
-          ),
-          const SizedBox(height: 24),
-          OutlinedButton.icon(
-            onPressed: isLoading
-                ? null
-                : () {
-                    context.read<AnyhooAuthCubit<ExampleUser>>().loginWithGoogle();
-                  },
-            icon: const Icon(Icons.g_mobiledata, size: 28),
-            label: const Text('Sign in with Google'),
-            style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 12)),
-          ),
-          const SizedBox(height: 16),
-          OutlinedButton.icon(
-            onPressed: isLoading
-                ? null
-                : () {
-                    context.read<AnyhooAuthCubit<ExampleUser>>().loginWithApple();
-                  },
-            icon: const Icon(Icons.apple, size: 28),
-            label: const Text('Sign in with Apple'),
-            style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 12)),
-          ),
         ],
       ),
     );
@@ -156,6 +126,8 @@ class _AuthDemoPageState extends State<AuthDemoPage> {
                   _UserInfoRow(label: 'Email', value: user.email),
                   const Divider(),
                   _UserInfoRow(label: 'Name', value: user.name),
+                  const Divider(),
+                  _UserInfoRow(label: 'Avatar url', value: user.avatarUrl ?? ''),
                 ],
               ),
             ),

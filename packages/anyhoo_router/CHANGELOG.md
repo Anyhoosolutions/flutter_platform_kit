@@ -1,3 +1,7 @@
+## 0.0.7
+ 
+* Refactor to use AnyhooRouter everywhere in the example app
+
 ## 0.0.6
  
 * Fix nested redirects

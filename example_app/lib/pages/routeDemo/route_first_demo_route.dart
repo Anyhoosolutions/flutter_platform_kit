@@ -1,18 +1,18 @@
 import 'package:anyhoo_router/anyhoo_router.dart';
 import 'package:example_app/main.dart';
-import 'package:example_app/pages/logging_page.dart';
+import 'package:example_app/pages/routeDemo/route_first_demo_page.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-class LoggingPageRoute extends AnyhooRoute<AnyhooRouteName> {
-  LoggingPageRoute();
+class RouteFirstDemoRoute extends AnyhooRoute<AnyhooRouteName> {
+  RouteFirstDemoRoute();
 
   @override
   Widget? Function(BuildContext, GoRouterState)? get builder =>
-      (context, state) => LoggingPage();
+      (context, state) => RouteFirstDemoPage();
 
   @override
-  String get path => '/logging';
+  String get path => '/route-demo';
 
   @override
   String? get redirect => null;
@@ -21,8 +21,8 @@ class LoggingPageRoute extends AnyhooRoute<AnyhooRouteName> {
   bool get requireLogin => false;
 
   @override
-  AnyhooRouteName get routeName => AnyhooRouteName.logging;
+  AnyhooRouteName get routeName => AnyhooRouteName.routeFirstDemo;
 
   @override
-  String get title => 'Logging';
+  String get title => 'Route First Demo';
 }

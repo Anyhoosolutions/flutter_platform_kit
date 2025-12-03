@@ -88,7 +88,7 @@ packages:
       path: "../packages/anyhoo_router"
       relative: true
     source: path
-    version: "0.0.5"
+    version: "0.0.7"
   anyhoo_search_bar:
     dependency: "direct main"
     description:

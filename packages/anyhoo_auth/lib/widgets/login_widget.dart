@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:anyhoo_auth/cubit/anyhoo_auth_cubit.dart';
 import 'package:anyhoo_auth/cubit/anyhoo_auth_state.dart';
 import 'package:anyhoo_core/anyhoo_core.dart';
@@ -7,249 +9,324 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 
-class LoginWidget extends StatefulWidget {
+class LoginWidget<T extends AnyhooUser> extends StatefulWidget {
   const LoginWidget({
     super.key,
     required this.title,
     this.assetLogoPath,
+    this.cubit,
   });
 
   final String title;
   final String? assetLogoPath;
+  final AnyhooAuthCubit<T>? cubit;
 
   @override
   State<LoginWidget> createState() => _LoginWidgetState();
 }
 
-class _LoginWidgetState extends State<LoginWidget> {
+class _LoginWidgetState<T extends AnyhooUser> extends State<LoginWidget<T>> {
   final _formKey = GlobalKey<FormBuilderState>();
   bool _isLoading = false;
   bool _isSignUp = false;
   bool _obscurePassword = true;
+  StreamSubscription<AnyhooAuthState<T>>? _stateSubscription;
+
+  @override
+  void initState() {
+    super.initState();
+    // Subscribe to cubit stream manually to avoid provider lookup issues with generics
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _subscribeToCubit();
+    });
+  }
+
+  @override
+  void dispose() {
+    _stateSubscription?.cancel();
+    super.dispose();
+  }
+
+  void _subscribeToCubit() {
+    final cubit = _getCubit(context);
+    _stateSubscription = cubit.stream.listen((state) {
+      if (!mounted) return;
+
+      if (state.isAuthenticated && state.user != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Welcome, ${state.user?.email ?? 'User'}!'),
+            backgroundColor: Theme.of(context).primaryColor,
+          ),
+        );
+      }
+      if (state.errorMessage != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(state.errorMessage!),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
+    });
+  }
+
+  AnyhooAuthCubit<T> _getCubit(BuildContext context) {
+    // First, try to use the cubit passed as a parameter
+    if (widget.cubit != null) {
+      return widget.cubit!;
+    }
+
+    // Fallback: try to find it in the widget tree
+    // NOTE: This may fail due to Dart's provider system limitations with generics
+    try {
+      return context.read<AnyhooAuthCubit<T>>();
+    } catch (e) {
+      throw StateError(
+        'Could not find AnyhooAuthCubit<$T>. '
+        'Either pass the cubit as a parameter to LoginWidget, or ensure '
+        'BlocProvider<AnyhooAuthCubit<$T>> is provided above LoginWidget. '
+        'Note: Dart\'s provider system cannot match generic type parameters, '
+        'so the concrete type must match exactly. '
+        'Original error: $e',
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<AnyhooAuthCubit, AnyhooAuthState>(
-      listener: (context, state) {
-        if (state is AnyhooUser) {
-          // Navigate to main app or show success
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Welcome, ${state.user?.email ?? 'User'}!'),
-              backgroundColor: Theme.of(context).primaryColor,
-            ),
-          );
-        }
-        if (state.errorMessage != null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.errorMessage!),
-              backgroundColor: Theme.of(context).colorScheme.error,
-            ),
-          );
-        }
-      },
-      child: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const SizedBox(height: 60),
-              // App Logo/Title
-              if (widget.assetLogoPath != null) Image.asset(widget.assetLogoPath!, width: 80, height: 80),
-              const SizedBox(height: 24),
-              Text(
-                widget.title,
-                style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.primary,
-                      fontWeight: FontWeight.bold,
-                    ),
-                textAlign: TextAlign.center,
+    // Get the cubit - prefer passed cubit, fallback to provider lookup
+    final cubit = _getCubit(context);
+
+    // Manually listen to state changes since we can't use BlocListener with generics
+    return StreamBuilder<AnyhooAuthState<T>>(
+      stream: cubit.stream,
+      initialData: cubit.state,
+      builder: (context, snapshot) {
+        final state = snapshot.data!;
+
+        // Handle state changes
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (state.isAuthenticated && state.user != null) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Welcome, ${state.user?.email ?? 'User'}!'),
+                backgroundColor: Theme.of(context).primaryColor,
               ),
-              const SizedBox(height: 8),
-              Text(
-                _isSignUp ? 'Create your account' : 'Sign in to continue',
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: Theme.of(context).colorScheme.secondary,
-                    ),
-                textAlign: TextAlign.center,
+            );
+          }
+          if (state.errorMessage != null) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.errorMessage!),
+                backgroundColor: Theme.of(context).colorScheme.error,
               ),
-              const SizedBox(height: 48),
+            );
+          }
+        });
 
-              // Email/Password Form
-              FormBuilder(
-                key: _formKey,
-                child: Column(
-                  children: [
-                    FormBuilderTextField(
-                      name: 'email',
-                      decoration: const InputDecoration(
-                        labelText: 'Email',
-                        prefixIcon: Icon(Icons.email_outlined),
-                      ),
-                      keyboardType: TextInputType.emailAddress,
-                      validator: FormBuilderValidators.compose([
-                        FormBuilderValidators.required(),
-                        FormBuilderValidators.email(),
-                      ]),
-                    ),
-                    const SizedBox(height: 16),
-                    FormBuilderTextField(
-                      name: 'password',
-                      decoration: InputDecoration(
-                        labelText: 'Password',
-                        prefixIcon: const Icon(Icons.lock_outlined),
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              _obscurePassword = !_obscurePassword;
-                            });
-                          },
-                        ),
-                      ),
-                      obscureText: _obscurePassword,
-                      validator: FormBuilderValidators.compose([
-                        FormBuilderValidators.required(),
-                        FormBuilderValidators.minLength(6),
-                      ]),
-                    ),
-                    const SizedBox(height: 24),
-
-                    // Sign In/Up Button
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: _isLoading ? null : _handleEmailAuth,
-                        child: _isLoading
-                            ? const SizedBox(
-                                height: 20,
-                                width: 20,
-                                child: CircularProgressIndicator(), // TODO: Shimmer
-                              )
-                            : Text(_isSignUp ? 'Create Account' : 'Sign In'),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 24),
-
-              // Toggle between Sign In and Sign Up
-              TextButton(
-                onPressed: () {
-                  setState(() {
-                    _isSignUp = !_isSignUp;
-                  });
-                },
-                child: Text(
-                  _isSignUp ? 'Already have an account? Sign In' : 'Don\'t have an account? Sign Up',
-                ),
-              ),
-
-              const SizedBox(height: 32),
-
-              // Divider
-              Row(
-                children: [
-                  Expanded(
-                    child: Divider(color: Theme.of(context).colorScheme.outline, thickness: 1),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Text(
-                      'OR',
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.secondary,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: Divider(color: Theme.of(context).colorScheme.outline, thickness: 1),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 32),
-
-              // Social Sign In Buttons
-              _buildSocialSignInButton(
-                onPressed: _isLoading ? null : _handleGoogleSignIn,
-                icon: 'images/google_icon.svg',
-                text: 'Continue with Google',
-                backgroundColor: Colors.white,
-                textColor: Colors.black87,
-                borderColor: Theme.of(context).colorScheme.outline,
-              ),
-
-              const SizedBox(height: 16),
-
-              _buildSocialSignInButton(
-                onPressed: _isLoading ? null : _handleAppleSignIn,
-                icon: 'assets/images/apple_icon.svg',
-                text: 'Continue with Apple',
-                backgroundColor: Colors.black,
-                textColor: Colors.white,
-                borderColor: Theme.of(context).colorScheme.outline,
-              ),
-
-              const SizedBox(height: 32),
-
-              // Anonymous Sign In Button
-              SizedBox(
-                width: double.infinity,
-                child: OutlinedButton(
-                  onPressed: _isLoading ? null : _handleAnonymousSignIn,
-                  style: OutlinedButton.styleFrom(
-                    backgroundColor: Colors.transparent,
-                    foregroundColor: Theme.of(context).colorScheme.primary,
-                    // side: BorderSide(color: AppTheme.primaryColor),
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.person_outline,
-                        size: 24,
+        return SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const SizedBox(height: 60),
+                // App Logo/Title
+                if (widget.assetLogoPath != null) Image.asset(widget.assetLogoPath!, width: 80, height: 80),
+                const SizedBox(height: 24),
+                Text(
+                  widget.title,
+                  style: Theme.of(context).textTheme.displayMedium?.copyWith(
                         color: Theme.of(context).colorScheme.primary,
+                        fontWeight: FontWeight.bold,
                       ),
-                      const SizedBox(width: 12),
-                      Text(
-                        'Continue as Guest',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Theme.of(context).colorScheme.primary,
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  _isSignUp ? 'Create your account' : 'Sign in to continue',
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        color: Theme.of(context).colorScheme.secondary,
+                      ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 48),
+
+                // Email/Password Form
+                FormBuilder(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      FormBuilderTextField(
+                        name: 'email',
+                        decoration: const InputDecoration(
+                          labelText: 'Email',
+                          prefixIcon: Icon(Icons.email_outlined),
+                        ),
+                        keyboardType: TextInputType.emailAddress,
+                        validator: FormBuilderValidators.compose([
+                          FormBuilderValidators.required(),
+                          FormBuilderValidators.email(),
+                        ]),
+                      ),
+                      const SizedBox(height: 16),
+                      FormBuilderTextField(
+                        name: 'password',
+                        decoration: InputDecoration(
+                          labelText: 'Password',
+                          prefixIcon: const Icon(Icons.lock_outlined),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _obscurePassword = !_obscurePassword;
+                              });
+                            },
+                          ),
+                        ),
+                        obscureText: _obscurePassword,
+                        validator: FormBuilderValidators.compose([
+                          FormBuilderValidators.required(),
+                          FormBuilderValidators.minLength(6),
+                        ]),
+                      ),
+                      const SizedBox(height: 24),
+
+                      // Sign In/Up Button
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: _isLoading ? null : _handleEmailAuth,
+                          child: _isLoading
+                              ? const SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: CircularProgressIndicator(), // TODO: Shimmer
+                                )
+                              : Text(_isSignUp ? 'Create Account' : 'Sign In'),
                         ),
                       ),
                     ],
                   ),
                 ),
-              ),
 
-              const SizedBox(height: 32),
+                const SizedBox(height: 24),
 
-              // Terms and Privacy
-              Text(
-                'By continuing, you agree to our Terms of Service and Privacy Policy',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Theme.of(context).colorScheme.secondary,
+                // Toggle between Sign In and Sign Up
+                TextButton(
+                  onPressed: () {
+                    setState(() {
+                      _isSignUp = !_isSignUp;
+                    });
+                  },
+                  child: Text(
+                    _isSignUp ? 'Already have an account? Sign In' : 'Don\'t have an account? Sign Up',
+                  ),
+                ),
+
+                const SizedBox(height: 32),
+
+                // Divider
+                Row(
+                  children: [
+                    Expanded(
+                      child: Divider(color: Theme.of(context).colorScheme.outline, thickness: 1),
                     ),
-                textAlign: TextAlign.center,
-              ),
-            ],
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Text(
+                        'OR',
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.secondary,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Divider(color: Theme.of(context).colorScheme.outline, thickness: 1),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 32),
+
+                // Social Sign In Buttons
+                _buildSocialSignInButton(
+                  onPressed: _isLoading ? null : _handleGoogleSignIn,
+                  icon: 'images/google_icon.svg',
+                  text: 'Continue with Google',
+                  backgroundColor: Colors.white,
+                  textColor: Colors.black87,
+                  borderColor: Theme.of(context).colorScheme.outline,
+                ),
+
+                const SizedBox(height: 16),
+
+                _buildSocialSignInButton(
+                  onPressed: _isLoading ? null : _handleAppleSignIn,
+                  icon: 'assets/images/apple_icon.svg',
+                  text: 'Continue with Apple',
+                  backgroundColor: Colors.black,
+                  textColor: Colors.white,
+                  borderColor: Theme.of(context).colorScheme.outline,
+                ),
+
+                const SizedBox(height: 32),
+
+                // Anonymous Sign In Button
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton(
+                    onPressed: _isLoading ? null : _handleAnonymousSignIn,
+                    style: OutlinedButton.styleFrom(
+                      backgroundColor: Colors.transparent,
+                      foregroundColor: Theme.of(context).colorScheme.primary,
+                      // side: BorderSide(color: AppTheme.primaryColor),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.person_outline,
+                          size: 24,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                        const SizedBox(width: 12),
+                        Text(
+                          'Continue as Guest',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 32),
+
+                // Terms and Privacy
+                Text(
+                  'By continuing, you agree to our Terms of Service and Privacy Policy',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Theme.of(context).colorScheme.secondary,
+                      ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
@@ -305,9 +382,9 @@ class _LoginWidgetState extends State<LoginWidget> {
 
       try {
         if (_isSignUp) {
-          context.read<AnyhooAuthCubit>().login(email, password); // TODO: Create account
+          _getCubit(context).login(email, password); // TODO: Create account
         } else {
-          context.read<AnyhooAuthCubit>().login(email, password);
+          _getCubit(context).login(email, password);
         }
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -330,7 +407,7 @@ class _LoginWidgetState extends State<LoginWidget> {
     });
 
     try {
-      context.read<AnyhooAuthCubit>().loginWithGoogle();
+      _getCubit(context).loginWithGoogle();
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -351,7 +428,7 @@ class _LoginWidgetState extends State<LoginWidget> {
     });
 
     try {
-      context.read<AnyhooAuthCubit>().loginWithApple();
+      _getCubit(context).loginWithApple();
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -372,7 +449,7 @@ class _LoginWidgetState extends State<LoginWidget> {
     });
 
     try {
-      context.read<AnyhooAuthCubit>().loginWithAnonymous();
+      _getCubit(context).loginWithAnonymous();
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

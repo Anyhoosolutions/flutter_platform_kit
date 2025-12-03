@@ -1,5 +1,6 @@
 import 'package:anyhoo_auth/services/anyhoo_auth_service.dart';
 import 'package:anyhoo_auth/models/anyhoo_user_converter.dart';
+import 'package:anyhoo_core/models/anyhoo_user.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:google_sign_in/google_sign_in.dart';
@@ -19,7 +20,7 @@ final _log = Logger('AnyhooFirebaseAuthService');
 ///   converter: MyAppUserConverter(),
 /// );
 /// ```
-class AnyhooFirebaseAuthService extends AnyhooAuthService {
+class AnyhooFirebaseAuthService<T extends AnyhooUser> extends AnyhooAuthService<T> {
   final firebase_auth.FirebaseAuth _firebaseAuth;
 
   /// Creates a Firebase authentication service.
@@ -27,7 +28,7 @@ class AnyhooFirebaseAuthService extends AnyhooAuthService {
   /// [converter] is required to convert Firebase user data to your app's user model.
   /// [firebaseAuth] is optional - defaults to [FirebaseAuth.instance].
   AnyhooFirebaseAuthService({
-    required AnyhooUserConverter converter,
+    required AnyhooUserConverter<T> converter,
     firebase_auth.FirebaseAuth? firebaseAuth,
   })  : _firebaseAuth = firebaseAuth ?? firebase_auth.FirebaseAuth.instance,
         super(

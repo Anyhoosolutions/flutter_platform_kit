@@ -1,6 +1,6 @@
 import 'package:anyhoo_router/anyhoo_router.dart';
 import 'package:example_app/main.dart';
-import 'package:example_app/pages/remote_config_demo_page.dart';
+import 'package:example_app/pages/remoteConfigDemo/remote_config_demo_page.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:anyhoo_remote_config/anyhoo_remote_config.dart';

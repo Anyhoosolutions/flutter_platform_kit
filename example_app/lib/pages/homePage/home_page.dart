@@ -1,20 +1,7 @@
-import 'package:anyhoo_auth/cubit/anyhoo_auth_cubit.dart';
-import 'package:anyhoo_auth/widgets/login_widget.dart';
 import 'package:anyhoo_core/models/arguments.dart';
-import 'package:anyhoo_core/widgets/error_page.dart';
-import 'package:anyhoo_core/widgets/waiting_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:example_app/models/example_user.dart';
-import 'package:example_app/models/example_user_converter.dart';
-import 'package:example_app/pages/arguments_demo_page.dart';
-import 'package:example_app/pages/enhance_user_demo_page.dart';
-import 'package:example_app/pages/firestore_demo_page.dart';
-import 'package:example_app/services/mock_auth_service.dart';
-import 'package:example_app/services/mock_enhance_user_service.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'image_selector_demo_page.dart';
 
 /// Home page that serves as a navigation hub for package demos.
 class HomePage extends StatelessWidget {
@@ -37,7 +24,7 @@ class HomePage extends StatelessWidget {
           const SizedBox(height: 16),
           _loggingPageDemoButton(context),
           const SizedBox(height: 16),
-          _loginButtonconst(context),
+          _loginButton(context),
           SizedBox(height: 16),
           _enhancedUserDemoButton(context),
           const SizedBox(height: 16),
@@ -72,32 +59,13 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  _DemoCard _loginButtonconst(BuildContext context) {
+  _DemoCard _loginButton(BuildContext context) {
     return _DemoCard(
       title: 'Login Widget Demo',
       description: 'Demonstrates the login widget',
       icon: Icons.login,
       onTap: () {
-        final authService = createMockAuthService();
-
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) {
-              return Scaffold(
-                appBar: AppBar(
-                  title: const Text('Login Widget Demo'),
-                  backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-                ),
-                body: BlocProvider<AnyhooAuthCubit<ExampleUser>>(
-                  create: (_) =>
-                      AnyhooAuthCubit<ExampleUser>(authService: authService, converter: ExampleUserConverter()),
-                  child: LoginWidget(title: 'Example app', assetLogoPath: 'assets/images/logo.webp'),
-                ),
-              );
-            },
-          ),
-        );
+        GoRouter.of(context).push('/login');
       },
     );
   }
@@ -108,19 +76,7 @@ class HomePage extends StatelessWidget {
       description: 'Demonstrates authentication with custom user models',
       icon: Icons.login,
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => BlocProvider(
-              create: (_) => AnyhooAuthCubit<ExampleUser>(
-                authService: createMockAuthService(),
-                converter: ExampleUserConverter(),
-                enhanceUserService: createMockEnhanceUserService(),
-              ),
-              child: EnhanceUserDemoPage(),
-            ),
-          ),
-        );
+        GoRouter.of(context).push('/enhance-user');
       },
     );
   }
@@ -142,7 +98,7 @@ class HomePage extends StatelessWidget {
       description: 'Demonstrates image selection from gallery, camera, or stock photos',
       icon: Icons.image,
       onTap: () {
-        Navigator.push(context, MaterialPageRoute(builder: (_) => const ImageSelectorDemoPage()));
+        GoRouter.of(context).push('/image-selector');
       },
     );
   }
@@ -164,7 +120,7 @@ class HomePage extends StatelessWidget {
       description: 'Demonstrates arguments passed in when launching the app',
       icon: Icons.image,
       onTap: () {
-        Navigator.push(context, MaterialPageRoute(builder: (_) => ArgumentsDemoPage(arguments: arguments)));
+        GoRouter.of(context).push('/arguments', extra: arguments);
       },
     );
   }
@@ -175,7 +131,7 @@ class HomePage extends StatelessWidget {
       description: 'Demonstrates Firestore usage',
       icon: Icons.data_array,
       onTap: () {
-        Navigator.push(context, MaterialPageRoute(builder: (_) => FirestoreDemoPage(firestore: firestore)));
+        GoRouter.of(context).push('/firestore', extra: firestore);
       },
     );
   }
@@ -197,29 +153,7 @@ class HomePage extends StatelessWidget {
       description: 'Demonstrates error page',
       icon: Icons.error,
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => Scaffold(
-              appBar: AppBar(
-                title: const Text('Error Page Demo'),
-                actions: [
-                  IconButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    icon: const Icon(Icons.close),
-                  ),
-                ],
-              ),
-              body: ErrorPage(
-                errorMessage: 'Error message',
-                detailedError:
-                    'Detailed error message. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-              ),
-            ),
-          ),
-        );
+        GoRouter.of(context).push('/error');
       },
     );
   }
@@ -230,25 +164,7 @@ class HomePage extends StatelessWidget {
       description: 'Demonstrates waiting page',
       icon: Icons.hourglass_empty,
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => Scaffold(
-              appBar: AppBar(
-                title: const Text('Waiting Page Demo'),
-                actions: [
-                  IconButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    icon: const Icon(Icons.close),
-                  ),
-                ],
-              ),
-              body: WaitingPage(message: 'Loading...'),
-            ),
-          ),
-        );
+        GoRouter.of(context).push('/waiting');
       },
     );
   }
