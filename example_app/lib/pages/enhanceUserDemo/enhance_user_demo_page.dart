@@ -25,7 +25,7 @@ class _EnhanceUserDemoPageState extends State<EnhanceUserDemoPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Auth Demo')),
+      appBar: AppBar(title: const Text('Enhanced User Demo')),
       body: BlocListener<AnyhooAuthCubit<ExampleUser>, AnyhooAuthState<ExampleUser>>(
         listener: (context, state) {
           if (state.errorMessage != null) {
@@ -56,7 +56,7 @@ class _EnhanceUserDemoPageState extends State<EnhanceUserDemoPage> {
         children: [
           const Icon(Icons.login, size: 80, color: Colors.blue),
           const SizedBox(height: 32),
-          Text('Login Demo', style: Theme.of(context).textTheme.headlineMedium, textAlign: TextAlign.center),
+          Text('Enhanced User Demo', style: Theme.of(context).textTheme.headlineMedium, textAlign: TextAlign.center),
           const SizedBox(height: 8),
           Text(
             'Enter any email and password to login (mock authentication)',
