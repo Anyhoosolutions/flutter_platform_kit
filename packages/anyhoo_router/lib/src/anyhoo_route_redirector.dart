@@ -12,6 +12,7 @@ class AnyhooRouteRedirector {
   final String? webDeepLinkHost;
   final String loginPath;
   final String initialPath;
+  final List<String> allPaths;
 
   AnyhooRouteRedirector({
     required this.routes,
@@ -20,12 +21,18 @@ class AnyhooRouteRedirector {
     this.webDeepLinkHost,
     this.loginPath = '/login',
     this.initialPath = '/',
-  });
+  }) : allPaths = getAllPaths(routes);
 
   String? redirect(BuildContext context, GoRouterState state) {
     final uri = state.uri;
     final originalPath = uri.path;
     log.info('redirect called for originalPath: $originalPath');
+    log.info('allPaths: ${allPaths.join(', ')}');
+
+    if (!_pathMatchesAnyRoute(originalPath)) {
+      log.info('route not found, redirecting to /');
+      return redirecting(originalPath, '/');
+    }
 
     if (deepLinkSchemeName != null) {
       // Handle custom scheme deep links
@@ -79,5 +86,65 @@ class AnyhooRouteRedirector {
 
     log.info('...redirecting to $redirectTo instead of $originalPath');
     return redirectTo;
+  }
+
+  bool _pathMatchesAnyRoute(String path) {
+    final normalizedPath = path.toLowerCase();
+
+    // First check exact match
+    if (allPaths.contains(normalizedPath)) {
+      return true;
+    }
+
+    // Then check if it matches any parameterized route pattern
+    final pathSegments = normalizedPath.split('/').where((s) => s.isNotEmpty).toList();
+
+    for (final routePath in allPaths) {
+      final routeSegments = routePath.split('/').where((s) => s.isNotEmpty).toList();
+
+      // Must have same number of segments
+      if (pathSegments.length != routeSegments.length) {
+        continue;
+      }
+
+      // Check if all non-parameter segments match
+      bool matches = true;
+      for (int i = 0; i < pathSegments.length; i++) {
+        final routeSegment = routeSegments[i];
+        // If it's a parameter (starts with :), it matches any value
+        if (routeSegment.startsWith(':')) {
+          continue;
+        }
+        // Otherwise, segments must match exactly
+        if (pathSegments[i] != routeSegment) {
+          matches = false;
+          break;
+        }
+      }
+
+      if (matches) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  static List<String> getAllPaths(List<RouteBase> routes) {
+    List<String> paths = [];
+    routes.forEach((route) {
+      final r = route as GoRoute;
+      String p = r.path.toLowerCase();
+      if (p.endsWith('/')) {
+        p = p.substring(0, p.length - 1);
+      }
+      if (!p.startsWith('/')) {
+        p = '/$p';
+      }
+      paths.add(p);
+
+      paths.addAll(getAllPaths(r.routes));
+    });
+    return paths;
   }
 }

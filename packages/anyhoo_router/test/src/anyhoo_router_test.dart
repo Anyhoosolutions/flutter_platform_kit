@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+import 'package:logging/logging.dart';
 import 'package:mocktail/mocktail.dart';
 
 enum AnyhooTestRouteName { home, login, users, profiles, accounts, usersDetails, accountsDetails, profilesDetails }
@@ -16,6 +17,10 @@ void main() {
     late GoRouter goRouter;
 
     setUp(() {
+      Logger.root.onRecord.listen((record) {
+        print('${record.level.name}: ${record.time}: ${record.message}');
+      });
+
       final routes = [
         GoRoute(
           path: '/',
@@ -78,6 +83,19 @@ void main() {
       expect(goRouter.routeInformationProvider.value.uri.path, '/users');
 
       expect(find.text('Users'), findsOneWidget);
+    });
+
+    testWidgets('should redirect if route doesn\'t exist', (WidgetTester tester) async {
+      await tester.pumpWidget(MaterialApp.router(routerConfig: goRouter));
+
+      // Navigate to /accounts which should redirect to /profiles, then to /users
+      goRouter.go('/nonexistent');
+      await tester.pumpAndSettle();
+
+      // Verify we ended up at /users (the final destination after recursive redirects)
+      expect(goRouter.routeInformationProvider.value.uri.path, '/');
+
+      expect(find.text('Home'), findsOneWidget);
     });
 
     testWidgets('should redirect: /profiles -> /users', (WidgetTester tester) async {
