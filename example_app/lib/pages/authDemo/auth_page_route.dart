@@ -1,18 +1,18 @@
 import 'package:anyhoo_router/anyhoo_router.dart';
 import 'package:example_app/main.dart';
-import 'package:example_app/pages/route_first_demo_page.dart';
+import 'package:example_app/pages/authDemo/auth_demo_page.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-class RouteFirstDemoRoute extends AnyhooRoute<AnyhooRouteName> {
-  RouteFirstDemoRoute();
+class AuthPageRoute extends AnyhooRoute<AnyhooRouteName> {
+  AuthPageRoute();
 
   @override
   Widget? Function(BuildContext, GoRouterState)? get builder =>
-      (context, state) => RouteFirstDemoPage();
+      (context, state) => AuthDemoPage();
 
   @override
-  String get path => '/route-demo';
+  String get path => '/auth';
 
   @override
   String? get redirect => null;
@@ -21,8 +21,8 @@ class RouteFirstDemoRoute extends AnyhooRoute<AnyhooRouteName> {
   bool get requireLogin => false;
 
   @override
-  AnyhooRouteName get routeName => AnyhooRouteName.routeFirstDemo;
+  AnyhooRouteName get routeName => AnyhooRouteName.auth;
 
   @override
-  String get title => 'Route First Demo';
+  String get title => 'Auth';
 }

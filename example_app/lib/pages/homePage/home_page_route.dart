@@ -2,7 +2,7 @@ import 'package:anyhoo_core/models/arguments.dart';
 import 'package:anyhoo_router/anyhoo_router.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:example_app/main.dart';
-import 'package:example_app/pages/home_page.dart';
+import 'package:example_app/pages/homePage/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
