@@ -9,6 +9,7 @@ import 'package:example_app/pages/analyticsDemo/analytics_demo_route.dart';
 import 'package:example_app/pages/argumentsDemo/arguments_demo_page_route.dart';
 import 'package:example_app/pages/authDemo/auth_page_route.dart';
 import 'package:example_app/pages/enhanceUserDemo/enhance_user_demo_page_route.dart';
+import 'package:example_app/pages/errorPageDemo/error_page_demo_page_route.dart';
 import 'package:example_app/pages/firestoreDemo/firestore_demo_page_route.dart';
 import 'package:example_app/pages/homePage/home_page_route.dart';
 import 'package:example_app/pages/imageSelectorDemo/image_selector_page_route.dart';
@@ -17,6 +18,7 @@ import 'package:example_app/pages/routeDemo/redirecting_demo_route.dart';
 import 'package:example_app/pages/remoteConfigDemo/remote_config_demo_route.dart';
 import 'package:example_app/pages/routeDemo/route_first_demo_route.dart';
 import 'package:example_app/pages/routeDemo/route_nested_demo_route.dart';
+import 'package:example_app/pages/waitingPageDemo/waiting_page_demo_page_route.dart';
 import 'package:example_app/services/firebase_auth_service.dart' hide ExampleUserConverter;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -88,6 +90,8 @@ class MyApp extends StatelessWidget {
       EnhanceUserDemoPageRoute(),
       ArgumentsDemoPageRoute(),
       FirestoreDemoPageRoute(),
+      ErrorPageDemoPageRoute(),
+      WaitingPageDemoPageRoute(),
     ];
 
     final appRouter = AnyhooRouter(routes: routes).getGoRouter();
@@ -119,4 +123,6 @@ enum AnyhooRouteName {
   enhanceUser,
   arguments,
   firestore,
+  error,
+  waiting,
 }

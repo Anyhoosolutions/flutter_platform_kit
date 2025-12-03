@@ -1,6 +1,4 @@
 import 'package:anyhoo_core/models/arguments.dart';
-import 'package:anyhoo_core/widgets/error_page.dart';
-import 'package:anyhoo_core/widgets/waiting_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -155,29 +153,7 @@ class HomePage extends StatelessWidget {
       description: 'Demonstrates error page',
       icon: Icons.error,
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => Scaffold(
-              appBar: AppBar(
-                title: const Text('Error Page Demo'),
-                actions: [
-                  IconButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    icon: const Icon(Icons.close),
-                  ),
-                ],
-              ),
-              body: ErrorPage(
-                errorMessage: 'Error message',
-                detailedError:
-                    'Detailed error message. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-              ),
-            ),
-          ),
-        );
+        GoRouter.of(context).push('/error');
       },
     );
   }
@@ -188,25 +164,7 @@ class HomePage extends StatelessWidget {
       description: 'Demonstrates waiting page',
       icon: Icons.hourglass_empty,
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => Scaffold(
-              appBar: AppBar(
-                title: const Text('Waiting Page Demo'),
-                actions: [
-                  IconButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    icon: const Icon(Icons.close),
-                  ),
-                ],
-              ),
-              body: WaitingPage(message: 'Loading...'),
-            ),
-          ),
-        );
+        GoRouter.of(context).push('/waiting');
       },
     );
   }
