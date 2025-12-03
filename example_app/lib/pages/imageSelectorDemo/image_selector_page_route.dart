@@ -9,13 +9,7 @@ class ImageSelectorPageRoute extends AnyhooRoute<AnyhooRouteName> {
 
   @override
   Widget? Function(BuildContext, GoRouterState)? get builder => (context, state) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Login Widget Demo'),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-      ),
-      body: ImageSelectorDemoPage(),
-    );
+    return ImageSelectorDemoPage();
   };
 
   @override
