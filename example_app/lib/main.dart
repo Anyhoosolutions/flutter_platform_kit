@@ -8,6 +8,7 @@ import 'package:example_app/models/example_user_converter.dart';
 import 'package:example_app/pages/analyticsDemo/analytics_demo_route.dart';
 import 'package:example_app/pages/authDemo/auth_page_route.dart';
 import 'package:example_app/pages/homePage/home_page_route.dart';
+import 'package:example_app/pages/imageSelectorDemo/image_selector_page_route.dart';
 import 'package:example_app/pages/loggingPage/logging_page_route.dart';
 import 'package:example_app/pages/routeDemo/redirecting_demo_route.dart';
 import 'package:example_app/pages/remoteConfigDemo/remote_config_demo_route.dart';
@@ -80,6 +81,7 @@ class MyApp extends StatelessWidget {
       AnalyticsDemoRoute(),
       RemoteConfigDemoRoute(),
       LoggingPageRoute(),
+      ImageSelectorPageRoute(),
     ];
 
     final appRouter = AnyhooRouter(routes: routes).getGoRouter();
@@ -107,4 +109,5 @@ enum AnyhooRouteName {
   analytics,
   remoteConfig,
   logging,
+  imageSelector,
 }

@@ -1,5 +1,4 @@
 import 'package:anyhoo_auth/cubit/anyhoo_auth_cubit.dart';
-import 'package:anyhoo_auth/widgets/login_widget.dart';
 import 'package:anyhoo_core/models/arguments.dart';
 import 'package:anyhoo_core/widgets/error_page.dart';
 import 'package:anyhoo_core/widgets/waiting_page.dart';
@@ -37,7 +36,7 @@ class HomePage extends StatelessWidget {
           const SizedBox(height: 16),
           _loggingPageDemoButton(context),
           const SizedBox(height: 16),
-          _loginButtonconst(context),
+          _loginButton(context),
           SizedBox(height: 16),
           _enhancedUserDemoButton(context),
           const SizedBox(height: 16),
@@ -72,32 +71,13 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  _DemoCard _loginButtonconst(BuildContext context) {
+  _DemoCard _loginButton(BuildContext context) {
     return _DemoCard(
       title: 'Login Widget Demo',
       description: 'Demonstrates the login widget',
       icon: Icons.login,
       onTap: () {
-        final authService = createMockAuthService();
-
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) {
-              return Scaffold(
-                appBar: AppBar(
-                  title: const Text('Login Widget Demo'),
-                  backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-                ),
-                body: BlocProvider<AnyhooAuthCubit<ExampleUser>>(
-                  create: (_) =>
-                      AnyhooAuthCubit<ExampleUser>(authService: authService, converter: ExampleUserConverter()),
-                  child: LoginWidget(title: 'Example app', assetLogoPath: 'assets/images/logo.webp'),
-                ),
-              );
-            },
-          ),
-        );
+        GoRouter.of(context).push('/image-selector');
       },
     );
   }
