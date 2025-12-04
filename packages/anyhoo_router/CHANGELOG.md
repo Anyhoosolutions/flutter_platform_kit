@@ -1,3 +1,7 @@
+## 0.0.10
+ 
+* Fix full paths checking
+
 ## 0.0.9
  
 * Allow debugLogDiagnostics

@@ -130,21 +130,64 @@ class AnyhooRouteRedirector {
     return false;
   }
 
-  static List<String> getAllPaths(List<RouteBase> routes) {
+  static List<String> getAllPaths(List<RouteBase> routes, [String parentPath = '']) {
     List<String> paths = [];
     for (var route in routes) {
       final r = route as GoRoute;
-      String p = r.path.toLowerCase();
+      String p = r.path;
+
+      // Normalize the path
       if (p.endsWith('/')) {
         p = p.substring(0, p.length - 1);
       }
-      if (!p.startsWith('/')) {
-        p = '/$p';
-      }
-      paths.add(p);
 
-      paths.addAll(getAllPaths(r.routes));
+      // Build full path by combining parent and current path
+      String fullPath;
+      if (parentPath.isEmpty) {
+        // Root level route
+        if (!p.startsWith('/')) {
+          fullPath = '/$p';
+        } else {
+          fullPath = p;
+        }
+      } else {
+        // Nested route - combine with parent
+        // In GoRouter, child routes are always relative to parent, even if they start with /
+        // So we remove leading slash if present and combine with parent
+        String relativePath = p.startsWith('/') ? p.substring(1) : p;
+
+        // Special case: if parent is '/', don't add extra slash
+        if (parentPath == '/') {
+          fullPath = '/$relativePath';
+        } else {
+          fullPath = '$parentPath/$relativePath';
+        }
+      }
+
+      // Normalize to lowercase for matching (but preserve parameter names)
+      // Parameters like :id, :postId should remain as-is for matching
+      String normalizedPath = _normalizePathForMatching(fullPath);
+      paths.add(normalizedPath);
+
+      // Recursively process child routes with the full path as parent
+      paths.addAll(getAllPaths(r.routes, fullPath));
     }
     return paths;
+  }
+
+  /// Normalizes a path for matching by lowercasing non-parameter segments
+  /// Parameter names (starting with :) are preserved as-is
+  static String _normalizePathForMatching(String path) {
+    // Split path into segments
+    final segments = path.split('/');
+    final normalizedSegments = segments.map((segment) {
+      // If it's a parameter (starts with :), keep it as-is (preserve case)
+      if (segment.startsWith(':')) {
+        return segment;
+      }
+      // Otherwise, lowercase it
+      return segment.toLowerCase();
+    }).toList();
+    return normalizedSegments.join('/');
   }
 }
