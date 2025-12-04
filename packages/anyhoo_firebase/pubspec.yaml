@@ -1,6 +1,6 @@
 name: anyhoo_firebase
 description: "A new Flutter package project."
-version: 0.0.6
+version: 0.0.7
 homepage: https://anyhoosolutions.web.app/documentation/flutter_platform_kit
 publish_to: none
 
@@ -26,6 +26,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
+  mocktail: ^1.0.0
 
 flutter:
   generate: true

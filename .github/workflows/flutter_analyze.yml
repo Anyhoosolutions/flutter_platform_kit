@@ -1,4 +1,4 @@
-name: Flutter analyze
+name: Flutter analyze and test
 
 on:
   pull_request:
@@ -6,21 +6,20 @@ on:
       - main
 
 jobs:
-  check-version:
-    name: Flutter analyze
+  analyze-and-test:
+    name: Flutter analyze and test
     runs-on: ubuntu-latest
 
     # Skip if PR title contains "WIP: "
-    if: ${{ !contains(github.event.pull_request.title, 'WIP') }}
+    if: ${{ github.event_name == 'push' || !contains(github.event.pull_request.title, 'WIP') }}
 
     steps:
-      - name: Checkout PR branch
+      - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          # flutter-version: "3.38.0"
           channel: "stable"
 
       - name: Show Flutter version
@@ -38,15 +37,38 @@ jobs:
       - name: Get dependencies
         run: |
           for package in packages/*/; do
-            cd $package
-            flutter pub get
-            cd ../..
+            if [ -f "$package/pubspec.yaml" ]; then
+              echo "Getting dependencies for $(basename $package)"
+              cd $package
+              flutter pub get
+              cd ../..
+            fi
           done
 
       - name: Run "flutter analyze" in each package
         run: |
           for package in packages/*/; do
-            cd $package
-            flutter analyze
-            cd ../..
+            if [ -f "$package/pubspec.yaml" ]; then
+              echo "🔍 Analyzing $(basename $package)"
+              cd $package
+              flutter analyze
+              cd ../..
+            fi
+          done
+
+      - name: Run tests for packages with test files
+        run: |
+          for package in packages/*/; do
+            package_name=$(basename "$package")
+            test_dir="$package/test"
+            
+            if [ -d "$test_dir" ] && [ -n "$(find "$test_dir" -name '*_test.dart' -type f 2>/dev/null)" ]; then
+              echo "🧪 Running tests for $package_name"
+              cd $package
+              flutter test
+              cd ../..
+              echo "✅ Tests passed for $package_name"
+            else
+              echo "⏭️  Skipping $package_name (no test files found)"
+            fi
           done
