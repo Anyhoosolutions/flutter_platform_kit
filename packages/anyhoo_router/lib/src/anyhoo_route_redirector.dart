@@ -33,7 +33,7 @@ class AnyhooRouteRedirector {
 
     if (!_pathMatchesAnyRoute(originalPath)) {
       log.info('route not found, redirecting to /');
-      return redirecting(originalPath, redirectNotFound);
+      return redirecting(originalPath, '$redirectNotFound?originalPath=$originalPath');
     }
 
     if (deepLinkSchemeName != null) {
