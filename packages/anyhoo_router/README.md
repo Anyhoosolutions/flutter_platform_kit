@@ -39,4 +39,7 @@ and needs the url prefix and app name prefix to know what parts should be remove
 
 This is also handled by the redirect function for `GoRouter` and is built in to `AnyhooRouter`. 
 It will check if any route is matching and if not, redirect to the route given by the parameter.
+
+
 There is a parameter `redirectNotFound` that allows the user to specify where to redirect to. It defaults to `/not-found`.
+It will pass the original route as a `originalPath` query parameter.

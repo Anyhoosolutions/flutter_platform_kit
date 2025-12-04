@@ -104,6 +104,9 @@ void main() {
         goRouter.go('/nonexistent');
         await tester.pumpAndSettle();
 
+        expect(goRouter.routeInformationProvider.value.uri.path, '/not-found');
+        expect(goRouter.routeInformationProvider.value.uri.queryParameters, {'originalPath': '/nonexistent'});
+
         expect(find.text('Not Found'), findsOneWidget);
       });
 

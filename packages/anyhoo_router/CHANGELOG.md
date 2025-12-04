@@ -1,3 +1,7 @@
+## 0.0.12
+ 
+* Pass original route when route not found
+
 ## 0.0.11
  
 * Allow to specify where to redirect for missing route
