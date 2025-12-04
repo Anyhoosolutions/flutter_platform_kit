@@ -231,12 +231,10 @@ void main() {
         when(() => doc1.data()).thenReturn({'name': 'Test'});
         when(() => mockQuerySnapshot.docs).thenReturn([doc1]);
         when(() => mockQuery.get()).thenAnswer((_) async => mockQuerySnapshot);
-        when(() => mockQuery.orderBy(any(), descending: any(named: 'descending'))).thenReturn(mockQuery);
+        // After orderBy returns a Query, subsequent calls are on that Query
         when(() => mockQuery.where(any(), isNull: any(named: 'isNull'))).thenReturn(mockQuery);
         when(() => mockQuery.limit(any())).thenReturn(mockQuery);
         when(() => mockCollection.orderBy(any(), descending: any(named: 'descending'))).thenReturn(mockQuery);
-        when(() => mockCollection.where(any(), isNull: any(named: 'isNull'))).thenReturn(mockQuery);
-        when(() => mockCollection.limit(any())).thenReturn(mockQuery);
         when(() => mockFirestore.collection(any())).thenReturn(mockCollection);
 
         await firestoreService.getSnapshotsList(
@@ -247,9 +245,11 @@ void main() {
           limit: 10,
         );
 
+        // Verify orderBy is called on collection (returns a Query)
         verify(() => mockCollection.orderBy('name', descending: true)).called(1);
-        verify(() => mockCollection.where('deletedAt', isNull: true)).called(1);
-        verify(() => mockCollection.limit(10)).called(1);
+        // Verify where and limit are called on the Query returned from orderBy
+        verify(() => mockQuery.where('deletedAt', isNull: true)).called(1);
+        verify(() => mockQuery.limit(10)).called(1);
       });
     });
 
@@ -314,57 +314,43 @@ void main() {
     });
 
     group('addDocument', () {
-      // Note: These tests are skipped because addDocument uses FirebaseFirestore.instance
-      // (a static call) instead of the injected firestore instance, which makes it difficult
-      // to test in a unit test environment without full Firebase initialization.
-      // Consider refactoring addDocument to use the injected firestore instance for better testability.
-      test(
-        'creates document with provided docId',
-        () async {
-          // Note: addDocument uses FirebaseFirestore.instance.collection() internally
-          // but then uses firestore.doc() for setting. We'll verify the set call.
-          when(() => mockFirestore.doc('test_collection/doc1')).thenReturn(mockDocument);
-          when(() => mockDocument.set(any())).thenAnswer((_) async => {});
+      test('creates document with provided docId', () async {
+        when(() => mockFirestore.collection('test_collection')).thenReturn(mockCollection);
+        when(() => mockFirestore.doc('test_collection/doc1')).thenReturn(mockDocument);
+        when(() => mockDocument.set(any())).thenAnswer((_) async => {});
 
-          final docId = await firestoreService.addDocument(
-            path: 'test_collection',
-            data: {'name': 'Test', 'value': 42},
-            docId: 'doc1',
-          );
+        final docId = await firestoreService.addDocument(
+          path: 'test_collection',
+          data: {'name': 'Test', 'value': 42},
+          docId: 'doc1',
+        );
 
-          expect(docId, 'doc1');
-          verify(() => mockFirestore.doc('test_collection/doc1')).called(1);
-          verify(() => mockDocument.set({'name': 'Test', 'value': 42})).called(1);
-        },
-        skip: 'addDocument uses FirebaseFirestore.instance which requires Firebase initialization',
-      );
+        expect(docId, 'doc1');
+        verify(() => mockFirestore.collection('test_collection')).called(1);
+        verify(() => mockFirestore.doc('test_collection/doc1')).called(1);
+        verify(() => mockDocument.set({'name': 'Test', 'value': 42})).called(1);
+      });
 
-      test(
-        'generates docId when not provided',
-        () async {
-          // Note: This test verifies that addDocument generates an ID when none is provided.
-          // Since addDocument uses FirebaseFirestore.instance internally for collection().doc(),
-          // we verify the final set call on the injected firestore instance.
-          final newDocRef = MockDocumentReference();
-          when(() => newDocRef.id).thenReturn('generated_id');
+      test('generates docId when not provided', () async {
+        final newDocRef = MockDocumentReference();
+        when(() => newDocRef.id).thenReturn('generated_id');
 
-          // Mock the static instance's collection and doc methods
-          final staticCollection = MockCollectionReference();
-          when(() => staticCollection.doc()).thenReturn(newDocRef);
+        when(() => mockFirestore.collection('test_collection')).thenReturn(mockCollection);
+        when(() => mockCollection.doc()).thenReturn(newDocRef);
+        when(() => mockFirestore.doc('test_collection/generated_id')).thenReturn(mockDocument);
+        when(() => mockDocument.set(any())).thenAnswer((_) async => {});
 
-          // Mock the injected firestore's doc method for the final set call
-          when(() => mockFirestore.doc('test_collection/generated_id')).thenReturn(mockDocument);
-          when(() => mockDocument.set(any())).thenAnswer((_) async => {});
+        final docId = await firestoreService.addDocument(path: 'test_collection', data: {'name': 'Test'});
 
-          final docId = await firestoreService.addDocument(path: 'test_collection', data: {'name': 'Test'});
-
-          expect(docId, isNotEmpty);
-          verify(() => mockDocument.set({'name': 'Test'})).called(1);
-        },
-        skip: 'addDocument uses FirebaseFirestore.instance which requires Firebase initialization',
-      );
+        expect(docId, 'generated_id');
+        verify(() => mockFirestore.collection('test_collection')).called(1);
+        verify(() => mockCollection.doc()).called(1);
+        verify(() => mockFirestore.doc('test_collection/generated_id')).called(1);
+        verify(() => mockDocument.set({'name': 'Test'})).called(1);
+      });
 
       test('adds idFields to data', () async {
+        when(() => mockFirestore.collection('test_collection')).thenReturn(mockCollection);
         when(() => mockFirestore.doc('test_collection/doc1')).thenReturn(mockDocument);
         when(() => mockDocument.set(any())).thenAnswer((_) async => {});
 
@@ -375,27 +361,28 @@ void main() {
           idFields: {'refId': 'ref_'},
         );
 
+        verify(() => mockFirestore.collection('test_collection')).called(1);
+        verify(() => mockFirestore.doc('test_collection/doc1')).called(1);
         verify(() => mockDocument.set({'name': 'Test', 'refId': 'ref_doc1'})).called(1);
       });
     });
 
     group('addDocumentAsJson', () {
-      test(
-        'decodes JSON and calls addDocument',
-        () async {
-          when(() => mockFirestore.doc('test_collection/doc1')).thenReturn(mockDocument);
-          when(() => mockDocument.set(any())).thenAnswer((_) async => {});
+      test('decodes JSON and calls addDocument', () async {
+        when(() => mockFirestore.collection('test_collection')).thenReturn(mockCollection);
+        when(() => mockFirestore.doc('test_collection/doc1')).thenReturn(mockDocument);
+        when(() => mockDocument.set(any())).thenAnswer((_) async => {});
 
-          await firestoreService.addDocumentAsJson(
-            path: 'test_collection',
-            data: '{"name":"Test","value":42}',
-            docId: 'doc1',
-          );
+        await firestoreService.addDocumentAsJson(
+          path: 'test_collection',
+          data: '{"name":"Test","value":42}',
+          docId: 'doc1',
+        );
 
-          verify(() => mockDocument.set({'name': 'Test', 'value': 42})).called(1);
-        },
-        skip: 'addDocumentAsJson calls addDocument which uses FirebaseFirestore.instance',
-      );
+        verify(() => mockFirestore.collection('test_collection')).called(1);
+        verify(() => mockFirestore.doc('test_collection/doc1')).called(1);
+        verify(() => mockDocument.set({'name': 'Test', 'value': 42})).called(1);
+      });
     });
 
     group('updateDocument', () {

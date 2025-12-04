@@ -97,7 +97,7 @@ class FirestoreService {
     String? docId,
     Map<String, String>? idFields,
   }) async {
-    final collectionRef = FirebaseFirestore.instance.collection(path);
+    final collectionRef = firestore.collection(path);
 
     String fullPath = '$path/$docId';
 
