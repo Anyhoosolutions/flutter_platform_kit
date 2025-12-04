@@ -12,8 +12,9 @@ final _log = Logger('AnyhooRouter');
 class AnyhooRouter<T extends Enum> {
   final List<RouteBase> routes;
   final AnyhooAuthCubit? authCubit;
+  final bool debugLogDiagnostics;
 
-  AnyhooRouter({required this.routes, this.authCubit});
+  AnyhooRouter({required this.routes, this.authCubit, this.debugLogDiagnostics = false});
 
   GoRouter getGoRouter() {
     final routeStackObserver = AnyhooRouteStackObserver();
@@ -26,7 +27,7 @@ class AnyhooRouter<T extends Enum> {
     final router = GoRouter(
       initialLocation: '/',
       navigatorKey: rootNavigatorKey,
-      debugLogDiagnostics: false,
+      debugLogDiagnostics: debugLogDiagnostics,
       observers: [routeStackObserver],
       redirect: (context, state) => redirectHelper.redirect(context, state),
       refreshListenable: authCubit != null ? GoRouterRefreshStream([authCubit!.stream]) : null,

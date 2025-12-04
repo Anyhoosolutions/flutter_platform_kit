@@ -1,3 +1,7 @@
+## 0.0.9
+ 
+* Allow debugLogDiagnostics
+
 ## 0.0.8
  
 * Refactor AnyhooRouter to use GoRoute or TypedGoRoute directly
