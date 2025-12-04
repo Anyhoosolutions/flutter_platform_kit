@@ -14,7 +14,7 @@ jobs:
         runs-on: ubuntu-latest
 
         # Skip if PR title contains "WIP: "
-        if: ${{ !contains(github.event.pull_request.title, 'WIP') || github.event_name == 'push' }}
+        if: ${{ github.event_name == 'push' || !contains(github.event.pull_request.title, 'WIP') }}
 
         steps:
             - name: Checkout code
