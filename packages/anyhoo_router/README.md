@@ -3,6 +3,14 @@
 
 A package for handling routing using `GoRouter`. It will take a list of routes (`AnyhooRoute`) and some other arguments, to handle building the nested routing tree, handling redirects (when logged in or not).
 
+## Arguments
+
+* `routes` - list of routes (`RouteBase`)
+* `authCubit` - `AnyhooAuthCubit`
+* `debugLogDiagnostics` - boolean if logging debug diagnostics (default is `false`)
+* `redirectNotFound` - string of where to redirect if a route isn't found (defaults to `/not-found`)
+* `loginPath` - string of where to redirect when user is not logged in (defaults to `/login`)
+* `initialPath` - string of where to redirect if no route is given (defaults to `/`)
 
 ## Redirecting
 
@@ -31,3 +39,4 @@ and needs the url prefix and app name prefix to know what parts should be remove
 
 This is also handled by the redirect function for `GoRouter` and is built in to `AnyhooRouter`. 
 It will check if any route is matching and if not, redirect to the route given by the parameter.
+There is a parameter `redirectNotFound` that allows the user to specify where to redirect to. It defaults to `/not-found`.
