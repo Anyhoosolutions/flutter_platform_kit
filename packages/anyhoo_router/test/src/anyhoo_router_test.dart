@@ -70,7 +70,7 @@ void main() {
           ],
         ),
       ];
-      router = AnyhooRouter<AnyhooTestRouteName>(routes: routes);
+      router = AnyhooRouter<AnyhooTestRouteName>(routes: routes, redirectNotFound: '/');
       goRouter = router.getGoRouter();
     });
 
@@ -86,6 +86,25 @@ void main() {
         expect(goRouter.routeInformationProvider.value.uri.path, '/');
 
         expect(find.text('Home'), findsOneWidget);
+      });
+      testWidgets('should redirect to specified route if route doesn\'t exist', (WidgetTester tester) async {
+        // Verify we ended up at /users (the final destination after recursive redirects)
+        expect(goRouter.routeInformationProvider.value.uri.path, '/');
+
+        final routes = [
+          GoRoute(path: '/', builder: (context, state) => Text('Home')),
+          GoRoute(path: '/not-found', builder: (context, state) => Text('Not Found')),
+        ];
+        router = AnyhooRouter<AnyhooTestRouteName>(routes: routes, redirectNotFound: '/not-found');
+        goRouter = router.getGoRouter();
+
+        await tester.pumpWidget(MaterialApp.router(routerConfig: goRouter));
+
+        // Navigate to /accounts which should redirect to /profiles, then to /users
+        goRouter.go('/nonexistent');
+        await tester.pumpAndSettle();
+
+        expect(find.text('Not Found'), findsOneWidget);
       });
 
       testWidgets('should NOT redirect for valid parameterized route with single param', (WidgetTester tester) async {

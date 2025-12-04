@@ -13,14 +13,16 @@ class AnyhooRouteRedirector {
   final String loginPath;
   final String initialPath;
   final List<String> allPaths;
+  final String redirectNotFound;
 
   AnyhooRouteRedirector({
     required this.routes,
     this.authCubit,
     this.deepLinkSchemeName,
     this.webDeepLinkHost,
-    this.loginPath = '/login',
-    this.initialPath = '/',
+    required this.loginPath,
+    required this.initialPath,
+    required this.redirectNotFound,
   }) : allPaths = getAllPaths(routes);
 
   String? redirect(BuildContext context, GoRouterState state) {
@@ -31,7 +33,7 @@ class AnyhooRouteRedirector {
 
     if (!_pathMatchesAnyRoute(originalPath)) {
       log.info('route not found, redirecting to /');
-      return redirecting(originalPath, '/');
+      return redirecting(originalPath, redirectNotFound);
     }
 
     if (deepLinkSchemeName != null) {

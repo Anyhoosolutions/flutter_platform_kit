@@ -13,13 +13,29 @@ class AnyhooRouter<T extends Enum> {
   final List<RouteBase> routes;
   final AnyhooAuthCubit? authCubit;
   final bool debugLogDiagnostics;
+  final String redirectNotFound;
+  final String loginPath;
+  final String initialPath;
 
-  AnyhooRouter({required this.routes, this.authCubit, this.debugLogDiagnostics = false});
+  AnyhooRouter({
+    required this.routes,
+    this.authCubit,
+    this.debugLogDiagnostics = false,
+    this.redirectNotFound = '/not-found',
+    this.loginPath = '/login',
+    this.initialPath = '/',
+  });
 
   GoRouter getGoRouter() {
     final routeStackObserver = AnyhooRouteStackObserver();
 
-    final redirectHelper = AnyhooRouteRedirector(routes: routes, authCubit: authCubit);
+    final redirectHelper = AnyhooRouteRedirector(
+      routes: routes,
+      authCubit: authCubit,
+      redirectNotFound: redirectNotFound,
+      loginPath: loginPath,
+      initialPath: initialPath,
+    );
 
     // Create unique GlobalKeys for each router instance
     final rootNavigatorKey = GlobalKey<NavigatorState>();
