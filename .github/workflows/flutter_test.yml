@@ -1,0 +1,66 @@
+name: Flutter test
+
+on:
+    pull_request:
+        branches:
+            - main
+    push:
+        branches:
+            - main
+
+jobs:
+    test:
+        name: Flutter test
+        runs-on: ubuntu-latest
+
+        # Skip if PR title contains "WIP: "
+        if: ${{ !contains(github.event.pull_request.title, 'WIP') || github.event_name == 'push' }}
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Set up Flutter
+              uses: subosito/flutter-action@v2
+              with:
+                  channel: "stable"
+
+            - name: Show Flutter version
+              run: |
+                  flutter --version
+
+            - name: Cache Flutter dependencies
+              uses: actions/cache@v3
+              with:
+                  path: |
+                      ~/.pub-cache
+                      **/.dart_tool
+                  key: ${{ runner.os }}-flutter-${{ hashFiles('**/pubspec.yaml') }}
+
+            - name: Get dependencies
+              run: |
+                  for package in packages/*/; do
+                    if [ -f "$package/pubspec.yaml" ]; then
+                      echo "Getting dependencies for $(basename $package)"
+                      cd $package
+                      flutter pub get
+                      cd ../..
+                    fi
+                  done
+
+            - name: Run tests for packages with test files
+              run: |
+                  for package in packages/*/; do
+                    package_name=$(basename "$package")
+                    test_dir="$package/test"
+                    
+                    if [ -d "$test_dir" ] && [ -n "$(find "$test_dir" -name '*_test.dart' -type f 2>/dev/null)" ]; then
+                      echo "🧪 Running tests for $package_name"
+                      cd $package
+                      flutter test
+                      cd ../..
+                      echo "✅ Tests passed for $package_name"
+                    else
+                      echo "⏭️  Skipping $package_name (no test files found)"
+                    fi
+                  done
