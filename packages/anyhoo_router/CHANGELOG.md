@@ -1,4 +1,4 @@
-## 0.0.10
+## 0.0.11
  
 * Allow to specify where to redirect for missing route
 
