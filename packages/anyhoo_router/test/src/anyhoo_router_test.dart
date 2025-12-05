@@ -9,11 +9,9 @@ import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart';
 import 'package:mocktail/mocktail.dart';
 
-enum AnyhooTestRouteName { home, login, users, profiles, accounts, usersDetails, accountsDetails, profilesDetails }
-
 void main() {
   group('AnyhooRouter', () {
-    late AnyhooRouter<AnyhooTestRouteName> router;
+    late AnyhooRouter router;
     late GoRouter goRouter;
 
     setUp(() {
@@ -70,7 +68,7 @@ void main() {
           ],
         ),
       ];
-      router = AnyhooRouter<AnyhooTestRouteName>(routes: routes, redirectNotFound: '/');
+      router = AnyhooRouter(routes: routes, redirectNotFound: '/');
       goRouter = router.getGoRouter();
     });
 
@@ -95,7 +93,7 @@ void main() {
           GoRoute(path: '/', builder: (context, state) => Text('Home')),
           GoRoute(path: '/not-found', builder: (context, state) => Text('Not Found')),
         ];
-        router = AnyhooRouter<AnyhooTestRouteName>(routes: routes, redirectNotFound: '/not-found');
+        router = AnyhooRouter(routes: routes, redirectNotFound: '/not-found');
         goRouter = router.getGoRouter();
 
         await tester.pumpWidget(MaterialApp.router(routerConfig: goRouter));
