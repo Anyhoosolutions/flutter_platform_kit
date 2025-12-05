@@ -1,3 +1,7 @@
+## 0.0.13
+ 
+* Clean up Type for router, since no longer needed
+
 ## 0.0.12
  
 * Pass original route when route not found

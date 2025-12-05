@@ -9,7 +9,7 @@ import 'package:logging/logging.dart';
 
 final _log = Logger('AnyhooRouter');
 
-class AnyhooRouter<T extends Enum> {
+class AnyhooRouter {
   final List<RouteBase> routes;
   final AnyhooAuthCubit? authCubit;
   final bool debugLogDiagnostics;
