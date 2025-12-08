@@ -1,3 +1,7 @@
+## 0.0.13
+
+* Refactor EnhancedAuthService to be an interface
+
 ## 0.0.12
 
 * Refactor AuthService to be an interface
