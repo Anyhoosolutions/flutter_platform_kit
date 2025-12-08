@@ -1,3 +1,7 @@
+## 0.0.16
+
+* Allow to refresh a user
+
 ## 0.0.15
 
 * Getters for AnyhooUser

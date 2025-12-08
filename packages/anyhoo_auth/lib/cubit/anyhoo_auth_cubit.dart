@@ -170,4 +170,14 @@ class AnyhooAuthCubit<T extends AnyhooUser> extends Cubit<AnyhooAuthState<T>> {
       rethrow;
     }
   }
+
+  Future<void> refreshUser(Map<String, dynamic> user) async {
+    emit(state.copyWith(user: null, isLoading: true));
+
+    final enhancedUserData = await enhanceUserService?.enhanceUser(user) ?? user;
+    final convertedUser = converter.fromJson(enhancedUserData);
+    _log.info('Auth state changed (user): ${convertedUser.getId()}');
+
+    emit(state.copyWith(user: convertedUser, isLoading: false));
+  }
 }
