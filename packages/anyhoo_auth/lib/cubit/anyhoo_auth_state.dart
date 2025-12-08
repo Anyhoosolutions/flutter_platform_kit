@@ -37,6 +37,6 @@ class AnyhooAuthState<T extends AnyhooUser> {
 
   @override
   String toString() {
-    return 'AuthState(user: ${user?.email}, isLoading: $isLoading, errorMessage: $errorMessage)';
+    return 'AuthState(user: ${user?.getEmail()}, isLoading: $isLoading, errorMessage: $errorMessage)';
   }
 }
