@@ -4,10 +4,10 @@
 /// with app-specific fields and settings.
 abstract class AnyhooUser {
   /// Unique identifier for the user.
-  String get id;
+  String getId();
 
   /// User's email address.
-  String get email;
+  String getEmail();
 
   /// Convert user to JSON for storage/serialization.
   Map<String, dynamic> toJson();

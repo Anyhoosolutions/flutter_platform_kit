@@ -1,3 +1,7 @@
+## 0.0.15
+
+* Getters for AnyhooUser
+
 ## 0.0.14
 
 * Allow EnhancedAuthService to save a user
