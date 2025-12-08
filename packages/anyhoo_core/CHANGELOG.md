@@ -1,3 +1,7 @@
+## 0.0.9
+ 
+* Getters for AnyhooUser
+
 ## 0.0.8
  
 * substringSafe
