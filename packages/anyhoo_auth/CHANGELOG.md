@@ -1,3 +1,7 @@
+## 0.0.18
+
+* More logging
+
 ## 0.0.17
 
 * Allow for refreshing user
