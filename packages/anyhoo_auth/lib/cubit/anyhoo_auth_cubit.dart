@@ -42,12 +42,23 @@ class AnyhooAuthCubit<T extends AnyhooUser> extends Cubit<AnyhooAuthState<T>> {
   void init() {
     _authStateSubscription = authService.authStateChanges.listen(
       (user) async {
+        _log.info('Auth state changed (user): $user');
+        _log.info('User data values:');
+        for (var entry in user?.entries ?? <MapEntry<String, dynamic>>[]) {
+          _log.info('User data value: ${entry.key}: ${entry.value}');
+        }
+
         if (user == null) {
-          _log.info('Auth state changed (user): null');
           emit(state.copyWith(clearUser: true, isLoading: false));
         } else {
           final enhancedUserData = await enhanceUserService?.enhanceUser(user) ?? user;
+          _log.info('Enhanced user data: $enhancedUserData');
+          _log.info('Enhanced user data values:');
+          for (var entry in enhancedUserData.entries) {
+            _log.info('enhanced user data value: ${entry.key}: ${entry.value}');
+          }
           final convertedUser = converter.fromJson(enhancedUserData);
+          _log.info('Converted user: $convertedUser');
           _log.info('Auth state changed (user): ${convertedUser.getId()}');
 
           emit(state.copyWith(user: convertedUser, isLoading: false));
