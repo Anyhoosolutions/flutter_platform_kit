@@ -1,5 +1,6 @@
 import 'package:anyhoo_core/models/arguments.dart';
 import 'package:anyhoo_core/widgets/error_display_widget.dart';
+import 'package:anyhoo_firebase/src/emulator_config.dart';
 import 'package:anyhoo_firebase/src/os_tool.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
@@ -14,35 +15,23 @@ import 'package:logging/logging.dart';
 class FirebaseInitializer {
   final _log = Logger('FirebaseInitializer');
   final Arguments arguments;
+  final EmulatorConfig emulatorConfig;
 
   FirebaseApp? _firebaseApp;
   FirebaseAuth? _auth;
   FirebaseFirestore? _firestore;
   FirebaseStorage? _storage;
 
-  bool useFirebaseAuth;
-  bool useFirebaseFirestore;
-  bool useFirebaseStorage;
-  String? hostIp;
-  bool? overrideUseFirebaseEmulator;
-
-  FirebaseInitializer({
-    required this.arguments,
-    this.useFirebaseAuth = true,
-    this.useFirebaseFirestore = true,
-    this.useFirebaseStorage = true,
-    this.hostIp,
-    this.overrideUseFirebaseEmulator,
-  });
+  FirebaseInitializer({required this.arguments, required this.emulatorConfig});
 
   Future<void> initialize(FirebaseOptions firebaseOptions) async {
     _log.info('!! Initializing Firebase');
     _log.info('!! useFakeData: ${arguments.useFakeData}');
-    _log.info('!! useFirebaseAuth: $useFirebaseAuth');
-    _log.info('!! useFirebaseFirestore: $useFirebaseFirestore');
-    _log.info('!! useFirebaseStorage: $useFirebaseStorage');
-    _log.info('!! hostIp: $hostIp');
-    _log.info('!! overrideUseFirebaseEmulator: $overrideUseFirebaseEmulator');
+    _log.info('!! useFirebaseAuth: ${emulatorConfig.useFirebaseAuth}');
+    _log.info('!! useFirebaseFirestore: ${emulatorConfig.useFirebaseFirestore}');
+    _log.info('!! useFirebaseStorage: ${emulatorConfig.useFirebaseStorage}');
+    _log.info('!! hostIp: ${emulatorConfig.hostIp}');
+    _log.info('!! overrideUseFirebaseEmulator: ${emulatorConfig.overrideUseFirebaseEmulator}');
 
     if (arguments.useFakeData) {
       _log.info('!! Using fake data, skipping Firebase initialization');
@@ -69,13 +58,13 @@ class FirebaseInitializer {
       _log.info('!! Firebase initialized');
       _firebaseApp = firebase;
 
-      if (useFirebaseAuth) {
+      if (emulatorConfig.useFirebaseAuth) {
         _setupFirebaseAuth();
       }
-      if (useFirebaseFirestore) {
+      if (emulatorConfig.useFirebaseFirestore) {
         _setupFirebaseFirestore();
       }
-      if (useFirebaseStorage) {
+      if (emulatorConfig.useFirebaseStorage) {
         _setupFirebaseStorage();
       }
 
@@ -102,9 +91,9 @@ class FirebaseInitializer {
   }
 
   bool _isEmulatorEnabled() {
-    if (overrideUseFirebaseEmulator != null) {
-      _log.info('Firebase emulator is ${overrideUseFirebaseEmulator! ? 'enabled' : 'disabled'}');
-      return overrideUseFirebaseEmulator!;
+    if (emulatorConfig.overrideUseFirebaseEmulator != null) {
+      _log.info('Firebase emulator is ${emulatorConfig.overrideUseFirebaseEmulator! ? 'enabled' : 'disabled'}');
+      return emulatorConfig.overrideUseFirebaseEmulator!;
     }
     final isEnabled = arguments.shouldUseFirebaseEmulator();
     _log.info('Firebase emulator is ${isEnabled ? 'enabled' : 'disabled'}');
@@ -126,8 +115,8 @@ class FirebaseInitializer {
       if (_isEmulatorEnabled()) {
         final host = _getHost();
         if (host != null) {
-          _log.info('!! Configuring Auth emulator with host: $host, port: 9099');
-          await _auth!.useAuthEmulator(host, 9099);
+          _log.info('!! Configuring Auth emulator with host: $host, port: ${emulatorConfig.authPort}');
+          await _auth!.useAuthEmulator(host, emulatorConfig.authPort);
           _log.info('!! Successfully configured Auth emulator');
           // On web, ensure emulator is fully ready before proceeding
           if (kIsWeb) {
@@ -171,8 +160,10 @@ class FirebaseInitializer {
       if (_isEmulatorEnabled()) {
         final host = _getHost();
         if (host != null) {
-          _firestore!.useFirestoreEmulator(host, 8080);
-          _log.info('!! Successfully configured Firestore emulator');
+          _firestore!.useFirestoreEmulator(host, emulatorConfig.firestorePort);
+          _log.info(
+            '!! Successfully configured Firestore emulator with host: $host, port: ${emulatorConfig.firestorePort}',
+          );
         }
       }
       _log.info('!! Firestore configured: ${_firestore!.settings}');
@@ -194,12 +185,12 @@ class FirebaseInitializer {
   }
 
   String? _getHost() {
-    if (hostIp == null) {
+    if (emulatorConfig.hostIp == null) {
       _log.info("!! hostIp is null, using 'localhost'");
       return 'localhost';
     }
 
-    _log.info('!! hostIp: $hostIp');
+    _log.info('!! hostIp: ${emulatorConfig.hostIp}');
     _log.info('!! arguments.shouldUseEmulator(): ${arguments.shouldUseFirebaseEmulator()}');
     _log.info('!! OSTool.getPlatformType(): ${OSTool.getPlatformType()}');
     _log.info('!! arguments.useDeviceEmulator(): ${arguments.useDeviceEmulator}');
@@ -211,12 +202,12 @@ class FirebaseInitializer {
         // Android emulator
         (PlatformType.android, true) => 'localhost',
         // Real Android device
-        (PlatformType.android, false) => hostIp,
+        (PlatformType.android, false) => emulatorConfig.hostIp,
 
         // Real iOS device
-        (PlatformType.ios, false) => hostIp,
+        (PlatformType.ios, false) => emulatorConfig.hostIp,
         // Simulator iOS device
-        (PlatformType.ios, true) => hostIp,
+        (PlatformType.ios, true) => emulatorConfig.hostIp,
 
         // Default case
         (_, _) => null,
@@ -245,7 +236,7 @@ class FirebaseInitializer {
       if (_isEmulatorEnabled()) {
         final host = _getHost();
         if (host != null) {
-          _storage!.useStorageEmulator(host, 9199);
+          _storage!.useStorageEmulator(host, emulatorConfig.storagePort);
           _log.info('!! Successfully configured Storage emulator');
         }
       }

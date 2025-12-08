@@ -30,7 +30,8 @@ void main() async {
 
   final arguments = await ArgumentsParser.getArguments();
 
-  final firebaseInitializer = FirebaseInitializer(arguments: arguments, hostIp: '192.168.86.27');
+  final emulatorConfig = EmulatorConfig(hostIp: 'localhost', authPort: 21201, firestorePort: 21203, storagePort: 21204);
+  final firebaseInitializer = FirebaseInitializer(arguments: arguments, emulatorConfig: emulatorConfig);
   await firebaseInitializer.initialize(DefaultFirebaseOptions.currentPlatform);
 
   runApp(

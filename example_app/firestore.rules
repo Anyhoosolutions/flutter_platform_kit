@@ -2,8 +2,48 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /test/{document=**} {
-      allow read, write: if true;
+  // Helper function to check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+  // Helper function to check if the user owns the document
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+  // Helper function to check if the current user is a member of the group
+    function isGroupMember(groupId) {
+      return isAuthenticated() &&
+      exists(/databases/$(database)/documents/groups/$(groupId)) &&
+      get(/databases/$(database)/documents/groups/$(groupId)).data.members.hasAny([request.auth.uid]);
+    }
+
+  // Helper function to check if the current user is the group creator
+    function isGroupCreator(groupId) {
+      return isAuthenticated() &&
+      exists(/databases/$(database)/documents/groups/$(groupId)) &&
+      get(/databases/$(database)/documents/groups/$(groupId)).data.createdBy == request.auth.uid;
+    }
+
+  // Helper function to check if user can access the group (member or creator)
+    function canAccessGroup(groupId) {
+      return isGroupMember(groupId) || isGroupCreator(groupId);
+    }
+
+    match /testData/{docId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    match /demo/{documentId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    match /users/{userId} {
+      allow read: if isOwner(userId);
+      allow write: if isOwner(userId);
     }
   }
 }
