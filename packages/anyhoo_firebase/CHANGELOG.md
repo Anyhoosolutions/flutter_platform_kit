@@ -1,3 +1,7 @@
+## 0.0.8
+ 
+* EmulatorConfig
+
 ## 0.0.7
  
 * Expose methods for JSON for FirestoreService
