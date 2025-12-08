@@ -5,24 +5,24 @@ import 'package:logging/logging.dart';
 final _log = Logger('AnyhooFirebaseEnhanceUserService');
 
 class AnyhooFirebaseEnhanceUserService extends AnyhooEnhanceUserService {
-  AnyhooFirebaseEnhanceUserService({required this.path, FirebaseFirestore? firestore})
-      : super(enhanceUserFunction: _createEnhanceUserFunction(firestore ?? FirebaseFirestore.instance, path));
+  AnyhooFirebaseEnhanceUserService({required this.path, required this.firestore});
 
   final String path;
+  final FirebaseFirestore firestore;
 
-  static Future<Map<String, dynamic>> Function(Map<String, dynamic>) _createEnhanceUserFunction(
-      FirebaseFirestore firestore, String path) {
-    return (Map<String, dynamic> user) async {
-      final id = user['id'] ?? user['uid'] ?? '';
-      _log.info('Enhancing user (id): $id');
-      _log.info('user values: ${user.entries}');
+  @override
+  Future<Map<String, dynamic>> enhanceUser(Map<String, dynamic> user) async {
+    final id = user['id'] ?? user['uid'] ?? '';
+    _log.info('Enhancing user (id): $id');
+    _log.info('user values: ${user.entries}');
 
-      if (id.isEmpty) {
-        throw Exception('User map must contain either "id" or "uid" field');
-      }
-      final data = await firestore.collection(path).doc(id).get().then((value) => value.data() ?? <String, dynamic>{});
+    if (id.isEmpty) {
+      throw Exception('User map must contain either "id" or "uid" field');
+    }
+    final data = await firestore.collection(path).doc(id).get().then((value) => value.data() ?? <String, dynamic>{});
 
-      return data;
-    };
+    final enhancedUser = {...data, ...user};
+    _log.info('Enhanced user: $enhancedUser');
+    return enhancedUser;
   }
 }

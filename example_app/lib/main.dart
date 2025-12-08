@@ -1,3 +1,4 @@
+import 'package:anyhoo_auth/services/anyhoo_firebase_enhance_user_service.dart';
 import 'package:anyhoo_core/arguments_parser.dart';
 import 'package:anyhoo_core/models/arguments.dart';
 import 'package:anyhoo_firebase/anyhoo_firebase.dart';
@@ -7,7 +8,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:example_app/firebase_options.dart';
 import 'package:example_app/models/example_user_converter.dart';
 import 'package:example_app/routes/routes.dart';
-import 'package:example_app/services/mock_enhance_user_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -71,7 +71,10 @@ class MyApp extends StatelessWidget {
             create: (_) => AnyhooAuthCubit<ExampleUser>(
               authService: authService,
               converter: converter,
-              enhanceUserService: createMockEnhanceUserService(),
+              enhanceUserService: AnyhooFirebaseEnhanceUserService(
+                path: 'users',
+                firestore: firebaseInitializer.getFirestore(),
+              ),
             ),
           ),
         ],
