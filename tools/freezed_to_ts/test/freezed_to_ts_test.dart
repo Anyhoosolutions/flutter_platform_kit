@@ -1,5 +1,5 @@
 import 'package:test/test.dart';
-import 'package:freezed_to_ts/converter.dart';
+import 'package:freezed_to_ts/freezed_to_ts.dart';
 
 void main() {
   group('Freezed to TypeScript Converter', () {

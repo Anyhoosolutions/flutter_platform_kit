@@ -1,6 +1,6 @@
 import 'package:args/args.dart';
 import 'dart:io';
-import 'package:freezed_to_ts/converter.dart';
+import 'package:freezed_to_ts/freezed_to_ts.dart';
 
 void main(List<String> arguments) async {
   final parser = ArgParser()
