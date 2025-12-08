@@ -14,7 +14,10 @@ class AnyhooFirebaseEnhanceUserService extends AnyhooEnhanceUserService {
   Future<Map<String, dynamic>> enhanceUser(Map<String, dynamic> user) async {
     final id = user['id'] ?? user['uid'] ?? '';
     _log.info('Enhancing user (id): $id');
-    _log.info('user values: ${user.entries}');
+    _log.info('user values:');
+    for (var entry in user.entries) {
+      _log.info('user value: ${entry.key}: ${entry.value}');
+    }
 
     if (id.isEmpty) {
       throw Exception('User map must contain either "id" or "uid" field');
