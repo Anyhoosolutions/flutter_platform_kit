@@ -128,6 +128,8 @@ class _EnhanceUserDemoPageState extends State<EnhanceUserDemoPage> {
                   _UserInfoRow(label: 'Name', value: user.name),
                   const Divider(),
                   _UserInfoRow(label: 'Avatar url', value: user.avatarUrl ?? ''),
+                  const Divider(),
+                  _UserInfoRow(label: 'Num recipes', value: user.numRecipes?.toString() ?? ''),
                 ],
               ),
             ),

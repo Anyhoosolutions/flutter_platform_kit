@@ -1,3 +1,7 @@
+## 0.0.14
+
+* Allow EnhancedAuthService to save a user
+
 ## 0.0.13
 
 * Refactor EnhancedAuthService to be an interface

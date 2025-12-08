@@ -25,4 +25,17 @@ class AnyhooFirebaseEnhanceUserService extends AnyhooEnhanceUserService {
     _log.info('Enhanced user: $enhancedUser');
     return enhancedUser;
   }
+
+  @override
+  Future<void> saveUser(Map<String, dynamic> user) async {
+    final id = user['id'] ?? user['uid'] ?? '';
+    _log.info('Saving user (id): $id');
+    _log.info('user values: ${user.entries}');
+
+    if (id.isEmpty) {
+      throw Exception('User map must contain either "id" or "uid" field');
+    }
+
+    await firestore.collection(path).doc(id).set(user);
+  }
 }
