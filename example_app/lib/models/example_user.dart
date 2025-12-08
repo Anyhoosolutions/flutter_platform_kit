@@ -10,12 +10,12 @@ class ExampleUser extends AnyhooUser {
   final String email;
   final String name;
   final String? avatarUrl;
-
-  ExampleUser({required this.id, required this.email, required this.name, this.avatarUrl});
+  final int? numRecipes;
+  ExampleUser({required this.id, required this.email, required this.name, this.avatarUrl, this.numRecipes});
 
   @override
   Map<String, dynamic> toJson() {
-    return {'id': id, 'email': email, 'name': name, 'avatarUrl': avatarUrl};
+    return {'id': id, 'email': email, 'name': name, 'avatarUrl': avatarUrl, 'numRecipes': numRecipes};
   }
 
   factory ExampleUser.fromJson(Map<String, dynamic> json) {
@@ -24,9 +24,11 @@ class ExampleUser extends AnyhooUser {
       email: json['email'] as String,
       name: json['name'] as String,
       avatarUrl: json['avatarUrl'] as String?,
+      numRecipes: json['numRecipes'] as int?,
     );
   }
 
   @override
-  String toString() => 'ExampleUser(id: $id, email: $email, name: $name)';
+  String toString() =>
+      'ExampleUser(id: $id, email: $email, name: $name, avatarUrl: $avatarUrl, numRecipes: $numRecipes)';
 }

@@ -156,4 +156,18 @@ class AnyhooAuthCubit<T extends AnyhooUser> extends Cubit<AnyhooAuthState<T>> {
       rethrow;
     }
   }
+
+  Future<void> saveUser(Map<String, dynamic> user) async {
+    _log.info('Saving user');
+    emit(state.copyWith(isLoading: true, clearError: true));
+
+    try {
+      await enhanceUserService?.saveUser(user);
+      emit(state.copyWith(isLoading: false, clearError: true, user: converter.fromJson(user)));
+    } catch (e) {
+      _log.severe('Error saving user', e);
+      emit(state.copyWith(isLoading: false, errorMessage: e.toString()));
+      rethrow;
+    }
+  }
 }
