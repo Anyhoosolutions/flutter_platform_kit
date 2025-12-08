@@ -4,9 +4,7 @@ import 'package:anyhoo_core/anyhoo_core.dart';
 ///
 /// This demonstrates how apps can extend AuthUser with their own fields.
 class ExampleUser extends AnyhooUser {
-  @override
   final String id;
-  @override
   final String email;
   final String name;
   final String? avatarUrl;
@@ -31,4 +29,10 @@ class ExampleUser extends AnyhooUser {
   @override
   String toString() =>
       'ExampleUser(id: $id, email: $email, name: $name, avatarUrl: $avatarUrl, numRecipes: $numRecipes)';
+
+  @override
+  String getEmail() => email;
+
+  @override
+  String getId() => id;
 }

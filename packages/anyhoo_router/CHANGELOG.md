@@ -1,3 +1,7 @@
+## 0.0.14
+ 
+* Getters for AnyhooRouter
+
 ## 0.0.13
  
 * Clean up Type for router, since no longer needed

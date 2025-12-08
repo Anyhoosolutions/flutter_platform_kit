@@ -55,7 +55,7 @@ class _LoginWidgetState<T extends AnyhooUser> extends State<LoginWidget<T>> {
       if (state.isAuthenticated && state.user != null) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Welcome, ${state.user?.email ?? 'User'}!'),
+            content: Text('Welcome, ${state.user?.getEmail() ?? 'User'}!'),
             backgroundColor: Theme.of(context).primaryColor,
           ),
         );
@@ -110,7 +110,7 @@ class _LoginWidgetState<T extends AnyhooUser> extends State<LoginWidget<T>> {
           if (state.isAuthenticated && state.user != null) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text('Welcome, ${state.user?.email ?? 'User'}!'),
+                content: Text('Welcome, ${state.user?.getEmail() ?? 'User'}!'),
                 backgroundColor: Theme.of(context).primaryColor,
               ),
             );
