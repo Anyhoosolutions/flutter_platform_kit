@@ -14,8 +14,7 @@ class FreezedToTsConverter {
     final compilationUnit = parseResult.unit;
 
     for (final declaration in compilationUnit.declarations) {
-      if (declaration is ClassDeclaration &&
-          declaration.metadata.any((m) => m.name.name == 'freezed')) {
+      if (declaration is ClassDeclaration && declaration.metadata.any((m) => m.name.name == 'freezed')) {
         _knownFreezedClasses.add(declaration.name.lexeme);
       }
     }
@@ -38,48 +37,88 @@ class FreezedToTsConverter {
       if (!isFreezed) continue;
 
       final className = declaration.name.lexeme;
-      final constructor = declaration.members.whereType<ConstructorDeclaration>().firstWhere(
-            (m) => m.factoryKeyword != null && m.name?.lexeme == null,
-            orElse: () => throw Exception('No default factory constructor found for $className.'),
+      final factoryConstructors = declaration.members.whereType<ConstructorDeclaration>().where(
+            (m) => m.factoryKeyword != null,
           );
 
-      final fields = <String, String>{};
-      final parameters = constructor.parameters.parameters;
+      if (factoryConstructors.isEmpty) {
+        throw Exception(
+            'No factory constructors found for $className. Freezed classes should have at least one factory constructor.');
+      }
 
-      for (final param in parameters) {
-        final parameter = param as DefaultFormalParameter;
-        var name = parameter.name!.lexeme;
-        final type =
-            (parameter.parameter as SimpleFormalParameter).type!.toSource();
+      final allFields = <String, String>{}; // Map to store unique fields across all constructors
 
-        for (final annotation in parameter.metadata) {
-          if (annotation.name.name == 'JsonKey' &&
-              annotation.arguments != null) {
-            for (final arg in annotation.arguments!.arguments) {
-              if (arg is NamedExpression && arg.name.label.name == 'name') {
-                final expression = arg.expression;
-                if (expression is StringLiteral) {
-                  name = expression.stringValue ?? name;
+      for (final constructor in factoryConstructors) {
+        if (constructor.name?.lexeme == 'fromJson') {
+          continue;
+        }
+        for (final param in constructor.parameters.parameters) {
+          String originalName;
+          TypeAnnotation? paramTypeAnnotation;
+
+          if (param is DefaultFormalParameter) {
+            originalName = param.name!.lexeme;
+            paramTypeAnnotation = (param.parameter as SimpleFormalParameter).type;
+          } else if (param is FieldFormalParameter) {
+            originalName = param.name.lexeme;
+            paramTypeAnnotation = param.type;
+          } else if (param is SimpleFormalParameter) {
+            originalName = param.name!.lexeme;
+            paramTypeAnnotation = param.type;
+          } else {
+            continue; // Skip unsupported parameter types
+          }
+
+          if (paramTypeAnnotation == null) continue;
+
+          var name = originalName;
+          final type = paramTypeAnnotation.toSource();
+          var finalTsType = _dartToTsType(type);
+
+          // Existing JsonKey processing for 'name', 'fromJson', 'toJson'
+          for (final annotation in param.metadata) {
+            if (annotation.name.name == 'JsonKey' && annotation.arguments != null) {
+              String? jsonKeyName;
+              String? fromJsonFuncName;
+              String? toJsonFuncName;
+
+              for (final arg in annotation.arguments!.arguments) {
+                if (arg is NamedExpression) {
+                  if (arg.name.label.name == 'name' && arg.expression is StringLiteral) {
+                    jsonKeyName = (arg.expression as StringLiteral).stringValue;
+                  } else if (arg.name.label.name == 'fromJson' && arg.expression is SimpleIdentifier) {
+                    fromJsonFuncName = (arg.expression as SimpleIdentifier).name;
+                  } else if (arg.name.label.name == 'toJson' && arg.expression is SimpleIdentifier) {
+                    toJsonFuncName = (arg.expression as SimpleIdentifier).name;
+                  }
                 }
               }
+
+              if (jsonKeyName != null) {
+                name = jsonKeyName;
+              }
+
+              // if ((fromJsonFuncName == 'fromDateTime' || fromJsonFuncName == 'toDateTime') ||
+              //     (toJsonFuncName == 'fromDateTime' || toJsonFuncName == 'toDateTime')) {
+              //     finalTsType = 'Timestamp';
+              // }
             }
           }
-        }
 
-        final tsType = _dartToTsType(type);
-        if (tsType == 'Timestamp') {
-          needsTimestampImport = true;
-        }
+          if (finalTsType == 'Timestamp') {
+            needsTimestampImport = true;
+          }
 
-        final isNullable = type.endsWith('?');
-        fields[name] = '$tsType${isNullable ? ' | null' : ''}';
+          final isNullable = type.endsWith('?');
+          allFields[name] = '$finalTsType${isNullable ? ' | null' : ''}';
+        }
       }
 
       if (needsTimestampImport) {
         output.writeln("import { Timestamp } from 'firebase/firestore';");
       }
       output.writeln('export interface $className {');
-      fields.forEach((name, type) {
+      allFields.forEach((name, type) {
         output.writeln('  $name: $type;');
       });
       output.writeln('}');
