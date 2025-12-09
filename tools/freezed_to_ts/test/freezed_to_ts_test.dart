@@ -37,7 +37,7 @@ void main() {
       final result = converter.convert(dartCode).trim();
 
       final expectedTsCode = r'''
-import { Timestamp } from 'firebase/firestore';
+import type { Timestamp } from 'firebase/firestore';
 export interface User {
   id: string;
   email: string;
@@ -84,7 +84,7 @@ export interface User {
           const factory User({
             required String id,
             required Address address,
-            Address? shippingAddress,
+            DateTime? createdAt,
           }) = _User;
         }
       ''';
@@ -94,12 +94,13 @@ export interface User {
       converter.learn(userCode);
 
       final expectedUserTs = r'''
+import type { Timestamp } from 'firebase/firestore';
 import type { Address } from './address.ts';
 
 export interface User {
   id: string;
   address: Address;
-  shippingAddress: Address | null;
+  createdAt: Timestamp | null;
 }
 '''
           .trim();
@@ -157,7 +158,7 @@ export interface Address {
       final result = converter.convert(dartCode).trim();
 
       final expectedTsCode = r'''
-import { Timestamp } from 'firebase/firestore';
+import type { Timestamp } from 'firebase/firestore';
 export interface Task {
   id: string | null;
   name: string;

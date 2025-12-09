@@ -127,8 +127,19 @@ class FreezedToTsConverter {
         }
       }
 
+      // Collect all imports and sort them according to Biome's default order:
+      // 1. External packages (e.g., 'firebase/firestore')
+      // 2. Relative imports (e.g., './address.ts')
+      // Within each group, sorted alphabetically
+      final List<String> externalImports = [];
+      final List<String> relativeImports = [];
+
+      // Add Timestamp import if needed
+      if (needsTimestampImport) {
+        externalImports.add("import type { Timestamp } from 'firebase/firestore';");
+      }
+
       // Generate imports for referenced freezed classes
-      bool hasFreezedImports = false;
       for (final referencedClass in referencedFreezedClasses) {
         // Find the import path for this class
         String? importPath;
@@ -143,17 +154,25 @@ class FreezedToTsConverter {
           }
         }
         if (importPath != null) {
-          output.writeln("import type { $referencedClass } from '$importPath';");
-          hasFreezedImports = true;
+          relativeImports.add("import type { $referencedClass } from '$importPath';");
         }
       }
 
-      if (needsTimestampImport) {
-        output.writeln("import { Timestamp } from 'firebase/firestore';");
+      // Sort imports alphabetically within each group
+      externalImports.sort();
+      relativeImports.sort();
+
+      // Output imports in Biome's default order: external first, then relative
+      for (final import in externalImports) {
+        output.writeln(import);
+      }
+      for (final import in relativeImports) {
+        output.writeln(import);
       }
 
-      if (hasFreezedImports) {
-        output.writeln(''); // Add blank line after freezed class imports
+      // Add blank line only if there are relative imports
+      if (relativeImports.isNotEmpty) {
+        output.writeln('');
       }
       output.writeln('export interface $className {');
       allFields.forEach((name, type) {

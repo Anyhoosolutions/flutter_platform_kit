@@ -26,7 +26,7 @@ The script can be run from a local clone (ideal for development) or activated gl
 
 ### Examples
 
-### Running from a local clone:
+#### Running from a local clone
 
 ```sh
 # Process a single file and print to console
@@ -36,7 +36,7 @@ dart run freezed_to_ts -i ../../packages/anyhoo_core/lib/src/models/user.dart
 dart run freezed_to_ts -i ../../packages/anyhoo_core/lib/src/models -o ./types
 ```
 
-### Running as a global executable: 
+#### Running as a global executable:
 
 ```sh
 # Activate from GitHub
@@ -44,7 +44,6 @@ dart pub global activate --source git https://github.com/lidholm/flutter_platfor
 
 # Run from anywhere
 freezed_to_ts -i path/to/your/models -o path/to/your/ts/types
-
 
 
 # Using a tag/version:
@@ -55,7 +54,6 @@ freezed_to_ts -i path/to/your/models -o path/to/your/ts/types
 
 # Using a commit hash:
    dart pub global activate --source git https://github.com/lidholm/flutter_platform_ts.git --git-path tools/freezed_to_ts --git-ref abc123def456
-
 ```
 
 ## Testing
