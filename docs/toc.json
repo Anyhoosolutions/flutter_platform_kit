@@ -52,7 +52,8 @@
 					"name": "Changelog",
 					"title": "Changelog",
 					"subpages": []
-				}]
+				}
+			]
 		},
 		{
 			"filepath": "anyhoo_router/README.md",
@@ -64,7 +65,8 @@
 					"name": "Changelog",
 					"title": "Changelog",
 					"subpages": []
-				}]
+				}
+			]
 		},
 		{
 			"filepath": "anyhoo_image_selector/README.md",
@@ -151,6 +153,19 @@
 			"subpages": [
 				{
 					"filepath": "anyhoo_search_bar/CHANGELOG.md",
+					"name": "Changelog",
+					"title": "Changelog",
+					"subpages": []
+				}
+			]
+		},
+		{
+			"filepath": "freezed_to_ts/README.md",
+			"name": "Freezed to TypeScript",
+			"title": "Anyhoo Search Bar",
+			"subpages": [
+				{
+					"filepath": "freezed_to_ts/CHANGELOG.md",
 					"name": "Changelog",
 					"title": "Changelog",
 					"subpages": []
