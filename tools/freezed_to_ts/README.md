@@ -10,6 +10,10 @@ It then inspects the parameters of the constructor to determine the field names 
 
 ## How to Use
 
+To use this tool, you have a few options:
+
+### Running from a local clone (for development/testing)
+
 1.  Navigate to the `tools/freezed_to_ts` directory.
 2.  If you haven't already, fetch the dependencies:
     ```sh
@@ -20,6 +24,25 @@ It then inspects the parameters of the constructor to determine the field names 
     ```sh
     dart run freezed_to_ts --path ../../packages/anyhoo_core/lib/src/models/user.dart
     ```
+
+### Running Directly from GitHub (before publishing to pub.dev)
+
+You can activate and run the tool directly from its GitHub repository. This is useful for trying it out before it's officially published to pub.dev, or if you prefer to use a specific version from the repository.
+
+1.  Activate the tool globally from the Git repository:
+    ```sh
+    dart pub global activate --source git https://github.com/lidholm/flutter_platform_kit.git --path tools/freezed_to_ts
+    ```
+    *Note: The `--path tools/freezed_to_ts` argument is crucial to specify the subdirectory within the repository where the package is located.*
+
+2.  Once activated, you can run the `freezed_to_ts` command from anywhere:
+    ```sh
+    freezed_to_ts --path path/to/your/freezed_file.dart
+    ```
+
+    To update the tool later, simply run the `dart pub global activate` command again.
+
+*Caveat: While convenient, activating directly from Git makes the command to install quite long. Publishing to `pub.dev` will provide the most user-friendly installation experience.*
 
 The generated TypeScript interface will be printed to the console.
 
