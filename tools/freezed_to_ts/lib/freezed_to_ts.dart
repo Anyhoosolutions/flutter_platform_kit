@@ -1,11 +1,18 @@
 import 'package:analyzer/dart/analysis/features.dart';
 import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:logging/logging.dart';
+
+final _log = Logger('FreezedToTsConverter');
 
 class FreezedToTsConverter {
   final Set<String> _knownFreezedClasses = {};
 
   void learn(String dartCode) {
+    final classNameLine = dartCode.split('\n').firstWhere((line) => line.contains('class '));
+    final classPosition = classNameLine.indexOf('class ');
+    final className = classNameLine.substring(classPosition + 5).trim().split(' ').first;
+    _log.info('Learning $className');
     final parseResult = parseString(
       content: dartCode,
       featureSet: FeatureSet.latestLanguageVersion(),
