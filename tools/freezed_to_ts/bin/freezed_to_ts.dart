@@ -1,27 +1,77 @@
 import 'package:args/args.dart';
 import 'dart:io';
 import 'package:freezed_to_ts/freezed_to_ts.dart';
+import 'package:path/path.dart' as p;
 
 void main(List<String> arguments) async {
   final parser = ArgParser()
-    ..addOption('path', abbr: 'p', help: 'Path to the Dart file with freezed classes.');
+    ..addOption('input', abbr: 'i', help: 'Path to a Dart file or a directory containing Dart files.')
+    ..addOption('output', abbr: 'o', help: 'Directory where the generated TypeScript files will be written.');
+
   final argResults = parser.parse(arguments);
 
-  if (!argResults.wasParsed('path')) {
-    print('Usage: dart run freezed_to_ts --path <file_path.dart>');
+  if (!argResults.wasParsed('input')) {
+    print('Usage: dart run freezed_to_ts -i <file_or_directory_path> [-o <output_directory_path>]');
     print(parser.usage);
     exit(1);
   }
 
-  final filePath = argResults['path'] as String;
-  final file = File(filePath);
+  final inputPath = argResults['input'] as String;
+  final outputPath = argResults['output'] as String?;
 
-  if (!await file.exists()) {
-    print('Error: File not found at $filePath');
+  final type = FileSystemEntity.typeSync(inputPath);
+
+  if (type == FileSystemEntityType.notFound) {
+    print('Error: Input not found at $inputPath');
     exit(1);
   }
 
+  final List<File> filesToProcess = [];
+
+  if (type == FileSystemEntityType.file) {
+    if (inputPath.endsWith('.dart')) {
+      filesToProcess.add(File(inputPath));
+    }
+  } else if (type == FileSystemEntityType.directory) {
+    final dir = Directory(inputPath);
+    final files = dir.listSync(recursive: true);
+    for (final file in files) {
+      if (file is File && file.path.endsWith('.dart')) {
+        filesToProcess.add(file);
+      }
+    }
+  }
+
+  if (filesToProcess.isEmpty) {
+    print('No Dart files found to process.');
+    return;
+  }
+
+  for (final file in filesToProcess) {
+    await _processFile(file, outputPath);
+  }
+}
+
+Future<void> _processFile(File file, String? outputDir) async {
   final content = await file.readAsString();
-  final result = convertFreezedToTypeScript(content);
-  print(result);
+  if (!content.contains('@freezed')) return;
+
+  print('Processing ${file.path}...');
+  final tsContent = convertFreezedToTypeScript(content);
+
+  if (tsContent.isEmpty) {
+    print('  -> No freezed classes found.');
+    return;
+  }
+
+  if (outputDir != null) {
+    final outputFileName = p.basenameWithoutExtension(file.path) + '.ts';
+    final outputFile = File(p.join(outputDir, outputFileName));
+
+    await outputFile.parent.create(recursive: true);
+    await outputFile.writeAsString(tsContent);
+    print('  -> Wrote to ${outputFile.path}');
+  } else {
+    print('---\n${file.path}:\n---\n$tsContent');
+  }
 }
