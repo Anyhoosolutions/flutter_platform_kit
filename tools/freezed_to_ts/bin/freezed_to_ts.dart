@@ -26,8 +26,7 @@ void main(List<String> arguments) async {
     exit(1);
   }
 
-  final List<File> filesToProcess = [];
-
+  final filesToProcess = <File>[];
   if (type == FileSystemEntityType.file) {
     if (inputPath.endsWith('.dart')) {
       filesToProcess.add(File(inputPath));
@@ -41,23 +40,34 @@ void main(List<String> arguments) async {
       }
     }
   }
-
   if (filesToProcess.isEmpty) {
     print('No Dart files found to process.');
     return;
   }
 
+  final converter = FreezedToTsConverter();
   for (final file in filesToProcess) {
-    await _processFile(file, outputPath);
+    final content = await file.readAsString();
+    if (content.contains('@freezed')) {
+      converter.learn(content);
+    }
+  }
+
+  for (final file in filesToProcess) {
+    await _processFile(file, outputPath, converter);
   }
 }
 
-Future<void> _processFile(File file, String? outputDir) async {
+Future<void> _processFile(
+  File file,
+  String? outputDir,
+  FreezedToTsConverter converter,
+) async {
   final content = await file.readAsString();
   if (!content.contains('@freezed')) return;
 
   print('Processing ${file.path}...');
-  final tsContent = convertFreezedToTypeScript(content);
+  final tsContent = converter.convert(content);
 
   if (tsContent.isEmpty) {
     print('  -> No freezed classes found.');
