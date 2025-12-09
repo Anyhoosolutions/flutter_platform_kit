@@ -94,6 +94,8 @@ export interface User {
       converter.learn(userCode);
 
       final expectedUserTs = r'''
+import type { Address } from './address.ts';
+
 export interface User {
   id: string;
   address: Address;

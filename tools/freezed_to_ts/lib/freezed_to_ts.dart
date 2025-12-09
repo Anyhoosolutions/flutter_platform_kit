@@ -29,6 +29,24 @@ class FreezedToTsConverter {
     final compilationUnit = parseResult.unit;
     final output = StringBuffer();
     bool needsTimestampImport = false;
+    final Set<String> referencedFreezedClasses = {};
+    final Map<String, String> importMap = {}; // Maps class name to import path
+
+    // Parse imports to build a map of class names to their import paths
+    for (final directive in compilationUnit.directives) {
+      if (directive is ImportDirective) {
+        final importPath = directive.uri.stringValue;
+        if (importPath != null && !importPath.startsWith('package:')) {
+          // This is a relative import (e.g., 'address.dart')
+          // We'll need to check which classes from this file are used
+          // For now, we'll store the import path and match it later
+          final tsImportPath = _convertDartImportToTs(importPath);
+          // Extract class name from file name (e.g., 'address.dart' -> 'Address')
+          // This is a heuristic - we'll match it with actual class names later
+          importMap[tsImportPath] = tsImportPath;
+        }
+      }
+    }
 
     for (final declaration in compilationUnit.declarations) {
       if (declaration is! ClassDeclaration) continue;
@@ -75,6 +93,12 @@ class FreezedToTsConverter {
           final type = paramTypeAnnotation.toSource();
           var finalTsType = _dartToTsType(type);
 
+          // Track referenced freezed classes
+          final baseType = type.endsWith('?') ? type.substring(0, type.length - 1) : type;
+          if (_knownFreezedClasses.contains(baseType) && baseType != className) {
+            referencedFreezedClasses.add(baseType);
+          }
+
           // Existing JsonKey processing for 'name', 'fromJson', 'toJson'
           for (final annotation in param.metadata) {
             if (annotation.name.name == 'JsonKey' && annotation.arguments != null) {
@@ -103,8 +127,33 @@ class FreezedToTsConverter {
         }
       }
 
+      // Generate imports for referenced freezed classes
+      bool hasFreezedImports = false;
+      for (final referencedClass in referencedFreezedClasses) {
+        // Find the import path for this class
+        String? importPath;
+        for (final directive in compilationUnit.directives) {
+          if (directive is ImportDirective) {
+            final dartImportPath = directive.uri.stringValue;
+            if (dartImportPath != null && !dartImportPath.startsWith('package:')) {
+              // Convert Dart import path to TypeScript import path
+              importPath = _convertDartImportToTs(dartImportPath);
+              break; // Use the first relative import found
+            }
+          }
+        }
+        if (importPath != null) {
+          output.writeln("import type { $referencedClass } from '$importPath';");
+          hasFreezedImports = true;
+        }
+      }
+
       if (needsTimestampImport) {
-        output.writeln('import type { Timestamp } from "firebase-admin/firestore";');
+        output.writeln("import { Timestamp } from 'firebase/firestore';");
+      }
+
+      if (hasFreezedImports) {
+        output.writeln(''); // Add blank line after freezed class imports
       }
       output.writeln('export interface $className {');
       allFields.forEach((name, type) {
@@ -114,6 +163,14 @@ class FreezedToTsConverter {
     }
 
     return output.toString();
+  }
+
+  String _convertDartImportToTs(String dartImport) {
+    // Convert 'address.dart' to './address.ts'
+    if (dartImport.endsWith('.dart')) {
+      return './${dartImport.substring(0, dartImport.length - 5)}.ts';
+    }
+    return './$dartImport.ts';
   }
 
   String _dartToTsType(String dartType) {
