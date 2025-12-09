@@ -37,7 +37,7 @@ void main() {
       final result = converter.convert(dartCode).trim();
 
       final expectedTsCode = r'''
-import type { Timestamp } from 'firebase/firestore';
+import type { Timestamp } from 'firebase-admin/firestore';
 export interface User {
   id: string;
   email: string;
@@ -252,7 +252,7 @@ export interface RecipeShort {
       final result = converter.convert(dartCode).trim();
 
       final expectedTsCode = r'''
-import type { Timestamp } from 'firebase/firestore';
+import type { Timestamp } from 'firebase-admin/firestore';
 export interface Task {
   id: string | null;
   name: string;
