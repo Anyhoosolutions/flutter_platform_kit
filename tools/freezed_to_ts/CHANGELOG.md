@@ -1,3 +1,9 @@
+## 0.0.2
+
+- Fixes for import type
+- Fixes for import of nested classes
+- Updating documentation
+
 ## 0.0.1
 
 - Initial version of the script.
