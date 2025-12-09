@@ -6,6 +6,8 @@ import 'package:flutter/foundation.dart';
 part 'address.freezed.dart';
 part 'address.g.dart';
 
+enum AddressType { home, work, other }
+
 @freezed
 class Address with _$Address {
   const factory Address({
@@ -14,6 +16,7 @@ class Address with _$Address {
     required String city,
     required String zip,
     required String country,
+    required AddressType addressType,
   }) = _Address;
 
   factory Address.fromJson(Map<String, Object?> json) => _$AddressFromJson(json);

@@ -14,6 +14,7 @@ It then inspects the parameters of the constructor to determine the field names 
 * Handles nested classes, that eventually evaluate to a simple type
 * Handles ` @JsonKey(fromJson: fromDateTime, toJson: toDateTime)` with basic types 
 * Converts single file or a directory of files
+* Handles enums
 
 ## How to Use
 

@@ -266,5 +266,316 @@ export interface Task {
 
       expect(result, equals(expectedTsCode));
     });
+
+    test('handles enums with package imports', () {
+      final converter = FreezedToTsConverter();
+
+      const themeTypeCode = r'''
+        enum ThemeType {
+          light,
+          dark,
+          system,
+        }
+      ''';
+
+      const userProfileCode = r'''
+        import 'package:freezed_annotation/freezed_annotation.dart';
+        import 'package:snapandsavor/features/profile/theme_type.dart';
+
+        part 'user_profile.freezed.dart';
+        part 'user_profile.g.dart';
+
+        @freezed
+        sealed class UserProfile with _$UserProfile {
+          const factory UserProfile({
+            required String id,
+            required String name,
+            required ThemeType theme,
+            ThemeType? preferredTheme,
+          }) = _UserProfile;
+
+          factory UserProfile.fromJson(Map<String, Object?> json) =>
+              _$UserProfileFromJson(json);
+        }
+      ''';
+
+      // Learn both enum and class
+      converter.learn(themeTypeCode);
+      converter.learn(userProfileCode);
+
+      final expectedThemeTypeTs = r'''
+export enum ThemeType {
+  light = 'light',
+  dark = 'dark',
+  system = 'system',
+}
+'''
+          .trim();
+
+      final expectedUserProfileTs = r'''
+import type { ThemeType } from './theme_type.ts';
+
+export interface UserProfile {
+  id: string;
+  name: string;
+  theme: ThemeType;
+  preferredTheme: ThemeType | null;
+}
+'''
+          .trim();
+
+      final themeTypeResult = converter.convert(themeTypeCode).trim();
+      expect(themeTypeResult, equals(expectedThemeTypeTs),
+          reason: 'ThemeType enum should be converted to TypeScript enum');
+
+      final userProfileResult = converter.convert(userProfileCode).trim();
+      expect(userProfileResult, equals(expectedUserProfileTs),
+          reason: 'UserProfile should include import for ThemeType enum');
+    });
+
+    test('validates full file output with enum and freezed class in same file', () {
+      final converter = FreezedToTsConverter();
+
+      const fullFileCode = r'''
+        import 'package:freezed_annotation/freezed_annotation.dart';
+
+        part 'user_settings.freezed.dart';
+        part 'user_settings.g.dart';
+
+        enum ThemeType {
+          light,
+          dark,
+          system,
+        }
+
+        @freezed
+        sealed class UserSettings with _$UserSettings {
+          const factory UserSettings({
+            required String id,
+            required ThemeType theme,
+            ThemeType? preferredTheme,
+          }) = _UserSettings;
+
+          factory UserSettings.fromJson(Map<String, Object?> json) =>
+              _$UserSettingsFromJson(json);
+        }
+      ''';
+
+      converter.learn(fullFileCode);
+
+      final expectedFullFileTs = r'''
+export enum ThemeType {
+  light = 'light',
+  dark = 'dark',
+  system = 'system',
+}
+
+export interface UserSettings {
+  id: string;
+  theme: ThemeType;
+  preferredTheme: ThemeType | null;
+}
+'''
+          .trim();
+
+      final result = converter.convert(fullFileCode).trim();
+      expect(result, equals(expectedFullFileTs),
+          reason: 'Full file should output enum and interface without importing enum from elsewhere');
+    });
+
+    test('validates full file output with multiple enums and freezed classes', () {
+      final converter = FreezedToTsConverter();
+
+      const fullFileCode = r'''
+        import 'package:cloud_firestore/cloud_firestore.dart';
+        import 'package:freezed_annotation/freezed_annotation.dart';
+
+        part 'models.freezed.dart';
+        part 'models.g.dart';
+
+        enum Status {
+          active,
+          inactive,
+          pending,
+        }
+
+        enum Priority {
+          low,
+          medium,
+          high,
+        }
+
+        DateTime fromDateTime(Timestamp dateTime) => dateTime.toDate();
+        Timestamp toDateTime(DateTime dateTime) => Timestamp.fromDate(dateTime);
+
+        @freezed
+        sealed class Task with _$Task {
+          const factory Task({
+            required String id,
+            required String title,
+            required Status status,
+            required Priority priority,
+            @JsonKey(fromJson: fromDateTime, toJson: toDateTime)
+            required DateTime createdAt,
+          }) = _Task;
+
+          factory Task.fromJson(Map<String, Object?> json) => _$TaskFromJson(json);
+        }
+
+        @freezed
+        sealed class Project with _$Project {
+          const factory Project({
+            required String id,
+            required String name,
+            required List<Task> tasks,
+            Status? currentStatus,
+          }) = _Project;
+
+          factory Project.fromJson(Map<String, Object?> json) => _$ProjectFromJson(json);
+        }
+      ''';
+
+      converter.learn(fullFileCode);
+
+      final expectedFullFileTs = r'''
+import type { Timestamp } from 'firebase-admin/firestore';
+
+export enum Priority {
+  low = 'low',
+  medium = 'medium',
+  high = 'high',
+}
+
+export enum Status {
+  active = 'active',
+  inactive = 'inactive',
+  pending = 'pending',
+}
+
+export interface Project {
+  id: string;
+  name: string;
+  tasks: Task[];
+  currentStatus: Status | null;
+}
+
+export interface Task {
+  id: string;
+  title: string;
+  status: Status;
+  priority: Priority;
+  createdAt: Timestamp;
+}
+'''
+          .trim();
+
+      final result = converter.convert(fullFileCode).trim();
+      expect(result, equals(expectedFullFileTs),
+          reason: 'Full file should output all enums and interfaces in correct order without duplicate imports');
+    });
+
+    test('validates multiple input files generate correct multiple output files', () {
+      final converter = FreezedToTsConverter();
+
+      // File 1: Enum definition
+      const themeTypeFile = r'''
+        enum ThemeType {
+          light,
+          dark,
+          system,
+        }
+      ''';
+
+      // File 2: Freezed class that uses other file
+      const userProfileFile = r'''
+        import 'package:freezed_annotation/freezed_annotation.dart';
+        import 'settings.dart';
+
+        part 'user_profile.freezed.dart';
+        part 'user_profile.g.dart';
+
+        @freezed
+        sealed class UserProfile with _$UserProfile {
+          const factory UserProfile({
+            required String id,
+            required String name,
+            required Settings settings,
+          }) = _UserProfile;
+
+          factory UserProfile.fromJson(Map<String, Object?> json) =>
+              _$UserProfileFromJson(json);
+        }
+      ''';
+
+      // File 3: Another freezed class that uses the enum
+      const settingsFile = r'''
+        import 'package:freezed_annotation/freezed_annotation.dart';
+        import 'package:snapandsavor/features/profile/theme_type.dart';
+
+        part 'settings.freezed.dart';
+        part 'settings.g.dart';
+
+        @freezed
+        sealed class Settings with _$Settings {
+          const factory Settings({
+            required String userId,
+            required ThemeType defaultTheme,
+            @Default([]) List<ThemeType> allowedThemes,
+          }) = _Settings;
+
+          factory Settings.fromJson(Map<String, Object?> json) =>
+              _$SettingsFromJson(json);
+        }
+      ''';
+
+      // Learn all files
+      converter.learn(themeTypeFile);
+      converter.learn(userProfileFile);
+      converter.learn(settingsFile);
+
+      // Expected outputs
+      final expectedThemeTypeOutput = r'''
+export enum ThemeType {
+  light = 'light',
+  dark = 'dark',
+  system = 'system',
+}
+'''
+          .trim();
+
+      final expectedUserProfileOutput = r'''
+import type { Settings } from './settings.ts';
+
+export interface UserProfile {
+  id: string;
+  name: string;
+  settings: Settings;
+}
+'''
+          .trim();
+
+      final expectedSettingsOutput = r'''
+import type { ThemeType } from './theme_type.ts';
+
+export interface Settings {
+  userId: string;
+  defaultTheme: ThemeType;
+  allowedThemes: ThemeType[];
+}
+'''
+          .trim();
+
+      // Convert each file and validate output
+      final themeTypeResult = converter.convert(themeTypeFile).trim();
+      expect(themeTypeResult, equals(expectedThemeTypeOutput), reason: 'ThemeType file should output enum definition');
+
+      final userProfileResult = converter.convert(userProfileFile).trim();
+      expect(userProfileResult, equals(expectedUserProfileOutput),
+          reason: 'UserProfile file should output interface with enum import');
+
+      final settingsResult = converter.convert(settingsFile).trim();
+      expect(settingsResult, equals(expectedSettingsOutput),
+          reason: 'Settings file should output interface with enum import');
+    });
   });
 }
