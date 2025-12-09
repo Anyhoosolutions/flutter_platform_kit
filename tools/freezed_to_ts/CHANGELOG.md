@@ -1,3 +1,10 @@
+## 0.0.3
+
+- Fixes for import type
+- Fixes for import of nested classes
+- Updating documentation
+- Sort imports
+
 ## 0.0.2
 
 - Fixes for import type
