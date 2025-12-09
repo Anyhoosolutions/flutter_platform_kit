@@ -94,7 +94,7 @@ export interface User {
       converter.learn(userCode);
 
       final expectedUserTs = r'''
-import type { Timestamp } from 'firebase/firestore';
+import type { Timestamp } from 'firebase-admin/firestore';
 import type { Address } from './address.ts';
 
 export interface User {
@@ -118,6 +118,100 @@ export interface Address {
 
       final addressResult = converter.convert(addressCode).trim();
       expect(addressResult, equals(expectedAddressTs));
+    });
+
+    test('handles nested freezed classes with package imports', () {
+      final converter = FreezedToTsConverter();
+
+      const recipeShortCode = r'''
+        import 'package:freezed_annotation/freezed_annotation.dart';
+
+        part 'recipe_short.freezed.dart';
+        part 'recipe_short.g.dart';
+
+        @freezed
+        sealed class RecipeShort with _$RecipeShort {
+          const factory RecipeShort({
+            required String id,
+            required String title,
+            @Default(null) String? description,
+            @Default([]) List<String> imageUrls,
+            @Default([]) List<String> categories,
+          }) = _RecipeShort;
+
+          factory RecipeShort.fromJson(Map<String, Object?> json) =>
+              _$RecipeShortFromJson(json);
+        }
+      ''';
+
+      const userGroupCode = r'''
+        // ignore_for_file: invalid_annotation_target
+
+        import 'package:cloud_firestore/cloud_firestore.dart';
+        import 'package:freezed_annotation/freezed_annotation.dart';
+        import 'package:snapandsavor/sharedModels/recipe_short.dart';
+
+        part 'user_group.freezed.dart';
+        part 'user_group.g.dart';
+
+        @freezed
+        sealed class UserGroup with _$UserGroup {
+          const factory UserGroup({
+            required String id,
+            @Default(null) String? groupRef,
+            required String title,
+            @Default(null) String? description,
+            @JsonKey(fromJson: fromDateTime, toJson: toDateTime)
+            required DateTime createdAt,
+            @JsonKey(fromJson: fromDateTime, toJson: toDateTime)
+            required DateTime updatedAt,
+            @Default([]) List<RecipeShort> recipes,
+          }) = _UserGroup;
+
+          factory UserGroup.fromJson(Map<String, Object?> json) =>
+              _$UserGroupFromJson(json);
+        }
+
+        DateTime fromDateTime(Timestamp dateTime) => dateTime.toDate();
+        Timestamp toDateTime(DateTime dateTime) => Timestamp.fromDate(dateTime);
+      ''';
+
+      // Learn both classes
+      converter.learn(recipeShortCode);
+      converter.learn(userGroupCode);
+
+      final expectedUserGroupTs = r'''
+import type { Timestamp } from 'firebase-admin/firestore';
+import type { RecipeShort } from './recipe_short.ts';
+
+export interface UserGroup {
+  id: string;
+  groupRef: string | null;
+  title: string;
+  description: string | null;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+  recipes: RecipeShort[];
+}
+'''
+          .trim();
+
+      final expectedRecipeShortTs = r'''
+export interface RecipeShort {
+  id: string;
+  title: string;
+  description: string | null;
+  imageUrls: string[];
+  categories: string[];
+}
+'''
+          .trim();
+
+      final userGroupResult = converter.convert(userGroupCode).trim();
+      expect(userGroupResult, equals(expectedUserGroupTs), reason: 'UserGroup should include import for RecipeShort');
+
+      final recipeShortResult = converter.convert(recipeShortCode).trim();
+      expect(recipeShortResult, equals(expectedRecipeShortTs));
     });
 
     test('handles JsonKey with fromJson/toJson conversion functions', () {
