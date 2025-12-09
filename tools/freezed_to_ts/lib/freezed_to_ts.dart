@@ -7,12 +7,9 @@ final _log = Logger('FreezedToTsConverter');
 
 class FreezedToTsConverter {
   final Set<String> _knownFreezedClasses = {};
+  final Set<String> _knownEnums = {};
 
   void learn(String dartCode) {
-    final classNameLine = dartCode.split('\n').firstWhere((line) => line.contains('class '));
-    final classPosition = classNameLine.indexOf('class ');
-    final className = classNameLine.substring(classPosition + 5).trim().split(' ').first;
-    _log.info('Learning $className');
     final parseResult = parseString(
       content: dartCode,
       featureSet: FeatureSet.latestLanguageVersion(),
@@ -22,7 +19,13 @@ class FreezedToTsConverter {
 
     for (final declaration in compilationUnit.declarations) {
       if (declaration is ClassDeclaration && declaration.metadata.any((m) => m.name.name == 'freezed')) {
-        _knownFreezedClasses.add(declaration.name.lexeme);
+        final className = declaration.name.lexeme;
+        _log.info('Learning freezed class $className');
+        _knownFreezedClasses.add(className);
+      } else if (declaration is EnumDeclaration) {
+        final enumName = declaration.name.lexeme;
+        _log.info('Learning enum $enumName');
+        _knownEnums.add(enumName);
       }
     }
   }
@@ -37,6 +40,7 @@ class FreezedToTsConverter {
     final output = StringBuffer();
     bool needsTimestampImport = false;
     final Set<String> referencedFreezedClasses = {};
+    final Set<String> referencedEnums = {};
     final Map<String, String> importMap = {}; // Maps class name to import path
 
     // Parse imports to build a map of class names to their import paths
@@ -55,6 +59,33 @@ class FreezedToTsConverter {
       }
     }
 
+    // Handle enum declarations first
+    bool hasEnums = false;
+    for (final declaration in compilationUnit.declarations) {
+      if (declaration is EnumDeclaration) {
+        if (hasEnums) {
+          output.writeln(''); // Add blank line between multiple enums
+        }
+        final enumName = declaration.name.lexeme;
+        output.writeln('export enum $enumName {');
+        for (final enumConstant in declaration.constants) {
+          final constantName = enumConstant.name.lexeme;
+          output.writeln("  $constantName = '$constantName',");
+        }
+        output.writeln('}');
+        hasEnums = true;
+      }
+    }
+
+    // Add blank line between enums and freezed classes if both exist
+    bool hasFreezedClasses = compilationUnit.declarations.any(
+      (d) => d is ClassDeclaration && d.metadata.any((m) => m.name.name == 'freezed'),
+    );
+    if (hasEnums && hasFreezedClasses) {
+      output.writeln('');
+    }
+
+    // Handle freezed class declarations
     for (final declaration in compilationUnit.declarations) {
       if (declaration is! ClassDeclaration) continue;
 
@@ -102,6 +133,8 @@ class FreezedToTsConverter {
 
           // Track referenced freezed classes (including those inside generics)
           _extractReferencedFreezedClasses(type, className, referencedFreezedClasses);
+          // Track referenced enums (including those inside generics)
+          _extractReferencedEnums(type, referencedEnums);
 
           // Existing JsonKey processing for 'name', 'fromJson', 'toJson'
           for (final annotation in param.metadata) {
@@ -199,6 +232,62 @@ class FreezedToTsConverter {
         }
       }
 
+      // Generate imports for referenced enums
+      for (final referencedEnum in referencedEnums) {
+        // Find the import path for this enum
+        String? importPath;
+
+        // First, try to find a matching relative import
+        for (final directive in compilationUnit.directives) {
+          if (directive is ImportDirective) {
+            final dartImportPath = directive.uri.stringValue;
+            if (dartImportPath != null && !dartImportPath.startsWith('package:')) {
+              // Relative import: Convert Dart import path to TypeScript import path
+              importPath = _convertDartImportToTs(dartImportPath);
+              break; // Use the first relative import found
+            }
+          }
+        }
+
+        // If no relative import found, try to find a matching package import
+        if (importPath == null) {
+          final expectedFileName = _classNameToFileName(referencedEnum);
+          for (final directive in compilationUnit.directives) {
+            if (directive is ImportDirective) {
+              final dartImportPath = directive.uri.stringValue;
+              if (dartImportPath != null && dartImportPath.startsWith('package:')) {
+                // Package import: Extract file name and check if it matches the enum name
+                final fileName = _extractFileNameFromPackageImport(dartImportPath);
+                if (fileName != null && fileName == expectedFileName) {
+                  importPath = _convertDartImportToTs(fileName);
+                  break; // Use the matching package import
+                }
+              }
+            }
+          }
+        }
+
+        // If still no match found, use the first package import as fallback
+        if (importPath == null) {
+          for (final directive in compilationUnit.directives) {
+            if (directive is ImportDirective) {
+              final dartImportPath = directive.uri.stringValue;
+              if (dartImportPath != null && dartImportPath.startsWith('package:')) {
+                final fileName = _extractFileNameFromPackageImport(dartImportPath);
+                if (fileName != null) {
+                  importPath = _convertDartImportToTs(fileName);
+                  break; // Use the first package import as fallback
+                }
+              }
+            }
+          }
+        }
+
+        if (importPath != null) {
+          relativeImports.add("import type { $referencedEnum } from '$importPath';");
+        }
+      }
+
       // Sort imports alphabetically within each group
       externalImports.sort();
       relativeImports.sort();
@@ -247,6 +336,32 @@ class FreezedToTsConverter {
       // Check if this type is a known freezed class
       if (_knownFreezedClasses.contains(baseType) && baseType != currentClassName) {
         referencedClasses.add(baseType);
+      }
+    }
+  }
+
+  void _extractReferencedEnums(String type, Set<String> referencedEnums) {
+    // Remove nullable marker
+    final baseType = type.endsWith('?') ? type.substring(0, type.length - 1) : type;
+
+    // Check if it's a generic type (e.g., List<ThemeType>)
+    if (baseType.startsWith('List<')) {
+      final innerType = baseType.substring(5, baseType.length - 1);
+      _extractReferencedEnums(innerType, referencedEnums);
+    } else if (baseType.startsWith('Map<')) {
+      // For Map<K, V>, extract both key and value types
+      final innerPart = baseType.substring(4, baseType.length - 1);
+      final commaIndex = innerPart.indexOf(',');
+      if (commaIndex != -1) {
+        final keyType = innerPart.substring(0, commaIndex).trim();
+        final valueType = innerPart.substring(commaIndex + 1).trim();
+        _extractReferencedEnums(keyType, referencedEnums);
+        _extractReferencedEnums(valueType, referencedEnums);
+      }
+    } else {
+      // Check if this type is a known enum
+      if (_knownEnums.contains(baseType)) {
+        referencedEnums.add(baseType);
       }
     }
   }
@@ -310,6 +425,9 @@ class FreezedToTsConverter {
         return 'any';
       default:
         if (_knownFreezedClasses.contains(dartType)) {
+          return dartType;
+        }
+        if (_knownEnums.contains(dartType)) {
           return dartType;
         }
         if (dartType.startsWith('List<')) {
