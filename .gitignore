@@ -14,3 +14,4 @@ example_app/android/app/google-services.json
 example_app/ios/Runner/GoogleService-Info.plist
 example_app/lib/firebase_options.dart
 firebase-debug.log
+tools/freezed_to_ts/tmp/
