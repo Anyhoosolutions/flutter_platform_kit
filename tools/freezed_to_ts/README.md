@@ -8,6 +8,13 @@ This script works by parsing the Dart source code directly using the official `a
 
 It then inspects the parameters of the constructor to determine the field names and types, and generates a corresponding TypeScript interface.
 
+## Features
+
+* Handles simple types
+* Handles nested classes, that eventually evaluate to a simple type
+* Handles ` @JsonKey(fromJson: fromDateTime, toJson: toDateTime)` with basic types 
+* Converts single file or a directory of files
+
 ## How to Use
 
 The script can be run from a local clone (ideal for development) or activated globally from GitHub or pub.dev (once published).
@@ -19,7 +26,8 @@ The script can be run from a local clone (ideal for development) or activated gl
 
 ### Examples
 
-**Running from a local clone:**
+### Running from a local clone:
+
 ```sh
 # Process a single file and print to console
 dart run freezed_to_ts -i ../../packages/anyhoo_core/lib/src/models/user.dart
@@ -28,7 +36,8 @@ dart run freezed_to_ts -i ../../packages/anyhoo_core/lib/src/models/user.dart
 dart run freezed_to_ts -i ../../packages/anyhoo_core/lib/src/models -o ./types
 ```
 
-**Running as a global executable:**
+### Running as a global executable: 
+
 ```sh
 # Activate from GitHub
 dart pub global activate --source git https://github.com/lidholm/flutter_platform_kit.git --path tools/freezed_to_ts
