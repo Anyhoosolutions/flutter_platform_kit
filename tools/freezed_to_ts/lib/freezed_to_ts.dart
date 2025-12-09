@@ -149,7 +149,7 @@ class FreezedToTsConverter {
       }
 
       if (needsTimestampImport) {
-        output.writeln("import { Timestamp } from 'firebase/firestore';");
+        output.writeln("import type { Timestamp } from 'firebase/firestore';");
       }
 
       if (hasFreezedImports) {
