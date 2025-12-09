@@ -41,7 +41,7 @@ import { Timestamp } from 'firebase/firestore';
 export interface User {
   id: string;
   email: string;
-  fullName: string | null;
+  full_name: string | null;
   age: number;
   rating: number;
   isPremium: boolean;

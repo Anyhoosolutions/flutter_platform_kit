@@ -52,7 +52,7 @@ The tool has a test suite to ensure the conversion logic is correct. To run the 
 This tool is currently a simple prototype. Here are some potential features and improvements for the future:
 
 - [x] **Handle Nested Classes**: The script now correctly handles nested `freezed` classes. It identifies all `@freezed` classes in the input files and uses their names as types in the generated TypeScript interfaces.
-- [ ] **Respect `@JsonKey` Annotation**: The script could parse the `@JsonKey(name: '...')` annotation and use the specified name in the TypeScript output.
+- [x] **Respect `@JsonKey` Annotation**: The script now parses the `@JsonKey(name: '...')` annotation and uses the specified name in the TypeScript output.
 - [x] **File Output**: Add an `--output` flag to write the generated interface directly to a specified `.ts` file. *(In Progress)*
 - [x] **Directory Processing**: Add functionality to process all `freezed` files within a given directory instead of just a single file. *(In Progress)*
 - [ ] **Improved Error Handling**: Provide more specific error messages if a file can't be parsed or a valid `freezed` class isn't found.

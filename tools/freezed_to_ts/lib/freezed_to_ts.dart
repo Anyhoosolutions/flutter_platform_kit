@@ -48,8 +48,23 @@ class FreezedToTsConverter {
 
       for (final param in parameters) {
         final parameter = param as DefaultFormalParameter;
-        final name = parameter.name!.lexeme;
-        final type = (parameter.parameter as SimpleFormalParameter).type!.toSource();
+        var name = parameter.name!.lexeme;
+        final type =
+            (parameter.parameter as SimpleFormalParameter).type!.toSource();
+
+        for (final annotation in parameter.metadata) {
+          if (annotation.name.name == 'JsonKey' &&
+              annotation.arguments != null) {
+            for (final arg in annotation.arguments!.arguments) {
+              if (arg is NamedExpression && arg.name.label.name == 'name') {
+                final expression = arg.expression;
+                if (expression is StringLiteral) {
+                  name = expression.stringValue ?? name;
+                }
+              }
+            }
+          }
+        }
 
         final tsType = _dartToTsType(type);
         if (tsType == 'Timestamp') {
