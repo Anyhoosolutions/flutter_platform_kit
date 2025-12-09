@@ -2,6 +2,7 @@
 
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:flutter/foundation.dart';
+import 'address.dart';
 
 part 'user.freezed.dart';
 part 'user.g.dart';
@@ -19,6 +20,7 @@ class User with _$User {
     DateTime? lastLogin,
     @Default([]) List<String> tags,
     @Default({}) Map<String, dynamic> settings,
+    required Address address,
   }) = _User;
 
   factory User.fromJson(Map<String, Object?> json) => _$UserFromJson(json);
