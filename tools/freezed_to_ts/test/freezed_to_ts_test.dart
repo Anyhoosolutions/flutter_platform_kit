@@ -332,5 +332,146 @@ export interface UserProfile {
       expect(userProfileResult, equals(expectedUserProfileTs),
           reason: 'UserProfile should include import for ThemeType enum');
     });
+
+    test('validates full file output with enum and freezed class in same file', () {
+      final converter = FreezedToTsConverter();
+
+      const fullFileCode = r'''
+        import 'package:freezed_annotation/freezed_annotation.dart';
+
+        part 'user_settings.freezed.dart';
+        part 'user_settings.g.dart';
+
+        enum ThemeType {
+          light,
+          dark,
+          system,
+        }
+
+        @freezed
+        sealed class UserSettings with _$UserSettings {
+          const factory UserSettings({
+            required String id,
+            required ThemeType theme,
+            ThemeType? preferredTheme,
+          }) = _UserSettings;
+
+          factory UserSettings.fromJson(Map<String, Object?> json) =>
+              _$UserSettingsFromJson(json);
+        }
+      ''';
+
+      converter.learn(fullFileCode);
+
+      final expectedFullFileTs = r'''
+export enum ThemeType {
+  light = 'light',
+  dark = 'dark',
+  system = 'system',
+}
+
+export interface UserSettings {
+  id: string;
+  theme: ThemeType;
+  preferredTheme: ThemeType | null;
+}
+'''
+          .trim();
+
+      final result = converter.convert(fullFileCode).trim();
+      expect(result, equals(expectedFullFileTs),
+          reason: 'Full file should output enum and interface without importing enum from elsewhere');
+    });
+
+    test('validates full file output with multiple enums and freezed classes', () {
+      final converter = FreezedToTsConverter();
+
+      const fullFileCode = r'''
+        import 'package:cloud_firestore/cloud_firestore.dart';
+        import 'package:freezed_annotation/freezed_annotation.dart';
+
+        part 'models.freezed.dart';
+        part 'models.g.dart';
+
+        enum Status {
+          active,
+          inactive,
+          pending,
+        }
+
+        enum Priority {
+          low,
+          medium,
+          high,
+        }
+
+        DateTime fromDateTime(Timestamp dateTime) => dateTime.toDate();
+        Timestamp toDateTime(DateTime dateTime) => Timestamp.fromDate(dateTime);
+
+        @freezed
+        sealed class Task with _$Task {
+          const factory Task({
+            required String id,
+            required String title,
+            required Status status,
+            required Priority priority,
+            @JsonKey(fromJson: fromDateTime, toJson: toDateTime)
+            required DateTime createdAt,
+          }) = _Task;
+
+          factory Task.fromJson(Map<String, Object?> json) => _$TaskFromJson(json);
+        }
+
+        @freezed
+        sealed class Project with _$Project {
+          const factory Project({
+            required String id,
+            required String name,
+            required List<Task> tasks,
+            Status? currentStatus,
+          }) = _Project;
+
+          factory Project.fromJson(Map<String, Object?> json) => _$ProjectFromJson(json);
+        }
+      ''';
+
+      converter.learn(fullFileCode);
+
+      final expectedFullFileTs = r'''
+import type { Timestamp } from 'firebase-admin/firestore';
+
+export enum Priority {
+  low = 'low',
+  medium = 'medium',
+  high = 'high',
+}
+
+export enum Status {
+  active = 'active',
+  inactive = 'inactive',
+  pending = 'pending',
+}
+
+export interface Project {
+  id: string;
+  name: string;
+  tasks: Task[];
+  currentStatus: Status | null;
+}
+
+export interface Task {
+  id: string;
+  title: string;
+  status: Status;
+  priority: Priority;
+  createdAt: Timestamp;
+}
+'''
+          .trim();
+
+      final result = converter.convert(fullFileCode).trim();
+      expect(result, equals(expectedFullFileTs),
+          reason: 'Full file should output all enums and interfaces in correct order without duplicate imports');
+    });
   });
 }

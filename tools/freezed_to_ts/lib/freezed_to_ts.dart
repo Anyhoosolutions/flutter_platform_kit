@@ -59,33 +59,16 @@ class FreezedToTsConverter {
       }
     }
 
-    // Handle enum declarations first
-    bool hasEnums = false;
+    // Collect enum declarations to output after imports
+    final List<EnumDeclaration> enumDeclarations = [];
     for (final declaration in compilationUnit.declarations) {
       if (declaration is EnumDeclaration) {
-        if (hasEnums) {
-          output.writeln(''); // Add blank line between multiple enums
-        }
-        final enumName = declaration.name.lexeme;
-        output.writeln('export enum $enumName {');
-        for (final enumConstant in declaration.constants) {
-          final constantName = enumConstant.name.lexeme;
-          output.writeln("  $constantName = '$constantName',");
-        }
-        output.writeln('}');
-        hasEnums = true;
+        enumDeclarations.add(declaration);
       }
     }
 
-    // Add blank line between enums and freezed classes if both exist
-    bool hasFreezedClasses = compilationUnit.declarations.any(
-      (d) => d is ClassDeclaration && d.metadata.any((m) => m.name.name == 'freezed'),
-    );
-    if (hasEnums && hasFreezedClasses) {
-      output.writeln('');
-    }
-
-    // Handle freezed class declarations
+    // Collect freezed class information first
+    final List<Map<String, dynamic>> freezedClasses = [];
     for (final declaration in compilationUnit.declarations) {
       if (declaration is! ClassDeclaration) continue;
 
@@ -164,146 +147,197 @@ class FreezedToTsConverter {
         }
       }
 
-      // Collect all imports and sort them according to Biome's default order:
-      // 1. External packages (e.g., 'firebase/firestore')
-      // 2. Relative imports (e.g., './address.ts')
-      // Within each group, sorted alphabetically
-      final List<String> externalImports = [];
-      final List<String> relativeImports = [];
+      freezedClasses.add({
+        'className': className,
+        'fields': allFields,
+      });
+    }
 
-      // Add Timestamp import if needed
-      if (needsTimestampImport) {
-        externalImports.add("import type { Timestamp } from 'firebase-admin/firestore';");
+    // Collect all imports and sort them according to Biome's default order:
+    // 1. External packages (e.g., 'firebase/firestore')
+    // 2. Relative imports (e.g., './address.ts')
+    // Within each group, sorted alphabetically
+    final List<String> externalImports = [];
+    final List<String> relativeImports = [];
+
+    // Add Timestamp import if needed
+    if (needsTimestampImport) {
+      externalImports.add("import type { Timestamp } from 'firebase-admin/firestore';");
+    }
+
+    // Generate imports for referenced freezed classes (only if not defined in current file)
+    final Set<String> localFreezedClassNames = freezedClasses.map((c) => c['className'] as String).toSet();
+    for (final referencedClass in referencedFreezedClasses) {
+      // Skip if class is defined in the current file
+      if (localFreezedClassNames.contains(referencedClass)) {
+        continue;
       }
 
-      // Generate imports for referenced freezed classes
-      for (final referencedClass in referencedFreezedClasses) {
-        // Find the import path for this class
-        String? importPath;
+      // Find the import path for this class
+      String? importPath;
 
-        // First, try to find a matching relative import
+      // First, try to find a matching relative import
+      for (final directive in compilationUnit.directives) {
+        if (directive is ImportDirective) {
+          final dartImportPath = directive.uri.stringValue;
+          if (dartImportPath != null && !dartImportPath.startsWith('package:')) {
+            // Relative import: Convert Dart import path to TypeScript import path
+            importPath = _convertDartImportToTs(dartImportPath);
+            break; // Use the first relative import found
+          }
+        }
+      }
+
+      // If no relative import found, try to find a matching package import
+      if (importPath == null) {
+        final expectedFileName = _classNameToFileName(referencedClass);
         for (final directive in compilationUnit.directives) {
           if (directive is ImportDirective) {
             final dartImportPath = directive.uri.stringValue;
-            if (dartImportPath != null && !dartImportPath.startsWith('package:')) {
-              // Relative import: Convert Dart import path to TypeScript import path
-              importPath = _convertDartImportToTs(dartImportPath);
-              break; // Use the first relative import found
-            }
-          }
-        }
-
-        // If no relative import found, try to find a matching package import
-        if (importPath == null) {
-          final expectedFileName = _classNameToFileName(referencedClass);
-          for (final directive in compilationUnit.directives) {
-            if (directive is ImportDirective) {
-              final dartImportPath = directive.uri.stringValue;
-              if (dartImportPath != null && dartImportPath.startsWith('package:')) {
-                // Package import: Extract file name and check if it matches the class name
-                final fileName = _extractFileNameFromPackageImport(dartImportPath);
-                if (fileName != null && fileName == expectedFileName) {
-                  importPath = _convertDartImportToTs(fileName);
-                  break; // Use the matching package import
-                }
+            if (dartImportPath != null && dartImportPath.startsWith('package:')) {
+              // Package import: Extract file name and check if it matches the class name
+              final fileName = _extractFileNameFromPackageImport(dartImportPath);
+              if (fileName != null && fileName == expectedFileName) {
+                importPath = _convertDartImportToTs(fileName);
+                break; // Use the matching package import
               }
             }
           }
-        }
-
-        // If still no match found, use the first package import as fallback
-        if (importPath == null) {
-          for (final directive in compilationUnit.directives) {
-            if (directive is ImportDirective) {
-              final dartImportPath = directive.uri.stringValue;
-              if (dartImportPath != null && dartImportPath.startsWith('package:')) {
-                final fileName = _extractFileNameFromPackageImport(dartImportPath);
-                if (fileName != null) {
-                  importPath = _convertDartImportToTs(fileName);
-                  break; // Use the first package import as fallback
-                }
-              }
-            }
-          }
-        }
-
-        if (importPath != null) {
-          relativeImports.add("import type { $referencedClass } from '$importPath';");
         }
       }
 
-      // Generate imports for referenced enums
-      for (final referencedEnum in referencedEnums) {
-        // Find the import path for this enum
-        String? importPath;
-
-        // First, try to find a matching relative import
+      // If still no match found, use the first package import as fallback
+      if (importPath == null) {
         for (final directive in compilationUnit.directives) {
           if (directive is ImportDirective) {
             final dartImportPath = directive.uri.stringValue;
-            if (dartImportPath != null && !dartImportPath.startsWith('package:')) {
-              // Relative import: Convert Dart import path to TypeScript import path
-              importPath = _convertDartImportToTs(dartImportPath);
-              break; // Use the first relative import found
-            }
-          }
-        }
-
-        // If no relative import found, try to find a matching package import
-        if (importPath == null) {
-          final expectedFileName = _classNameToFileName(referencedEnum);
-          for (final directive in compilationUnit.directives) {
-            if (directive is ImportDirective) {
-              final dartImportPath = directive.uri.stringValue;
-              if (dartImportPath != null && dartImportPath.startsWith('package:')) {
-                // Package import: Extract file name and check if it matches the enum name
-                final fileName = _extractFileNameFromPackageImport(dartImportPath);
-                if (fileName != null && fileName == expectedFileName) {
-                  importPath = _convertDartImportToTs(fileName);
-                  break; // Use the matching package import
-                }
+            if (dartImportPath != null && dartImportPath.startsWith('package:')) {
+              final fileName = _extractFileNameFromPackageImport(dartImportPath);
+              if (fileName != null) {
+                importPath = _convertDartImportToTs(fileName);
+                break; // Use the first package import as fallback
               }
             }
           }
         }
+      }
 
-        // If still no match found, use the first package import as fallback
-        if (importPath == null) {
-          for (final directive in compilationUnit.directives) {
-            if (directive is ImportDirective) {
-              final dartImportPath = directive.uri.stringValue;
-              if (dartImportPath != null && dartImportPath.startsWith('package:')) {
-                final fileName = _extractFileNameFromPackageImport(dartImportPath);
-                if (fileName != null) {
-                  importPath = _convertDartImportToTs(fileName);
-                  break; // Use the first package import as fallback
-                }
+      if (importPath != null) {
+        relativeImports.add("import type { $referencedClass } from '$importPath';");
+      }
+    }
+
+    // Generate imports for referenced enums (only if not defined in current file)
+    final Set<String> localEnumNames = enumDeclarations.map((e) => e.name.lexeme).toSet();
+    for (final referencedEnum in referencedEnums) {
+      // Skip if enum is defined in the current file
+      if (localEnumNames.contains(referencedEnum)) {
+        continue;
+      }
+
+      // Find the import path for this enum
+      String? importPath;
+
+      // First, try to find a matching relative import
+      for (final directive in compilationUnit.directives) {
+        if (directive is ImportDirective) {
+          final dartImportPath = directive.uri.stringValue;
+          if (dartImportPath != null && !dartImportPath.startsWith('package:')) {
+            // Relative import: Convert Dart import path to TypeScript import path
+            importPath = _convertDartImportToTs(dartImportPath);
+            break; // Use the first relative import found
+          }
+        }
+      }
+
+      // If no relative import found, try to find a matching package import
+      if (importPath == null) {
+        final expectedFileName = _classNameToFileName(referencedEnum);
+        for (final directive in compilationUnit.directives) {
+          if (directive is ImportDirective) {
+            final dartImportPath = directive.uri.stringValue;
+            if (dartImportPath != null && dartImportPath.startsWith('package:')) {
+              // Package import: Extract file name and check if it matches the enum name
+              final fileName = _extractFileNameFromPackageImport(dartImportPath);
+              if (fileName != null && fileName == expectedFileName) {
+                importPath = _convertDartImportToTs(fileName);
+                break; // Use the matching package import
               }
             }
           }
         }
+      }
 
-        if (importPath != null) {
-          relativeImports.add("import type { $referencedEnum } from '$importPath';");
+      // If still no match found, use the first package import as fallback
+      if (importPath == null) {
+        for (final directive in compilationUnit.directives) {
+          if (directive is ImportDirective) {
+            final dartImportPath = directive.uri.stringValue;
+            if (dartImportPath != null && dartImportPath.startsWith('package:')) {
+              final fileName = _extractFileNameFromPackageImport(dartImportPath);
+              if (fileName != null) {
+                importPath = _convertDartImportToTs(fileName);
+                break; // Use the first package import as fallback
+              }
+            }
+          }
         }
       }
 
-      // Sort imports alphabetically within each group
-      externalImports.sort();
-      relativeImports.sort();
+      if (importPath != null) {
+        relativeImports.add("import type { $referencedEnum } from '$importPath';");
+      }
+    }
 
-      // Output imports in Biome's default order: external first, then relative
-      for (final import in externalImports) {
-        output.writeln(import);
-      }
-      for (final import in relativeImports) {
-        output.writeln(import);
-      }
+    // Sort imports alphabetically within each group
+    externalImports.sort();
+    relativeImports.sort();
 
-      // Add blank line only if there are relative imports
-      if (relativeImports.isNotEmpty) {
-        output.writeln('');
+    // Output imports in Biome's default order: external first, then relative
+    for (final import in externalImports) {
+      output.writeln(import);
+    }
+    for (final import in relativeImports) {
+      output.writeln(import);
+    }
+
+    // Add blank line if there are relative imports or if we have enums to output
+    if (relativeImports.isNotEmpty || enumDeclarations.isNotEmpty) {
+      output.writeln('');
+    }
+
+    // Output enum declarations (sorted alphabetically)
+    final sortedEnums = List<EnumDeclaration>.from(enumDeclarations)
+      ..sort((a, b) => a.name.lexeme.compareTo(b.name.lexeme));
+    for (int i = 0; i < sortedEnums.length; i++) {
+      if (i > 0) {
+        output.writeln(''); // Add blank line between multiple enums
       }
+      final enumDeclaration = sortedEnums[i];
+      final enumName = enumDeclaration.name.lexeme;
+      output.writeln('export enum $enumName {');
+      for (final enumConstant in enumDeclaration.constants) {
+        final constantName = enumConstant.name.lexeme;
+        output.writeln("  $constantName = '$constantName',");
+      }
+      output.writeln('}');
+    }
+
+    // Add blank line between enums and freezed classes if both exist
+    if (enumDeclarations.isNotEmpty && freezedClasses.isNotEmpty) {
+      output.writeln('');
+    }
+
+    // Output freezed class declarations (sorted alphabetically)
+    final sortedFreezedClasses = List<Map<String, dynamic>>.from(freezedClasses)
+      ..sort((a, b) => (a['className'] as String).compareTo(b['className'] as String));
+    for (int i = 0; i < sortedFreezedClasses.length; i++) {
+      if (i > 0) {
+        output.writeln(''); // Add blank line between multiple interfaces
+      }
+      final classInfo = sortedFreezedClasses[i];
+      final className = classInfo['className'] as String;
+      final allFields = classInfo['fields'] as Map<String, String>;
       output.writeln('export interface $className {');
       allFields.forEach((name, type) {
         output.writeln('  $name: $type;');
