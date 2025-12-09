@@ -266,5 +266,71 @@ export interface Task {
 
       expect(result, equals(expectedTsCode));
     });
+
+    test('handles enums with package imports', () {
+      final converter = FreezedToTsConverter();
+
+      const themeTypeCode = r'''
+        enum ThemeType {
+          light,
+          dark,
+          system,
+        }
+      ''';
+
+      const userProfileCode = r'''
+        import 'package:freezed_annotation/freezed_annotation.dart';
+        import 'package:snapandsavor/features/profile/theme_type.dart';
+
+        part 'user_profile.freezed.dart';
+        part 'user_profile.g.dart';
+
+        @freezed
+        sealed class UserProfile with _$UserProfile {
+          const factory UserProfile({
+            required String id,
+            required String name,
+            required ThemeType theme,
+            ThemeType? preferredTheme,
+          }) = _UserProfile;
+
+          factory UserProfile.fromJson(Map<String, Object?> json) =>
+              _$UserProfileFromJson(json);
+        }
+      ''';
+
+      // Learn both enum and class
+      converter.learn(themeTypeCode);
+      converter.learn(userProfileCode);
+
+      final expectedThemeTypeTs = r'''
+export enum ThemeType {
+  light = 'light',
+  dark = 'dark',
+  system = 'system',
+}
+'''
+          .trim();
+
+      final expectedUserProfileTs = r'''
+import type { ThemeType } from './theme_type.ts';
+
+export interface UserProfile {
+  id: string;
+  name: string;
+  theme: ThemeType;
+  preferredTheme: ThemeType | null;
+}
+'''
+          .trim();
+
+      final themeTypeResult = converter.convert(themeTypeCode).trim();
+      expect(themeTypeResult, equals(expectedThemeTypeTs),
+          reason: 'ThemeType enum should be converted to TypeScript enum');
+
+      final userProfileResult = converter.convert(userProfileCode).trim();
+      expect(userProfileResult, equals(expectedUserProfileTs),
+          reason: 'UserProfile should include import for ThemeType enum');
+    });
   });
 }
