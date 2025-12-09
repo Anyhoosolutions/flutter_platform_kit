@@ -1,9 +1,18 @@
 import 'package:args/args.dart';
 import 'dart:io';
 import 'package:freezed_to_ts/freezed_to_ts.dart';
+import 'package:logging/logging.dart';
 import 'package:path/path.dart' as p;
 
 void main(List<String> arguments) async {
+  Logger.root.level = Level.INFO;
+
+  Logger.root.onRecord.listen((record) {
+    final str = '${record.loggerName}: ${record.level.name}: ${record.time}: ${record.message}';
+    // ignore: avoid_print
+    print('LOG: $str');
+  });
+
   final parser = ArgParser()
     ..addOption('input', abbr: 'i', help: 'Path to a Dart file or a directory containing Dart files.')
     ..addOption('output', abbr: 'o', help: 'Directory where the generated TypeScript files will be written.');

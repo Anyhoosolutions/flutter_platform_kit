@@ -1,11 +1,18 @@
 import 'package:analyzer/dart/analysis/features.dart';
 import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:logging/logging.dart';
+
+final _log = Logger('FreezedToTsConverter');
 
 class FreezedToTsConverter {
   final Set<String> _knownFreezedClasses = {};
 
   void learn(String dartCode) {
+    final classNameLine = dartCode.split('\n').firstWhere((line) => line.contains('class '));
+    final classPosition = classNameLine.indexOf('class ');
+    final className = classNameLine.substring(classPosition + 5).trim().split(' ').first;
+    _log.info('Learning $className');
     final parseResult = parseString(
       content: dartCode,
       featureSet: FeatureSet.latestLanguageVersion(),
@@ -93,11 +100,8 @@ class FreezedToTsConverter {
           final type = paramTypeAnnotation.toSource();
           var finalTsType = _dartToTsType(type);
 
-          // Track referenced freezed classes
-          final baseType = type.endsWith('?') ? type.substring(0, type.length - 1) : type;
-          if (_knownFreezedClasses.contains(baseType) && baseType != className) {
-            referencedFreezedClasses.add(baseType);
-          }
+          // Track referenced freezed classes (including those inside generics)
+          _extractReferencedFreezedClasses(type, className, referencedFreezedClasses);
 
           // Existing JsonKey processing for 'name', 'fromJson', 'toJson'
           for (final annotation in param.metadata) {
@@ -136,23 +140,60 @@ class FreezedToTsConverter {
 
       // Add Timestamp import if needed
       if (needsTimestampImport) {
-        externalImports.add("import type { Timestamp } from 'firebase/firestore';");
+        externalImports.add("import type { Timestamp } from 'firebase-admin/firestore';");
       }
 
       // Generate imports for referenced freezed classes
       for (final referencedClass in referencedFreezedClasses) {
         // Find the import path for this class
         String? importPath;
+
+        // First, try to find a matching relative import
         for (final directive in compilationUnit.directives) {
           if (directive is ImportDirective) {
             final dartImportPath = directive.uri.stringValue;
             if (dartImportPath != null && !dartImportPath.startsWith('package:')) {
-              // Convert Dart import path to TypeScript import path
+              // Relative import: Convert Dart import path to TypeScript import path
               importPath = _convertDartImportToTs(dartImportPath);
               break; // Use the first relative import found
             }
           }
         }
+
+        // If no relative import found, try to find a matching package import
+        if (importPath == null) {
+          final expectedFileName = _classNameToFileName(referencedClass);
+          for (final directive in compilationUnit.directives) {
+            if (directive is ImportDirective) {
+              final dartImportPath = directive.uri.stringValue;
+              if (dartImportPath != null && dartImportPath.startsWith('package:')) {
+                // Package import: Extract file name and check if it matches the class name
+                final fileName = _extractFileNameFromPackageImport(dartImportPath);
+                if (fileName != null && fileName == expectedFileName) {
+                  importPath = _convertDartImportToTs(fileName);
+                  break; // Use the matching package import
+                }
+              }
+            }
+          }
+        }
+
+        // If still no match found, use the first package import as fallback
+        if (importPath == null) {
+          for (final directive in compilationUnit.directives) {
+            if (directive is ImportDirective) {
+              final dartImportPath = directive.uri.stringValue;
+              if (dartImportPath != null && dartImportPath.startsWith('package:')) {
+                final fileName = _extractFileNameFromPackageImport(dartImportPath);
+                if (fileName != null) {
+                  importPath = _convertDartImportToTs(fileName);
+                  break; // Use the first package import as fallback
+                }
+              }
+            }
+          }
+        }
+
         if (importPath != null) {
           relativeImports.add("import type { $referencedClass } from '$importPath';");
         }
@@ -182,6 +223,62 @@ class FreezedToTsConverter {
     }
 
     return output.toString();
+  }
+
+  void _extractReferencedFreezedClasses(String type, String currentClassName, Set<String> referencedClasses) {
+    // Remove nullable marker
+    final baseType = type.endsWith('?') ? type.substring(0, type.length - 1) : type;
+
+    // Check if it's a generic type (e.g., List<RecipeShort>)
+    if (baseType.startsWith('List<')) {
+      final innerType = baseType.substring(5, baseType.length - 1);
+      _extractReferencedFreezedClasses(innerType, currentClassName, referencedClasses);
+    } else if (baseType.startsWith('Map<')) {
+      // For Map<K, V>, extract both key and value types
+      final innerPart = baseType.substring(4, baseType.length - 1);
+      final commaIndex = innerPart.indexOf(',');
+      if (commaIndex != -1) {
+        final keyType = innerPart.substring(0, commaIndex).trim();
+        final valueType = innerPart.substring(commaIndex + 1).trim();
+        _extractReferencedFreezedClasses(keyType, currentClassName, referencedClasses);
+        _extractReferencedFreezedClasses(valueType, currentClassName, referencedClasses);
+      }
+    } else {
+      // Check if this type is a known freezed class
+      if (_knownFreezedClasses.contains(baseType) && baseType != currentClassName) {
+        referencedClasses.add(baseType);
+      }
+    }
+  }
+
+  String _classNameToFileName(String className) {
+    // Convert class name to snake_case file name
+    // e.g., 'RecipeShort' -> 'recipe_short.dart'
+    final buffer = StringBuffer();
+    for (int i = 0; i < className.length; i++) {
+      final char = className[i];
+      if (char == char.toUpperCase() && i > 0) {
+        buffer.write('_');
+      }
+      buffer.write(char.toLowerCase());
+    }
+    return '${buffer.toString()}.dart';
+  }
+
+  String? _extractFileNameFromPackageImport(String packageImport) {
+    // Extract file name from package import
+    // e.g., 'package:snapandsavor/sharedModels/recipe_short.dart' -> 'recipe_short.dart'
+    if (packageImport.startsWith('package:')) {
+      final path = packageImport.substring(8); // Remove 'package:' prefix
+      final parts = path.split('/');
+      if (parts.isNotEmpty) {
+        final fileName = parts.last;
+        if (fileName.endsWith('.dart')) {
+          return fileName;
+        }
+      }
+    }
+    return null;
   }
 
   String _convertDartImportToTs(String dartImport) {

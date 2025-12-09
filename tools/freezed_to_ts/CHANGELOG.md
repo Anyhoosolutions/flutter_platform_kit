@@ -1,3 +1,9 @@
+## 0.0.4
+
+- Fixes for import type
+- Fix for imports of package type
+- A little logging
+
 ## 0.0.3
 
 - Fixes for import type
