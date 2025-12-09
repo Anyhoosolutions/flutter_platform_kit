@@ -1,3 +1,7 @@
+## 0.0.5
+
+- Handle enums
+
 ## 0.0.4
 
 - Fixes for import type
