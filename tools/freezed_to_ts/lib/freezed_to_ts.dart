@@ -79,17 +79,11 @@ class FreezedToTsConverter {
           for (final annotation in param.metadata) {
             if (annotation.name.name == 'JsonKey' && annotation.arguments != null) {
               String? jsonKeyName;
-              String? fromJsonFuncName;
-              String? toJsonFuncName;
 
               for (final arg in annotation.arguments!.arguments) {
                 if (arg is NamedExpression) {
                   if (arg.name.label.name == 'name' && arg.expression is StringLiteral) {
                     jsonKeyName = (arg.expression as StringLiteral).stringValue;
-                  } else if (arg.name.label.name == 'fromJson' && arg.expression is SimpleIdentifier) {
-                    fromJsonFuncName = (arg.expression as SimpleIdentifier).name;
-                  } else if (arg.name.label.name == 'toJson' && arg.expression is SimpleIdentifier) {
-                    toJsonFuncName = (arg.expression as SimpleIdentifier).name;
                   }
                 }
               }
@@ -97,11 +91,6 @@ class FreezedToTsConverter {
               if (jsonKeyName != null) {
                 name = jsonKeyName;
               }
-
-              // if ((fromJsonFuncName == 'fromDateTime' || fromJsonFuncName == 'toDateTime') ||
-              //     (toJsonFuncName == 'fromDateTime' || toJsonFuncName == 'toDateTime')) {
-              //     finalTsType = 'Timestamp';
-              // }
             }
           }
 
