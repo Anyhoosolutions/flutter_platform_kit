@@ -136,7 +136,7 @@ class FreezedToTsConverter {
 
       // Add Timestamp import if needed
       if (needsTimestampImport) {
-        externalImports.add("import type { Timestamp } from 'firebase/firestore';");
+        externalImports.add("import type { Timestamp } from 'firebase-admin/firestore';");
       }
 
       // Generate imports for referenced freezed classes
