@@ -5,11 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:anyhoo_image_selector/widgets/anyhoo_image_selector_widget.dart';
 
 class AnyhooFormImageSelector extends StatelessWidget {
+  final String? formFieldKey;
+  final String fieldName;
   final List<String> stockAssetPaths;
   final bool roundImage;
   final LayoutType layoutType;
-  final String? formFieldKey;
-  final String fieldName;
   final SelectedImage? initialValue;
 
   const AnyhooFormImageSelector({
