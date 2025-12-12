@@ -20,7 +20,7 @@ const horizontalSplitPadding = 16.0;
 
 final _log = Logger('AnyhooImageSelectorWidget');
 
-class AnyhooImageSelectorWidget extends StatelessWidget {
+class AnyhooImageSelectorWidget extends StatefulWidget {
   // Callback when a file is selected
   final ValueChanged<SelectedImage>? onImageSelected;
   final List<String> stockAssetPaths;
@@ -38,27 +38,57 @@ class AnyhooImageSelectorWidget extends StatelessWidget {
   });
 
   @override
+  State<AnyhooImageSelectorWidget> createState() => _AnyhooImageSelectorWidgetState();
+}
+
+class _AnyhooImageSelectorWidgetState extends State<AnyhooImageSelectorWidget> {
+  late final ImageSelectorCubit _imageSelectorCubit;
+  late final ShowStockPhotosCubit _showStockPhotosCubit;
+
+  @override
+  void initState() {
+    super.initState();
+    _imageSelectorCubit = ImageSelectorCubit(
+      stockAssetPaths: widget.stockAssetPaths,
+      preselectedImage: widget.preselectedImage,
+    );
+    _showStockPhotosCubit = ShowStockPhotosCubit();
+    _log.info('AnyhooImageSelectorWidget initState');
+    _log.info('preselectedImage: ${widget.preselectedImage}');
+  }
+
+  @override
+  void didUpdateWidget(AnyhooImageSelectorWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Update the cubit when preselectedImage changes
+    if (oldWidget.preselectedImage != widget.preselectedImage) {
+      _log.info('preselectedImage changed from ${oldWidget.preselectedImage} to ${widget.preselectedImage}');
+      _imageSelectorCubit.updatePreselectedImage(widget.preselectedImage);
+    }
+  }
+
+  @override
+  void dispose() {
+    _imageSelectorCubit.close();
+    _showStockPhotosCubit.close();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     // Provide the cubit locally to the widget subtree
     _log.info('AnyhooImageSelectorWidget build');
-    _log.info('preselectedImage: $preselectedImage');
+    _log.info('preselectedImage: ${widget.preselectedImage}');
     return MultiBlocProvider(
       providers: [
-        BlocProvider(
-          create: (context) => ImageSelectorCubit(
-            stockAssetPaths: stockAssetPaths,
-            preselectedImage: preselectedImage,
-          ),
-        ),
-        BlocProvider(
-          create: (context) => ShowStockPhotosCubit(),
-        ),
+        BlocProvider.value(value: _imageSelectorCubit),
+        BlocProvider.value(value: _showStockPhotosCubit),
       ],
       child: _ImageSelectorView(
-          onImageSelected: onImageSelected,
-          stockAssetPaths: stockAssetPaths,
-          layoutType: layoutType,
-          roundImage: roundImage),
+          onImageSelected: widget.onImageSelected,
+          stockAssetPaths: widget.stockAssetPaths,
+          layoutType: widget.layoutType,
+          roundImage: widget.roundImage),
     );
   }
 }
