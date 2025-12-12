@@ -6,7 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:anyhoo_firebase/src/firestore_service.dart';
+import 'package:anyhoo_firebase/src/services/firestore_service.dart';
 
 // Mock classes
 // Note: Some classes are sealed but we use Mock for testing purposes
