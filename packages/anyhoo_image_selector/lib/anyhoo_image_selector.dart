@@ -6,4 +6,4 @@ library anyhoo_image_selector;
 export 'widgets/anyhoo_image_selector_widget.dart';
 export 'selected_image.dart';
 export 'layout_type.dart';
-export 'widgets/form_image_selector.dart';
+export 'widgets/anyhoo_form_image_selector.dart';

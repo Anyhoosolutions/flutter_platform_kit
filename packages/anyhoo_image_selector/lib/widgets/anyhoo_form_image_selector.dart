@@ -4,19 +4,17 @@ import 'package:anyhoo_image_selector/selected_image.dart';
 import 'package:flutter/material.dart';
 import 'package:anyhoo_image_selector/widgets/anyhoo_image_selector_widget.dart';
 
-class FormImageSelector extends StatelessWidget {
+class AnyhooFormImageSelector extends StatelessWidget {
   final List<String> stockAssetPaths;
-  final String? preselectedImage;
   final bool roundImage;
   final LayoutType layoutType;
   final String? formFieldKey;
   final String fieldName;
   final SelectedImage? initialValue;
 
-  const FormImageSelector({
+  const AnyhooFormImageSelector({
     super.key,
     this.stockAssetPaths = const [],
-    this.preselectedImage,
     this.roundImage = false,
     required this.layoutType,
     required this.fieldName,
@@ -38,6 +36,7 @@ class FormImageSelector extends StatelessWidget {
             stockAssetPaths: stockAssetPaths,
             layoutType: layoutType,
             roundImage: roundImage,
+            preselectedImage: initialValue?.path ?? initialValue?.url,
           );
         });
   }
