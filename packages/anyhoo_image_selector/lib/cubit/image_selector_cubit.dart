@@ -67,4 +67,22 @@ class ImageSelectorCubit extends Cubit<ImageSelectorState> {
     _log.info('clearSelection called');
     emit(const ImageSelectorState());
   }
+
+  // Update the preselected image (useful when data loads asynchronously)
+  void updatePreselectedImage(String? newPreselectedImage) {
+    _log.info('updatePreselectedImage called with: $newPreselectedImage');
+    if (newPreselectedImage != preselectedImage) {
+      // Only update if no user selection has been made (state still matches initial state)
+      final isInitialState = state.path == preselectedImage &&
+          state.selectedFile == null &&
+          state.selectedImage == null &&
+          state.sourceType == ImageSourceType.none;
+      if (isInitialState) {
+        _log.info('Updating preselected image from $preselectedImage to $newPreselectedImage');
+        emit(ImageSelectorState(path: newPreselectedImage));
+      } else {
+        _log.info('Not updating preselected image - user has already made a selection');
+      }
+    }
+  }
 }
