@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:dotted_border/dotted_border.dart';
+import 'package:logging/logging.dart';
 
 import '../cubit/image_selector_cubit.dart';
 
@@ -16,6 +17,8 @@ const emptyIconSize = 40.0;
 const emptyIconTotalSize = 100.0;
 const horizontalSplitSpacing = 16.0;
 const horizontalSplitPadding = 16.0;
+
+final _log = Logger('AnyhooImageSelectorWidget');
 
 class AnyhooImageSelectorWidget extends StatelessWidget {
   // Callback when a file is selected
@@ -37,6 +40,8 @@ class AnyhooImageSelectorWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Provide the cubit locally to the widget subtree
+    _log.info('AnyhooImageSelectorWidget build');
+    _log.info('preselectedImage: $preselectedImage');
     return MultiBlocProvider(
       providers: [
         BlocProvider(
@@ -130,7 +135,9 @@ class _ImageSelectorView extends StatelessWidget {
   }
 
   bool shouldShowImage(ImageSelectorState state) {
-    return state.selectedFile != null || state.path != null || state.selectedImage != null;
+    final shouldShow = state.selectedFile != null || state.path != null || state.selectedImage != null;
+    _log.info('shouldShowImage: $shouldShow');
+    return shouldShow;
   }
 
   Future<Widget> _buildImagePreview(BuildContext context, ImageSelectorState state, double parentWidth) async {
@@ -144,15 +151,22 @@ class _ImageSelectorView extends StatelessWidget {
     }
 
     if (imageBytes != null) {
-      image = Image.memory(imageBytes, width: parentWidth * 0.9, fit: BoxFit.cover);
+      _log.info('Showing memory image');
+      image = Image.memory(key: const Key('memory-image'), imageBytes, width: parentWidth * 0.9, fit: BoxFit.cover);
     } else if (state.selectedFile != null) {
-      image = Image.file(state.selectedFile!, width: parentWidth * 0.9, fit: BoxFit.cover);
+      _log.info('Showing file image');
+      image =
+          Image.file(key: const Key('file-image'), state.selectedFile!, width: parentWidth * 0.9, fit: BoxFit.cover);
     } else if (state.path != null && state.path!.startsWith('http')) {
-      image = Image.network(state.path!, width: parentWidth * 0.9, fit: BoxFit.cover);
+      _log.info('Showing network image');
+      image = Image.network(key: const Key('network-image'), state.path!, width: parentWidth * 0.9, fit: BoxFit.cover);
     } else if (state.path != null) {
-      image = Image.asset(state.path!, width: parentWidth * 0.9, fit: BoxFit.cover);
+      _log.info('Showing asset image');
+      image = Image.asset(key: const Key('asset-image'), state.path!, width: parentWidth * 0.9, fit: BoxFit.cover);
     } else {
+      _log.info('Showing empty image');
       image = Container(
+        key: const Key('empty-image'),
         height: 100,
         width: 100,
         color: Colors.grey.shade200,
