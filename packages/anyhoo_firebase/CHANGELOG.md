@@ -1,3 +1,7 @@
+## 0.0.9
+ 
+* AnyhooStorageService
+
 ## 0.0.8
  
 * EmulatorConfig

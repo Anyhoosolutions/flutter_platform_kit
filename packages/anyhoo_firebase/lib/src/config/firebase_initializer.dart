@@ -1,6 +1,6 @@
 import 'package:anyhoo_core/models/arguments.dart';
 import 'package:anyhoo_core/widgets/error_display_widget.dart';
-import 'package:anyhoo_firebase/src/emulator_config.dart';
+import 'package:anyhoo_firebase/src/config/emulator_config.dart';
 import 'package:anyhoo_firebase/src/os_tool.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';

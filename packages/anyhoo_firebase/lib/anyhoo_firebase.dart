@@ -5,8 +5,8 @@
 // ignore: unnecessary_library_name
 library anyhoo_firebase;
 
-export 'src/firebase_initializer.dart';
+export 'src/config/firebase_initializer.dart';
 export 'src/os_tool.dart';
 export 'src/widgets/firebase_analytics_page.dart';
-export 'src/firestore_service.dart';
-export 'src/emulator_config.dart';
+export 'src/services/firestore_service.dart';
+export 'src/config/emulator_config.dart';
