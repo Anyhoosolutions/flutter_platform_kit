@@ -7,6 +7,12 @@ class AnyhooFirebaseUploadTask implements AnyhooUploadTask {
   AnyhooFirebaseUploadTask({required this.uploadTask});
 
   @override
+  Future<String> getPath() async {
+    final snapshot = uploadTask.snapshot;
+    return snapshot.ref.getDownloadURL();
+  }
+
+  @override
   Future<void> cancel() {
     return uploadTask.cancel();
   }
