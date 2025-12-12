@@ -37,24 +37,24 @@ dart run freezed_to_ts -i ../../packages/anyhoo_core/lib/src/models/user.dart
 dart run freezed_to_ts -i ../../packages/anyhoo_core/lib/src/models -o ./types
 ```
 
-#### Running as a global executable:
+#### Running as a global executable
 
 ```sh
-# Activate from GitHub
+echo 'Activate from GitHub'
 dart pub global activate --source git https://github.com/lidholm/flutter_platform_kit.git --git-path tools/freezed_to_ts
 
-# Run from anywhere
+echo 'Run from anywhere'
 freezed_to_ts -i path/to/your/models -o path/to/your/ts/types
 
 
-# Using a tag/version:
-   dart pub global activate --source git https://github.com/lidholm/flutter_platform_kit.git --git-path tools/freezed_to_ts --git-ref v0.0.1
+echo 'Using a tag/version'
+dart pub global activate --source git https://github.com/lidholm/flutter_platform_kit.git --git-path tools/freezed_to_ts --git-ref v0.0.1
 
-# Using a branch:
-   dart pub global activate --source git https://github.com/lidholm/flutter_platform_kit.git --git-path tools/freezed_to_ts --git-ref main
+echo 'Using a branch'
+dart pub global activate --source git https://github.com/lidholm/flutter_platform_kit.git --git-path tools/freezed_to_ts --git-ref main
 
-# Using a commit hash:
-   dart pub global activate --source git https://github.com/lidholm/flutter_platform_ts.git --git-path tools/freezed_to_ts --git-ref abc123def456
+echo 'Using a commit hash'
+dart pub global activate --source git https://github.com/lidholm/flutter_platform_ts.git --git-path tools/freezed_to_ts --git-ref abc123def456
 ```
 
 ## Testing

@@ -1,3 +1,7 @@
+## 0.0.11
+ 
+* AnyhooStringUtils
+
 ## 0.0.10
  
 * Expose String extensions

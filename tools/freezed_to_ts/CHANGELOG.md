@@ -1,3 +1,7 @@
+## 0.0.6
+
+- Fix documentation
+
 ## 0.0.5
 
 - Handle enums
