@@ -30,6 +30,22 @@ To run the android app with arguments, use `adb shell am start -n com.example.ex
 
 To run the iOS app with arguments, use `xcrun simctl launch booted com.example.myapp -location America/Pittsburg -isFooEnabled "true" -fooValue 3.14 -fooInt 42`
 
+### String extensions
+
+Provides convenient extension methods on `String`:
+
+- `capitalize()`: Capitalizes the first character of the string
+- `stripRight(String suffix)`: Removes the specified suffix from the end of the string
+- `repeat(int n)`: Repeats the string `n` times
+- `substringSafe(int start, int end)`: Safely extracts a substring with automatic bounds checking
+
+### AnyhooStringUtils
+
+A utility class for string operations:
+
+- `generateRandomString(int length, {...})`: Generates a random string of the specified length with configurable character sets (uppercase, lowercase, numbers, and special characters)
+
+
 #### Supported arguments
 
 ##### bool useFakeData
