@@ -1,6 +1,6 @@
 name: anyhoo_image_selector
 description: A reusable widget for selecting an image from various sources.
-version: 0.0.7
+version: 0.0.8
 homepage: https://github.com/anyhoosolutions/flutter_platform_kit/tree/main/packages/image_selector
 
 environment:

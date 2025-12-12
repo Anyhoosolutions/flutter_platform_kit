@@ -2,7 +2,12 @@ import 'package:anyhoo_firebase/src/services/storage/anyhoo_upload_task.dart';
 
 class AnyhooFakeUploadTask implements AnyhooUploadTask {
   @override
-  Future<String> getPath() {
+  bool isComplete() {
+    return true;
+  }
+
+  @override
+  Future<String> getDownloadUrl() {
     return Future.value('fake_path');
   }
 

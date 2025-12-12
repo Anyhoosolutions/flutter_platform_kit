@@ -7,7 +7,7 @@ class AnyhooFirebaseUploadTask implements AnyhooUploadTask {
   AnyhooFirebaseUploadTask({required this.uploadTask});
 
   @override
-  Future<String> getPath() async {
+  Future<String> getDownloadUrl() async {
     final snapshot = uploadTask.snapshot;
     return snapshot.ref.getDownloadURL();
   }
@@ -25,5 +25,10 @@ class AnyhooFirebaseUploadTask implements AnyhooUploadTask {
   @override
   int getTotalBytes() {
     return uploadTask.snapshot.totalBytes;
+  }
+
+  @override
+  bool isComplete() {
+    return uploadTask.snapshot.state == TaskState.success;
   }
 }

@@ -60,7 +60,7 @@ packages:
       path: "../packages/anyhoo_firebase"
       relative: true
     source: path
-    version: "0.0.8"
+    version: "0.0.10"
   anyhoo_form_builder_widgets:
     dependency: "direct main"
     description:
@@ -74,7 +74,7 @@ packages:
       path: "../packages/anyhoo_image_selector"
       relative: true
     source: path
-    version: "0.0.7"
+    version: "0.0.8"
   anyhoo_remote_config:
     dependency: "direct main"
     description:

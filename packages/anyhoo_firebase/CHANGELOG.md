@@ -1,3 +1,7 @@
+## 0.0.10
+ 
+* Add isComplete method and change name getPath => getDownloadUrl
+
 ## 0.0.9
  
 * AnyhooStorageService
