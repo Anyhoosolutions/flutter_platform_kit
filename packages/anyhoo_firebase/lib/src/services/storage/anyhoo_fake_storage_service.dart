@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:anyhoo_firebase/src/services/storage/anyhoo_fake_upload_task.dart';
@@ -16,7 +17,7 @@ class AnyhooFakeStorageService implements AnyhooStorageService {
   }
 
   @override
-  AnyhooUploadTask uploadFile(String path, String file) {
+  AnyhooUploadTask uploadFile(String path, File file) {
     return AnyhooFakeUploadTask();
   }
 
