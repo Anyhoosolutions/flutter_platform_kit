@@ -22,8 +22,8 @@ class AnyhooFirebaseStorageService implements AnyhooStorageService {
   }
 
   @override
-  AnyhooUploadTask uploadFile(String path, String file) {
-    final uploadTask = storage.ref(path).putFile(File(file));
+  AnyhooUploadTask uploadFile(String path, File file) {
+    final uploadTask = storage.ref(path).putFile(file);
     return AnyhooFirebaseUploadTask(uploadTask: uploadTask);
   }
 
