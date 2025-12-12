@@ -4,10 +4,16 @@ import 'package:anyhoo_image_selector/widgets/anyhoo_form_image_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:logging/logging.dart';
 
 void main() {
   group('AnyhooFormImageSelector', () {
     testWidgets('should display image when created with initialValue', (WidgetTester tester) async {
+      Logger.root.level = Level.ALL;
+      Logger.root.onRecord.listen((record) {
+        print('LOG: ${record.level.name}: ${record.time}: ${record.message}');
+      });
+
       const testImagePath = 'assets/images/test_image.png';
       const initialValue = SelectedImage(path: testImagePath);
 

@@ -151,15 +151,20 @@ class _ImageSelectorView extends StatelessWidget {
     }
 
     if (imageBytes != null) {
+      _log.info('Showing memory image');
       image = Image.memory(key: const Key('memory-image'), imageBytes, width: parentWidth * 0.9, fit: BoxFit.cover);
     } else if (state.selectedFile != null) {
+      _log.info('Showing file image');
       image =
           Image.file(key: const Key('file-image'), state.selectedFile!, width: parentWidth * 0.9, fit: BoxFit.cover);
     } else if (state.path != null && state.path!.startsWith('http')) {
+      _log.info('Showing network image');
       image = Image.network(key: const Key('network-image'), state.path!, width: parentWidth * 0.9, fit: BoxFit.cover);
     } else if (state.path != null) {
+      _log.info('Showing asset image');
       image = Image.asset(key: const Key('asset-image'), state.path!, width: parentWidth * 0.9, fit: BoxFit.cover);
     } else {
+      _log.info('Showing empty image');
       image = Container(
         key: const Key('empty-image'),
         height: 100,
