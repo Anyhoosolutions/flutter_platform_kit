@@ -11,6 +11,7 @@ void main() {
     testWidgets('should display image when created with initialValue', (WidgetTester tester) async {
       Logger.root.level = Level.ALL;
       Logger.root.onRecord.listen((record) {
+        // ignore: avoid_print
         print('LOG: ${record.level.name}: ${record.time}: ${record.message}');
       });
 

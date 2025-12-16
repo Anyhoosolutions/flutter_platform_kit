@@ -17,12 +17,7 @@ class AnyhooFakeUploadTask implements AnyhooUploadTask {
   }
 
   @override
-  int getBytesTransferred() {
-    return 123;
-  }
-
-  @override
-  int getTotalBytes() {
-    return 1234;
+  Stream<int> getBytesTransferred() {
+    return Stream.value(123);
   }
 }

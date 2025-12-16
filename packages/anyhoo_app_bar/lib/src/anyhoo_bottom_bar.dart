@@ -59,7 +59,7 @@ class _AnyhooBottomBarState extends State<AnyhooBottomBar> {
     return GestureDetector(
       onTap: () {
         _log.info('Tapping on $label to go to $url');
-        GoRouterWrapper.push(context, url);
+        GoRouterWrapper().push(context, url);
       },
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
