@@ -1,3 +1,7 @@
+## 0.0.9
+
+- New lines and no .ts suffices
+
 ## 0.0.8
 
 - Fix import
