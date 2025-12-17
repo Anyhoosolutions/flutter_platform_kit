@@ -7,7 +7,9 @@ class FakeAnyhooRemoteConfigService implements AnyhooRemoteConfigService {
   Future<void> setupRemoteConfig() async {}
 
   @override
-  Future<void> getAll() async {}
+  Future<Map<String, String>> getAll() async {
+    return {};
+  }
 
   @override
   Stream<void> getConfigUpdatesStream() {

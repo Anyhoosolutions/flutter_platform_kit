@@ -9,3 +9,4 @@ export 'src/interface/anyhoo_remote_config_values.dart';
 export 'src/services/anyhoo_remote_config_service.dart';
 export 'src/services/firebase_anyhoo_remote_config_service.dart';
 export 'src/services/fake_anyhoo_remote_config_service.dart';
+export 'src/cubit/remote_config_cubit.dart';

@@ -1,3 +1,7 @@
+## 0.0.3
+ 
+* RemoteConfigCubit
+
 ## 0.0.2
  
 * Rename to AnyhooRemoteConfig
