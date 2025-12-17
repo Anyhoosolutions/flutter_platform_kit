@@ -94,7 +94,7 @@ export interface User {
 
       final expectedUserTs =
           r'''import type { Timestamp } from "firebase-admin/firestore";
-import type { Address } from "./address.ts";
+import type { Address } from "./address";
 
 export interface User {
   id: string;
@@ -178,7 +178,7 @@ export interface User {
 
       final expectedUserGroupTs =
           r'''import type { Timestamp } from "firebase-admin/firestore";
-import type { RecipeShort } from "./recipe_short.ts";
+import type { RecipeShort } from "./recipe_short";
 
 export interface UserGroup {
   id: string;
@@ -304,7 +304,7 @@ export interface Task {
 ''';
 
       final expectedUserProfileTs =
-          r'''import type { ThemeType } from "./theme_type.ts";
+          r'''import type { ThemeType } from "./theme_type";
 
 export interface UserProfile {
   id: string;
@@ -535,7 +535,7 @@ export interface Task {
 ''';
 
       final expectedUserProfileOutput =
-          r'''import type { Settings } from "./settings.ts";
+          r'''import type { Settings } from "./settings";
 
 export interface UserProfile {
   id: string;
@@ -545,7 +545,7 @@ export interface UserProfile {
 ''';
 
       final expectedSettingsOutput =
-          r'''import type { ThemeType } from "./theme_type.ts";
+          r'''import type { ThemeType } from "./theme_type";
 
 export interface Settings {
   userId: string;
@@ -709,7 +709,7 @@ export interface UploadInfo {
 
       final expectedParseTextOutput =
           r'''import type { Timestamp } from "firebase-admin/firestore";
-import type { RecipeUploadType } from "./upload_info.ts";
+import type { RecipeUploadType } from "./upload_info";
 
 export enum ParsingTextStatus {
   completed = "completed",
@@ -734,7 +734,7 @@ export interface ParseText {
 
       final expectedParseDataForRecipeOutput =
           r'''import type { Timestamp } from "firebase-admin/firestore";
-import type { RecipeUploadType } from "./upload_info.ts";
+import type { RecipeUploadType } from "./upload_info";
 
 export enum ParsingDataForRecipeStatus {
   uploaded = "uploaded",

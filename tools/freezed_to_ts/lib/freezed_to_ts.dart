@@ -486,11 +486,11 @@ class FreezedToTsConverter {
   }
 
   String _convertDartImportToTs(String dartImport) {
-    // Convert 'address.dart' to './address.ts'
+    // Convert 'address.dart' to './address'
     if (dartImport.endsWith('.dart')) {
-      return './${dartImport.substring(0, dartImport.length - 5)}.ts';
+      return './${dartImport.substring(0, dartImport.length - 5)}';
     }
-    return './$dartImport.ts';
+    return './$dartImport';
   }
 
   String _dartToTsType(String dartType) {
