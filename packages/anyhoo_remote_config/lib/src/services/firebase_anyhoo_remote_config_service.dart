@@ -2,7 +2,6 @@ import 'dart:async'; // Added for StreamController
 
 import 'package:anyhoo_remote_config/anyhoo_remote_config.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
-import 'package:flutter/foundation.dart';
 import 'package:logging/logging.dart';
 
 class FirebaseAnyhooRemoteConfigService implements AnyhooRemoteConfigService {
