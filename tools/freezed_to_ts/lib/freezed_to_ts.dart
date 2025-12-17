@@ -9,6 +9,16 @@ class FreezedToTsConverter {
   final Set<String> _knownFreezedClasses = {};
   final Set<String> _knownEnums = {};
 
+  static const _ignoredPackages = {
+    'cloud_firestore',
+    'firebase_core',
+    'freezed_annotation',
+    'json_annotation',
+    'flutter',
+    'meta',
+    'equatable',
+  };
+
   void learn(String dartCode) {
     final parseResult = parseString(
       content: dartCode,
@@ -226,11 +236,18 @@ class FreezedToTsConverter {
             final dartImportPath = directive.uri.stringValue;
             if (dartImportPath != null &&
                 dartImportPath.startsWith('package:')) {
+              // Check if it's an ignored package
+              final tempParts = dartImportPath.substring(8).split('/');
+              if (tempParts.isNotEmpty &&
+                  _ignoredPackages.contains(tempParts.first)) {
+                continue;
+              }
+
               final fileName =
                   _extractFileNameFromPackageImport(dartImportPath);
               if (fileName != null) {
                 importPath = _convertDartImportToTs(fileName);
-                break; // Use the first package import as fallback
+                break; // Use the first valid package import as fallback
               }
             }
           }
@@ -295,11 +312,18 @@ class FreezedToTsConverter {
             final dartImportPath = directive.uri.stringValue;
             if (dartImportPath != null &&
                 dartImportPath.startsWith('package:')) {
+              // Check if it's an ignored package
+              final tempParts = dartImportPath.substring(8).split('/');
+              if (tempParts.isNotEmpty &&
+                  _ignoredPackages.contains(tempParts.first)) {
+                continue;
+              }
+
               final fileName =
                   _extractFileNameFromPackageImport(dartImportPath);
               if (fileName != null) {
                 importPath = _convertDartImportToTs(fileName);
-                break; // Use the first package import as fallback
+                break; // Use the first valid package import as fallback
               }
             }
           }

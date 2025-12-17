@@ -727,7 +727,7 @@ export interface UploadInfo {
 
       final expectedParseTextOutput = r'''
 import type { Timestamp } from "firebase-admin/firestore";
-import type { RecipeUploadType } from "./upload_info";
+import type { RecipeUploadType } from "./upload_info.ts";
 
 export enum ParsingTextStatus {
   completed = "completed",
@@ -753,7 +753,7 @@ export interface ParseText {
 
       final expectedParseDataForRecipeOutput = r'''
 import type { Timestamp } from "firebase-admin/firestore";
-import type { RecipeUploadType } from "./upload_info";
+import type { RecipeUploadType } from "./upload_info.ts";
 
 export enum ParsingDataForRecipeStatus {
   uploaded = "uploaded",

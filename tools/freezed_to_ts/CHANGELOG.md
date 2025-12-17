@@ -1,3 +1,7 @@
+## 0.0.8
+
+- Fix import
+
 ## 0.0.7
 
 - Use double quotes
