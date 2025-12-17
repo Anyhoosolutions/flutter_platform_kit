@@ -18,7 +18,8 @@ class FreezedToTsConverter {
     final compilationUnit = parseResult.unit;
 
     for (final declaration in compilationUnit.declarations) {
-      if (declaration is ClassDeclaration && declaration.metadata.any((m) => m.name.name == 'freezed')) {
+      if (declaration is ClassDeclaration &&
+          declaration.metadata.any((m) => m.name.name == 'freezed')) {
         final className = declaration.name.lexeme;
         _log.info('Learning freezed class $className');
         _knownFreezedClasses.add(className);
@@ -72,20 +73,23 @@ class FreezedToTsConverter {
     for (final declaration in compilationUnit.declarations) {
       if (declaration is! ClassDeclaration) continue;
 
-      final isFreezed = declaration.metadata.any((m) => m.name.name == 'freezed');
+      final isFreezed =
+          declaration.metadata.any((m) => m.name.name == 'freezed');
       if (!isFreezed) continue;
 
       final className = declaration.name.lexeme;
-      final factoryConstructors = declaration.members.whereType<ConstructorDeclaration>().where(
-            (m) => m.factoryKeyword != null,
-          );
+      final factoryConstructors =
+          declaration.members.whereType<ConstructorDeclaration>().where(
+                (m) => m.factoryKeyword != null,
+              );
 
       if (factoryConstructors.isEmpty) {
         throw Exception(
             'No factory constructors found for $className. Freezed classes should have at least one factory constructor.');
       }
 
-      final allFields = <String, String>{}; // Map to store unique fields across all constructors
+      final allFields = <String,
+          String>{}; // Map to store unique fields across all constructors
 
       for (final constructor in factoryConstructors) {
         if (constructor.name?.lexeme == 'fromJson') {
@@ -97,7 +101,8 @@ class FreezedToTsConverter {
 
           if (param is DefaultFormalParameter) {
             originalName = param.name!.lexeme;
-            paramTypeAnnotation = (param.parameter as SimpleFormalParameter).type;
+            paramTypeAnnotation =
+                (param.parameter as SimpleFormalParameter).type;
           } else if (param is FieldFormalParameter) {
             originalName = param.name.lexeme;
             paramTypeAnnotation = param.type;
@@ -115,18 +120,21 @@ class FreezedToTsConverter {
           var finalTsType = _dartToTsType(type);
 
           // Track referenced freezed classes (including those inside generics)
-          _extractReferencedFreezedClasses(type, className, referencedFreezedClasses);
+          _extractReferencedFreezedClasses(
+              type, className, referencedFreezedClasses);
           // Track referenced enums (including those inside generics)
           _extractReferencedEnums(type, referencedEnums);
 
           // Existing JsonKey processing for 'name', 'fromJson', 'toJson'
           for (final annotation in param.metadata) {
-            if (annotation.name.name == 'JsonKey' && annotation.arguments != null) {
+            if (annotation.name.name == 'JsonKey' &&
+                annotation.arguments != null) {
               String? jsonKeyName;
 
               for (final arg in annotation.arguments!.arguments) {
                 if (arg is NamedExpression) {
-                  if (arg.name.label.name == 'name' && arg.expression is StringLiteral) {
+                  if (arg.name.label.name == 'name' &&
+                      arg.expression is StringLiteral) {
                     jsonKeyName = (arg.expression as StringLiteral).stringValue;
                   }
                 }
@@ -162,11 +170,13 @@ class FreezedToTsConverter {
 
     // Add Timestamp import if needed
     if (needsTimestampImport) {
-      externalImports.add("import type { Timestamp } from 'firebase-admin/firestore';");
+      externalImports
+          .add('import type { Timestamp } from "firebase-admin/firestore";');
     }
 
     // Generate imports for referenced freezed classes (only if not defined in current file)
-    final Set<String> localFreezedClassNames = freezedClasses.map((c) => c['className'] as String).toSet();
+    final Set<String> localFreezedClassNames =
+        freezedClasses.map((c) => c['className'] as String).toSet();
     for (final referencedClass in referencedFreezedClasses) {
       // Skip if class is defined in the current file
       if (localFreezedClassNames.contains(referencedClass)) {
@@ -180,7 +190,8 @@ class FreezedToTsConverter {
       for (final directive in compilationUnit.directives) {
         if (directive is ImportDirective) {
           final dartImportPath = directive.uri.stringValue;
-          if (dartImportPath != null && !dartImportPath.startsWith('package:')) {
+          if (dartImportPath != null &&
+              !dartImportPath.startsWith('package:')) {
             // Relative import: Convert Dart import path to TypeScript import path
             importPath = _convertDartImportToTs(dartImportPath);
             break; // Use the first relative import found
@@ -194,9 +205,11 @@ class FreezedToTsConverter {
         for (final directive in compilationUnit.directives) {
           if (directive is ImportDirective) {
             final dartImportPath = directive.uri.stringValue;
-            if (dartImportPath != null && dartImportPath.startsWith('package:')) {
+            if (dartImportPath != null &&
+                dartImportPath.startsWith('package:')) {
               // Package import: Extract file name and check if it matches the class name
-              final fileName = _extractFileNameFromPackageImport(dartImportPath);
+              final fileName =
+                  _extractFileNameFromPackageImport(dartImportPath);
               if (fileName != null && fileName == expectedFileName) {
                 importPath = _convertDartImportToTs(fileName);
                 break; // Use the matching package import
@@ -211,8 +224,10 @@ class FreezedToTsConverter {
         for (final directive in compilationUnit.directives) {
           if (directive is ImportDirective) {
             final dartImportPath = directive.uri.stringValue;
-            if (dartImportPath != null && dartImportPath.startsWith('package:')) {
-              final fileName = _extractFileNameFromPackageImport(dartImportPath);
+            if (dartImportPath != null &&
+                dartImportPath.startsWith('package:')) {
+              final fileName =
+                  _extractFileNameFromPackageImport(dartImportPath);
               if (fileName != null) {
                 importPath = _convertDartImportToTs(fileName);
                 break; // Use the first package import as fallback
@@ -223,12 +238,14 @@ class FreezedToTsConverter {
       }
 
       if (importPath != null) {
-        relativeImports.add("import type { $referencedClass } from '$importPath';");
+        relativeImports
+            .add('import type { $referencedClass } from "$importPath";');
       }
     }
 
     // Generate imports for referenced enums (only if not defined in current file)
-    final Set<String> localEnumNames = enumDeclarations.map((e) => e.name.lexeme).toSet();
+    final Set<String> localEnumNames =
+        enumDeclarations.map((e) => e.name.lexeme).toSet();
     for (final referencedEnum in referencedEnums) {
       // Skip if enum is defined in the current file
       if (localEnumNames.contains(referencedEnum)) {
@@ -242,7 +259,8 @@ class FreezedToTsConverter {
       for (final directive in compilationUnit.directives) {
         if (directive is ImportDirective) {
           final dartImportPath = directive.uri.stringValue;
-          if (dartImportPath != null && !dartImportPath.startsWith('package:')) {
+          if (dartImportPath != null &&
+              !dartImportPath.startsWith('package:')) {
             // Relative import: Convert Dart import path to TypeScript import path
             importPath = _convertDartImportToTs(dartImportPath);
             break; // Use the first relative import found
@@ -256,9 +274,11 @@ class FreezedToTsConverter {
         for (final directive in compilationUnit.directives) {
           if (directive is ImportDirective) {
             final dartImportPath = directive.uri.stringValue;
-            if (dartImportPath != null && dartImportPath.startsWith('package:')) {
+            if (dartImportPath != null &&
+                dartImportPath.startsWith('package:')) {
               // Package import: Extract file name and check if it matches the enum name
-              final fileName = _extractFileNameFromPackageImport(dartImportPath);
+              final fileName =
+                  _extractFileNameFromPackageImport(dartImportPath);
               if (fileName != null && fileName == expectedFileName) {
                 importPath = _convertDartImportToTs(fileName);
                 break; // Use the matching package import
@@ -273,8 +293,10 @@ class FreezedToTsConverter {
         for (final directive in compilationUnit.directives) {
           if (directive is ImportDirective) {
             final dartImportPath = directive.uri.stringValue;
-            if (dartImportPath != null && dartImportPath.startsWith('package:')) {
-              final fileName = _extractFileNameFromPackageImport(dartImportPath);
+            if (dartImportPath != null &&
+                dartImportPath.startsWith('package:')) {
+              final fileName =
+                  _extractFileNameFromPackageImport(dartImportPath);
               if (fileName != null) {
                 importPath = _convertDartImportToTs(fileName);
                 break; // Use the first package import as fallback
@@ -285,7 +307,8 @@ class FreezedToTsConverter {
       }
 
       if (importPath != null) {
-        relativeImports.add("import type { $referencedEnum } from '$importPath';");
+        relativeImports
+            .add('import type { $referencedEnum } from "$importPath";');
       }
     }
 
@@ -318,7 +341,7 @@ class FreezedToTsConverter {
       output.writeln('export enum $enumName {');
       for (final enumConstant in enumDeclaration.constants) {
         final constantName = enumConstant.name.lexeme;
-        output.writeln("  $constantName = '$constantName',");
+        output.writeln('  $constantName = "$constantName",');
       }
       output.writeln('}');
     }
@@ -330,7 +353,8 @@ class FreezedToTsConverter {
 
     // Output freezed class declarations (sorted alphabetically)
     final sortedFreezedClasses = List<Map<String, dynamic>>.from(freezedClasses)
-      ..sort((a, b) => (a['className'] as String).compareTo(b['className'] as String));
+      ..sort((a, b) =>
+          (a['className'] as String).compareTo(b['className'] as String));
     for (int i = 0; i < sortedFreezedClasses.length; i++) {
       if (i > 0) {
         output.writeln(''); // Add blank line between multiple interfaces
@@ -348,14 +372,17 @@ class FreezedToTsConverter {
     return output.toString();
   }
 
-  void _extractReferencedFreezedClasses(String type, String currentClassName, Set<String> referencedClasses) {
+  void _extractReferencedFreezedClasses(
+      String type, String currentClassName, Set<String> referencedClasses) {
     // Remove nullable marker
-    final baseType = type.endsWith('?') ? type.substring(0, type.length - 1) : type;
+    final baseType =
+        type.endsWith('?') ? type.substring(0, type.length - 1) : type;
 
     // Check if it's a generic type (e.g., List<RecipeShort>)
     if (baseType.startsWith('List<')) {
       final innerType = baseType.substring(5, baseType.length - 1);
-      _extractReferencedFreezedClasses(innerType, currentClassName, referencedClasses);
+      _extractReferencedFreezedClasses(
+          innerType, currentClassName, referencedClasses);
     } else if (baseType.startsWith('Map<')) {
       // For Map<K, V>, extract both key and value types
       final innerPart = baseType.substring(4, baseType.length - 1);
@@ -363,12 +390,15 @@ class FreezedToTsConverter {
       if (commaIndex != -1) {
         final keyType = innerPart.substring(0, commaIndex).trim();
         final valueType = innerPart.substring(commaIndex + 1).trim();
-        _extractReferencedFreezedClasses(keyType, currentClassName, referencedClasses);
-        _extractReferencedFreezedClasses(valueType, currentClassName, referencedClasses);
+        _extractReferencedFreezedClasses(
+            keyType, currentClassName, referencedClasses);
+        _extractReferencedFreezedClasses(
+            valueType, currentClassName, referencedClasses);
       }
     } else {
       // Check if this type is a known freezed class
-      if (_knownFreezedClasses.contains(baseType) && baseType != currentClassName) {
+      if (_knownFreezedClasses.contains(baseType) &&
+          baseType != currentClassName) {
         referencedClasses.add(baseType);
       }
     }
@@ -376,7 +406,8 @@ class FreezedToTsConverter {
 
   void _extractReferencedEnums(String type, Set<String> referencedEnums) {
     // Remove nullable marker
-    final baseType = type.endsWith('?') ? type.substring(0, type.length - 1) : type;
+    final baseType =
+        type.endsWith('?') ? type.substring(0, type.length - 1) : type;
 
     // Check if it's a generic type (e.g., List<ThemeType>)
     if (baseType.startsWith('List<')) {
