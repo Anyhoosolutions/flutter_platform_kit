@@ -13,3 +13,4 @@
 - [ ] Apple sign in
 - [ ] Admin role
 - [x] Check for version in pubspec.yaml
+- [ ] Move RemoteConfigCubit here 

@@ -18,13 +18,8 @@ class AnyhooFirebaseUploadTask implements AnyhooUploadTask {
   }
 
   @override
-  int getBytesTransferred() {
-    return uploadTask.snapshot.bytesTransferred;
-  }
-
-  @override
-  int getTotalBytes() {
-    return uploadTask.snapshot.totalBytes;
+  Stream<int> getBytesTransferred() {
+    return uploadTask.snapshotEvents.map((event) => event.bytesTransferred);
   }
 
   @override

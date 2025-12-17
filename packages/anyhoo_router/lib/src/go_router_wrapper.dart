@@ -5,12 +5,12 @@ import 'package:logging/logging.dart';
 final log = Logger('GoRouterWrapper');
 
 class GoRouterWrapper {
-  static void go(BuildContext context, String path) {
+  void go(BuildContext context, String path) {
     log.info('Going to $path');
     GoRouter.of(context).go(path);
   }
 
-  static Future<Object?> push(BuildContext context, String path, {Object? extra}) {
+  Future<Object?> push(BuildContext context, String path, {Object? extra}) {
     log.info('Pushing $path');
     if (extra != null) {
       return GoRouter.of(context).push(path, extra: extra);
@@ -19,7 +19,7 @@ class GoRouterWrapper {
     }
   }
 
-  static void pop(BuildContext context, Object? extra) {
+  void pop(BuildContext context, Object? extra) {
     if (extra == null) {
       log.info('Popping without extra');
       GoRouter.of(context).pop();

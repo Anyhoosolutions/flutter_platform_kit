@@ -39,7 +39,7 @@ packages:
       path: "../packages/anyhoo_app_bar"
       relative: true
     source: path
-    version: "0.0.4"
+    version: "0.0.5"
   anyhoo_auth:
     dependency: transitive
     description:
@@ -60,7 +60,7 @@ packages:
       path: "../packages/anyhoo_firebase"
       relative: true
     source: path
-    version: "0.0.10"
+    version: "0.0.11"
   anyhoo_form_builder_widgets:
     dependency: "direct main"
     description:
@@ -74,21 +74,21 @@ packages:
       path: "../packages/anyhoo_image_selector"
       relative: true
     source: path
-    version: "0.0.8"
+    version: "0.0.9"
   anyhoo_remote_config:
     dependency: "direct main"
     description:
       path: "../packages/anyhoo_remote_config"
       relative: true
     source: path
-    version: "0.0.2"
+    version: "0.0.3"
   anyhoo_router:
     dependency: transitive
     description:
       path: "../packages/anyhoo_router"
       relative: true
     source: path
-    version: "0.0.14"
+    version: "0.0.15"
   anyhoo_search_bar:
     dependency: "direct main"
     description:

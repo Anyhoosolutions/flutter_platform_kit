@@ -53,8 +53,6 @@ class _AnyhooImageSelectorWidgetState extends State<AnyhooImageSelectorWidget> {
       preselectedImage: widget.preselectedImage,
     );
     _showStockPhotosCubit = ShowStockPhotosCubit();
-    _log.info('AnyhooImageSelectorWidget initState');
-    _log.info('preselectedImage: ${widget.preselectedImage}');
   }
 
   @override
@@ -62,7 +60,6 @@ class _AnyhooImageSelectorWidgetState extends State<AnyhooImageSelectorWidget> {
     super.didUpdateWidget(oldWidget);
     // Update the cubit when preselectedImage changes
     if (oldWidget.preselectedImage != widget.preselectedImage) {
-      _log.info('preselectedImage changed from ${oldWidget.preselectedImage} to ${widget.preselectedImage}');
       _imageSelectorCubit.updatePreselectedImage(widget.preselectedImage);
     }
   }
@@ -77,8 +74,6 @@ class _AnyhooImageSelectorWidgetState extends State<AnyhooImageSelectorWidget> {
   @override
   Widget build(BuildContext context) {
     // Provide the cubit locally to the widget subtree
-    _log.info('AnyhooImageSelectorWidget build');
-    _log.info('preselectedImage: ${widget.preselectedImage}');
     return MultiBlocProvider(
       providers: [
         BlocProvider.value(value: _imageSelectorCubit),
@@ -166,7 +161,6 @@ class _ImageSelectorView extends StatelessWidget {
 
   bool shouldShowImage(ImageSelectorState state) {
     final shouldShow = state.selectedFile != null || state.path != null || state.selectedImage != null;
-    _log.info('shouldShowImage: $shouldShow');
     return shouldShow;
   }
 

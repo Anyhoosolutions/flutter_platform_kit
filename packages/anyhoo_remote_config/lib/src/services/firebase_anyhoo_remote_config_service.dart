@@ -2,18 +2,19 @@ import 'dart:async'; // Added for StreamController
 
 import 'package:anyhoo_remote_config/anyhoo_remote_config.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
-import 'package:flutter/foundation.dart';
 import 'package:logging/logging.dart';
 
 class FirebaseAnyhooRemoteConfigService implements AnyhooRemoteConfigService {
   final _log = Logger('FirebaseRemoteConfigService');
 
-  final AnyhooRemoteConfigValues remoteConfigValues;
+  final Map<String, dynamic> _defaults = {};
+
+  FirebaseAnyhooRemoteConfigService({required Map<String, dynamic> defaults}) {
+    _defaults.addAll(defaults);
+  }
 
   // Stream controller for config updates
   final _configUpdateController = StreamController<void>.broadcast();
-
-  FirebaseAnyhooRemoteConfigService({required this.remoteConfigValues});
 
   @override
   Future<void> setupRemoteConfig() async {
@@ -23,16 +24,14 @@ class FirebaseAnyhooRemoteConfigService implements AnyhooRemoteConfigService {
       RemoteConfigSettings(fetchTimeout: const Duration(seconds: 10), minimumFetchInterval: const Duration(hours: 1)),
     );
 
-    await remoteConfig.setDefaults(remoteConfigValues.toMap());
+    await remoteConfig.setDefaults(_defaults);
 
-    if (!kIsWeb) {
-      remoteConfig.onConfigUpdated.listen((event) async {
-        _log.info('Remote config updated: ${event.updatedKeys}');
-        await remoteConfig.activate();
-        await getAll(); // Update our local values
-        _configUpdateController.add(null); // Notify listeners
-      });
-    }
+    remoteConfig.onConfigUpdated.listen((event) async {
+      _log.info('Remote config updated: ${event.updatedKeys}');
+      await remoteConfig.activate();
+      await getAll(); // Update our local values
+      _configUpdateController.add(null); // Notify listeners
+    });
 
     // Fetch and activate config immediately
     await remoteConfig.fetch();
@@ -43,11 +42,11 @@ class FirebaseAnyhooRemoteConfigService implements AnyhooRemoteConfigService {
   }
 
   @override
-  Future<void> getAll() async {
+  Future<Map<String, String>> getAll() async {
     final remoteConfig = FirebaseRemoteConfig.instance;
     final allValues = remoteConfig.getAll().map((key, value) => MapEntry(key, value.asString()));
     _log.info('All remote config: $allValues');
-    remoteConfigValues.fromMap(allValues);
+    return allValues;
   }
 
   void dispose() {

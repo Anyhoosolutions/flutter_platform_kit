@@ -2,7 +2,6 @@ import 'package:anyhoo_auth/cubit/anyhoo_auth_cubit.dart';
 import 'package:anyhoo_auth/widgets/login_widget.dart';
 import 'package:anyhoo_core/models/arguments.dart';
 import 'package:anyhoo_firebase/anyhoo_firebase.dart';
-import 'package:anyhoo_remote_config/anyhoo_remote_config.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:example_app/models/example_user.dart';
 import 'package:example_app/pages/argumentsDemo/arguments_demo_page.dart';
@@ -123,7 +122,7 @@ class ImageSelectorRoute extends GoRouteData with $ImageSelectorRoute {
 class RemoteConfigRoute extends GoRouteData with $RemoteConfigRoute {
   @override
   Widget build(BuildContext context, GoRouterState state) {
-    return RemoteConfigDemoPage(remoteConfigValues: state.extra as RemoteConfigValues);
+    return RemoteConfigDemoPage();
   }
 }
 
@@ -224,20 +223,5 @@ class NotLoggedInRedirectorRoute extends GoRouteData with $NotLoggedInRedirector
       return '/login';
     }
     return null;
-  }
-}
-
-class RemoteConfigValues extends AnyhooRemoteConfigValues {
-  Map<String, String> values = {};
-
-  @override
-  void fromMap(Map<String, dynamic> map) {
-    values.clear();
-    values.addAll(map.cast<String, String>());
-  }
-
-  @override
-  Map<String, dynamic> toMap() {
-    return values.cast<String, dynamic>();
   }
 }

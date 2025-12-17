@@ -1,3 +1,7 @@
+## 0.0.15
+ 
+* Change GoRouterWrapper from being a static class
+
 ## 0.0.14
  
 * Getters for AnyhooRouter

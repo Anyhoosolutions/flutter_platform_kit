@@ -1,5 +1,5 @@
 abstract class AnyhooRemoteConfigService {
   Future<void> setupRemoteConfig();
-  Future<void> getAll();
+  Future<Map<String, String>> getAll();
   Stream<void> getConfigUpdatesStream();
 }

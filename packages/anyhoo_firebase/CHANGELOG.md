@@ -1,3 +1,7 @@
+## 0.0.11
+ 
+* Update UploadTask API
+
 ## 0.0.10
  
 * Add isComplete method and change name getPath => getDownloadUrl
