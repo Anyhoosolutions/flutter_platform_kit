@@ -37,7 +37,7 @@ void main() {
       final result = converter.convert(dartCode).trim();
 
       final expectedTsCode = r'''
-import type { Timestamp } from 'firebase-admin/firestore';
+import type { Timestamp } from "firebase-admin/firestore";
 export interface User {
   id: string;
   email: string;
@@ -94,8 +94,8 @@ export interface User {
       converter.learn(userCode);
 
       final expectedUserTs = r'''
-import type { Timestamp } from 'firebase-admin/firestore';
-import type { Address } from './address.ts';
+import type { Timestamp } from "firebase-admin/firestore";
+import type { Address } from "./address.ts";
 
 export interface User {
   id: string;
@@ -181,8 +181,8 @@ export interface Address {
       converter.learn(userGroupCode);
 
       final expectedUserGroupTs = r'''
-import type { Timestamp } from 'firebase-admin/firestore';
-import type { RecipeShort } from './recipe_short.ts';
+import type { Timestamp } from "firebase-admin/firestore";
+import type { RecipeShort } from "./recipe_short.ts";
 
 export interface UserGroup {
   id: string;
@@ -208,7 +208,8 @@ export interface RecipeShort {
           .trim();
 
       final userGroupResult = converter.convert(userGroupCode).trim();
-      expect(userGroupResult, equals(expectedUserGroupTs), reason: 'UserGroup should include import for RecipeShort');
+      expect(userGroupResult, equals(expectedUserGroupTs),
+          reason: 'UserGroup should include import for RecipeShort');
 
       final recipeShortResult = converter.convert(recipeShortCode).trim();
       expect(recipeShortResult, equals(expectedRecipeShortTs));
@@ -252,7 +253,7 @@ export interface RecipeShort {
       final result = converter.convert(dartCode).trim();
 
       final expectedTsCode = r'''
-import type { Timestamp } from 'firebase-admin/firestore';
+import type { Timestamp } from "firebase-admin/firestore";
 export interface Task {
   id: string | null;
   name: string;
@@ -305,15 +306,15 @@ export interface Task {
 
       final expectedThemeTypeTs = r'''
 export enum ThemeType {
-  light = 'light',
-  dark = 'dark',
-  system = 'system',
+  light = "light",
+  dark = "dark",
+  system = "system",
 }
 '''
           .trim();
 
       final expectedUserProfileTs = r'''
-import type { ThemeType } from './theme_type.ts';
+import type { ThemeType } from "./theme_type.ts";
 
 export interface UserProfile {
   id: string;
@@ -333,7 +334,8 @@ export interface UserProfile {
           reason: 'UserProfile should include import for ThemeType enum');
     });
 
-    test('validates full file output with enum and freezed class in same file', () {
+    test('validates full file output with enum and freezed class in same file',
+        () {
       final converter = FreezedToTsConverter();
 
       const fullFileCode = r'''
@@ -365,9 +367,9 @@ export interface UserProfile {
 
       final expectedFullFileTs = r'''
 export enum ThemeType {
-  light = 'light',
-  dark = 'dark',
-  system = 'system',
+  light = "light",
+  dark = "dark",
+  system = "system",
 }
 
 export interface UserSettings {
@@ -380,10 +382,12 @@ export interface UserSettings {
 
       final result = converter.convert(fullFileCode).trim();
       expect(result, equals(expectedFullFileTs),
-          reason: 'Full file should output enum and interface without importing enum from elsewhere');
+          reason:
+              'Full file should output enum and interface without importing enum from elsewhere');
     });
 
-    test('validates full file output with multiple enums and freezed classes', () {
+    test('validates full file output with multiple enums and freezed classes',
+        () {
       final converter = FreezedToTsConverter();
 
       const fullFileCode = r'''
@@ -438,18 +442,18 @@ export interface UserSettings {
       converter.learn(fullFileCode);
 
       final expectedFullFileTs = r'''
-import type { Timestamp } from 'firebase-admin/firestore';
+import type { Timestamp } from "firebase-admin/firestore";
 
 export enum Priority {
-  low = 'low',
-  medium = 'medium',
-  high = 'high',
+  low = "low",
+  medium = "medium",
+  high = "high",
 }
 
 export enum Status {
-  active = 'active',
-  inactive = 'inactive',
-  pending = 'pending',
+  active = "active",
+  inactive = "inactive",
+  pending = "pending",
 }
 
 export interface Project {
@@ -471,10 +475,13 @@ export interface Task {
 
       final result = converter.convert(fullFileCode).trim();
       expect(result, equals(expectedFullFileTs),
-          reason: 'Full file should output all enums and interfaces in correct order without duplicate imports');
+          reason:
+              'Full file should output all enums and interfaces in correct order without duplicate imports');
     });
 
-    test('validates multiple input files generate correct multiple output files', () {
+    test(
+        'validates multiple input files generate correct multiple output files',
+        () {
       final converter = FreezedToTsConverter();
 
       // File 1: Enum definition
@@ -536,15 +543,15 @@ export interface Task {
       // Expected outputs
       final expectedThemeTypeOutput = r'''
 export enum ThemeType {
-  light = 'light',
-  dark = 'dark',
-  system = 'system',
+  light = "light",
+  dark = "dark",
+  system = "system",
 }
 '''
           .trim();
 
       final expectedUserProfileOutput = r'''
-import type { Settings } from './settings.ts';
+import type { Settings } from "./settings.ts";
 
 export interface UserProfile {
   id: string;
@@ -555,7 +562,7 @@ export interface UserProfile {
           .trim();
 
       final expectedSettingsOutput = r'''
-import type { ThemeType } from './theme_type.ts';
+import type { ThemeType } from "./theme_type.ts";
 
 export interface Settings {
   userId: string;
@@ -567,7 +574,8 @@ export interface Settings {
 
       // Convert each file and validate output
       final themeTypeResult = converter.convert(themeTypeFile).trim();
-      expect(themeTypeResult, equals(expectedThemeTypeOutput), reason: 'ThemeType file should output enum definition');
+      expect(themeTypeResult, equals(expectedThemeTypeOutput),
+          reason: 'ThemeType file should output enum definition');
 
       final userProfileResult = converter.convert(userProfileFile).trim();
       expect(userProfileResult, equals(expectedUserProfileOutput),
