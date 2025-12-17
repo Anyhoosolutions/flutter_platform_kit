@@ -1,3 +1,7 @@
+## 0.0.5
+ 
+* Update to GoRouterWrapper
+
 ## 0.0.4
  
 * AnyhooBottomBar
