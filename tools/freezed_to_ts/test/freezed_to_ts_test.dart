@@ -585,5 +585,217 @@ export interface Settings {
       expect(settingsResult, equals(expectedSettingsOutput),
           reason: 'Settings file should output interface with enum import');
     });
+
+    test('validates parse text files', () {
+      final converter = FreezedToTsConverter();
+
+      // File 1: Freezed class that is referenced by other files
+      const uploadInfoFile = r'''
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+part 'upload_info.freezed.dart';
+part 'upload_info.g.dart';
+
+enum RecipeUploadType { image, web, youtube, instagram, manually }
+
+@freezed
+sealed class UploadInfo with _$UploadInfo {
+  const factory UploadInfo({
+    required RecipeUploadType type,
+    @Default(null) String? source,
+  }) = _UploadInfo;
+
+  factory UploadInfo.fromJson(Map<String, Object?> json) =>
+      _$UploadInfoFromJson(json);
+}
+''';
+
+      // File 2: Freezed class that uses other file
+      const parseTextFile = r'''
+        // ignore_for_file: invalid_annotation_target
+
+        import 'package:cloud_firestore/cloud_firestore.dart';
+        import 'package:freezed_annotation/freezed_annotation.dart';
+        import 'package:snapandsavor/sharedModels/upload_info.dart';
+
+        part 'parse_text.freezed.dart';
+        part 'parse_text.g.dart';
+
+        enum ParsingTextStatus { completed, parsingText, error }
+
+        @freezed
+        abstract class ParseText with _$ParseText {
+          const factory ParseText({
+            required String groupId,
+            required String? recipeId,
+            required String userId,
+            @JsonKey(fromJson: fromDateTime, toJson: toDateTime)
+            required DateTime createdAt,
+            @JsonKey(fromJson: fromMaybeDateTime, toJson: toMaybeDateTime)
+            required DateTime? processedAt,
+            required String? text,
+            required String? error,
+            required RecipeUploadType type,
+            required String uploadRef,
+            required String status,
+            required String source,
+          }) = _ParseText;
+
+          factory ParseText.fromJson(Map<String, Object?> json) =>
+              _$ParseTextFromJson(json);
+        }
+
+        DateTime fromDateTime(Timestamp dateTime) => dateTime.toDate();
+        Timestamp toDateTime(DateTime dateTime) => Timestamp.fromDate(dateTime);
+
+        DateTime? fromMaybeDateTime(Timestamp? dateTime) => dateTime?.toDate();
+        Timestamp? toMaybeDateTime(DateTime? dateTime) =>
+            dateTime != null ? Timestamp.fromDate(dateTime) : null;
+
+      ''';
+
+      // File 3: Another freezed class that uses the enum
+      const parseDataForRecipeFile = r'''
+        // ignore_for_file: invalid_annotation_target
+
+        import 'package:cloud_firestore/cloud_firestore.dart';
+        import 'package:freezed_annotation/freezed_annotation.dart';
+        import 'package:snapandsavor/sharedModels/upload_info.dart';
+
+        part 'parsing_data_for_recipe.freezed.dart';
+        part 'parsing_data_for_recipe.g.dart';
+
+        enum ParsingDataForRecipeStatus {
+          uploaded,
+          parsingSource,
+          buildingRecipe,
+          completed,
+          error,
+        }
+
+        // TODO: Different factories instead?
+        @freezed
+        sealed class ParsingDataForRecipe with _$ParsingDataForRecipe {
+          const factory ParsingDataForRecipe({
+            required String? id,
+            required String uploadId,
+            required String source,
+            required RecipeUploadType recipeUploadType,
+            required String groupId,
+            required ParsingDataForRecipeStatus status,
+            required String userId,
+            @JsonKey(fromJson: fromDateTime, toJson: toDateTime)
+            required DateTime createdAt,
+            String? recipeId,
+            @JsonKey(fromJson: fromMaybeDateTime, toJson: toMaybeDateTime)
+            DateTime? processedAt,
+            String? output,
+            String? error,
+          }) = _ParsingDataForRecipe;
+
+          factory ParsingDataForRecipe.fromJson(Map<String, Object?> json) =>
+              _$ParsingDataForRecipeFromJson(json);
+        }
+
+        DateTime fromDateTime(Timestamp dateTime) => dateTime.toDate();
+        Timestamp toDateTime(DateTime dateTime) => Timestamp.fromDate(dateTime);
+
+        DateTime? fromMaybeDateTime(Timestamp? dateTime) => dateTime?.toDate();
+        Timestamp? toMaybeDateTime(DateTime? dateTime) =>
+            dateTime != null ? Timestamp.fromDate(dateTime) : null;
+
+      ''';
+
+      // Learn all files
+      converter.learn(uploadInfoFile);
+      converter.learn(parseTextFile);
+      converter.learn(parseDataForRecipeFile);
+
+      final expectedUploadInfoTextOutput = r'''
+export enum RecipeUploadType {
+  image = "image",
+  web = "web",
+  youtube = "youtube",
+  instagram = "instagram",
+  manually = "manually",
+}
+
+export interface UploadInfo {
+  type: RecipeUploadType;
+  source: string | null;
+}''';
+
+      final expectedParseTextOutput = r'''
+import type { Timestamp } from "firebase-admin/firestore";
+import type { RecipeUploadType } from "./upload_info";
+
+export enum ParsingTextStatus {
+  completed = "completed",
+  parsingText = "parsingText",
+  error = "error",
+}
+
+export interface ParseText {
+  groupId: string;
+  recipeId: string | null;
+  userId: string;
+  createdAt: Timestamp;
+  processedAt: Timestamp | null;
+  text: string | null;
+  error: string | null;
+  type: RecipeUploadType;
+  uploadRef: string;
+  status: string;
+  source: string;
+}
+'''
+          .trim();
+
+      final expectedParseDataForRecipeOutput = r'''
+import type { Timestamp } from "firebase-admin/firestore";
+import type { RecipeUploadType } from "./upload_info";
+
+export enum ParsingDataForRecipeStatus {
+  uploaded = "uploaded",
+  parsingSource = "parsingSource",
+  buildingRecipe = "buildingRecipe",
+  completed = "completed",
+  error = "error",
+}
+
+export interface ParsingDataForRecipe {
+  id: string | null;
+  uploadId: string;
+  source: string;
+  recipeUploadType: RecipeUploadType;
+  groupId: string;
+  status: ParsingDataForRecipeStatus;
+  userId: string;
+  createdAt: Timestamp;
+  recipeId: string | null;
+  processedAt: Timestamp | null;
+  output: string | null;
+  error: string | null;
+}
+'''
+          .trim();
+
+      // Convert each file and validate output
+
+      final uploadInfoResult = converter.convert(uploadInfoFile).trim();
+      expect(uploadInfoResult, equals(expectedUploadInfoTextOutput),
+          reason: 'UploadInfo file should output interface with enum import');
+
+      final parseTextResult = converter.convert(parseTextFile).trim();
+      print(parseTextResult);
+      expect(parseTextResult, equals(expectedParseTextOutput),
+          reason: 'ParseText file should output interface with enum import');
+
+      final parseDataForRecipeResult =
+          converter.convert(parseDataForRecipeFile).trim();
+      expect(parseDataForRecipeResult, equals(expectedParseDataForRecipeOutput),
+          reason:
+              'ParseDataForRecipe file should output interface with enum import');
+    });
   });
 }
