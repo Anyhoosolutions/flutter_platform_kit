@@ -1,3 +1,7 @@
+## 0.0.7
+
+- Use double quotes
+
 ## 0.0.6
 
 - Fix documentation
