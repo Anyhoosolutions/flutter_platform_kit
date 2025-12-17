@@ -27,14 +27,12 @@ class FirebaseAnyhooRemoteConfigService implements AnyhooRemoteConfigService {
 
     await remoteConfig.setDefaults(_defaults);
 
-    // if (!kIsWeb) {
     remoteConfig.onConfigUpdated.listen((event) async {
       _log.info('Remote config updated: ${event.updatedKeys}');
       await remoteConfig.activate();
       await getAll(); // Update our local values
       _configUpdateController.add(null); // Notify listeners
     });
-    // }
 
     // Fetch and activate config immediately
     await remoteConfig.fetch();
