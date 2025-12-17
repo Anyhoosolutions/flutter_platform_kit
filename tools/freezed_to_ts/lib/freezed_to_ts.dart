@@ -393,7 +393,7 @@ class FreezedToTsConverter {
       output.writeln('}');
     }
 
-    return output.toString();
+    return '${output.toString().trim()}\n';
   }
 
   void _extractReferencedFreezedClasses(

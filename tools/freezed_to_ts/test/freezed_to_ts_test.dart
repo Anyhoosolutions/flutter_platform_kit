@@ -34,10 +34,10 @@ void main() {
 
       final converter = FreezedToTsConverter();
       converter.learn(dartCode);
-      final result = converter.convert(dartCode).trim();
+      final result = converter.convert(dartCode);
 
-      final expectedTsCode = r'''
-import type { Timestamp } from "firebase-admin/firestore";
+      final expectedTsCode =
+          r'''import type { Timestamp } from "firebase-admin/firestore";
 export interface User {
   id: string;
   email: string;
@@ -50,8 +50,7 @@ export interface User {
   tags: string[];
   settings: { [key: string]: any };
 }
-'''
-          .trim();
+''';
 
       expect(result, equals(expectedTsCode));
     });
@@ -93,8 +92,8 @@ export interface User {
       converter.learn(addressCode);
       converter.learn(userCode);
 
-      final expectedUserTs = r'''
-import type { Timestamp } from "firebase-admin/firestore";
+      final expectedUserTs =
+          r'''import type { Timestamp } from "firebase-admin/firestore";
 import type { Address } from "./address.ts";
 
 export interface User {
@@ -102,21 +101,18 @@ export interface User {
   address: Address;
   createdAt: Timestamp | null;
 }
-'''
-          .trim();
+''';
 
-      final expectedAddressTs = r'''
-export interface Address {
+      final expectedAddressTs = r'''export interface Address {
   street: string;
   city: string;
 }
-'''
-          .trim();
+''';
 
-      final userResult = converter.convert(userCode).trim();
+      final userResult = converter.convert(userCode);
       expect(userResult, equals(expectedUserTs));
 
-      final addressResult = converter.convert(addressCode).trim();
+      final addressResult = converter.convert(addressCode);
       expect(addressResult, equals(expectedAddressTs));
     });
 
@@ -180,8 +176,8 @@ export interface Address {
       converter.learn(recipeShortCode);
       converter.learn(userGroupCode);
 
-      final expectedUserGroupTs = r'''
-import type { Timestamp } from "firebase-admin/firestore";
+      final expectedUserGroupTs =
+          r'''import type { Timestamp } from "firebase-admin/firestore";
 import type { RecipeShort } from "./recipe_short.ts";
 
 export interface UserGroup {
@@ -193,25 +189,22 @@ export interface UserGroup {
   updatedAt: Timestamp;
   recipes: RecipeShort[];
 }
-'''
-          .trim();
+''';
 
-      final expectedRecipeShortTs = r'''
-export interface RecipeShort {
+      final expectedRecipeShortTs = r'''export interface RecipeShort {
   id: string;
   title: string;
   description: string | null;
   imageUrls: string[];
   categories: string[];
 }
-'''
-          .trim();
+''';
 
-      final userGroupResult = converter.convert(userGroupCode).trim();
+      final userGroupResult = converter.convert(userGroupCode);
       expect(userGroupResult, equals(expectedUserGroupTs),
           reason: 'UserGroup should include import for RecipeShort');
 
-      final recipeShortResult = converter.convert(recipeShortCode).trim();
+      final recipeShortResult = converter.convert(recipeShortCode);
       expect(recipeShortResult, equals(expectedRecipeShortTs));
     });
 
@@ -250,10 +243,10 @@ export interface RecipeShort {
 
       final converter = FreezedToTsConverter();
       converter.learn(dartCode);
-      final result = converter.convert(dartCode).trim();
+      final result = converter.convert(dartCode);
 
-      final expectedTsCode = r'''
-import type { Timestamp } from "firebase-admin/firestore";
+      final expectedTsCode =
+          r'''import type { Timestamp } from "firebase-admin/firestore";
 export interface Task {
   id: string | null;
   name: string;
@@ -262,8 +255,7 @@ export interface Task {
   createdAt: Timestamp;
   updatedAt: Timestamp | null;
 }
-'''
-          .trim();
+''';
 
       expect(result, equals(expectedTsCode));
     });
@@ -304,17 +296,15 @@ export interface Task {
       converter.learn(themeTypeCode);
       converter.learn(userProfileCode);
 
-      final expectedThemeTypeTs = r'''
-export enum ThemeType {
+      final expectedThemeTypeTs = r'''export enum ThemeType {
   light = "light",
   dark = "dark",
   system = "system",
 }
-'''
-          .trim();
+''';
 
-      final expectedUserProfileTs = r'''
-import type { ThemeType } from "./theme_type.ts";
+      final expectedUserProfileTs =
+          r'''import type { ThemeType } from "./theme_type.ts";
 
 export interface UserProfile {
   id: string;
@@ -322,14 +312,13 @@ export interface UserProfile {
   theme: ThemeType;
   preferredTheme: ThemeType | null;
 }
-'''
-          .trim();
+''';
 
-      final themeTypeResult = converter.convert(themeTypeCode).trim();
+      final themeTypeResult = converter.convert(themeTypeCode);
       expect(themeTypeResult, equals(expectedThemeTypeTs),
           reason: 'ThemeType enum should be converted to TypeScript enum');
 
-      final userProfileResult = converter.convert(userProfileCode).trim();
+      final userProfileResult = converter.convert(userProfileCode);
       expect(userProfileResult, equals(expectedUserProfileTs),
           reason: 'UserProfile should include import for ThemeType enum');
     });
@@ -365,8 +354,7 @@ export interface UserProfile {
 
       converter.learn(fullFileCode);
 
-      final expectedFullFileTs = r'''
-export enum ThemeType {
+      final expectedFullFileTs = r'''export enum ThemeType {
   light = "light",
   dark = "dark",
   system = "system",
@@ -377,10 +365,9 @@ export interface UserSettings {
   theme: ThemeType;
   preferredTheme: ThemeType | null;
 }
-'''
-          .trim();
+''';
 
-      final result = converter.convert(fullFileCode).trim();
+      final result = converter.convert(fullFileCode);
       expect(result, equals(expectedFullFileTs),
           reason:
               'Full file should output enum and interface without importing enum from elsewhere');
@@ -441,8 +428,8 @@ export interface UserSettings {
 
       converter.learn(fullFileCode);
 
-      final expectedFullFileTs = r'''
-import type { Timestamp } from "firebase-admin/firestore";
+      final expectedFullFileTs =
+          r'''import type { Timestamp } from "firebase-admin/firestore";
 
 export enum Priority {
   low = "low",
@@ -470,10 +457,9 @@ export interface Task {
   priority: Priority;
   createdAt: Timestamp;
 }
-'''
-          .trim();
+''';
 
-      final result = converter.convert(fullFileCode).trim();
+      final result = converter.convert(fullFileCode);
       expect(result, equals(expectedFullFileTs),
           reason:
               'Full file should output all enums and interfaces in correct order without duplicate imports');
@@ -541,47 +527,43 @@ export interface Task {
       converter.learn(settingsFile);
 
       // Expected outputs
-      final expectedThemeTypeOutput = r'''
-export enum ThemeType {
+      final expectedThemeTypeOutput = r'''export enum ThemeType {
   light = "light",
   dark = "dark",
   system = "system",
 }
-'''
-          .trim();
+''';
 
-      final expectedUserProfileOutput = r'''
-import type { Settings } from "./settings.ts";
+      final expectedUserProfileOutput =
+          r'''import type { Settings } from "./settings.ts";
 
 export interface UserProfile {
   id: string;
   name: string;
   settings: Settings;
 }
-'''
-          .trim();
+''';
 
-      final expectedSettingsOutput = r'''
-import type { ThemeType } from "./theme_type.ts";
+      final expectedSettingsOutput =
+          r'''import type { ThemeType } from "./theme_type.ts";
 
 export interface Settings {
   userId: string;
   defaultTheme: ThemeType;
   allowedThemes: ThemeType[];
 }
-'''
-          .trim();
+''';
 
       // Convert each file and validate output
-      final themeTypeResult = converter.convert(themeTypeFile).trim();
+      final themeTypeResult = converter.convert(themeTypeFile);
       expect(themeTypeResult, equals(expectedThemeTypeOutput),
           reason: 'ThemeType file should output enum definition');
 
-      final userProfileResult = converter.convert(userProfileFile).trim();
+      final userProfileResult = converter.convert(userProfileFile);
       expect(userProfileResult, equals(expectedUserProfileOutput),
           reason: 'UserProfile file should output interface with enum import');
 
-      final settingsResult = converter.convert(settingsFile).trim();
+      final settingsResult = converter.convert(settingsFile);
       expect(settingsResult, equals(expectedSettingsOutput),
           reason: 'Settings file should output interface with enum import');
     });
@@ -711,8 +693,7 @@ sealed class UploadInfo with _$UploadInfo {
       converter.learn(parseTextFile);
       converter.learn(parseDataForRecipeFile);
 
-      final expectedUploadInfoTextOutput = r'''
-export enum RecipeUploadType {
+      final expectedUploadInfoTextOutput = r'''export enum RecipeUploadType {
   image = "image",
   web = "web",
   youtube = "youtube",
@@ -723,10 +704,11 @@ export enum RecipeUploadType {
 export interface UploadInfo {
   type: RecipeUploadType;
   source: string | null;
-}''';
+}
+''';
 
-      final expectedParseTextOutput = r'''
-import type { Timestamp } from "firebase-admin/firestore";
+      final expectedParseTextOutput =
+          r'''import type { Timestamp } from "firebase-admin/firestore";
 import type { RecipeUploadType } from "./upload_info.ts";
 
 export enum ParsingTextStatus {
@@ -748,11 +730,10 @@ export interface ParseText {
   status: string;
   source: string;
 }
-'''
-          .trim();
+''';
 
-      final expectedParseDataForRecipeOutput = r'''
-import type { Timestamp } from "firebase-admin/firestore";
+      final expectedParseDataForRecipeOutput =
+          r'''import type { Timestamp } from "firebase-admin/firestore";
 import type { RecipeUploadType } from "./upload_info.ts";
 
 export enum ParsingDataForRecipeStatus {
@@ -777,22 +758,21 @@ export interface ParsingDataForRecipe {
   output: string | null;
   error: string | null;
 }
-'''
-          .trim();
+''';
 
       // Convert each file and validate output
 
-      final uploadInfoResult = converter.convert(uploadInfoFile).trim();
+      final uploadInfoResult = converter.convert(uploadInfoFile);
       expect(uploadInfoResult, equals(expectedUploadInfoTextOutput),
           reason: 'UploadInfo file should output interface with enum import');
 
-      final parseTextResult = converter.convert(parseTextFile).trim();
+      final parseTextResult = converter.convert(parseTextFile);
       print(parseTextResult);
       expect(parseTextResult, equals(expectedParseTextOutput),
           reason: 'ParseText file should output interface with enum import');
 
       final parseDataForRecipeResult =
-          converter.convert(parseDataForRecipeFile).trim();
+          converter.convert(parseDataForRecipeFile);
       expect(parseDataForRecipeResult, equals(expectedParseDataForRecipeOutput),
           reason:
               'ParseDataForRecipe file should output interface with enum import');
