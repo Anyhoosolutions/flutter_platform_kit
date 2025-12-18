@@ -27,17 +27,6 @@ class ExampleUser extends AnyhooUser {
   }
 
   @override
-  ExampleUser copyWith({String? id, String? email, String? name, String? photoUrl, int? phoneNumber}) {
-    return ExampleUser(
-      id: id ?? this.id,
-      email: email ?? this.email,
-      name: name ?? this.name,
-      photoUrl: photoUrl ?? this.photoUrl,
-      phoneNumber: phoneNumber ?? this.phoneNumber,
-    );
-  }
-
-  @override
   String toString() =>
       'ExampleUser(id: $id, email: $email, name: $name, photoUrl: $photoUrl, phoneNumber: $phoneNumber)';
 
