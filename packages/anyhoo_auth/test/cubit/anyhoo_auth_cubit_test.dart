@@ -31,7 +31,7 @@ void main() {
       mockConverter = MockAnyhooUserConverter();
       mockEnhanceUserService = MockAnyhooEnhanceUserService();
 
-      when(() => mockAuthService.authStateChanges).thenAnswer((_) => Stream.empty());
+      when(() => mockAuthService.authStateChanges).thenAnswer((_) => const Stream.empty());
       when(() => mockAuthService.currentUser).thenReturn(null);
 
       Logger.root.level = Level.ALL;
