@@ -1,3 +1,7 @@
+## 0.0.23
+
+* Map<String, dynamic> for getting user data and <T extends AnyhooUser> when saving
+
 ## 0.0.22
 
 * Simplify AnyhooUser
