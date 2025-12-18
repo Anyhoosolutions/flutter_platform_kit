@@ -7,18 +7,12 @@ import 'package:anyhoo_core/models/anyhoo_user.dart';
 ///
 class MockEnhanceUserService<T extends AnyhooUser> extends AnyhooEnhanceUserService<T> {
   String phoneNumber = '212-555-1234';
-  final AnyhooUserConverter<T> _converter;
 
-  MockEnhanceUserService({required AnyhooUserConverter<T> converter}) : _converter = converter;
+  MockEnhanceUserService();
 
   @override
-  Future<T> enhanceUser(T user) async {
-    return _converter.fromJson({
-      ...user.toJson(),
-      'extra': 'here is more',
-      'avatarUrl': 'enhanced avatar url',
-      'phoneNumber': phoneNumber,
-    });
+  Future<Map<String, dynamic>> enhanceUser(Map<String, dynamic> user) async {
+    return {...user, 'phoneNumber': phoneNumber};
   }
 
   @override

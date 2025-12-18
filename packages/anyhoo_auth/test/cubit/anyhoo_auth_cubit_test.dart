@@ -11,20 +11,20 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:logging/logging.dart';
 import 'package:mocktail/mocktail.dart';
 
-class MockAnyhooAuthService extends Mock implements AnyhooAuthService<TestUser> {}
+class MockAnyhooAuthService extends Mock implements AnyhooAuthService {}
 
 class SimpleAnyhooEnhanceUserService extends AnyhooEnhanceUserService<TestUser> {
   SimpleAnyhooEnhanceUserService({
-    Future<TestUser> Function(TestUser)? enhanceUserCallback,
+    Future<Map<String, dynamic>> Function(Map<String, dynamic>)? enhanceUserCallback,
     Future<TestUser> Function(TestUser)? saveUserCallback,
   })  : _enhanceUserCallback = enhanceUserCallback,
         _saveUserCallback = saveUserCallback;
 
-  final Future<TestUser> Function(TestUser)? _enhanceUserCallback;
+  final Future<Map<String, dynamic>> Function(Map<String, dynamic>)? _enhanceUserCallback;
   final Future<TestUser> Function(TestUser)? _saveUserCallback;
 
   @override
-  Future<TestUser> enhanceUser(TestUser user) async {
+  Future<Map<String, dynamic>> enhanceUser(Map<String, dynamic> user) async {
     if (_enhanceUserCallback != null) {
       return _enhanceUserCallback!(user);
     }
@@ -103,13 +103,13 @@ void main() {
 
     test('initial state is correct when user is logged in', () {
       final testUser = TestUser(id: '123', email: 'test@example.com');
-      when(() => mockAuthService.currentUser).thenReturn(testUser);
+      when(() => mockAuthService.currentUser).thenReturn(testUser.toJson());
 
       cubit = AnyhooAuthCubit(
         authService: mockAuthService,
         converter: testConverter,
       );
-      expect(cubit.state.user, equals(testUser));
+      expect(cubit.state.user?.toJson(), equals(testUser.toJson()));
     });
 
     group('Auth State Changes', () {
@@ -118,12 +118,12 @@ void main() {
         final enhancedTestUser = TestUser(id: testUser.id, email: testUser.email, extra: 'here is more');
 
         // Mock stream controller to emit events
-        final controller = StreamController<TestUser?>();
+        final controller = StreamController<Map<String, dynamic>?>();
         when(() => mockAuthService.authStateChanges).thenAnswer((_) => controller.stream);
 
         // Configure enhancements
         enhanceUserService = SimpleAnyhooEnhanceUserService(
-          enhanceUserCallback: (_) async => enhancedTestUser,
+          enhanceUserCallback: (_) async => enhancedTestUser.toJson(),
         );
 
         cubit = AnyhooAuthCubit(
@@ -135,12 +135,12 @@ void main() {
         // Wait for init to listen
         await Future.delayed(Duration.zero);
 
-        controller.add(testUser);
+        controller.add(testUser.toJson());
 
         await expectLater(
           cubit.stream,
           emits(isA<AnyhooAuthState<TestUser>>()
-              .having((s) => s.user, 'user', enhancedTestUser)
+              .having((s) => s.user?.toJson(), 'user', enhancedTestUser.toJson())
               .having((s) => s.isLoading, 'isLoading', false)),
         );
 
@@ -149,7 +149,7 @@ void main() {
 
       test('emits state with null user when auth state changes to signed out', () async {
         // Mock stream controller
-        final controller = StreamController<TestUser?>();
+        final controller = StreamController<Map<String, dynamic>?>();
         when(() => mockAuthService.authStateChanges).thenAnswer((_) => controller.stream);
 
         cubit = AnyhooAuthCubit(
@@ -173,7 +173,7 @@ void main() {
       });
 
       test('emits error state when auth state stream has error', () async {
-        final controller = StreamController<TestUser?>();
+        final controller = StreamController<Map<String, dynamic>?>();
         when(() => mockAuthService.authStateChanges).thenAnswer((_) => controller.stream);
 
         cubit = AnyhooAuthCubit(
@@ -201,14 +201,14 @@ void main() {
         final enhancedUser2 = TestUser(id: enhancedUser1.id, email: enhancedUser1.email, extra: 'enhanced2');
 
         final enhanceUserService2 = SimpleAnyhooEnhanceUserService(
-          enhanceUserCallback: (_) async => enhancedUser2,
+          enhanceUserCallback: (_) async => enhancedUser2.toJson(),
         );
 
-        final controller = StreamController<TestUser?>();
+        final controller = StreamController<Map<String, dynamic>?>();
         when(() => mockAuthService.authStateChanges).thenAnswer((_) => controller.stream);
 
         enhanceUserService = SimpleAnyhooEnhanceUserService(
-          enhanceUserCallback: (_) async => enhancedUser1,
+          enhanceUserCallback: (_) async => enhancedUser1.toJson(),
         );
 
         cubit = AnyhooAuthCubit(
@@ -219,12 +219,12 @@ void main() {
 
         await Future.delayed(Duration.zero);
 
-        controller.add(testUser);
+        controller.add(testUser.toJson());
 
         await expectLater(
           cubit.stream,
           emits(isA<AnyhooAuthState<TestUser>>()
-              .having((s) => s.user, 'user', enhancedUser2)
+              .having((s) => s.user?.toJson(), 'user', enhancedUser2.toJson())
               .having((s) => s.isLoading, 'isLoading', false)),
         );
 
@@ -484,7 +484,7 @@ void main() {
         final enhancedUser = TestUser(id: testUser.id, email: testUser.email, extra: 'refreshed');
 
         enhanceUserService = SimpleAnyhooEnhanceUserService(
-          enhanceUserCallback: (_) async => enhancedUser,
+          enhanceUserCallback: (_) async => enhancedUser.toJson(),
         );
 
         cubit = AnyhooAuthCubit(
@@ -494,7 +494,7 @@ void main() {
         );
 
         await cubit.refreshUser(testUser);
-        expect(cubit.state.user, equals(enhancedUser));
+        expect(cubit.state.user?.toJson(), equals(enhancedUser.toJson()));
         expect(cubit.state.isLoading, false);
       });
 
@@ -503,11 +503,11 @@ void main() {
         final enhancedUser1 = TestUser(id: testUser.id, email: testUser.email, extra: 'refreshed1');
         final enhancedUser2 = TestUser(id: enhancedUser1.id, email: enhancedUser1.email, extra: 'refreshed2');
         final enhanceUserService2 = SimpleAnyhooEnhanceUserService(
-          enhanceUserCallback: (_) async => enhancedUser2,
+          enhanceUserCallback: (_) async => enhancedUser2.toJson(),
         );
 
         enhanceUserService = SimpleAnyhooEnhanceUserService(
-          enhanceUserCallback: (_) async => enhancedUser1,
+          enhanceUserCallback: (_) async => enhancedUser1.toJson(),
         );
 
         cubit = AnyhooAuthCubit(
@@ -517,7 +517,7 @@ void main() {
         );
 
         await cubit.refreshUser(testUser);
-        expect(cubit.state.user, equals(enhancedUser2));
+        expect(cubit.state.user?.toJson(), equals(enhancedUser2.toJson()));
         expect(cubit.state.isLoading, false);
       });
 
@@ -526,7 +526,7 @@ void main() {
         final enhancedUser = TestUser(id: testUser.id, email: testUser.email, extra: 'refreshed');
 
         enhanceUserService = SimpleAnyhooEnhanceUserService(
-          enhanceUserCallback: (_) async => enhancedUser,
+          enhanceUserCallback: (_) async => enhancedUser.toJson(),
         );
 
         cubit = AnyhooAuthCubit(
@@ -548,7 +548,7 @@ void main() {
 
         // Should have initial null user state, then updated user state
         expect(states.any((s) => s.user == null && s.isLoading == true), isTrue);
-        expect(cubit.state.user, equals(enhancedUser));
+        expect(cubit.state.user?.toJson(), equals(enhancedUser.toJson()));
         expect(cubit.state.isLoading, false);
 
         await subscription.cancel();
@@ -557,7 +557,7 @@ void main() {
 
     group('Subscription Management', () {
       test('cancels subscription on close', () async {
-        final controller = StreamController<TestUser?>();
+        final controller = StreamController<Map<String, dynamic>?>();
         when(() => mockAuthService.authStateChanges).thenAnswer((_) => controller.stream);
 
         cubit = AnyhooAuthCubit(

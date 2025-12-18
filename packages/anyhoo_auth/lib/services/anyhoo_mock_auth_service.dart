@@ -1,7 +1,5 @@
 import 'dart:async';
-import 'package:anyhoo_auth/models/anyhoo_user_converter.dart';
 import 'package:anyhoo_auth/services/anyhoo_auth_service.dart';
-import 'package:anyhoo_core/models/anyhoo_user.dart';
 
 /// Mock implementation of [AnyhooAuthService] for testing and development.
 ///
@@ -13,7 +11,7 @@ import 'package:anyhoo_core/models/anyhoo_user.dart';
 /// ```dart
 /// final mockAuthService = AnyhooMockAuthService();
 /// ```
-class AnyhooMockAuthService<T extends AnyhooUser> implements AnyhooAuthService<T> {
+class AnyhooMockAuthService implements AnyhooAuthService {
   /// Default delay for login operations (1 second).
   final Duration loginDelay;
 
@@ -36,22 +34,21 @@ class AnyhooMockAuthService<T extends AnyhooUser> implements AnyhooAuthService<T
   /// If null, a default mock user structure will be used.
   final Map<String, dynamic> Function(String email)? userDataGenerator;
 
-  final AnyhooUserConverter<T> _converter;
-
   /// Current authenticated user, null if not logged in.
-  T? _currentUser;
+  Map<String, dynamic>? _currentUser;
 
   /// Stream controller for auth state changes.
-  final StreamController<T?> _authStateController = StreamController<T?>.broadcast();
+  final StreamController<Map<String, dynamic>?> _authStateController =
+      StreamController<Map<String, dynamic>?>.broadcast();
 
   @override
-  T? get currentUser => _currentUser;
+  Map<String, dynamic>? get currentUser => _currentUser;
 
   @override
   bool get isAuthenticated => currentUser != null;
 
   @override
-  Stream<T?> get authStateChanges {
+  Stream<Map<String, dynamic>?> get authStateChanges {
     // Return a stream that starts with the current value, then continues with updates
     return Stream.multi((controller) {
       // Emit current value immediately
@@ -82,10 +79,9 @@ class AnyhooMockAuthService<T extends AnyhooUser> implements AnyhooAuthService<T
     this.loginDelay = const Duration(seconds: 1),
     this.logoutDelay = const Duration(milliseconds: 500),
     this.refreshDelay = const Duration(milliseconds: 500),
-    required AnyhooUserConverter<T> converter,
     this.credentialValidator,
     this.userDataGenerator,
-  }) : _converter = converter;
+  });
 
   @override
   Future<void> loginWithEmailAndPassword(String email, String password) async {
@@ -103,18 +99,18 @@ class AnyhooMockAuthService<T extends AnyhooUser> implements AnyhooAuthService<T
     }
 
     // Generate user data
-    T user;
+    Map<String, dynamic> user;
     if (userDataGenerator != null) {
-      user = _converter.fromJson(userDataGenerator!(email));
+      user = userDataGenerator!(email);
     } else {
       // Default mock user data
-      user = _converter.fromJson({
+      user = {
         'id': 'mock_user_${DateTime.now().millisecondsSinceEpoch}',
         'email': email,
         'displayName': email.split('@').first,
         'photoURL': null,
         'emailVerified': true,
-      });
+      };
     }
 
     _currentUser = user;
@@ -124,13 +120,13 @@ class AnyhooMockAuthService<T extends AnyhooUser> implements AnyhooAuthService<T
   @override
   Future<void> loginWithGoogle() async {
     await Future.delayed(loginDelay);
-    final user = _converter.fromJson({
+    final user = {
       'id': 'mock_google_user_${DateTime.now().millisecondsSinceEpoch}',
       'email': 'google.user@example.com',
       'displayName': 'Google User',
       'photoURL': null,
       'emailVerified': true,
-    });
+    };
     _currentUser = user;
     _emitAuthState();
   }
@@ -138,13 +134,13 @@ class AnyhooMockAuthService<T extends AnyhooUser> implements AnyhooAuthService<T
   @override
   Future<void> loginWithApple() async {
     await Future.delayed(loginDelay);
-    final user = _converter.fromJson({
+    final user = {
       'id': 'mock_apple_user_${DateTime.now().millisecondsSinceEpoch}',
       'email': 'apple.user@example.com',
       'displayName': 'Apple User',
       'photoURL': null,
       'emailVerified': true,
-    });
+    };
     _currentUser = user;
     _emitAuthState();
   }
@@ -152,13 +148,13 @@ class AnyhooMockAuthService<T extends AnyhooUser> implements AnyhooAuthService<T
   @override
   Future<void> loginWithAnonymous() async {
     await Future.delayed(loginDelay);
-    final user = _converter.fromJson({
+    final user = {
       'id': 'mock_anonymous_user_${DateTime.now().millisecondsSinceEpoch}',
       'email': '',
       'displayName': 'Anonymous User',
       'photoURL': null,
       'emailVerified': false,
-    });
+    };
     _currentUser = user;
     _emitAuthState();
   }
@@ -172,7 +168,7 @@ class AnyhooMockAuthService<T extends AnyhooUser> implements AnyhooAuthService<T
   }
 
   @override
-  void setUser(T user) {
+  void setUser(Map<String, dynamic> user) {
     _currentUser = user;
     _emitAuthState();
   }
@@ -188,13 +184,5 @@ class AnyhooMockAuthService<T extends AnyhooUser> implements AnyhooAuthService<T
   /// Call this when the service is no longer needed to free resources.
   void dispose() {
     _authStateController.close();
-  }
-
-  /// Set a mock user directly (useful for testing).
-  ///
-  /// This bypasses the login flow and sets the user directly.
-  void setMockUser(T user) {
-    _currentUser = user;
-    _emitAuthState();
   }
 }
