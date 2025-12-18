@@ -140,8 +140,7 @@ class AnyhooFirebaseAuthService<T extends AnyhooUser> implements AnyhooAuthServi
         idToken: appleCredential.identityToken,
         accessToken: appleCredential.authorizationCode,
       );
-      final userCredential = await _firebaseAuth.signInWithCredential(credential);
-      _firebaseUserToMap(userCredential.user!);
+      await _firebaseAuth.signInWithCredential(credential);
       return;
     } catch (e) {
       _log.severe('Error logging in with Apple', e);

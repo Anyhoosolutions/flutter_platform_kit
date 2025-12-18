@@ -1,6 +1,6 @@
 ## 0.0.13
 
-* copyWith as getter
+* Simplify AnyhooUser
 
 ## 0.0.12
  
