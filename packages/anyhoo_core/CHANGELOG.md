@@ -1,3 +1,7 @@
+## 0.0.13
+
+* copyWith as getter
+
 ## 0.0.12
  
 * Add copyWith method to AnyhooUser
