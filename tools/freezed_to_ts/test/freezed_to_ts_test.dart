@@ -777,5 +777,42 @@ export interface ParsingDataForRecipe {
           reason:
               'ParseDataForRecipe file should output interface with enum import');
     });
+
+    test('skips fields annotated with @JsonKey(ignore: true)', () {
+      final converter = FreezedToTsConverter();
+
+      const dartCode = r'''
+        import 'package:freezed_annotation/freezed_annotation.dart';
+
+        part 'user.freezed.dart';
+        part 'user.g.dart';
+
+        @freezed
+        class User with _$User {
+          const factory User({
+            required String id,
+            required String username,
+            @JsonKey(ignore: true) String? password,
+            @JsonKey(ignore: true)
+            required String internalSecret,
+            @JsonKey(name: 'display_name') String? displayName,
+          }) = _User;
+
+          factory User.fromJson(Map<String, Object?> json) => _$UserFromJson(json);
+        }
+      ''';
+
+      converter.learn(dartCode);
+      final result = converter.convert(dartCode);
+
+      final expectedTsCode = r'''export interface User {
+  id: string;
+  username: string;
+  display_name: string | null;
+}
+''';
+
+      expect(result, equals(expectedTsCode));
+    });
   });
 }
