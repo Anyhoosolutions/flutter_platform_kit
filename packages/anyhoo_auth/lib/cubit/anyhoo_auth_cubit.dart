@@ -40,14 +40,9 @@ class AnyhooAuthCubit<T extends AnyhooUser> extends Cubit<AnyhooAuthState<T>> {
   final List<AnyhooEnhanceUserService> enhanceUserServices;
   StreamSubscription<Map<String, dynamic>?>? _authStateSubscription;
 
-  AnyhooAuthCubit(
-      {required this.authService,
-      required this.converter,
-      this.enhanceUserServices = const []})
+  AnyhooAuthCubit({required this.authService, required this.converter, this.enhanceUserServices = const []})
       : super(AnyhooAuthState<T>(
-            user: authService.currentUser == null
-                ? null
-                : converter.fromJson(authService.currentUser!))) {
+            user: authService.currentUser == null ? null : converter.fromJson(authService.currentUser!))) {
     init();
   }
 
@@ -63,14 +58,13 @@ class AnyhooAuthCubit<T extends AnyhooUser> extends Cubit<AnyhooAuthState<T>> {
         if (user == null) {
           emit(state.copyWith(clearUser: true, isLoading: false));
         } else {
-          var enhancedUserData = <String, dynamic>{};
+          var enhancedUserData = {...user};
           for (final enhanceUserService in enhanceUserServices) {
-            enhancedUserData = await enhanceUserService.enhanceUser(user);
+            enhancedUserData = await enhanceUserService.enhanceUser(enhancedUserData);
             _log.info('Enhanced user data: $enhancedUserData');
             _log.info('Enhanced user data values:');
             for (var entry in enhancedUserData.entries) {
-              _log.info(
-                  'enhanced user data value: ${entry.key}: ${entry.value}');
+              _log.info('enhanced user data value: ${entry.key}: ${entry.value}');
             }
           }
           final convertedUser = converter.fromJson(enhancedUserData);
@@ -193,10 +187,7 @@ class AnyhooAuthCubit<T extends AnyhooUser> extends Cubit<AnyhooAuthState<T>> {
       for (final enhanceUserService in enhanceUserServices) {
         enhancedUserData = await enhanceUserService.saveUser(enhancedUserData);
       }
-      emit(state.copyWith(
-          isLoading: false,
-          clearError: true,
-          user: converter.fromJson(enhancedUserData)));
+      emit(state.copyWith(isLoading: false, clearError: true, user: converter.fromJson(enhancedUserData)));
     } catch (e) {
       _log.severe('Error saving user', e);
       emit(state.copyWith(isLoading: false, errorMessage: e.toString()));
