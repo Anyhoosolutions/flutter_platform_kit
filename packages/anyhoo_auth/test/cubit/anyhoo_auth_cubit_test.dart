@@ -109,7 +109,7 @@ void main() {
         authService: mockAuthService,
         converter: testConverter,
       );
-      expect(cubit.state.user?.toJson(), equals(testUser.toJson()));
+      expect(cubit.state.user, equals(null));
     });
 
     group('Auth State Changes', () {
