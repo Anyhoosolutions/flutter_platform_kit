@@ -1,3 +1,7 @@
+## 0.0.12
+ 
+* Add copyWith method to AnyhooUser
+
 ## 0.0.11
  
 * AnyhooStringUtils
