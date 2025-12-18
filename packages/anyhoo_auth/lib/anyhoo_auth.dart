@@ -11,6 +11,7 @@ export 'services/anyhoo_auth_service.dart';
 export 'services/anyhoo_firebase_auth_service.dart';
 export 'services/anyhoo_mock_auth_service.dart';
 export 'services/anyhoo_enhance_user_service.dart';
+export 'services/anyhoo_firebase_enhance_user_service.dart';
 export 'updater/anyhoo_user_updater.dart';
 export 'updater/updatable_for_anyhoo_user.dart';
 export 'widgets/login_widget.dart';
