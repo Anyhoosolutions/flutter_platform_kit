@@ -18,12 +18,12 @@ import 'package:anyhoo_core/models/anyhoo_user.dart';
 /// ```
 abstract class AnyhooAuthService<T extends AnyhooUser> {
   /// Current authenticated user, null if not logged in.
-  T? get currentUser;
+  Map<String, dynamic>? get currentUser;
 
   /// Whether a user is currently logged in.
   bool get isAuthenticated => currentUser != null;
 
-  Stream<T?> get authStateChanges;
+  Stream<Map<String, dynamic>?> get authStateChanges;
 
   /// Log in with email and password.
   ///
