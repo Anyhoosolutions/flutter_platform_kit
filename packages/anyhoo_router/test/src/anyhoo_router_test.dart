@@ -450,6 +450,9 @@ class TestUser extends AnyhooUser {
   Map<String, dynamic> toJson() => {'id': id, 'email': email};
 
   @override
+  TestUser copyWith() => TestUser(id: id, email: email);
+
+  @override
   String getEmail() => email;
 
   @override

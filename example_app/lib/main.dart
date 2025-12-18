@@ -1,4 +1,3 @@
-import 'package:anyhoo_auth/services/anyhoo_firebase_enhance_user_service.dart';
 import 'package:anyhoo_core/arguments_parser.dart';
 import 'package:anyhoo_core/models/arguments.dart';
 import 'package:anyhoo_firebase/anyhoo_firebase.dart';
@@ -30,24 +29,12 @@ void main() async {
 
   final arguments = await ArgumentsParser.getArguments();
 
-  final emulatorConfig = EmulatorConfig(
-    hostIp: 'localhost',
-    authPort: 21201,
-    firestorePort: 21203,
-    storagePort: 21204,
-  );
-  final firebaseInitializer = FirebaseInitializer(
-    arguments: arguments,
-    emulatorConfig: emulatorConfig,
-  );
+  final emulatorConfig = EmulatorConfig(hostIp: 'localhost', authPort: 21201, firestorePort: 21203, storagePort: 21204);
+  final firebaseInitializer = FirebaseInitializer(arguments: arguments, emulatorConfig: emulatorConfig);
   await firebaseInitializer.initialize(DefaultFirebaseOptions.currentPlatform);
 
   runApp(
-    MyApp(
-      arguments: arguments,
-      firebaseInitializer: firebaseInitializer,
-      loggingConfiguration: loggingConfiguration,
-    ),
+    MyApp(arguments: arguments, firebaseInitializer: firebaseInitializer, loggingConfiguration: loggingConfiguration),
   );
 }
 
@@ -66,24 +53,19 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final converter = ExampleUserConverter();
-    final AnyhooAuthService authService = AnyhooFirebaseAuthService(
+    final AnyhooAuthService<ExampleUser> authService = AnyhooFirebaseAuthService(
       firebaseAuth: firebaseInitializer.getAuth(),
+      converter: converter,
     );
 
     final appRouter = AnyhooRouter(routes: $appRoutes).getGoRouter();
 
     return MultiRepositoryProvider(
       providers: [
-        RepositoryProvider<LoggingConfiguration>(
-          create: (context) => loggingConfiguration,
-        ),
+        RepositoryProvider<LoggingConfiguration>(create: (context) => loggingConfiguration),
         RepositoryProvider<Arguments>(create: (context) => arguments),
-        RepositoryProvider<FirebaseFirestore>(
-          create: (context) => firebaseInitializer.getFirestore(),
-        ),
-        RepositoryProvider<firebase_auth.FirebaseAuth>(
-          create: (context) => firebaseInitializer.getAuth(),
-        ),
+        RepositoryProvider<FirebaseFirestore>(create: (context) => firebaseInitializer.getFirestore()),
+        RepositoryProvider<firebase_auth.FirebaseAuth>(create: (context) => firebaseInitializer.getAuth()),
       ],
       child: MultiBlocProvider(
         providers: [
@@ -96,15 +78,13 @@ class MyApp extends StatelessWidget {
                 AnyhooFirebaseEnhanceUserService(
                   path: 'users',
                   firestore: firebaseInitializer.getFirestore(),
+                  converter: converter,
                 ),
               ],
             ),
           ),
         ],
-        child: MaterialApp.router(
-          title: 'Example app',
-          routerConfig: appRouter,
-        ),
+        child: MaterialApp.router(title: 'Example app', routerConfig: appRouter),
       ),
     );
   }

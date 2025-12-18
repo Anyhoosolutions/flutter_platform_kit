@@ -1,3 +1,7 @@
+## 0.0.21
+
+* AnyhooAuthService returns AnyhooUser instead of Map<String, dynamic>
+
 ## 0.0.20
 
 * Export AnyhooFirebaseEnhanceUserService

@@ -35,14 +35,13 @@ import 'package:logging/logging.dart';
 final _log = Logger('AnyhooAuthCubit');
 
 class AnyhooAuthCubit<T extends AnyhooUser> extends Cubit<AnyhooAuthState<T>> {
-  final AnyhooAuthService authService;
+  final AnyhooAuthService<T> authService;
   final AnyhooUserConverter<T> converter;
-  final List<AnyhooEnhanceUserService> enhanceUserServices;
-  StreamSubscription<Map<String, dynamic>?>? _authStateSubscription;
+  final List<AnyhooEnhanceUserService<T>> enhanceUserServices;
+  StreamSubscription<T?>? _authStateSubscription;
 
   AnyhooAuthCubit({required this.authService, required this.converter, this.enhanceUserServices = const []})
-      : super(AnyhooAuthState<T>(
-            user: authService.currentUser == null ? null : converter.fromJson(authService.currentUser!))) {
+      : super(AnyhooAuthState<T>(user: authService.currentUser)) {
     init();
   }
 
@@ -51,27 +50,25 @@ class AnyhooAuthCubit<T extends AnyhooUser> extends Cubit<AnyhooAuthState<T>> {
       (user) async {
         _log.info('Auth state changed (user): $user');
         _log.info('User data values:');
-        for (var entry in user?.entries ?? <MapEntry<String, dynamic>>[]) {
+        for (var entry in user?.toJson().entries ?? <MapEntry<String, dynamic>>[]) {
           _log.info('User data value: ${entry.key}: ${entry.value}');
         }
 
         if (user == null) {
           emit(state.copyWith(clearUser: true, isLoading: false));
         } else {
-          var enhancedUserData = {...user};
+          var enhancedUserData = user.copyWith() as T;
           for (final enhanceUserService in enhanceUserServices) {
             enhancedUserData = await enhanceUserService.enhanceUser(enhancedUserData);
             _log.info('Enhanced user data: $enhancedUserData');
             _log.info('Enhanced user data values:');
-            for (var entry in enhancedUserData.entries) {
+            for (var entry in enhancedUserData.toJson().entries) {
               _log.info('enhanced user data value: ${entry.key}: ${entry.value}');
             }
           }
-          final convertedUser = converter.fromJson(enhancedUserData);
-          _log.info('Converted user: $convertedUser');
-          _log.info('Auth state changed (user): ${convertedUser.getId()}');
+          _log.info('Auth state changed (user): ${enhancedUserData.getId()}');
 
-          emit(state.copyWith(user: convertedUser, isLoading: false));
+          emit(state.copyWith(user: enhancedUserData, isLoading: false));
         }
       },
       onError: (error) {
@@ -178,16 +175,16 @@ class AnyhooAuthCubit<T extends AnyhooUser> extends Cubit<AnyhooAuthState<T>> {
     }
   }
 
-  Future<void> saveUser(Map<String, dynamic> user) async {
+  Future<void> saveUser(T user) async {
     _log.info('Saving user');
     emit(state.copyWith(isLoading: true, clearError: true));
 
     try {
-      var enhancedUserData = {...user};
+      var enhancedUserData = user.copyWith() as T;
       for (final enhanceUserService in enhanceUserServices) {
         enhancedUserData = await enhanceUserService.saveUser(enhancedUserData);
       }
-      emit(state.copyWith(isLoading: false, clearError: true, user: converter.fromJson(enhancedUserData)));
+      emit(state.copyWith(isLoading: false, clearError: true, user: enhancedUserData));
     } catch (e) {
       _log.severe('Error saving user', e);
       emit(state.copyWith(isLoading: false, errorMessage: e.toString()));
@@ -195,16 +192,15 @@ class AnyhooAuthCubit<T extends AnyhooUser> extends Cubit<AnyhooAuthState<T>> {
     }
   }
 
-  Future<void> refreshUser(Map<String, dynamic> user) async {
+  Future<void> refreshUser(T user) async {
     emit(state.copyWith(user: null, isLoading: true));
 
-    var enhancedUserData = {...user};
+    var enhancedUserData = user.copyWith() as T;
     for (final enhanceUserService in enhanceUserServices) {
       enhancedUserData = await enhanceUserService.enhanceUser(enhancedUserData);
     }
-    final convertedUser = converter.fromJson(enhancedUserData);
-    _log.info('Auth state changed (user): ${convertedUser.getId()}');
+    _log.info('Auth state changed (user): ${enhancedUserData.getId()}');
 
-    emit(state.copyWith(user: convertedUser, isLoading: false));
+    emit(state.copyWith(user: enhancedUserData, isLoading: false));
   }
 }
