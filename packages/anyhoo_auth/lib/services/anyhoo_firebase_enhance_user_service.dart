@@ -5,7 +5,8 @@ import 'package:logging/logging.dart';
 final _log = Logger('AnyhooFirebaseEnhanceUserService');
 
 class AnyhooFirebaseEnhanceUserService extends AnyhooEnhanceUserService {
-  AnyhooFirebaseEnhanceUserService({required this.path, required this.firestore});
+  AnyhooFirebaseEnhanceUserService(
+      {required this.path, required this.firestore});
 
   final String path;
   final FirebaseFirestore firestore;
@@ -22,7 +23,11 @@ class AnyhooFirebaseEnhanceUserService extends AnyhooEnhanceUserService {
     if (id.isEmpty) {
       throw Exception('User map must contain either "id" or "uid" field');
     }
-    final data = await firestore.collection(path).doc(id).get().then((value) => value.data() ?? <String, dynamic>{});
+    final data = await firestore
+        .collection(path)
+        .doc(id)
+        .get()
+        .then((value) => value.data() ?? <String, dynamic>{});
 
     final enhancedUser = {...data, ...user};
     _log.info('Enhanced user: $enhancedUser');
@@ -30,7 +35,7 @@ class AnyhooFirebaseEnhanceUserService extends AnyhooEnhanceUserService {
   }
 
   @override
-  Future<void> saveUser(Map<String, dynamic> user) async {
+  Future<Map<String, dynamic>> saveUser(Map<String, dynamic> user) async {
     final id = user['id'] ?? user['uid'] ?? '';
     _log.info('Saving user (id): $id');
     _log.info('user values: ${user.entries}');
@@ -40,5 +45,6 @@ class AnyhooFirebaseEnhanceUserService extends AnyhooEnhanceUserService {
     }
 
     await firestore.collection(path).doc(id).set(user);
+    return user;
   }
 }
