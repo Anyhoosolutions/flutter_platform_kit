@@ -1,3 +1,7 @@
+## 0.0.22
+
+* copyWith as getter
+
 ## 0.0.21
 
 * AnyhooAuthService returns AnyhooUser instead of Map<String, dynamic>
