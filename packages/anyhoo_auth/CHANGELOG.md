@@ -1,3 +1,7 @@
+## 0.0.20
+
+* Export AnyhooFirebaseEnhanceUserService
+
 ## 0.0.19
 
 * Multiple EnhanceUserServices
