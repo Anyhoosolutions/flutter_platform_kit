@@ -66,7 +66,6 @@ class AnyhooAuthCubit<T extends AnyhooUser> extends Cubit<AnyhooAuthState<T>> {
               _log.info('enhanced user data value: ${entry.key}: ${entry.value}');
             }
           }
-          _log.info('Auth state changed (user): ${enhancedUserData.getId()}');
 
           emit(state.copyWith(user: enhancedUserData, isLoading: false));
         }
@@ -199,7 +198,6 @@ class AnyhooAuthCubit<T extends AnyhooUser> extends Cubit<AnyhooAuthState<T>> {
     for (final enhanceUserService in enhanceUserServices) {
       enhancedUserData = await enhanceUserService.enhanceUser(enhancedUserData);
     }
-    _log.info('Auth state changed (user): ${enhancedUserData.getId()}');
 
     emit(state.copyWith(user: enhancedUserData, isLoading: false));
   }

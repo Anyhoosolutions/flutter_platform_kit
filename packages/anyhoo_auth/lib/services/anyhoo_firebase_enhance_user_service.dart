@@ -16,7 +16,7 @@ class AnyhooFirebaseEnhanceUserService<T extends AnyhooUser> extends AnyhooEnhan
   final AnyhooUserConverter<T> _converter;
   @override
   Future<T> enhanceUser(T user) async {
-    final id = user.getId();
+    final id = user.toJson()['id'];
     _log.info('Enhancing user (id): $id');
     _log.info('user values:');
     for (var entry in user.toJson().entries) {
@@ -36,7 +36,7 @@ class AnyhooFirebaseEnhanceUserService<T extends AnyhooUser> extends AnyhooEnhan
 
   @override
   Future<T> saveUser(T user) async {
-    final id = user.getId();
+    final id = user.toJson()['id'];
     _log.info('Saving user (id): $id');
     _log.info('user values: ${user.toJson().entries}');
 

@@ -48,7 +48,6 @@ class AnyhooFirebaseAuthService<T extends AnyhooUser> implements AnyhooAuthServi
       _log.info('Auth state changed (uid): ${firebaseUser?.uid ?? 'null'}');
       if (firebaseUser != null) {
         final userData = _firebaseUserToMap(firebaseUser);
-        _log.info('Auth state changed (email): ${userData.getEmail()}');
         setUser(userData);
       } else {
         clearUser();
@@ -118,11 +117,7 @@ class AnyhooFirebaseAuthService<T extends AnyhooUser> implements AnyhooAuthServi
           idToken: googleAuth.idToken,
         );
 
-        // Once signed in, return the UserCredential
-        final userCredential = await _firebaseAuth.signInWithCredential(credential);
-        final userData = _firebaseUserToMap(userCredential.user!);
-        _log.info('Google Sign-In successful (email): ${userData.getEmail()}');
-        return;
+        await _firebaseAuth.signInWithCredential(credential);
       }
     } catch (e) {
       _log.severe('Error logging in with Google', e);
@@ -146,8 +141,7 @@ class AnyhooFirebaseAuthService<T extends AnyhooUser> implements AnyhooAuthServi
         accessToken: appleCredential.authorizationCode,
       );
       final userCredential = await _firebaseAuth.signInWithCredential(credential);
-      final userData = _firebaseUserToMap(userCredential.user!);
-      _log.info('Apple Sign-In successful (email): ${userData.getEmail()}');
+      _firebaseUserToMap(userCredential.user!);
       return;
     } catch (e) {
       _log.severe('Error logging in with Apple', e);

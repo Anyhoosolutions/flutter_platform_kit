@@ -50,18 +50,12 @@ class TestUserConverter implements AnyhooUserConverter<TestUser> {
   Map<String, dynamic> toJson(TestUser user) => user.toJson();
 }
 
-class TestUser extends AnyhooUser {
+class TestUser implements AnyhooUser {
   final String id;
   final String email;
   final String? extra;
 
   TestUser({required this.id, required this.email, this.extra});
-
-  @override
-  String getEmail() => email;
-
-  @override
-  String getId() => id;
 
   @override
   Map<String, dynamic> toJson() => {'id': id, 'email': email, 'extra': extra};

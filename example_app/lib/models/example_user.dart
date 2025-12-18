@@ -1,38 +1,23 @@
-import 'package:anyhoo_core/anyhoo_core.dart';
+import 'package:anyhoo_core/models/anyhoo_user.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+part 'example_user.freezed.dart';
+part 'example_user.g.dart';
 
 /// Example user model for the demo app.
 ///
 /// This demonstrates how apps can extend AuthUser with their own fields.
-class ExampleUser extends AnyhooUser {
-  final String id;
-  final String email;
-  final String name;
-  final String? photoUrl;
-  final int? phoneNumber;
-  ExampleUser({required this.id, required this.email, required this.name, this.photoUrl, this.phoneNumber});
+@freezed
+abstract class ExampleUser with _$ExampleUser implements AnyhooUser {
+  const factory ExampleUser({
+    required String id,
+    required String email,
+    required String name,
+    String? photoUrl,
+    int? phoneNumber,
+  }) = _ExampleUser;
 
-  @override
-  Map<String, dynamic> toJson() {
-    return {'id': id, 'email': email, 'name': name, 'photoUrl': photoUrl, 'phoneNumber': phoneNumber};
-  }
+  factory ExampleUser.fromJson(Map<String, dynamic> json) => _$ExampleUserFromJson(json);
 
-  factory ExampleUser.fromJson(Map<String, dynamic> json) {
-    return ExampleUser(
-      id: json['id'] as String,
-      email: json['email'] as String,
-      name: json['name'] as String,
-      photoUrl: json['photoUrl'] as String?,
-      phoneNumber: json['phoneNumber'] as int?,
-    );
-  }
-
-  @override
-  String toString() =>
-      'ExampleUser(id: $id, email: $email, name: $name, photoUrl: $photoUrl, phoneNumber: $phoneNumber)';
-
-  @override
-  String getEmail() => email;
-
-  @override
-  String getId() => id;
+  const ExampleUser._();
 }

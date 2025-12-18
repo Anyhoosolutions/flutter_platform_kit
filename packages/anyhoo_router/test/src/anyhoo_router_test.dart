@@ -440,7 +440,7 @@ void main() {
 
 class MockAuthCubit extends Mock implements AnyhooAuthCubit<TestUser> {}
 
-class TestUser extends AnyhooUser {
+class TestUser implements AnyhooUser {
   final String id;
   final String email;
 
@@ -448,10 +448,4 @@ class TestUser extends AnyhooUser {
 
   @override
   Map<String, dynamic> toJson() => {'id': id, 'email': email};
-
-  @override
-  String getEmail() => email;
-
-  @override
-  String getId() => id;
 }
