@@ -53,10 +53,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final converter = ExampleUserConverter();
-    final AnyhooAuthService<ExampleUser> authService = AnyhooFirebaseAuthService(
-      firebaseAuth: firebaseInitializer.getAuth(),
-      converter: converter,
-    );
+    final AnyhooAuthService authService = AnyhooFirebaseAuthService(firebaseAuth: firebaseInitializer.getAuth());
 
     final appRouter = AnyhooRouter(routes: $appRoutes).getGoRouter();
 
@@ -75,11 +72,7 @@ class MyApp extends StatelessWidget {
               authService: authService,
               converter: converter,
               enhanceUserServices: [
-                AnyhooFirebaseEnhanceUserService(
-                  path: 'users',
-                  firestore: firebaseInitializer.getFirestore(),
-                  converter: converter,
-                ),
+                AnyhooFirebaseEnhanceUserService(path: 'users', firestore: firebaseInitializer.getFirestore()),
                 PhoneNumberEnhanceUserService(),
               ],
             ),
@@ -93,8 +86,8 @@ class MyApp extends StatelessWidget {
 
 class PhoneNumberEnhanceUserService extends AnyhooEnhanceUserService<ExampleUser> {
   @override
-  Future<ExampleUser> enhanceUser(ExampleUser user) async {
-    return user.copyWith(phoneNumber: 2125551234);
+  Future<Map<String, dynamic>> enhanceUser(Map<String, dynamic> user) async {
+    return {...user, 'phoneNumber': 2125551234};
   }
 
   @override

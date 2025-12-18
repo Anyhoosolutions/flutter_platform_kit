@@ -1,4 +1,3 @@
-import 'package:anyhoo_auth/models/anyhoo_user_converter.dart';
 import 'package:anyhoo_auth/services/anyhoo_auth_service.dart';
 import 'package:anyhoo_core/models/anyhoo_user.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
@@ -20,15 +19,14 @@ final _log = Logger('AnyhooFirebaseAuthService');
 ///   converter: MyAppUserConverter(),
 /// );
 /// ```
-class AnyhooFirebaseAuthService<T extends AnyhooUser> implements AnyhooAuthService<T> {
-  final AnyhooUserConverter<T> _converter;
+class AnyhooFirebaseAuthService<T extends AnyhooUser> implements AnyhooAuthService {
   final firebase_auth.FirebaseAuth _firebaseAuth;
 
   /// Current authenticated user, null if not logged in.
-  T? _currentUser;
+  Map<String, dynamic>? _currentUser;
 
   @override
-  T? get currentUser => _currentUser;
+  Map<String, dynamic>? get currentUser => _currentUser;
 
   @override
   bool get isAuthenticated => currentUser != null;
@@ -38,10 +36,8 @@ class AnyhooFirebaseAuthService<T extends AnyhooUser> implements AnyhooAuthServi
   /// [firebaseAuth] is optional - defaults to [FirebaseAuth.instance].
   /// Note: The converter is no longer needed here as it's used by the cubit, not the service.
   AnyhooFirebaseAuthService({
-    required AnyhooUserConverter<T> converter,
     firebase_auth.FirebaseAuth? firebaseAuth,
-  })  : _firebaseAuth = firebaseAuth ?? firebase_auth.FirebaseAuth.instance,
-        _converter = converter {
+  }) : _firebaseAuth = firebaseAuth ?? firebase_auth.FirebaseAuth.instance {
     // Listen to auth state changes and update current user
 
     _firebaseAuth.authStateChanges().listen((firebaseUser) {
@@ -56,7 +52,7 @@ class AnyhooFirebaseAuthService<T extends AnyhooUser> implements AnyhooAuthServi
   }
 
   @override
-  Stream<T?> get authStateChanges {
+  Stream<Map<String, dynamic>?> get authStateChanges {
     return _firebaseAuth.authStateChanges().map((firebaseUser) {
       _log.info('Auth state changed (uid): ${firebaseUser?.uid ?? 'null'}');
       if (firebaseUser != null) {
@@ -167,7 +163,7 @@ class AnyhooFirebaseAuthService<T extends AnyhooUser> implements AnyhooAuthServi
   }
 
   @override
-  void setUser(T user) {
+  void setUser(Map<String, dynamic> user) {
     _currentUser = user;
   }
 
@@ -177,7 +173,7 @@ class AnyhooFirebaseAuthService<T extends AnyhooUser> implements AnyhooAuthServi
   }
 
   /// Converts a Firebase User to a Map that can be used by the converter.
-  T _firebaseUserToMap(firebase_auth.User firebaseUser) {
+  Map<String, dynamic> _firebaseUserToMap(firebase_auth.User firebaseUser) {
     final map = {
       'id': firebaseUser.uid,
       'email': firebaseUser.email ?? '',
@@ -190,7 +186,6 @@ class AnyhooFirebaseAuthService<T extends AnyhooUser> implements AnyhooAuthServi
         'lastSignInTime': firebaseUser.metadata.lastSignInTime?.toIso8601String(),
       },
     };
-    final user = _converter.fromJson(map);
-    return user;
+    return map;
   }
 }
