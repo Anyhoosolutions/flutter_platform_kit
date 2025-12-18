@@ -1,3 +1,7 @@
+## 0.0.10
+
+- Allow to skip fields when generating
+
 ## 0.0.9
 
 - New lines and no .ts suffices
