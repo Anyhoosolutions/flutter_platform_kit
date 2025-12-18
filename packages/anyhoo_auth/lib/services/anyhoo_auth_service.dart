@@ -1,3 +1,5 @@
+import 'package:anyhoo_core/models/anyhoo_user.dart';
+
 /// Abstract interface for authentication services.
 ///
 /// Implement this interface to create custom authentication services.
@@ -14,14 +16,14 @@
 ///   // Implement other required methods...
 /// }
 /// ```
-abstract class AnyhooAuthService {
+abstract class AnyhooAuthService<T extends AnyhooUser> {
   /// Current authenticated user, null if not logged in.
-  Map<String, dynamic>? get currentUser;
+  T? get currentUser;
 
   /// Whether a user is currently logged in.
   bool get isAuthenticated => currentUser != null;
 
-  Stream<Map<String, dynamic>?> get authStateChanges;
+  Stream<T?> get authStateChanges;
 
   /// Log in with email and password.
   ///
@@ -50,7 +52,7 @@ abstract class AnyhooAuthService {
   Future<void> logout();
 
   /// Set the current user (useful for restoring from storage).
-  void setUser(Map<String, dynamic> user);
+  void setUser(T user);
 
   /// Clear the current user without calling logout API.
   void clearUser();

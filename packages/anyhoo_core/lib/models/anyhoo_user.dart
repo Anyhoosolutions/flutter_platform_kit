@@ -11,4 +11,6 @@ abstract class AnyhooUser {
 
   /// Convert user to JSON for storage/serialization.
   Map<String, dynamic> toJson();
+
+  AnyhooUser copyWith();
 }

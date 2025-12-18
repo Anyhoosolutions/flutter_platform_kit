@@ -1,4 +1,6 @@
+import 'package:anyhoo_auth/models/anyhoo_user_converter.dart';
 import 'package:anyhoo_auth/services/anyhoo_auth_service.dart';
+import 'package:anyhoo_core/models/anyhoo_user.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:google_sign_in/google_sign_in.dart';
@@ -18,14 +20,15 @@ final _log = Logger('AnyhooFirebaseAuthService');
 ///   converter: MyAppUserConverter(),
 /// );
 /// ```
-class AnyhooFirebaseAuthService implements AnyhooAuthService {
+class AnyhooFirebaseAuthService<T extends AnyhooUser> implements AnyhooAuthService<T> {
+  final AnyhooUserConverter<T> _converter;
   final firebase_auth.FirebaseAuth _firebaseAuth;
 
   /// Current authenticated user, null if not logged in.
-  Map<String, dynamic>? _currentUser;
+  T? _currentUser;
 
   @override
-  Map<String, dynamic>? get currentUser => _currentUser;
+  T? get currentUser => _currentUser;
 
   @override
   bool get isAuthenticated => currentUser != null;
@@ -35,15 +38,17 @@ class AnyhooFirebaseAuthService implements AnyhooAuthService {
   /// [firebaseAuth] is optional - defaults to [FirebaseAuth.instance].
   /// Note: The converter is no longer needed here as it's used by the cubit, not the service.
   AnyhooFirebaseAuthService({
+    required AnyhooUserConverter<T> converter,
     firebase_auth.FirebaseAuth? firebaseAuth,
-  }) : _firebaseAuth = firebaseAuth ?? firebase_auth.FirebaseAuth.instance {
+  })  : _firebaseAuth = firebaseAuth ?? firebase_auth.FirebaseAuth.instance,
+        _converter = converter {
     // Listen to auth state changes and update current user
 
     _firebaseAuth.authStateChanges().listen((firebaseUser) {
       _log.info('Auth state changed (uid): ${firebaseUser?.uid ?? 'null'}');
       if (firebaseUser != null) {
         final userData = _firebaseUserToMap(firebaseUser);
-        _log.info('Auth state changed (name): ${userData['displayName']}');
+        _log.info('Auth state changed (email): ${userData.getEmail()}');
         setUser(userData);
       } else {
         clearUser();
@@ -52,7 +57,7 @@ class AnyhooFirebaseAuthService implements AnyhooAuthService {
   }
 
   @override
-  Stream<Map<String, dynamic>?> get authStateChanges {
+  Stream<T?> get authStateChanges {
     return _firebaseAuth.authStateChanges().map((firebaseUser) {
       _log.info('Auth state changed (uid): ${firebaseUser?.uid ?? 'null'}');
       if (firebaseUser != null) {
@@ -116,7 +121,7 @@ class AnyhooFirebaseAuthService implements AnyhooAuthService {
         // Once signed in, return the UserCredential
         final userCredential = await _firebaseAuth.signInWithCredential(credential);
         final userData = _firebaseUserToMap(userCredential.user!);
-        _log.info('Google Sign-In successful (user): ${userData['displayName']}');
+        _log.info('Google Sign-In successful (email): ${userData.getEmail()}');
         return;
       }
     } catch (e) {
@@ -142,7 +147,7 @@ class AnyhooFirebaseAuthService implements AnyhooAuthService {
       );
       final userCredential = await _firebaseAuth.signInWithCredential(credential);
       final userData = _firebaseUserToMap(userCredential.user!);
-      _log.info('Apple Sign-In successful (user): ${userData['displayName']}');
+      _log.info('Apple Sign-In successful (email): ${userData.getEmail()}');
       return;
     } catch (e) {
       _log.severe('Error logging in with Apple', e);
@@ -169,7 +174,7 @@ class AnyhooFirebaseAuthService implements AnyhooAuthService {
   }
 
   @override
-  void setUser(Map<String, dynamic> user) {
+  void setUser(T user) {
     _currentUser = user;
   }
 
@@ -179,8 +184,8 @@ class AnyhooFirebaseAuthService implements AnyhooAuthService {
   }
 
   /// Converts a Firebase User to a Map that can be used by the converter.
-  Map<String, dynamic> _firebaseUserToMap(firebase_auth.User firebaseUser) {
-    return {
+  T _firebaseUserToMap(firebase_auth.User firebaseUser) {
+    final map = {
       'id': firebaseUser.uid,
       'email': firebaseUser.email ?? '',
       'displayName': firebaseUser.displayName,
@@ -192,5 +197,7 @@ class AnyhooFirebaseAuthService implements AnyhooAuthService {
         'lastSignInTime': firebaseUser.metadata.lastSignInTime?.toIso8601String(),
       },
     };
+    final user = _converter.fromJson(map);
+    return user;
   }
 }
