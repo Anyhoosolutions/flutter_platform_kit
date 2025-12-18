@@ -16,6 +16,13 @@ import 'package:logging/logging.dart';
 /// ```dart
 /// final authCubit = AuthCubit<MyAppUser>(
 ///   authService: authService,
+///   enhanceUserServices: [
+///     AnyhooFirebaseEnhanceUserService(
+///       path: 'users',
+///       firestore: firebaseInitializer.getFirestore(),
+///     ),
+///   ],
+///   converter: converter,
 /// );
 ///
 /// // In your widget
@@ -30,10 +37,10 @@ final _log = Logger('AnyhooAuthCubit');
 class AnyhooAuthCubit<T extends AnyhooUser> extends Cubit<AnyhooAuthState<T>> {
   final AnyhooAuthService authService;
   final AnyhooUserConverter<T> converter;
-  final AnyhooEnhanceUserService? enhanceUserService;
+  final List<AnyhooEnhanceUserService> enhanceUserServices;
   StreamSubscription<Map<String, dynamic>?>? _authStateSubscription;
 
-  AnyhooAuthCubit({required this.authService, required this.converter, this.enhanceUserService})
+  AnyhooAuthCubit({required this.authService, required this.converter, this.enhanceUserServices = const []})
       : super(AnyhooAuthState<T>(
             user: authService.currentUser == null ? null : converter.fromJson(authService.currentUser!))) {
     init();
@@ -51,11 +58,14 @@ class AnyhooAuthCubit<T extends AnyhooUser> extends Cubit<AnyhooAuthState<T>> {
         if (user == null) {
           emit(state.copyWith(clearUser: true, isLoading: false));
         } else {
-          final enhancedUserData = await enhanceUserService?.enhanceUser(user) ?? user;
-          _log.info('Enhanced user data: $enhancedUserData');
-          _log.info('Enhanced user data values:');
-          for (var entry in enhancedUserData.entries) {
-            _log.info('enhanced user data value: ${entry.key}: ${entry.value}');
+          var enhancedUserData = {...user};
+          for (final enhanceUserService in enhanceUserServices) {
+            enhancedUserData = await enhanceUserService.enhanceUser(enhancedUserData);
+            _log.info('Enhanced user data: $enhancedUserData');
+            _log.info('Enhanced user data values:');
+            for (var entry in enhancedUserData.entries) {
+              _log.info('enhanced user data value: ${entry.key}: ${entry.value}');
+            }
           }
           final convertedUser = converter.fromJson(enhancedUserData);
           _log.info('Converted user: $convertedUser');
@@ -173,8 +183,11 @@ class AnyhooAuthCubit<T extends AnyhooUser> extends Cubit<AnyhooAuthState<T>> {
     emit(state.copyWith(isLoading: true, clearError: true));
 
     try {
-      await enhanceUserService?.saveUser(user);
-      emit(state.copyWith(isLoading: false, clearError: true, user: converter.fromJson(user)));
+      var enhancedUserData = {...user};
+      for (final enhanceUserService in enhanceUserServices) {
+        enhancedUserData = await enhanceUserService.saveUser(enhancedUserData);
+      }
+      emit(state.copyWith(isLoading: false, clearError: true, user: converter.fromJson(enhancedUserData)));
     } catch (e) {
       _log.severe('Error saving user', e);
       emit(state.copyWith(isLoading: false, errorMessage: e.toString()));
@@ -185,7 +198,10 @@ class AnyhooAuthCubit<T extends AnyhooUser> extends Cubit<AnyhooAuthState<T>> {
   Future<void> refreshUser(Map<String, dynamic> user) async {
     emit(state.copyWith(user: null, isLoading: true));
 
-    final enhancedUserData = await enhanceUserService?.enhanceUser(user) ?? user;
+    var enhancedUserData = {...user};
+    for (final enhanceUserService in enhanceUserServices) {
+      enhancedUserData = await enhanceUserService.enhanceUser(enhancedUserData);
+    }
     final convertedUser = converter.fromJson(enhancedUserData);
     _log.info('Auth state changed (user): ${convertedUser.getId()}');
 

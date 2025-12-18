@@ -9,11 +9,16 @@ class MockEnhanceUserService extends AnyhooEnhanceUserService {
 
   @override
   Future<Map<String, dynamic>> enhanceUser(Map<String, dynamic> user) async {
-    return {...user, 'extra': 'here is more', 'avatarUrl': 'enhanced avatar url', 'phoneNumber': phoneNumber};
+    return {
+      ...user,
+      'extra': 'here is more',
+      'avatarUrl': 'enhanced avatar url',
+      'phoneNumber': phoneNumber,
+    };
   }
 
   @override
-  Future<void> saveUser(Map<String, dynamic> user) async {
-    return;
+  Future<Map<String, dynamic>> saveUser(Map<String, dynamic> user) async {
+    return user;
   }
 }

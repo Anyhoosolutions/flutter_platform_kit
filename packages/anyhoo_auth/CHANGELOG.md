@@ -1,3 +1,7 @@
+## 0.0.19
+
+* Multiple EnhanceUserServices
+
 ## 0.0.18
 
 * More logging

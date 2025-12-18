@@ -135,7 +135,9 @@ class FreezedToTsConverter {
           // Track referenced enums (including those inside generics)
           _extractReferencedEnums(type, referencedEnums);
 
-          // Existing JsonKey processing for 'name', 'fromJson', 'toJson'
+          bool shouldIgnore = false;
+
+          // Process JsonKey annotation
           for (final annotation in param.metadata) {
             if (annotation.name.name == 'JsonKey' &&
                 annotation.arguments != null) {
@@ -143,9 +145,12 @@ class FreezedToTsConverter {
 
               for (final arg in annotation.arguments!.arguments) {
                 if (arg is NamedExpression) {
-                  if (arg.name.label.name == 'name' &&
-                      arg.expression is StringLiteral) {
+                  final argName = arg.name.label.name;
+                  if (argName == 'name' && arg.expression is StringLiteral) {
                     jsonKeyName = (arg.expression as StringLiteral).stringValue;
+                  } else if (argName == 'ignore' &&
+                      arg.expression is BooleanLiteral) {
+                    shouldIgnore = (arg.expression as BooleanLiteral).value;
                   }
                 }
               }
@@ -155,6 +160,8 @@ class FreezedToTsConverter {
               }
             }
           }
+
+          if (shouldIgnore) continue;
 
           if (finalTsType == 'Timestamp') {
             needsTimestampImport = true;
