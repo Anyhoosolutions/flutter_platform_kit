@@ -41,8 +41,7 @@ class AnyhooAuthCubit<T extends AnyhooUser> extends Cubit<AnyhooAuthState<T>> {
   StreamSubscription<Map<String, dynamic>?>? _authStateSubscription;
 
   AnyhooAuthCubit({required this.authService, required this.converter, this.enhanceUserServices = const []})
-      : super(AnyhooAuthState<T>(
-            user: authService.currentUser != null ? converter.fromJson(authService.currentUser!) : null)) {
+      : super(AnyhooAuthState<T>(user: null)) {
     init();
   }
 

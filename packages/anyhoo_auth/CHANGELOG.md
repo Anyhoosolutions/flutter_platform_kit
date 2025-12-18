@@ -1,3 +1,7 @@
+## 0.0.24
+
+* AuthState to start at `null`
+
 ## 0.0.23
 
 * Map<String, dynamic> for getting user data and <T extends AnyhooUser> when saving
