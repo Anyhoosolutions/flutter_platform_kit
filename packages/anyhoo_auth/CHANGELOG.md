@@ -1,3 +1,7 @@
+## 0.0.22
+
+* Simplify AnyhooUser
+
 ## 0.0.21
 
 * AnyhooAuthService returns AnyhooUser instead of Map<String, dynamic>

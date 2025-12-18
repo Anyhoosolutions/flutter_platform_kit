@@ -13,7 +13,7 @@ void main() {
 }
 
 // Test implementation
-class TestUser extends AnyhooUser {
+class TestUser implements AnyhooUser {
   final String id;
   final String email;
 
@@ -21,13 +21,4 @@ class TestUser extends AnyhooUser {
 
   @override
   Map<String, dynamic> toJson() => {'id': id, 'email': email};
-
-  @override
-  TestUser copyWith() => TestUser(id: id, email: email);
-
-  @override
-  String getEmail() => email;
-
-  @override
-  String getId() => id;
 }

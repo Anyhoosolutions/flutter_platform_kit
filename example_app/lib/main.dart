@@ -80,6 +80,7 @@ class MyApp extends StatelessWidget {
                   firestore: firebaseInitializer.getFirestore(),
                   converter: converter,
                 ),
+                PhoneNumberEnhanceUserService(),
               ],
             ),
           ),
@@ -90,20 +91,14 @@ class MyApp extends StatelessWidget {
   }
 }
 
-enum AnyhooRouteName {
-  home,
-  auth,
-  routeFirstDemo,
-  routeNestedDemo,
-  routeRedirectingDemo,
-  analytics,
-  remoteConfig,
-  logging,
-  imageSelector,
-  enhanceUser,
-  arguments,
-  firestore,
-  error,
-  waiting,
-  login,
+class PhoneNumberEnhanceUserService extends AnyhooEnhanceUserService<ExampleUser> {
+  @override
+  Future<ExampleUser> enhanceUser(ExampleUser user) async {
+    return user.copyWith(phoneNumber: 2125551234);
+  }
+
+  @override
+  Future<ExampleUser> saveUser(ExampleUser user) {
+    throw UnimplementedError();
+  }
 }

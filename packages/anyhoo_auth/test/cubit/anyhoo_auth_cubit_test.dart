@@ -50,23 +50,12 @@ class TestUserConverter implements AnyhooUserConverter<TestUser> {
   Map<String, dynamic> toJson(TestUser user) => user.toJson();
 }
 
-class TestUser extends AnyhooUser {
+class TestUser implements AnyhooUser {
   final String id;
   final String email;
   final String? extra;
 
   TestUser({required this.id, required this.email, this.extra});
-
-  @override
-  TestUser copyWith({String? id, String? email, String? extra}) {
-    return TestUser(id: id ?? this.id, email: email ?? this.email, extra: extra ?? this.extra);
-  }
-
-  @override
-  String getEmail() => email;
-
-  @override
-  String getId() => id;
 
   @override
   Map<String, dynamic> toJson() => {'id': id, 'email': email, 'extra': extra};
@@ -126,7 +115,7 @@ void main() {
     group('Auth State Changes', () {
       test('emits state with new user when auth state changes to signed in', () async {
         final testUser = TestUser(id: '123', email: 'test@example.com');
-        final enhancedTestUser = testUser.copyWith(extra: 'here is more');
+        final enhancedTestUser = TestUser(id: testUser.id, email: testUser.email, extra: 'here is more');
 
         // Mock stream controller to emit events
         final controller = StreamController<TestUser?>();
@@ -208,8 +197,8 @@ void main() {
 
       test('calls multiple enhance user services in sequence', () async {
         final testUser = TestUser(id: '123', email: 'test@example.com');
-        final enhancedUser1 = testUser.copyWith(extra: 'enhanced1');
-        final enhancedUser2 = enhancedUser1.copyWith(extra: 'enhanced2');
+        final enhancedUser1 = TestUser(id: testUser.id, email: testUser.email, extra: 'enhanced1');
+        final enhancedUser2 = TestUser(id: enhancedUser1.id, email: enhancedUser1.email, extra: 'enhanced2');
 
         final enhanceUserService2 = SimpleAnyhooEnhanceUserService(
           enhanceUserCallback: (_) async => enhancedUser2,
@@ -420,7 +409,7 @@ void main() {
     group('User Management', () {
       test('saveUser calls enhance services and updates state', () async {
         final testUser = TestUser(id: '123', email: 'test@example.com');
-        final savedUser = testUser.copyWith(extra: 'saved');
+        final savedUser = TestUser(id: testUser.id, email: testUser.email, extra: 'saved');
 
         enhanceUserService = SimpleAnyhooEnhanceUserService(
           saveUserCallback: (_) async => savedUser,
@@ -443,8 +432,8 @@ void main() {
 
       test('saveUser calls multiple enhance services in sequence', () async {
         final testUser = TestUser(id: '123', email: 'test@example.com');
-        final savedUser1 = testUser.copyWith(extra: 'saved1');
-        final savedUser2 = savedUser1.copyWith(extra: 'saved2');
+        final savedUser1 = TestUser(id: testUser.id, email: testUser.email, extra: 'saved1');
+        final savedUser2 = TestUser(id: savedUser1.id, email: savedUser1.email, extra: 'saved2');
         final enhanceUserService2 = SimpleAnyhooEnhanceUserService(
           saveUserCallback: (_) async => savedUser2,
         );
@@ -492,7 +481,7 @@ void main() {
 
       test('refreshUser calls enhance services and updates state', () async {
         final testUser = TestUser(id: '123', email: 'test@example.com');
-        final enhancedUser = testUser.copyWith(extra: 'refreshed');
+        final enhancedUser = TestUser(id: testUser.id, email: testUser.email, extra: 'refreshed');
 
         enhanceUserService = SimpleAnyhooEnhanceUserService(
           enhanceUserCallback: (_) async => enhancedUser,
@@ -511,8 +500,8 @@ void main() {
 
       test('refreshUser calls multiple enhance services in sequence', () async {
         final testUser = TestUser(id: '123', email: 'test@example.com');
-        final enhancedUser1 = testUser.copyWith(extra: 'refreshed1');
-        final enhancedUser2 = enhancedUser1.copyWith(extra: 'refreshed2');
+        final enhancedUser1 = TestUser(id: testUser.id, email: testUser.email, extra: 'refreshed1');
+        final enhancedUser2 = TestUser(id: enhancedUser1.id, email: enhancedUser1.email, extra: 'refreshed2');
         final enhanceUserService2 = SimpleAnyhooEnhanceUserService(
           enhanceUserCallback: (_) async => enhancedUser2,
         );
@@ -534,7 +523,7 @@ void main() {
 
       test('refreshUser sets user to null initially then updates', () async {
         final testUser = TestUser(id: '123', email: 'test@example.com');
-        final enhancedUser = testUser.copyWith(extra: 'refreshed');
+        final enhancedUser = TestUser(id: testUser.id, email: testUser.email, extra: 'refreshed');
 
         enhanceUserService = SimpleAnyhooEnhanceUserService(
           enhanceUserCallback: (_) async => enhancedUser,

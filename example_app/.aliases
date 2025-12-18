@@ -1,0 +1,2 @@
+alias startEmulators="export NODE_ENV=development && firebase emulators:start --project flutterplatformkit --inspect-functions "
+alias exportEmulatorData="firebase emulators:export ./emulatorData --project flutterplatformkit"
