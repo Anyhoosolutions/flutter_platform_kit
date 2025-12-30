@@ -1,0 +1,30 @@
+{
+	"widgetbookUrl": "http://localhost:45678",
+	"outputDir": "./screenshots",
+	"screens": [
+		{
+			"name": "recipe_list",
+			"title": "Recipe List",
+			"path": "pages/recipe/recipelistpage/recipelistpage",
+			"navigatesTo": ["recipe_details", "add_recipe"]
+		},
+		{
+			"name": "recipe_details",
+			"title": "Recipe Details",
+			"path": "pages/recipe/recipedetailspage/recipedetailspage",
+			"navigatesTo": ["edit_recipe"]
+		},
+		{
+			"name": "add_recipe",
+			"title": "Add Recipe",
+			"path": "pages/recipe/addrecipepage/addrecipepage",
+			"navigatesTo": ["recipe_list"]
+		},
+		{
+			"name": "edit_recipe",
+			"title": "Edit Recipe",
+			"path": "pages/recipe/editrecipepage/editrecipepage",
+			"navigatesTo": ["recipe_list"]
+		}
+	]
+}
