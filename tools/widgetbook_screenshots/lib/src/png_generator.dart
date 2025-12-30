@@ -96,7 +96,6 @@ class PngGenerator {
           node.y,
           GraphLayout.nodeWidth,
           GraphLayout.nodeHeight,
-          arrowColor,
           1,
         );
       } catch (e) {
@@ -142,19 +141,16 @@ class PngGenerator {
   ) {
     final color = img.ColorRgb8(arrowColorR, arrowColorG, arrowColorB);
 
-    // Use image library's drawLine for better quality
-    if (thickness == 1) {
-      img.drawLine(canvas, x1, y1, x2, y2, color);
-    } else {
-      // For thicker lines, draw multiple parallel lines
-      for (var i = -thickness ~/ 2; i <= thickness ~/ 2; i++) {
-        for (var j = -thickness ~/ 2; j <= thickness ~/ 2; j++) {
-          if (i * i + j * j <= (thickness / 2) * (thickness / 2)) {
-            img.drawLine(canvas, x1 + i, y1 + j, x2 + i, y2 + j, color);
-          }
-        }
-      }
-    }
+    // Use image library's drawLine with named parameters
+    img.drawLine(
+      canvas,
+      x1: x1,
+      y1: y1,
+      x2: x2,
+      y2: y2,
+      color: color,
+      thickness: thickness.toDouble(),
+    );
   }
 
   void _drawArrowhead(
@@ -181,8 +177,24 @@ class PngGenerator {
     final arrowY2 = (y + arrowHeadSize * math.sin(arrowAngle2)).round();
 
     // Draw arrowhead lines
-    img.drawLine(canvas, x, y, arrowX1, arrowY1, color);
-    img.drawLine(canvas, x, y, arrowX2, arrowY2, color);
+    img.drawLine(
+      canvas,
+      x1: x,
+      y1: y,
+      x2: arrowX1,
+      y2: arrowY1,
+      color: color,
+      thickness: arrowThickness.toDouble(),
+    );
+    img.drawLine(
+      canvas,
+      x1: x,
+      y1: y,
+      x2: arrowX2,
+      y2: arrowY2,
+      color: color,
+      thickness: arrowThickness.toDouble(),
+    );
   }
 
   void _drawRect(
@@ -191,7 +203,6 @@ class PngGenerator {
     int y,
     int width,
     int height,
-    int color,
     int thickness,
   ) {
     final colorRgb = img.ColorRgb8(arrowColorR, arrowColorG, arrowColorB);
@@ -200,11 +211,11 @@ class PngGenerator {
     for (var i = 0; i < thickness; i++) {
       img.drawLine(
         canvas,
-        x,
-        y + i,
-        x + width,
-        y + i,
-        colorRgb,
+        x1: x,
+        y1: y + i,
+        x2: x + width,
+        y2: y + i,
+        color: colorRgb,
       );
     }
 
@@ -212,11 +223,11 @@ class PngGenerator {
     for (var i = 0; i < thickness; i++) {
       img.drawLine(
         canvas,
-        x,
-        y + height - i - 1,
-        x + width,
-        y + height - i - 1,
-        colorRgb,
+        x1: x,
+        y1: y + height - i - 1,
+        x2: x + width,
+        y2: y + height - i - 1,
+        color: colorRgb,
       );
     }
 
@@ -224,11 +235,11 @@ class PngGenerator {
     for (var i = 0; i < thickness; i++) {
       img.drawLine(
         canvas,
-        x + i,
-        y,
-        x + i,
-        y + height,
-        colorRgb,
+        x1: x + i,
+        y1: y,
+        x2: x + i,
+        y2: y + height,
+        color: colorRgb,
       );
     }
 
@@ -236,11 +247,11 @@ class PngGenerator {
     for (var i = 0; i < thickness; i++) {
       img.drawLine(
         canvas,
-        x + width - i - 1,
-        y,
-        x + width - i - 1,
-        y + height,
-        colorRgb,
+        x1: x + width - i - 1,
+        y1: y,
+        x2: x + width - i - 1,
+        y2: y + height,
+        color: colorRgb,
       );
     }
   }

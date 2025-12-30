@@ -55,7 +55,14 @@ class Config {
 
   String getFullUrl(Screen screen) {
     final baseUrl = widgetbookUrl.endsWith('/') ? widgetbookUrl.substring(0, widgetbookUrl.length - 1) : widgetbookUrl;
-    final path = screen.path.startsWith('/') ? screen.path : '/${screen.path}';
-    return '$baseUrl/#/?path=$path';
+    final path = screen.path.startsWith('/') ? screen.path.substring(1) : screen.path;
+    final fullUrl = '$baseUrl/#/?path=$path';
+    print('Full URL: $fullUrl');
+    return fullUrl;
   }
 }
+
+
+// http://localhost:45678/#/?path=pages/recipe/recipelistpage/recipelistpage
+// http://localhost:45678/#/?path=pages/recipe/recipelistpage/recipelistpage
+

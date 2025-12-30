@@ -51,6 +51,7 @@ class ScreenshotCapturer {
       _logger.fine('  Output: $outputPath');
 
       // Use Playwright CLI to capture screenshot
+      // Note: Omitting --full-page means we capture only the viewport (default behavior)
       final result = await Process.run(
         'playwright',
         [
@@ -58,7 +59,6 @@ class ScreenshotCapturer {
           url,
           outputPath,
           '--wait-for-timeout=3000', // Wait 3 seconds for page to load
-          '--full-page=false', // Only capture viewport
         ],
         runInShell: true,
       );
