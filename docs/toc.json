@@ -167,9 +167,9 @@
 			]
 		},
 		{
-			"filepath": "scripts.md",
-			"name": "Scripts",
-			"title": "Scripts",
+			"filepath": "tools.md",
+			"name": "Tools",
+			"title": "Tools",
 			"subpages": [
 				{
 					"filepath": "freezed_to_ts/README.md",
