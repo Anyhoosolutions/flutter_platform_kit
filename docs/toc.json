@@ -12,163 +12,177 @@
 		},
 		{
 			"filepath": "how_to_new_package.md",
-			"name": "How to new package",
-			"title": "How to new package",
+			"name": "How to add a new package",
+			"title": "How to add a new package",
 			"subpages": []
 		},
 		{
-			"filepath": "anyhoo_core/README.md",
-			"name": "Anyhoo Core",
-			"title": "Anyhoo Core",
+			"filepath": "flutter_packages.md",
+			"name": "Flutter packages",
+			"title": "Flutter packages",
 			"subpages": [
 				{
-					"filepath": "anyhoo_core/CHANGELOG.md",
-					"name": "Changelog",
-					"title": "Changelog",
-					"subpages": []
+					"filepath": "anyhoo_core/README.md",
+					"name": "Anyhoo Core",
+					"title": "Anyhoo Core",
+					"subpages": [
+						{
+							"filepath": "anyhoo_core/CHANGELOG.md",
+							"name": "Changelog",
+							"title": "Changelog",
+							"subpages": []
+						}
+					]
+				},
+				{
+					"filepath": "anyhoo_auth/README.md",
+					"name": "Anyhoo Auth",
+					"title": "Anyhoo Auth",
+					"subpages": [
+						{
+							"filepath": "anyhoo_auth/CHANGELOG.md",
+							"name": "Changelog",
+							"title": "Changelog",
+							"subpages": []
+						}
+					]
+				},
+				{
+					"filepath": "anyhoo_firebase/README.md",
+					"name": "Anyhoo Firebase",
+					"title": "Anyhoo Firebase",
+					"subpages": [
+						{
+							"filepath": "anyhoo_firebase/CHANGELOG.md",
+							"name": "Changelog",
+							"title": "Changelog",
+							"subpages": []
+						}
+					]
+				},
+				{
+					"filepath": "anyhoo_router/README.md",
+					"name": "Anyhoo Router",
+					"title": "Anyhoo Router",
+					"subpages": [
+						{
+							"filepath": "anyhoo_router/CHANGELOG.md",
+							"name": "Changelog",
+							"title": "Changelog",
+							"subpages": []
+						}
+					]
+				},
+				{
+					"filepath": "anyhoo_image_selector/README.md",
+					"name": "Anyhoo Image Selector",
+					"title": "Anyhoo Image Selector",
+					"subpages": [
+						{
+							"filepath": "anyhoo_image_selector/CHANGELOG.md",
+							"name": "Changelog",
+							"title": "Changelog",
+							"subpages": []
+						}
+					]
+				},
+				{
+					"filepath": "anyhoo_remote_config/README.md",
+					"name": "Anyhoo Remote Config",
+					"title": "Anyhoo Remote Config",
+					"subpages": [
+						{
+							"filepath": "anyhoo_remote_config/CHANGELOG.md",
+							"name": "Changelog",
+							"title": "Changelog",
+							"subpages": []
+						}
+					]
+				},
+				{
+					"filepath": "anyhoo_shimmer/README.md",
+					"name": "Anyhoo Shimmer",
+					"title": "Anyhoo Shimmer",
+					"subpages": [
+						{
+							"filepath": "anyhoo_shimmer/CHANGELOG.md",
+							"name": "Changelog",
+							"title": "Changelog",
+							"subpages": []
+						}
+					]
+				},
+				{
+					"filepath": "anyhoo_app_bar/README.md",
+					"name": "Anyhoo App Bar",
+					"title": "Anyhoo App Bar",
+					"subpages": [
+						{
+							"filepath": "anyhoo_app_bar/CHANGELOG.md",
+							"name": "Changelog",
+							"title": "Changelog",
+							"subpages": []
+						}
+					]
+				},
+				{
+					"filepath": "anyhoo_form_builder_widgets/README.md",
+					"name": "Anyhoo Form Builder Widgets",
+					"title": "Anyhoo Form Builder Widgets",
+					"subpages": [
+						{
+							"filepath": "anyhoo_form_builder_widgets/CHANGELOG.md",
+							"name": "Changelog",
+							"title": "Changelog",
+							"subpages": []
+						}
+					]
+				},
+				{
+					"filepath": "anyhoo_logging/README.md",
+					"name": "Anyhoo Logging",
+					"title": "Anyhoo Logging",
+					"subpages": [
+						{
+							"filepath": "anyhoo_logging/CHANGELOG.md",
+							"name": "Changelog",
+							"title": "Changelog",
+							"subpages": []
+						}
+					]
+				},
+				{
+					"filepath": "anyhoo_search_bar/README.md",
+					"name": "Anyhoo Search Bar",
+					"title": "Anyhoo Search Bar",
+					"subpages": [
+						{
+							"filepath": "anyhoo_search_bar/CHANGELOG.md",
+							"name": "Changelog",
+							"title": "Changelog",
+							"subpages": []
+						}
+					]
 				}
 			]
 		},
 		{
-			"filepath": "anyhoo_auth/README.md",
-			"name": "Anyhoo Auth",
-			"title": "Anyhoo Auth",
+			"filepath": "scripts.md",
+			"name": "Scripts",
+			"title": "Scripts",
 			"subpages": [
 				{
-					"filepath": "anyhoo_auth/CHANGELOG.md",
-					"name": "Changelog",
-					"title": "Changelog",
-					"subpages": []
-				}
-			]
-		},
-		{
-			"filepath": "anyhoo_firebase/README.md",
-			"name": "Anyhoo Firebase",
-			"title": "Anyhoo Firebase",
-			"subpages": [
-				{
-					"filepath": "anyhoo_firebase/CHANGELOG.md",
-					"name": "Changelog",
-					"title": "Changelog",
-					"subpages": []
-				}
-			]
-		},
-		{
-			"filepath": "anyhoo_router/README.md",
-			"name": "Anyhoo Router",
-			"title": "Anyhoo Router",
-			"subpages": [
-				{
-					"filepath": "anyhoo_router/CHANGELOG.md",
-					"name": "Changelog",
-					"title": "Changelog",
-					"subpages": []
-				}
-			]
-		},
-		{
-			"filepath": "anyhoo_image_selector/README.md",
-			"name": "Anyhoo Image Selector",
-			"title": "Anyhoo Image Selector",
-			"subpages": [
-				{
-					"filepath": "anyhoo_image_selector/CHANGELOG.md",
-					"name": "Changelog",
-					"title": "Changelog",
-					"subpages": []
-				}
-			]
-		},
-		{
-			"filepath": "anyhoo_remote_config/README.md",
-			"name": "Anyhoo Remote Config",
-			"title": "Anyhoo Remote Config",
-			"subpages": [
-				{
-					"filepath": "anyhoo_remote_config/CHANGELOG.md",
-					"name": "Changelog",
-					"title": "Changelog",
-					"subpages": []
-				}
-			]
-		},
-		{
-			"filepath": "anyhoo_shimmer/README.md",
-			"name": "Anyhoo Shimmer",
-			"title": "Anyhoo Shimmer",
-			"subpages": [
-				{
-					"filepath": "anyhoo_shimmer/CHANGELOG.md",
-					"name": "Changelog",
-					"title": "Changelog",
-					"subpages": []
-				}
-			]
-		},
-		{
-			"filepath": "anyhoo_app_bar/README.md",
-			"name": "Anyhoo App Bar",
-			"title": "Anyhoo App Bar",
-			"subpages": [
-				{
-					"filepath": "anyhoo_app_bar/CHANGELOG.md",
-					"name": "Changelog",
-					"title": "Changelog",
-					"subpages": []
-				}
-			]
-		},
-		{
-			"filepath": "anyhoo_form_builder_widgets/README.md",
-			"name": "Anyhoo Form Builder Widgets",
-			"title": "Anyhoo Form Builder Widgets",
-			"subpages": [
-				{
-					"filepath": "anyhoo_form_builder_widgets/CHANGELOG.md",
-					"name": "Changelog",
-					"title": "Changelog",
-					"subpages": []
-				}
-			]
-		},
-		{
-			"filepath": "anyhoo_logging/README.md",
-			"name": "Anyhoo Logging",
-			"title": "Anyhoo Logging",
-			"subpages": [
-				{
-					"filepath": "anyhoo_logging/CHANGELOG.md",
-					"name": "Changelog",
-					"title": "Changelog",
-					"subpages": []
-				}
-			]
-		},
-		{
-			"filepath": "anyhoo_search_bar/README.md",
-			"name": "Anyhoo Search Bar",
-			"title": "Anyhoo Search Bar",
-			"subpages": [
-				{
-					"filepath": "anyhoo_search_bar/CHANGELOG.md",
-					"name": "Changelog",
-					"title": "Changelog",
-					"subpages": []
-				}
-			]
-		},
-		{
-			"filepath": "freezed_to_ts/README.md",
-			"name": "Freezed to TypeScript",
-			"title": "Anyhoo Search Bar",
-			"subpages": [
-				{
-					"filepath": "freezed_to_ts/CHANGELOG.md",
-					"name": "Changelog",
-					"title": "Changelog",
-					"subpages": []
+					"filepath": "freezed_to_ts/README.md",
+					"name": "Freezed to TypeScript",
+					"title": "Anyhoo Search Bar",
+					"subpages": [
+						{
+							"filepath": "freezed_to_ts/CHANGELOG.md",
+							"name": "Changelog",
+							"title": "Changelog",
+							"subpages": []
+						}
+					]
 				}
 			]
 		}
