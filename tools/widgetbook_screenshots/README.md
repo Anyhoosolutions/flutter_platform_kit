@@ -50,6 +50,12 @@ Create a JSON configuration file with the following structure:
 {
   "widgetbookUrl": "http://localhost:45678",
   "outputDir": "./screenshots",
+  "cropGeometry": {
+    "width": 515,
+    "height": 1080,
+    "xOffset": 700,
+    "yOffset": 0
+  },
   "screens": [
     {
       "name": "recipe_list",
@@ -77,6 +83,11 @@ Create a JSON configuration file with the following structure:
 
 - `widgetbookUrl` (optional): Base URL of the running Widgetbook instance (default: `http://localhost:45678`)
 - `outputDir` (optional): Directory where screenshots will be saved (default: `./screenshots`)
+- `cropGeometry` (optional): Crop geometry for screenshots. Since Widgetbook displays in the middle of the page, screenshots are automatically cropped:
+  - `width` (optional): Width of the cropped area in pixels (default: `515`)
+  - `height` (optional): Height of the cropped area in pixels (default: `1080`)
+  - `xOffset` (optional): X offset from left edge in pixels (default: `700`)
+  - `yOffset` (optional): Y offset from top edge in pixels (default: `0`)
 - `screens` (required): Array of screen definitions:
   - `name` (required): Unique identifier for the screen (used as filename: `{name}.png`)
   - `title` (required): Display title for the screen

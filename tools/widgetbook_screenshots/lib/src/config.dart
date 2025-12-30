@@ -26,15 +26,44 @@ class Screen {
   }
 }
 
+class CropGeometry {
+  final int width;
+  final int height;
+  final int xOffset;
+  final int yOffset;
+
+  CropGeometry({
+    required this.width,
+    required this.height,
+    required this.xOffset,
+    required this.yOffset,
+  });
+
+  factory CropGeometry.fromJson(Map<String, dynamic>? json) {
+    if (json == null) {
+      // Default geometry for Playwright (similar to Python script)
+      return CropGeometry(width: 515, height: 1080, xOffset: 700, yOffset: 0);
+    }
+    return CropGeometry(
+      width: json['width'] as int? ?? 515,
+      height: json['height'] as int? ?? 1080,
+      xOffset: json['xOffset'] as int? ?? 700,
+      yOffset: json['yOffset'] as int? ?? 0,
+    );
+  }
+}
+
 class Config {
   final String widgetbookUrl;
   final String outputDir;
   final List<Screen> screens;
+  final CropGeometry cropGeometry;
 
   Config({
     required this.widgetbookUrl,
     required this.outputDir,
     required this.screens,
+    required this.cropGeometry,
   });
 
   factory Config.fromJsonFile(String filePath) {
@@ -50,19 +79,13 @@ class Config {
       widgetbookUrl: json['widgetbookUrl'] as String? ?? 'http://localhost:45678',
       outputDir: json['outputDir'] as String? ?? './screenshots',
       screens: (json['screens'] as List<dynamic>).map((e) => Screen.fromJson(e as Map<String, dynamic>)).toList(),
+      cropGeometry: CropGeometry.fromJson(json['cropGeometry'] as Map<String, dynamic>?),
     );
   }
 
   String getFullUrl(Screen screen) {
     final baseUrl = widgetbookUrl.endsWith('/') ? widgetbookUrl.substring(0, widgetbookUrl.length - 1) : widgetbookUrl;
     final path = screen.path.startsWith('/') ? screen.path.substring(1) : screen.path;
-    final fullUrl = '$baseUrl/#/?path=$path';
-    print('Full URL: $fullUrl');
-    return fullUrl;
+    return '$baseUrl/#/?path=$path';
   }
 }
-
-
-// http://localhost:45678/#/?path=pages/recipe/recipelistpage/recipelistpage
-// http://localhost:45678/#/?path=pages/recipe/recipelistpage/recipelistpage
-

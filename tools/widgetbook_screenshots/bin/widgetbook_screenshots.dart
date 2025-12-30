@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:args/args.dart';
 import 'package:logging/logging.dart';
-import 'package:path/path.dart' as path;
 import 'package:widgetbook_screenshots/widgetbook_screenshots.dart';
 
 void main(List<String> arguments) async {

@@ -1,6 +1,12 @@
 {
 	"widgetbookUrl": "http://localhost:45678",
 	"outputDir": "./screenshots",
+	"cropGeometry": {
+		"width": 350,
+		"height": 1080,
+		"xOffset": 465,
+		"yOffset": 0
+	},
 	"screens": [
 		{
 			"name": "home_page",

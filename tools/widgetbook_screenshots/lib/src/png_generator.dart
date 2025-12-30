@@ -15,8 +15,8 @@ class PngGenerator {
   static const int arrowColorR = 108; // #6C757D gray color
   static const int arrowColorG = 117;
   static const int arrowColorB = 125;
-  static const int arrowThickness = 2;
-  static const int arrowHeadSize = 10;
+  static const int arrowThickness = 4;
+  static const int arrowHeadSize = 12;
 
   PngGenerator(this.config, this.layout);
 
@@ -88,16 +88,6 @@ class PngGenerator {
           dstX: node.x,
           dstY: node.y,
         );
-
-        // Optionally draw a border around the screenshot
-        _drawRect(
-          canvas,
-          node.x,
-          node.y,
-          GraphLayout.nodeWidth,
-          GraphLayout.nodeHeight,
-          1,
-        );
       } catch (e) {
         _logger.warning('Error drawing node ${node.screen.name}: $e');
       }
@@ -162,9 +152,10 @@ class PngGenerator {
   ) {
     final color = img.ColorRgb8(arrowColorR, arrowColorG, arrowColorB);
 
-    // Calculate angle from arrow end point back towards start
-    final dx = fromX - x;
-    final dy = fromY - y;
+    // Calculate angle from start point towards end point (where arrowhead is)
+    // This gives us the direction the arrow should point
+    final dx = x - fromX;
+    final dy = y - fromY;
     final angle = math.atan2(dy, dx);
 
     // Arrowhead points (135 degrees offset from main line)
@@ -195,64 +186,5 @@ class PngGenerator {
       color: color,
       thickness: arrowThickness.toDouble(),
     );
-  }
-
-  void _drawRect(
-    img.Image canvas,
-    int x,
-    int y,
-    int width,
-    int height,
-    int thickness,
-  ) {
-    final colorRgb = img.ColorRgb8(arrowColorR, arrowColorG, arrowColorB);
-
-    // Top edge
-    for (var i = 0; i < thickness; i++) {
-      img.drawLine(
-        canvas,
-        x1: x,
-        y1: y + i,
-        x2: x + width,
-        y2: y + i,
-        color: colorRgb,
-      );
-    }
-
-    // Bottom edge
-    for (var i = 0; i < thickness; i++) {
-      img.drawLine(
-        canvas,
-        x1: x,
-        y1: y + height - i - 1,
-        x2: x + width,
-        y2: y + height - i - 1,
-        color: colorRgb,
-      );
-    }
-
-    // Left edge
-    for (var i = 0; i < thickness; i++) {
-      img.drawLine(
-        canvas,
-        x1: x + i,
-        y1: y,
-        x2: x + i,
-        y2: y + height,
-        color: colorRgb,
-      );
-    }
-
-    // Right edge
-    for (var i = 0; i < thickness; i++) {
-      img.drawLine(
-        canvas,
-        x1: x + width - i - 1,
-        y1: y,
-        x2: x + width - i - 1,
-        y2: y + height,
-        color: colorRgb,
-      );
-    }
   }
 }
