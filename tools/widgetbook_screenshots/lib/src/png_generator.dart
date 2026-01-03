@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:math' as math;
 import 'package:image/image.dart' as img;
+import 'package:image/image.dart' show arial14;
 import 'package:logging/logging.dart';
 import 'package:path/path.dart' as path;
 import 'package:widgetbook_screenshots/src/config.dart';
@@ -17,6 +18,12 @@ class PngGenerator {
   static const int arrowColorB = 125;
   static const int arrowThickness = 4;
   static const int arrowHeadSize = 12;
+
+  // Text styling constants
+  static const int textColorR = 33; // #212529 dark gray/black
+  static const int textColorG = 37;
+  static const int textColorB = 41;
+  static const int textPadding = 10; // Space between screenshot and text
 
   PngGenerator(this.config, this.layout);
 
@@ -88,9 +95,41 @@ class PngGenerator {
           dstX: node.x,
           dstY: node.y,
         );
+
+        // Draw title text below the screenshot
+        _drawText(
+          canvas,
+          node.screen.title,
+          node.x + GraphLayout.nodeWidth ~/ 2, // Center horizontally
+          node.y + GraphLayout.nodeHeight + textPadding, // Below screenshot
+        );
       } catch (e) {
         _logger.warning('Error drawing node ${node.screen.name}: $e');
       }
+    }
+  }
+
+  void _drawText(img.Image canvas, String text, int centerX, int y) {
+    try {
+      // Estimate text width (approximately 8 pixels per character for arial14)
+      final estimatedWidth = text.length * 8;
+      final textX = centerX - estimatedWidth ~/ 2;
+
+      // Create color for text
+      final textColor = img.ColorRgb8(textColorR, textColorG, textColorB);
+
+      // Draw text using drawString function
+      // Signature: drawString(image, string, {required font, x, y, color, ...})
+      img.drawString(
+        canvas,
+        text,
+        font: arial14,
+        x: textX,
+        y: y,
+        color: textColor,
+      );
+    } catch (e) {
+      _logger.warning('Error drawing text "$text": $e');
     }
   }
 

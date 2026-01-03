@@ -18,7 +18,54 @@
 			"name": "recipe_list",
 			"title": "Recipe List",
 			"path": "pages/recipe/recipelistpage/recipelistpage",
-			"navigatesTo": []
+			"navigatesTo": ["recipe_details", "add_recipe_choice"]
+		},
+		{
+			"name": "add_recipe_choice",
+			"title": "Add Recipe Choice",
+			"path": "pages/recipe/addrecipechoicepage/addrecipechoicepage",
+			"navigatesTo": [
+				"add_recipe_image",
+				"add_recipe_web_link",
+				"add_recipe_youtube_link",
+				"add_recipe_manually"
+			]
+		},
+		{
+			"name": "add_recipe_image",
+			"title": "Add Recipe From Image",
+			"path": "pages/recipe/adddataforparsingrecipepage/addimageforparsingrecipepage",
+			"navigatesTo": ["recipe_details"]
+		},
+		{
+			"name": "add_recipe_web_link",
+			"title": "Add Recipe From Web Link",
+			"path": "pages/recipe/adddataforparsingrecipepage/addweblinkforparsingrecipepage",
+			"navigatesTo": ["recipe_details"]
+		},
+		{
+			"name": "add_recipe_youtube_link",
+			"title": "Add Recipe From YouTube Link",
+			"path": "pages/recipe/adddataforparsingrecipepage/addweblinkforparsingrecipepage",
+			"navigatesTo": ["recipe_details"]
+		},
+		{
+			"name": "add_recipe_manually",
+			"title": "Add Recipe Manually",
+			"path": "pages/recipe/addrecipemanuallypage/addrecipemanuallypage",
+			"navigatesTo": ["recipe_details"]
+		},
+		{
+			"name": "recipe_details",
+			"title": "Recipe Details",
+			"path": "pages/recipe/recipedetailspage/recipedetailspage",
+			"navigatesTo": ["edit_recipe_manually"]
+		},
+		{
+			"name": "edit_recipe_manually",
+			"title": "Edit Recipe Manually",
+			"path": "pages/recipe/addrecipemanuallypage/editrecipemanuallypage",
+			"navigatesTo": ["recipe_details"]
 		}
 	]
 }

@@ -35,6 +35,8 @@ class GraphLayout {
   static const int horizontalSpacing = 100; // Space between levels
   static const int verticalSpacing = 50; // Space between nodes in same level
   static const int padding = 50; // Padding around entire graph
+  static const int textHeight = 20; // Height for text labels below screenshots
+  static const int textPadding = 10; // Space between screenshot and text
 
   GraphLayout(this.config) {
     _buildGraph();
@@ -165,7 +167,8 @@ class GraphLayout {
 
     for (final node in nodesMap.values) {
       final nodeRight = node.x + nodeWidth;
-      final nodeBottom = node.y + nodeHeight;
+      // Account for screenshot height + text padding + text height
+      final nodeBottom = node.y + nodeHeight + textPadding + textHeight;
       if (nodeRight > maxX) maxX = nodeRight;
       if (nodeBottom > maxY) maxY = nodeBottom;
     }
