@@ -93,8 +93,11 @@ void main(List<String> arguments) async {
 
   // Generate navigation graph
   logger.info('\n📊 Generating navigation graph...');
+  logger.info('Creating graph layout...');
   final layout = GraphLayout(config);
+  logger.info('Graph layout created, creating PNG generator...');
   final generator = PngGenerator(config, layout);
+  logger.info('PNG generator created, generating PNG...');
   final success = await generator.generate(outputPath);
 
   if (success) {
