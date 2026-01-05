@@ -53,15 +53,38 @@ class GraphLayout {
     // Calculate levels using topological sort (handles cycles by breaking them)
     final levels = _calculateLevels();
 
+    // First pass: calculate the maximum height needed across all levels
+    // This gives us an estimate of the total graph height
+    int maxLevelHeight = 0;
+    for (final nodesInLevel in levels) {
+      if (nodesInLevel.isEmpty) continue;
+      final levelHeight = nodesInLevel.length * nodeHeight + (nodesInLevel.length - 1) * verticalSpacing;
+      if (levelHeight > maxLevelHeight) {
+        maxLevelHeight = levelHeight;
+      }
+    }
+
+    // Calculate the midpoint of the graph (for centering the 4th column)
+    // The midpoint should be at the center of the usable graph area
+    final graphMidpoint = padding + maxLevelHeight ~/ 2;
+
     // Position nodes based on levels
     int currentX = padding;
     for (int level = 0; level < levels.length; level++) {
       final nodesInLevel = levels[level];
       if (nodesInLevel.isEmpty) continue;
 
-      // Center nodes vertically within this level
       final totalHeight = nodesInLevel.length * nodeHeight + (nodesInLevel.length - 1) * verticalSpacing;
-      int currentY = padding + (totalHeight - nodeHeight) ~/ 2;
+
+      int currentY;
+      // For the 4th column (level 3), center around the graph midpoint
+      if (level == 3) {
+        // Center the column around the midpoint, so half nodes are above and half below
+        currentY = graphMidpoint - totalHeight ~/ 2;
+      } else {
+        // For other levels, center nodes vertically within this level
+        currentY = padding + (totalHeight - nodeHeight) ~/ 2;
+      }
 
       for (final screenName in nodesInLevel) {
         final screen = config.screens.firstWhere((s) => s.name == screenName);

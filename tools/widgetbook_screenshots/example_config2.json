@@ -1,0 +1,42 @@
+{
+	"widgetbookUrl": "http://localhost:45678",
+	"outputDir": "./screenshots",
+	"cropGeometry": {
+		"width": 350,
+		"height": 1080,
+		"xOffset": 465,
+		"yOffset": 0
+	},
+	"screens": [
+		{
+			"name": "home_page",
+			"title": "Home Page",
+			"path": "pages/home/homepage/homepage",
+			"navigatesTo": ["recipe_list", "add_recipe_choice"]
+		},
+		{
+			"name": "add_recipe_choice",
+			"title": "Add Recipe Choice",
+			"path": "pages/recipe/addrecipechoicepage/addrecipechoicepage",
+			"navigatesTo": ["recipe_details"]
+		},
+		{
+			"name": "recipe_list",
+			"title": "Recipe List",
+			"path": "pages/recipe/recipelistpage/recipelistpage",
+			"navigatesTo": ["recipe_details"]
+		},
+		{
+			"name": "recipe_details",
+			"title": "Recipe Details",
+			"path": "pages/recipe/recipedetailspage/recipedetailspage",
+			"navigatesTo": ["edit_recipe_manually"]
+		},
+		{
+			"name": "edit_recipe_manually",
+			"title": "Edit Recipe Manually",
+			"path": "pages/recipe/addrecipemanuallypage/editrecipemanuallypage",
+			"navigatesTo": ["recipe_details"]
+		}
+	]
+}

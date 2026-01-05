@@ -195,8 +195,8 @@ void main() {
         widgetbookUrl: 'http://localhost:45678',
         outputDir: './screenshots',
         screens: [
-          Screen(name: 'a', title: 'A', path: '/a', navigatesTo: ['c']),
-          Screen(name: 'b', title: 'B', path: '/b', navigatesTo: ['c']),
+          Screen(name: 'a', title: 'A', path: '/a', navigatesTo: ['b', 'c']),
+          Screen(name: 'b', title: 'B', path: '/b', navigatesTo: ['d']),
           Screen(name: 'c', title: 'C', path: '/c', navigatesTo: ['d']),
           Screen(name: 'd', title: 'D', path: '/d', navigatesTo: []),
         ],
@@ -207,9 +207,25 @@ void main() {
       final nodesByLevel = _groupNodesByLevel(layout.nodes);
 
       expect(nodesByLevel.length, 3);
-      expect(nodesByLevel[0], containsAll(['a', 'b']));
-      expect(nodesByLevel[1], contains('c'));
+      expect(nodesByLevel[0], containsAll(['a']));
+      expect(nodesByLevel[1], containsAll(['b', 'c']));
       expect(nodesByLevel[2], contains('d'));
+
+      expect(layout.nodes[0].screen.name, equals('a'));
+      expect(layout.nodes[0].x, equals(50));
+      expect(layout.nodes[0].y, equals(275));
+
+      expect(layout.nodes[1].screen.name, equals('b'));
+      expect(layout.nodes[1].x, equals(50));
+      expect(layout.nodes[1].y, equals(725));
+
+      expect(layout.nodes[2].screen.name, equals('c'));
+      expect(layout.nodes[2].x, equals(350));
+      expect(layout.nodes[2].y, equals(50));
+
+      expect(layout.nodes[3].screen.name, equals('d'));
+      expect(layout.nodes[3].x, equals(650));
+      expect(layout.nodes[3].y, equals(50));
     });
 
     test('all nodes are assigned to levels', () {
