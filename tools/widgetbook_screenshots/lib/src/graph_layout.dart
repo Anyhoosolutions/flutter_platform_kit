@@ -46,9 +46,16 @@ class GraphLayout {
 
   void _buildGraph() {
     // Build edges from navigation relationships
+    // Use a set to track unique edges and avoid duplicates
+    final edgeSet = <String>{};
     for (final screen in config.screens) {
       for (final targetName in screen.navigatesTo) {
-        _edges.add(Edge(from: screen.name, to: targetName));
+        final edgeKey = '${screen.name}->$targetName';
+        // Only add edge if we haven't seen it before (handles duplicate navigatesTo entries)
+        if (!edgeSet.contains(edgeKey)) {
+          edgeSet.add(edgeKey);
+          _edges.add(Edge(from: screen.name, to: targetName));
+        }
       }
     }
 
@@ -179,7 +186,12 @@ class GraphLayout {
     // BFS to assign levels
     // Use a set to track which nodes need processing to avoid duplicates
     final processingSet = <String>{};
-    while (queue.isNotEmpty) {
+    final processedNodes = <String>{}; // Track nodes that have been fully processed
+    int iterations = 0;
+    const maxIterations = 10000; // Safety limit
+
+    while (queue.isNotEmpty && iterations < maxIterations) {
+      iterations++;
       final current = queue.removeAt(0);
       processingSet.remove(current);
       final currentLevel = levels[current]!;
@@ -199,17 +211,25 @@ class GraphLayout {
             // Cycle detected (back edge to same level) - break it by placing neighbor in next level
             // Don't re-queue to avoid infinite loops in tight cycles
             levels[neighbor] = currentLevel + 1;
-          } else if (neighborLevel < newLevel) {
+          } else if (neighborLevel < newLevel && !processedNodes.contains(neighbor)) {
             // Longer path found - update level and re-process neighbors
+            // Only re-queue if we haven't fully processed this node yet
             levels[neighbor] = newLevel;
             if (!processingSet.contains(neighbor)) {
               queue.add(neighbor);
               processingSet.add(neighbor);
             }
           }
-          // If neighborLevel >= newLevel, no update needed
+          // If neighborLevel >= newLevel or already processed, no update needed
         }
       }
+
+      // Mark current node as fully processed
+      processedNodes.add(current);
+    }
+
+    if (iterations >= maxIterations) {
+      throw StateError('Infinite loop detected in level calculation. Graph may have complex cycles.');
     }
 
     // Assign levels to any remaining nodes (part of cycles)
@@ -293,10 +313,12 @@ class GraphLayout {
 
           // Process children
           for (final child in graph[current] ?? []) {
+            // Only process if not already visited (prevents infinite loops in cycles)
             if (!visited.contains(child)) {
               visited.add(child);
               queue.add(child);
             }
+            // If child is already visited, skip it (cycle detected and already processed)
           }
         }
       }
@@ -340,6 +362,29 @@ class GraphLayout {
   List<PositionedNode> get nodes => nodesMap.values.toList();
   List<Edge> get edges => _edges;
 
+  /// Get back edges: forward edges that go from right to left in the layout
+  /// (i.e., edges where the source node is at a higher level than the target node)
+  List<Edge> get backEdges {
+    final backEdgesList = <Edge>[];
+
+    for (final edge in _edges) {
+      final fromNode = nodesMap[edge.from];
+      final toNode = nodesMap[edge.to];
+
+      // Skip if nodes don't exist (shouldn't happen, but safety check)
+      if (fromNode == null || toNode == null) {
+        continue;
+      }
+
+      // Back edge: source node is to the right of target node (higher level)
+      if (fromNode.level > toNode.level) {
+        backEdgesList.add(edge);
+      }
+    }
+
+    return backEdgesList;
+  }
+
   /// Get the total dimensions needed for the canvas
   (int width, int height) getDimensions() {
     if (nodesMap.isEmpty) {
@@ -348,6 +393,7 @@ class GraphLayout {
 
     int maxX = 0;
     int maxY = 0;
+    int minY = double.maxFinite.toInt();
 
     for (final node in nodesMap.values) {
       final nodeRight = node.x + nodeWidth;
@@ -355,8 +401,17 @@ class GraphLayout {
       final nodeBottom = node.y + nodeHeight + textPadding + textHeight;
       if (nodeRight > maxX) maxX = nodeRight;
       if (nodeBottom > maxY) maxY = nodeBottom;
+      if (node.y < minY) minY = node.y;
     }
 
-    return (maxX + padding, maxY + padding);
+    // Account for back-edge arrows that extend below nodes
+    // Calculate how much extra space we need based on number of back edges
+    final backEdgesList = backEdges;
+    final baseOffset = 30;
+    final offsetPerLevel = 40; // Additional offset per overlapping level
+    final maxOffset = baseOffset + (backEdgesList.length > 0 ? offsetPerLevel * (backEdgesList.length - 1) : 0);
+    final extraBottomSpace = backEdgesList.isNotEmpty ? maxOffset + 20 : 0; // Add some padding
+
+    return (maxX + padding, maxY + padding + extraBottomSpace);
   }
 }

@@ -110,6 +110,9 @@ widgetbook_screenshots --config config.json --skip-screenshots
 
 # Skip only existing screenshots (capture missing ones)
 widgetbook_screenshots --config config.json --skip-existing-screenshots
+
+# Capture screenshots in dark mode
+widgetbook_screenshots --config config.json --dark-mode
 ```
 
 ### Command-Line Options
@@ -118,6 +121,7 @@ widgetbook_screenshots --config config.json --skip-existing-screenshots
 - `-o, --output`: (Optional) Output path for navigation graph PNG (default: `./navigation_graph.png`)
 - `--skip-screenshots`: (Optional) Skip all screenshot capture and use existing screenshots in output directory
 - `--skip-existing-screenshots`: (Optional) Skip screenshot capture only if file already exists (capture missing screenshots)
+- `--dark-mode`: (Optional) Capture screenshots in dark mode. Appends dark mode knobs to Widgetbook URLs and adds `-dark` suffix to filenames
 
 ## How It Works
 
@@ -174,10 +178,36 @@ This is useful when:
 - Some screenshots failed to capture initially
 - You want to preserve existing screenshots while capturing new ones
 
+### Dark Mode Support
+
+Capture screenshots in dark mode using the `--dark-mode` flag:
+
+```bash
+widgetbook_screenshots --config config.json --dark-mode
+```
+
+When dark mode is enabled:
+- Widgetbook URLs are modified to include `&knobs={Theme%20mode:dark}` parameter
+- Individual screenshot files are saved with `-dark` suffix (e.g., `recipe_list-dark.png`)
+- Navigation graph output file is saved with `-dark` suffix (e.g., `navigation_graph-dark.png`)
+
+This allows you to maintain both light and dark mode versions of your screenshots and navigation graphs without overwriting each other.
+
+**Example workflow for both modes:**
+
+```bash
+# Capture light mode screenshots
+widgetbook_screenshots --config config.json --output ./docs/navigation_graph.png
+
+# Capture dark mode screenshots
+widgetbook_screenshots --config config.json --dark-mode --output ./docs/navigation_graph.png
+# This will create navigation_graph-dark.png and screenshots with -dark suffix
+```
+
 ## Output
 
-- **Individual Screenshots**: Saved to the configured `outputDir` directory as `{name}.png`
-- **Navigation Graph**: Single PNG file showing all screenshots arranged with navigation arrows
+- **Individual Screenshots**: Saved to the configured `outputDir` directory as `{name}.png` (or `{name}-dark.png` when using `--dark-mode`)
+- **Navigation Graph**: Single PNG file showing all screenshots arranged with navigation arrows (saved as `navigation_graph-dark.png` when using `--dark-mode`)
 
 ## Troubleshooting
 

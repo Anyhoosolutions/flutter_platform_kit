@@ -22,7 +22,7 @@ jobs:
       - name: Copy CHANGELOGs to docs
         run: |
           # Copy each package's CHANGELOG.md to docs/{package_name}/CHANGELOG.md
-          for package_dir in packages/*/ tools/freezed_to_ts/; do
+          for package_dir in packages/*/ tools/*/; do
             package_name=$(basename "$package_dir")
             changelog_path="$package_dir/CHANGELOG.md"
             
@@ -38,7 +38,7 @@ jobs:
       - name: Copy READMEs to docs
         run: |
           # Copy each package's README.md to docs/{package_name}/README.md
-          for package_dir in packages/*/ tools/freezed_to_ts/; do
+          for package_dir in packages/*/ tools/*/; do
             package_name=$(basename "$package_dir")
             readme_path="$package_dir/README.md"
             
@@ -87,7 +87,7 @@ jobs:
       - name: Check for version in pubspec.yaml
         run: |
           failed=false
-          for package_dir in packages/*/ tools/freezed_to_ts/; do
+          for package_dir in packages/*/ tools/*/; do
             package_name=$(basename "$package_dir")
             
             if [ ! -f "$package_dir/pubspec.yaml" ] || [ ! -f "$package_dir/CHANGELOG.md" ]; then
@@ -121,17 +121,17 @@ jobs:
           # Check which packages have been modified
           CHANGED_PACKAGES=$(git diff --name-only origin/$BASE_REF...HEAD | grep -E '^packages/[^/]+/' | cut -d'/' -f2 | sort -u)
 
-          # Check if tools/freezed_to_ts has been modified
-          CHANGED_TOOLS=$(git diff --name-only origin/$BASE_REF...HEAD | grep -E '^tools/freezed_to_ts/' | wc -l)
+          # Check if any tools have been modified
+          CHANGED_TOOLS=$(git diff --name-only origin/$BASE_REF...HEAD | grep -E '^tools/[^/]+/' | cut -d'/' -f2 | sort -u)
           HAS_CHANGES=false
           if [ -n "$CHANGED_PACKAGES" ]; then
             HAS_CHANGES=true
           fi
-          if [ "$CHANGED_TOOLS" -gt 0 ]; then
+          if [ -n "$CHANGED_TOOLS" ]; then
             if [ -n "$CHANGED_PACKAGES" ]; then
-              CHANGED_PACKAGES="$CHANGED_PACKAGES freezed_to_ts"
+              CHANGED_PACKAGES="$CHANGED_PACKAGES $CHANGED_TOOLS"
             else
-              CHANGED_PACKAGES="freezed_to_ts"
+              CHANGED_PACKAGES="$CHANGED_TOOLS"
             fi
             HAS_CHANGES=true
           fi
@@ -140,8 +140,9 @@ jobs:
 
           # For each modified package, check if its CHANGELOG was updated
           for package in $CHANGED_PACKAGES; do
-            if [ "$package" = "freezed_to_ts" ]; then
-              CHANGELOG_PATH="tools/freezed_to_ts/CHANGELOG.md"
+            # Check if it's a tool (exists in tools directory)
+            if [ -d "tools/$package" ]; then
+              CHANGELOG_PATH="tools/$package/CHANGELOG.md"
             else
               CHANGELOG_PATH="packages/$package/CHANGELOG.md"
             fi
@@ -163,8 +164,9 @@ jobs:
           if [ ${#MISSING_CHANGELOGS[@]} -gt 0 ]; then
             echo "❌ Error: The following packages have changes but their CHANGELOG.md files have not been updated:"
             for package in "${MISSING_CHANGELOGS[@]}"; do
-              if [ "$package" = "freezed_to_ts" ]; then
-                echo "   - tools/freezed_to_ts/CHANGELOG.md"
+              # Check if it's a tool (exists in tools directory)
+              if [ -d "tools/$package" ]; then
+                echo "   - tools/$package/CHANGELOG.md"
               else
                 echo "   - packages/$package/CHANGELOG.md"
               fi
@@ -181,7 +183,7 @@ jobs:
         if: github.event_name == 'pull_request'
         run: |
           # Copy each package's CHANGELOG.md to docs/{package_name}/CHANGELOG.md
-          for package_dir in packages/*/ tools/freezed_to_ts/; do
+          for package_dir in packages/*/ tools/*/; do
             package_name=$(basename "$package_dir")
             changelog_path="$package_dir/CHANGELOG.md"
             
@@ -198,7 +200,7 @@ jobs:
         if: github.event_name == 'pull_request'
         run: |
           # Copy each package's README.md to docs/{package_name}/README.md
-          for package_dir in packages/*/ tools/freezed_to_ts/; do
+          for package_dir in packages/*/ tools/*/; do
             package_name=$(basename "$package_dir")
             readme_path="$package_dir/README.md"
             

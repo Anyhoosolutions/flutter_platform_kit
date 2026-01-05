@@ -1,0 +1,30 @@
+{
+	"widgetbookUrl": "http://localhost:45678",
+	"outputDir": "./screenshots",
+	"cropGeometry": {
+		"width": 350,
+		"height": 1080,
+		"xOffset": 465,
+		"yOffset": 0
+	},
+	"screens": [
+		{
+			"name": "home_page",
+			"title": "Home Page",
+			"path": "pages/home/homepage/homepage",
+			"navigatesTo": ["recipe_list_page"]
+		},
+		{
+			"name": "recipe_list_page",
+			"title": "Recipe List Page",
+			"path": "pages/recipe/recipelistpage/recipelistpage",
+			"navigatesTo": ["recipe_details_page"]
+		},
+		{
+			"name": "recipe_details_page",
+			"title": "Recipe Details Page",
+			"path": "pages/recipe/recipedetailspage/recipedetailspage",
+			"navigatesTo": ["recipe_list_page", "home_page"]
+		}
+	]
+}

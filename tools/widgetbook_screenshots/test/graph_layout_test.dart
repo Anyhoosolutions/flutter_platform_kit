@@ -297,6 +297,172 @@ void main() {
       }
     });
   });
+
+  group('GraphLayout.backEdges', () {
+    test('no back edges for linear graph going left to right', () {
+      final config = Config(
+        widgetbookUrl: 'http://localhost:45678',
+        outputDir: './screenshots',
+        screens: [
+          Screen(name: 'a', title: 'A', path: '/a', navigatesTo: ['b']),
+          Screen(name: 'b', title: 'B', path: '/b', navigatesTo: ['c']),
+          Screen(name: 'c', title: 'C', path: '/c', navigatesTo: []),
+        ],
+        cropGeometry: CropGeometry(width: 515, height: 1080, xOffset: 700, yOffset: 0),
+      );
+
+      final layout = GraphLayout(config);
+      final backEdges = layout.backEdges;
+
+      // All edges go left to right (lower level to higher level), so no back edges
+      expect(backEdges, isEmpty);
+    });
+
+    test('back edge exists when edge goes right to left', () {
+      final config = Config(
+        widgetbookUrl: 'http://localhost:45678',
+        outputDir: './screenshots',
+        screens: [
+          Screen(name: 'a', title: 'A', path: '/a', navigatesTo: ['b']),
+          Screen(name: 'b', title: 'B', path: '/b', navigatesTo: ['c']),
+          Screen(name: 'c', title: 'C', path: '/c', navigatesTo: ['a']), // c->a goes right to left
+        ],
+        cropGeometry: CropGeometry(width: 515, height: 1080, xOffset: 700, yOffset: 0),
+      );
+
+      final layout = GraphLayout(config);
+      final backEdges = layout.backEdges;
+
+      // Only c->a goes from right to left (higher level to lower level)
+      // a->b and b->c go left to right, so they are forward edges
+      expect(backEdges.length, 1);
+      expect(backEdges.first.from, 'c');
+      expect(backEdges.first.to, 'a');
+    });
+
+    test('back edge when both directions exist but one goes right to left', () {
+      final config = Config(
+        widgetbookUrl: 'http://localhost:45678',
+        outputDir: './screenshots',
+        screens: [
+          Screen(name: 'a', title: 'A', path: '/a', navigatesTo: ['b']),
+          Screen(name: 'b', title: 'B', path: '/b', navigatesTo: ['a']), // b->a goes right to left
+        ],
+        cropGeometry: CropGeometry(width: 515, height: 1080, xOffset: 700, yOffset: 0),
+      );
+
+      final layout = GraphLayout(config);
+      final backEdges = layout.backEdges;
+
+      // b->a goes from right to left (b is at level 1, a is at level 0)
+      // a->b goes left to right, so it's a forward edge
+      expect(backEdges.length, 1);
+      expect(backEdges.first.from, 'b');
+      expect(backEdges.first.to, 'a');
+    });
+
+    test('no back edge when edge goes left to right', () {
+      final config = Config(
+        widgetbookUrl: 'http://localhost:45678',
+        outputDir: './screenshots',
+        screens: [
+          Screen(name: 'a', title: 'A', path: '/a', navigatesTo: ['b']),
+          Screen(name: 'b', title: 'B', path: '/b', navigatesTo: []), // b doesn't navigate back
+        ],
+        cropGeometry: CropGeometry(width: 515, height: 1080, xOffset: 700, yOffset: 0),
+      );
+
+      final layout = GraphLayout(config);
+      final backEdges = layout.backEdges;
+
+      // a->b goes left to right (a is at level 0, b is at level 1), so no back edge
+      expect(backEdges, isEmpty);
+    });
+
+    test('multiple back edges in complex graph', () {
+      final config = Config(
+        widgetbookUrl: 'http://localhost:45678',
+        outputDir: './screenshots',
+        screens: [
+          Screen(name: 'a', title: 'A', path: '/a', navigatesTo: ['b']),
+          Screen(name: 'b', title: 'B', path: '/b', navigatesTo: ['c']),
+          Screen(name: 'c', title: 'C', path: '/c', navigatesTo: ['a']), // c->a goes right to left
+          Screen(name: 'd', title: 'D', path: '/d', navigatesTo: ['e']),
+          Screen(name: 'e', title: 'E', path: '/e', navigatesTo: ['d']), // e->d goes right to left
+        ],
+        cropGeometry: CropGeometry(width: 515, height: 1080, xOffset: 700, yOffset: 0),
+      );
+
+      final layout = GraphLayout(config);
+      final backEdges = layout.backEdges;
+
+      // c->a goes right to left (c at level 2, a at level 0)
+      // e->d goes right to left (e at level 1, d at level 0)
+      expect(backEdges.length, 2);
+      final backEdgeSet = backEdges.map((e) => '${e.from}->${e.to}').toSet();
+      expect(backEdgeSet, containsAll(['c->a', 'e->d']));
+    });
+
+    test('back edge detection with intermediate nodes', () {
+      final config = Config(
+        widgetbookUrl: 'http://localhost:45678',
+        outputDir: './screenshots',
+        screens: [
+          Screen(name: 'a', title: 'A', path: '/a', navigatesTo: ['b']),
+          Screen(name: 'b', title: 'B', path: '/b', navigatesTo: ['c']),
+          Screen(name: 'c', title: 'C', path: '/c', navigatesTo: ['d']),
+          Screen(name: 'd', title: 'D', path: '/d', navigatesTo: ['a']), // d->a goes right to left
+        ],
+        cropGeometry: CropGeometry(width: 515, height: 1080, xOffset: 700, yOffset: 0),
+      );
+
+      final layout = GraphLayout(config);
+      final backEdges = layout.backEdges;
+
+      // Only d->a goes right to left (d at level 3, a at level 0)
+      // a->b, b->c, c->d all go left to right
+      expect(backEdges.length, 1);
+      expect(backEdges.first.from, 'd');
+      expect(backEdges.first.to, 'a');
+    });
+
+    test('no back edges for disconnected components', () {
+      final config = Config(
+        widgetbookUrl: 'http://localhost:45678',
+        outputDir: './screenshots',
+        screens: [
+          Screen(name: 'a', title: 'A', path: '/a', navigatesTo: ['b']),
+          Screen(name: 'b', title: 'B', path: '/b', navigatesTo: []),
+          Screen(name: 'x', title: 'X', path: '/x', navigatesTo: ['y']),
+          Screen(name: 'y', title: 'Y', path: '/y', navigatesTo: []),
+        ],
+        cropGeometry: CropGeometry(width: 515, height: 1080, xOffset: 700, yOffset: 0),
+      );
+
+      final layout = GraphLayout(config);
+      final backEdges = layout.backEdges;
+
+      // No cycles, so no back edges
+      expect(backEdges, isEmpty);
+    });
+
+    test('no back edge for self-loop (same level)', () {
+      final config = Config(
+        widgetbookUrl: 'http://localhost:45678',
+        outputDir: './screenshots',
+        screens: [
+          Screen(name: 'a', title: 'A', path: '/a', navigatesTo: ['a']), // Self-loop
+        ],
+        cropGeometry: CropGeometry(width: 515, height: 1080, xOffset: 700, yOffset: 0),
+      );
+
+      final layout = GraphLayout(config);
+      final backEdges = layout.backEdges;
+
+      // Self-loop a->a: from and to are the same node (same level), so not a back edge
+      expect(backEdges, isEmpty);
+    });
+  });
 }
 
 /// Helper function to group nodes by their level for easier testing
