@@ -1,0 +1,38 @@
+{
+	"widgetbookUrl": "http://localhost:45678",
+	"outputDir": "./screenshots",
+	"cropGeometry": {
+		"width": 350,
+		"height": 1080,
+		"xOffset": 465,
+		"yOffset": 0
+	},
+	"scale": 1.0,
+	"backgroundColor": "#ff0000",
+	"useTitles": true,
+	"titleFontSize": 40,
+	"cornerRadius": 50,
+	"screens": [
+		{
+			"name": "One",
+			"title": "One Page",
+			"path": "pages/home/homepage/homepage",
+			"column": 0,
+			"columnPosition": 0
+		},
+		{
+			"name": "another_page",
+			"title": "Another Page",
+			"path": "pages/recipe/recipelistpage/recipelistpage",
+			"column": 0,
+			"columnPosition": 1
+		},
+		{
+			"name": "third_page",
+			"title": "Third Page",
+			"path": "pages/recipe/recipedetailspage/recipedetailspage",
+			"column": 1,
+			"columnPosition": 0
+		}
+	]
+}
