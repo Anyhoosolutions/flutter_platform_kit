@@ -1,0 +1,30 @@
+{
+	"widgetbookUrl": "http://localhost:45678",
+	"outputDir": "./screenshots",
+	"cropGeometry": {
+		"width": 350,
+		"height": 1080,
+		"xOffset": 465,
+		"yOffset": 0
+	},
+	"screens": [
+		{
+			"name": "One",
+			"title": "One Page",
+			"path": "anyhoo_app_bar/anyhooappbar/anyhooappbar",
+			"navigatesTo": ["another_page", "third_page"]
+		},
+		{
+			"name": "another_page",
+			"title": "Another Page",
+			"path": "anyhoo_core/errorpage/errorpage",
+			"navigatesTo": [""]
+		},
+		{
+			"name": "third_page",
+			"title": "Third Page",
+			"path": "anyhoo_app_bar/anyhoobottombar/anyhoobottombar",
+			"navigatesTo": []
+		}
+	]
+}
