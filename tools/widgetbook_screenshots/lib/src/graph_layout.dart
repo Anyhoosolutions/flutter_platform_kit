@@ -53,38 +53,41 @@ class GraphLayout {
     // Calculate levels using topological sort (handles cycles by breaking them)
     final levels = _calculateLevels();
 
-    // First pass: calculate the maximum height needed across all levels
-    // This gives us an estimate of the total graph height
-    int maxLevelHeight = 0;
-    for (final nodesInLevel in levels) {
-      if (nodesInLevel.isEmpty) continue;
-      final levelHeight = nodesInLevel.length * nodeHeight + (nodesInLevel.length - 1) * verticalSpacing;
-      if (levelHeight > maxLevelHeight) {
-        maxLevelHeight = levelHeight;
+    // Find the level with the most nodes to use as reference for centering
+    int maxNodeCount = 0;
+    int referenceLevelIndex = -1;
+    for (int i = 0; i < levels.length; i++) {
+      if (levels[i].length > maxNodeCount) {
+        maxNodeCount = levels[i].length;
+        referenceLevelIndex = i;
       }
     }
 
-    // Calculate the midpoint of the graph (for centering the 4th column)
-    // The midpoint should be at the center of the usable graph area
-    final graphMidpoint = padding + maxLevelHeight ~/ 2;
+    // Calculate the midpoint Y position based on the reference level
+    // This will be the center point around which all levels are aligned
+    int graphMidpoint;
+    if (referenceLevelIndex >= 0 && maxNodeCount > 0) {
+      final referenceLevelHeight = maxNodeCount * nodeHeight + (maxNodeCount - 1) * verticalSpacing;
+      // The midpoint is at the center of the reference level's total height
+      // This represents the vertical center of the level with most nodes
+      graphMidpoint = padding + referenceLevelHeight ~/ 2;
+    } else {
+      // Fallback if no levels exist
+      graphMidpoint = padding + nodeHeight ~/ 2;
+    }
 
-    // Position nodes based on levels
+    // Position nodes based on levels, all centered around the reference midpoint
     int currentX = padding;
     for (int level = 0; level < levels.length; level++) {
       final nodesInLevel = levels[level];
       if (nodesInLevel.isEmpty) continue;
 
-      final totalHeight = nodesInLevel.length * nodeHeight + (nodesInLevel.length - 1) * verticalSpacing;
+      final nodeCount = nodesInLevel.length;
+      final totalHeight = nodeCount * nodeHeight + (nodeCount - 1) * verticalSpacing;
 
-      int currentY;
-      // For the 4th column (level 3), center around the graph midpoint
-      if (level == 3) {
-        // Center the column around the midpoint, so half nodes are above and half below
-        currentY = graphMidpoint - totalHeight ~/ 2;
-      } else {
-        // For other levels, center nodes vertically within this level
-        currentY = padding + (totalHeight - nodeHeight) ~/ 2;
-      }
+      // Center this level around the reference midpoint
+      // Start Y is calculated so the entire group is centered around graphMidpoint
+      int currentY = graphMidpoint - totalHeight ~/ 2;
 
       for (final screenName in nodesInLevel) {
         final screen = config.screens.firstWhere((s) => s.name == screenName);

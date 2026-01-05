@@ -211,21 +211,22 @@ void main() {
       expect(nodesByLevel[1], containsAll(['b', 'c']));
       expect(nodesByLevel[2], contains('d'));
 
-      expect(layout.nodes[0].screen.name, equals('a'));
-      expect(layout.nodes[0].x, equals(50));
-      expect(layout.nodes[0].y, equals(275));
+      // Verify level assignments and X positions (Y positions vary with centering)
+      final nodeA = layout.nodes.firstWhere((n) => n.screen.name == 'a');
+      expect(nodeA.level, equals(0));
+      expect(nodeA.x, equals(50));
 
-      expect(layout.nodes[1].screen.name, equals('b'));
-      expect(layout.nodes[1].x, equals(50));
-      expect(layout.nodes[1].y, equals(725));
+      final nodeB = layout.nodes.firstWhere((n) => n.screen.name == 'b');
+      expect(nodeB.level, equals(1));
+      expect(nodeB.x, equals(350));
 
-      expect(layout.nodes[2].screen.name, equals('c'));
-      expect(layout.nodes[2].x, equals(350));
-      expect(layout.nodes[2].y, equals(50));
+      final nodeC = layout.nodes.firstWhere((n) => n.screen.name == 'c');
+      expect(nodeC.level, equals(1));
+      expect(nodeC.x, equals(350));
 
-      expect(layout.nodes[3].screen.name, equals('d'));
-      expect(layout.nodes[3].x, equals(650));
-      expect(layout.nodes[3].y, equals(50));
+      final nodeD = layout.nodes.firstWhere((n) => n.screen.name == 'd');
+      expect(nodeD.level, equals(2));
+      expect(nodeD.x, equals(650));
     });
 
     test('all nodes are assigned to levels', () {
@@ -253,6 +254,46 @@ void main() {
       // All nodes should have valid levels
       for (final node in nodes) {
         expect(node.level, greaterThanOrEqualTo(0));
+      }
+    });
+
+    test('all levels are centered around the midpoint of the level with most nodes', () {
+      final config = Config(
+        widgetbookUrl: 'http://localhost:45678',
+        outputDir: './screenshots',
+        screens: [
+          Screen(name: 'a', title: 'A', path: '/a', navigatesTo: ['b']),
+          Screen(name: 'b', title: 'B', path: '/b', navigatesTo: ['c', 'd', 'e']),
+          Screen(name: 'c', title: 'C', path: '/c', navigatesTo: []),
+          Screen(name: 'd', title: 'D', path: '/d', navigatesTo: []),
+          Screen(name: 'e', title: 'E', path: '/e', navigatesTo: []),
+        ],
+        cropGeometry: CropGeometry(width: 515, height: 1080, xOffset: 700, yOffset: 0),
+      );
+
+      final layout = GraphLayout(config);
+      final nodesByLevel = _groupNodesByLevel(layout.nodes);
+
+      // Level 2 has 3 nodes (most), so it's the reference level
+      expect(nodesByLevel[2]!.length, 3);
+
+      // Calculate expected midpoint based on reference level (3 nodes)
+      final referenceLevelHeight = 3 * GraphLayout.nodeHeight + 2 * GraphLayout.verticalSpacing;
+      final expectedMidpoint = GraphLayout.padding + referenceLevelHeight ~/ 2;
+
+      // Verify all levels are centered around this midpoint
+      for (int level = 0; level < nodesByLevel.length; level++) {
+        final nodesInLevel = layout.nodes.where((n) => n.level == level).toList();
+        if (nodesInLevel.isEmpty) continue;
+
+        final nodeCount = nodesInLevel.length;
+        final totalHeight = nodeCount * GraphLayout.nodeHeight + (nodeCount - 1) * GraphLayout.verticalSpacing;
+        final expectedStartY = expectedMidpoint - totalHeight ~/ 2;
+
+        // Check that the first node in the level starts at the expected Y position
+        final firstNode = nodesInLevel.first;
+        expect(firstNode.y, equals(expectedStartY),
+            reason: 'Level $level should be centered around midpoint $expectedMidpoint');
       }
     });
   });
