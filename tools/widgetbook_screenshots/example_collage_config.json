@@ -12,6 +12,21 @@
 	"useTitles": true,
 	"titleFontSize": 40,
 	"cornerRadius": 50,
+	"titlePadding": 0,
+	"screenSpacing": 0,
+	"horizontalPadding": 0,
+	"columnSpacing": 50,
+	"columns": {
+		"0": {
+			"top": 0
+		},
+		"1": {
+			"top": -240
+		},
+		"2": {
+			"top": -300
+		}
+	},
 	"screens": [
 		{
 			"name": "home_page",
@@ -50,7 +65,7 @@
 		},
 		{
 			"name": "profile",
-			"title": "Profile",
+			"title": "P",
 			"path": "pages/profile/profilepage/profilepage",
 			"column": 2,
 			"columnPosition": 0

@@ -17,7 +17,7 @@ class CollageGenerator {
   static const int textColorR = 33; // #212529 dark gray/black
   static const int textColorG = 37;
   static const int textColorB = 41;
-  static const int textPadding = 10; // Space between screenshot and text
+  static const int defaultTitlePadding = 10; // Default space between screenshot and text
 
   CollageGenerator(this.config, this.layout);
 
@@ -27,17 +27,17 @@ class CollageGenerator {
       _logger.info('Generating collage PNG...');
       _logger.info('Getting dimensions...');
       final dimensions = layout.getDimensions();
-      _logger.info('Dimensions: ${dimensions.$1}x${dimensions.$2}');
+      _logger.info('Dimensions: ${dimensions.width}x${dimensions.height}');
       _logger.info('Creating canvas...');
       final canvas = img.Image(
-        width: dimensions.$1,
-        height: dimensions.$2,
+        width: dimensions.width,
+        height: dimensions.height,
       );
       _logger.info('Canvas created');
 
       // Fill background
       final bgColor = config.getBackgroundColorRgb();
-      img.fill(canvas, color: img.ColorRgb8(bgColor.$1, bgColor.$2, bgColor.$3));
+      img.fill(canvas, color: img.ColorRgb8(bgColor.r, bgColor.g, bgColor.b));
       _logger.info('Background filled with color: ${config.backgroundColor}');
 
       // Draw screenshots
@@ -99,9 +99,9 @@ class CollageGenerator {
           processedScreenshot = imageUtils.removeRoundedCorners(
             resizedScreenshot,
             scaledRadius,
-            bgColor.$1,
-            bgColor.$2,
-            bgColor.$3,
+            bgColor.r,
+            bgColor.g,
+            bgColor.b,
           );
         }
 
@@ -123,12 +123,10 @@ class CollageGenerator {
   }
 
   void _drawTitles(img.Image canvas) {
-    for (final positionedScreen in layout.screens) {
-      final title = positionedScreen.screen.title;
-      final centerX = positionedScreen.x + positionedScreen.width ~/ 2;
-      final titleY = positionedScreen.y + positionedScreen.height + textPadding;
-
-      _drawText(canvas, title, centerX, titleY);
+    // Use the position map to get title positions
+    final positionMap = layout.getPositionMap();
+    for (final positionedScreen in positionMap.values) {
+      _drawText(canvas, positionedScreen.screen.title, positionedScreen.titleX, positionedScreen.titleY);
     }
   }
 

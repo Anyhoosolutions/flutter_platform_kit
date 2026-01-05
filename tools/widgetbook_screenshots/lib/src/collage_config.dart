@@ -41,6 +41,11 @@ class CollageConfig {
   final bool useTitles;
   final int titleFontSize;
   final int cornerRadius;
+  final Map<int, int> columnTops; // Maps column number to top position
+  final int? titlePadding; // Padding between screenshot and title (null = use default)
+  final int? screenSpacing; // Spacing between screens in same column (null = use default)
+  final int? horizontalPadding; // Horizontal padding on left/right (null = use default)
+  final int? columnSpacing; // Spacing between columns (null = use default)
 
   CollageConfig({
     required this.widgetbookUrl,
@@ -53,7 +58,12 @@ class CollageConfig {
     this.useTitles = false,
     this.titleFontSize = 24,
     this.cornerRadius = 0,
-  });
+    Map<int, int>? columnTops,
+    this.titlePadding,
+    this.screenSpacing,
+    this.horizontalPadding,
+    this.columnSpacing,
+  }) : columnTops = columnTops ?? {};
 
   factory CollageConfig.fromJsonFile(String filePath, {bool darkMode = false}) {
     final file = File(filePath);
@@ -63,6 +73,19 @@ class CollageConfig {
 
     final content = file.readAsStringSync();
     final json = jsonDecode(content) as Map<String, dynamic>;
+
+    // Parse column tops configuration
+    Map<int, int> columnTops = {};
+    if (json['columns'] != null) {
+      final columnsJson = json['columns'] as Map<String, dynamic>;
+      columnsJson.forEach((key, value) {
+        final column = int.parse(key);
+        final top = value is Map<String, dynamic> && value['top'] != null ? (value['top'] as num).toInt() : null;
+        if (top != null) {
+          columnTops[column] = top;
+        }
+      });
+    }
 
     return CollageConfig(
       widgetbookUrl: json['widgetbookUrl'] as String? ?? 'http://localhost:45678',
@@ -76,6 +99,11 @@ class CollageConfig {
       useTitles: json['useTitles'] as bool? ?? false,
       titleFontSize: json['titleFontSize'] as int? ?? 24,
       cornerRadius: json['cornerRadius'] as int? ?? 0,
+      columnTops: columnTops,
+      titlePadding: json['titlePadding'] != null ? (json['titlePadding'] as num).toInt() : null,
+      screenSpacing: json['screenSpacing'] != null ? (json['screenSpacing'] as num).toInt() : null,
+      horizontalPadding: json['horizontalPadding'] != null ? (json['horizontalPadding'] as num).toInt() : null,
+      columnSpacing: json['columnSpacing'] != null ? (json['columnSpacing'] as num).toInt() : null,
     );
   }
 
@@ -101,7 +129,7 @@ class CollageConfig {
   }
 
   /// Parse hex color string (e.g., "#F8F9FA" or "F8F9FA") to RGB values
-  (int r, int g, int b) getBackgroundColorRgb() {
+  ({int r, int g, int b}) getBackgroundColorRgb() {
     String hex = backgroundColor;
     if (hex.startsWith('#')) {
       hex = hex.substring(1);
@@ -110,9 +138,9 @@ class CollageConfig {
       final r = int.parse(hex.substring(0, 2), radix: 16);
       final g = int.parse(hex.substring(2, 4), radix: 16);
       final b = int.parse(hex.substring(4, 6), radix: 16);
-      return (r, g, b);
+      return (r: r, g: g, b: b);
     }
     // Default to light gray if parsing fails
-    return (248, 249, 250);
+    return (r: 248, g: 249, b: 250);
   }
 }
