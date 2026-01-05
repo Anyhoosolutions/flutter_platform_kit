@@ -34,7 +34,8 @@ class GraphLayout {
   static const int nodeHeight = 400;
   static const int horizontalSpacing = 100; // Space between levels
   static const int verticalSpacing = 50; // Space between nodes in same level
-  static const int branchSpacing = 100; // Extra spacing between different branches
+  static const int branchSpacing = 300; // Extra spacing between different branches (increased for better separation)
+  static const int branchLaneOffset = 40; // Horizontal offset per branch lane for visual separation
   static const int padding = 50; // Padding around entire graph
   static const int textHeight = 20; // Height for text labels below screenshots
   static const int textPadding = 10; // Space between screenshot and text
@@ -56,6 +57,9 @@ class GraphLayout {
 
     // Identify separate branches from root nodes for better visual separation
     final branchMap = _identifyBranches();
+
+    // Assign lane numbers to branches for horizontal separation
+    final branchLanes = _assignBranchLanes(branchMap);
 
     // Find the level with the most nodes to use as reference for centering
     int maxNodeCount = 0;
@@ -120,9 +124,13 @@ class GraphLayout {
 
         for (final screenName in branchNodes) {
           final screen = config.screens.firstWhere((s) => s.name == screenName);
+          final branch = branchMap[screenName] ?? 'default';
+          final laneNumber = branchLanes[branch] ?? 0;
+          // Add horizontal offset based on lane number to create parallel tracks
+          final xOffset = laneNumber * branchLaneOffset;
           nodesMap[screenName] = PositionedNode(
             screen: screen,
-            x: currentX,
+            x: currentX + xOffset,
             y: currentY,
             level: level,
           );
@@ -302,6 +310,31 @@ class GraphLayout {
     }
 
     return branchMap;
+  }
+
+  /// Assign lane numbers to branches for horizontal separation
+  /// Returns a map from branch identifier to lane number (0, 1, 2, ...)
+  Map<String, int> _assignBranchLanes(Map<String, String> branchMap) {
+    final Map<String, int> branchLanes = {};
+    final uniqueBranches = branchMap.values.toSet().toList()..sort();
+
+    // Assign lane numbers starting from 0, centered around 0
+    // For example: 3 branches -> lanes -1, 0, 1 (centered)
+    //              4 branches -> lanes -1, 0, 1, 2 (slightly off-center)
+    int laneNumber = 0;
+    if (uniqueBranches.length > 1) {
+      // Center lanes around 0
+      final centerOffset = -(uniqueBranches.length - 1) ~/ 2;
+      for (final branch in uniqueBranches) {
+        branchLanes[branch] = centerOffset + laneNumber;
+        laneNumber++;
+      }
+    } else {
+      // Single branch gets lane 0
+      branchLanes[uniqueBranches.first] = 0;
+    }
+
+    return branchLanes;
   }
 
   List<PositionedNode> get nodes => nodesMap.values.toList();
