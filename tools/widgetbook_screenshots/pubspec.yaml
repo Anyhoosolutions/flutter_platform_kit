@@ -1,6 +1,6 @@
 name: widgetbook_screenshots
 description: A tool to capture screenshots from widgetbook and generate navigation graphs.
-version: 0.0.2
+version: 0.0.3
 homepage: https://github.com/lidholm/flutter_platform_kit/tree/main/tools/widgetbook_screenshots
 repository: https://github.com/lidholm/flutter_platform_kit
 environment:

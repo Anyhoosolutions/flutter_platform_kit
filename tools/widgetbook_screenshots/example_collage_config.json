@@ -1,0 +1,78 @@
+{
+	"widgetbookUrl": "http://localhost:45678",
+	"outputDir": "./screenshots",
+	"cropGeometry": {
+		"width": 350,
+		"height": 1080,
+		"xOffset": 465,
+		"yOffset": 0
+	},
+	"scale": 1.0,
+	"backgroundColor": "#de6e47",
+	"cornerRadius": 50,
+	"height": 800,
+
+	"useTitles": true,
+	"titleFontSize": 24,
+	"titleOffset": -12,
+
+	"screenSpacing": 40,
+	"horizontalPadding": 20,
+	"columnSpacing": 40,
+
+	"columns": {
+		"0": {
+			"top": 10
+		},
+		"1": {
+			"top": -240
+		},
+		"2": {
+			"top": -300
+		}
+	},
+	"screens": [
+		{
+			"name": "home_page",
+			"title": "Home Page",
+			"path": "pages/home/homepage/homepage",
+			"column": 0,
+			"columnPosition": 0
+		},
+		{
+			"name": "recipe_list",
+			"title": "Recipe List",
+			"path": "pages/recipe/recipelistpage/recipelistpage",
+			"column": 0,
+			"columnPosition": 1
+		},
+		{
+			"name": "recipe_details",
+			"title": "Recipe Details",
+			"path": "pages/recipe/recipedetailspage/recipedetailspage",
+			"column": 1,
+			"columnPosition": 0
+		},
+		{
+			"name": "add_recipe",
+			"title": "Add Recipe",
+			"path": "pages/recipe/addrecipemanuallypage/addrecipemanuallypage",
+			"column": 1,
+			"columnPosition": 1
+		},
+		{
+			"name": "edit_recipe",
+			"title": "Edit Recipe",
+			"path": "pages/recipe/addrecipemanuallypage/editrecipemanuallypage",
+			"column": 1,
+			"columnPosition": 2
+		},
+		{
+			"name": "profile",
+			"title": "P",
+			"path": "pages/profile/profilepage/profilepage",
+			"column": 2,
+			"columnPosition": 0
+		}
+	]
+}
