@@ -247,7 +247,6 @@ class PngGenerator {
   }
 
   void _drawBackEdgeArrow(img.Image canvas, PositionedNode fromNode, PositionedNode toNode, int offset) {
-    _logger.info('Drawing back-edge arrow from ${fromNode.screen.name} to ${toNode.screen.name} with offset $offset');
     final color = img.ColorRgb8(arrowColorR, arrowColorG, arrowColorB);
 
     // Calculate bottom Y position (including text) - use the maximum of both nodes
@@ -255,158 +254,152 @@ class PngGenerator {
     final toBottomY = toNode.y + GraphLayout.nodeHeight + GraphLayout.textPadding + GraphLayout.textHeight;
     final bottomY = fromBottomY > toBottomY ? fromBottomY : toBottomY;
 
-    // Start point: bottom center of the "to" node (where the cycle returns to)
-    final startX = toNode.x + GraphLayout.nodeWidth ~/ 2;
+    // Start point: bottom center of the "from" node (source, on the right)
+    final startX = fromNode.x + GraphLayout.nodeWidth ~/ 2;
     final startY = bottomY;
 
-    // End point: bottom center of the "from" node (where the cycle originates)
-    final endX = fromNode.x + GraphLayout.nodeWidth ~/ 2;
+    // End point: bottom center of the "to" node (target, on the left)
+    final endX = toNode.x + GraphLayout.nodeWidth ~/ 2;
     final endY = bottomY;
 
-    // The path: start -> down by offset -> horizontally -> up by offset -> end
+    // The path: start -> down by offset -> horizontally left -> up by offset -> end
     final downY = startY + offset;
     final cornerRadius = 15.0;
 
-    // Determine direction (left or right)
-    final goingLeft = startX > endX;
+    // Back edges always go from right to left (fromNode.level > toNode.level)
+    // So we always go left, no need for the else clause
 
-    // Calculate path segments
-    // 1. Vertical down from start (with rounded corner at bottom)
     final verticalDownEndY = downY - cornerRadius;
-    _logger.info('Drawing vertical down line from ($startX, $startY) to ($startX, $verticalDownEndY)');
+
+    // 3. Horizontal segment (going left)
+    final horizontalStartX = startX - cornerRadius;
+    final horizontalEndX = endX + cornerRadius;
+    final verticalUpStartY = downY - cornerRadius;
+
+    // 1. Vertical down from start
     _drawLine(canvas, startX, startY, startX, verticalDownEndY.round(), arrowThickness);
 
-    // 2. Rounded corner: down to horizontal
-    // Corner center is at the intersection point: (startX, downY)
-    final corner1CenterX = startX;
-    final corner1CenterY = downY;
-    if (goingLeft) {
-      // Turning left: arc from vertical line end to horizontal line start
-      // Start: (startX, downY - radius) at angle 3π/2 from center (pointing "up" = smaller y)
-      // End: (startX - radius, downY) at angle π from center (pointing left)
-      _drawArcFromTo(
-        canvas,
-        corner1CenterX,
-        corner1CenterY,
-        cornerRadius,
-        3 * math.pi / 2, // Start angle (where vertical line ends)
-        math.pi, // End angle (left)
-        color,
-      );
-    } else {
-      // Turning right: arc from vertical line end to horizontal line start
-      // Start: (startX, downY - radius) at angle 3π/2 from center
-      // End: (startX + radius, downY) at angle 0 from center (pointing right)
-      _drawArcFromTo(
-        canvas,
-        corner1CenterX,
-        corner1CenterY,
-        cornerRadius,
-        3 * math.pi / 2, // Start angle (where vertical line ends)
-        0, // End angle (right)
-        color,
-        clockwise: true,
-      );
-    }
+    // 2. Rounded corner: down to horizontal (turning left)
+    _drawArcTopToLeft(canvas, startX.toDouble(), verticalDownEndY, horizontalStartX, horizontalEndX);
 
-    // 3. Horizontal segment
-    final horizontalStartX = goingLeft ? startX - cornerRadius : startX + cornerRadius;
-    final horizontalEndX = goingLeft ? endX + cornerRadius : endX - cornerRadius;
+    // 3. Horizontal segment (going left)
     _drawLine(canvas, horizontalStartX.round(), downY, horizontalEndX.round(), downY, arrowThickness);
 
-    // 4. Rounded corner: horizontal to up
-    // Corner center is at the intersection point: (endX, downY)
-    final corner2CenterX = endX;
-    final corner2CenterY = downY;
-    if (goingLeft) {
-      // Turning up from left: arc from left (π) to up (3π/2), counter-clockwise
-      // Start: (endX - radius, downY) at angle π from center
-      // End: (endX, downY - radius) at angle 3π/2 from center
-      _drawArcFromTo(
-        canvas,
-        corner2CenterX,
-        corner2CenterY,
-        cornerRadius,
-        math.pi, // Start angle (left)
-        3 * math.pi / 2, // End angle (up)
-        color,
-      );
-    } else {
-      // Turning up from right: arc from right (0) to up (3π/2), clockwise
-      // Start: (endX + radius, downY) at angle 0 from center
-      // End: (endX, downY - radius) at angle 3π/2 from center
-      _drawArcFromTo(
-        canvas,
-        corner2CenterX,
-        corner2CenterY,
-        cornerRadius,
-        0, // Start angle (right)
-        3 * math.pi / 2, // End angle (up)
-        color,
-        clockwise: true,
-      );
-    }
+    // 4. Rounded corner: horizontal to up (turning left to up)
+    _drawArcRightToTop(
+        canvas, horizontalEndX.toDouble(), downY.toDouble(), endX.toDouble(), verticalUpStartY.toDouble());
 
     // 5. Vertical up to end
-    final verticalUpStartY = downY - cornerRadius;
     _drawLine(canvas, endX, verticalUpStartY.round(), endX, endY, arrowThickness);
 
-    // Draw arrowhead at the end
-    _drawArrowhead(canvas, endX, endY, startX, startY);
+    // Draw arrowhead at the end (pointing to the target node)
+    _drawArrowhead(canvas, endX, endY, endX, verticalUpStartY.round());
   }
 
-  /// Draw an arc from startAngle to endAngle
-  /// [clockwise] if true, draws the arc clockwise (shorter path), otherwise counter-clockwise
-  void _drawArcFromTo(
+  /// Draws a 90-degree quarter circle arc from 0° (pointing right) to 270° (pointing up)
+  /// Calculates the center and radius from the start and end positions
+  void _drawArcTopToLeft(
     img.Image canvas,
-    int centerX,
-    int centerY,
-    double radius,
-    double startAngle,
-    double endAngle,
-    img.Color color, {
-    bool clockwise = false,
-  }) {
-    final numSegments = 30; // More segments for smoother arcs
+    double startX,
+    double startY,
+    double endX,
+    double endY,
+  ) {
+    final color = img.ColorRgb8(arrowColorR, arrowColorG, arrowColorB);
 
-    // Normalize angles to [0, 2π)
-    double normalizedStart = startAngle % (2 * math.pi);
-    if (normalizedStart < 0) normalizedStart += 2 * math.pi;
-    double normalizedEnd = endAngle % (2 * math.pi);
-    if (normalizedEnd < 0) normalizedEnd += 2 * math.pi;
+    // For an arc from 0° to 270°:
+    // - At 0° (pointing right): point is at (centerX + radius, centerY)
+    // - At 270° (pointing up): point is at (centerX, centerY - radius)
+    // So: centerX = endX, centerY = startY, radius = startX - endX = startY - endY
 
-    // Calculate angle difference
-    double angleDiff = normalizedEnd - normalizedStart;
+    final centerX = endX;
+    final centerY = startY;
+    final radius = (startX - endX).toDouble();
 
-    // Determine the correct direction
-    if (clockwise) {
-      // Clockwise: go the shorter negative way
-      if (angleDiff > 0) {
-        // If positive difference, go backwards (subtract 2π)
-        angleDiff -= 2 * math.pi;
-      }
-      // If already negative, use as-is (it's already going clockwise)
-    } else {
-      // Counter-clockwise: go the shorter positive way
-      if (angleDiff < 0) {
-        // If negative difference, wrap around (add 2π)
-        angleDiff += 2 * math.pi;
-      }
-      // If already positive, use as-is (it's already going counter-clockwise)
+    // Verify the positions are consistent (radius should match vertical distance)
+    final verticalRadius = (startY - endY).toDouble();
+    if ((radius - verticalRadius).abs() > 1) {
+      _logger.warning('Arc positions may be inconsistent: horizontal radius=$radius, vertical radius=$verticalRadius');
     }
 
-    final angleStep = angleDiff / numSegments;
+    // Draw a 90-degree quarter circle arc from 0° to 270° (counter-clockwise)
+    final startAngle = 0.0; // 0 degrees (pointing right)
+    final numSegments = 90; // Segments for 90-degree arc
+
+    // Go counter-clockwise from 0° to 270° (90 degrees total = π/2 radians)
+    final angleStep = math.pi / 2 / numSegments; // Positive for clockwise
 
     for (int i = 0; i < numSegments; i++) {
-      // Calculate angles along the arc
-      double angle1 = normalizedStart + i * angleStep;
-      double angle2 = normalizedStart + (i + 1) * angleStep;
+      // Calculate angles along the arc (going clockwise)
+      double angle1 = startAngle + i * angleStep;
+      double angle2 = startAngle + (i + 1) * angleStep;
 
       // Calculate points on the arc
       final x1 = (centerX + radius * math.cos(angle1)).round();
       final y1 = (centerY + radius * math.sin(angle1)).round();
       final x2 = (centerX + radius * math.cos(angle2)).round();
       final y2 = (centerY + radius * math.sin(angle2)).round();
+
+      img.drawLine(
+        canvas,
+        x1: x1,
+        y1: y1,
+        x2: x2,
+        y2: y2,
+        color: color,
+        thickness: arrowThickness.toDouble(),
+      );
+    }
+  }
+
+  /// Draws a 90-degree quarter circle arc from 270° (pointing down/bottom) to 180° (pointing left)
+  /// Calculates the center and radius from the start and end positions
+  void _drawArcRightToTop(
+    img.Image canvas,
+    double startX,
+    double startY,
+    double endX,
+    double endY,
+  ) {
+    final color = img.ColorRgb8(arrowColorR, arrowColorG, arrowColorB);
+
+    // For an arc from 270° (bottom) to 180° (left):
+    // - At 270° (pointing down): point is at (centerX, centerY + radius) in screen coords
+    // - At 180° (pointing left): point is at (centerX - radius, centerY) in screen coords
+    // So: centerX = startX, centerY = endY, radius = startX - endX = startY - endY
+
+    final centerX = startX;
+    final centerY = endY;
+    final radius = (startX - endX).toDouble();
+
+    // Verify the positions are consistent (radius should match vertical distance)
+    final verticalRadius = (startY - endY).toDouble();
+    if ((radius - verticalRadius).abs() > 1) {
+      _logger.warning('Arc positions may be inconsistent: horizontal radius=$radius, vertical radius=$verticalRadius');
+    }
+
+    // Draw a 90-degree quarter circle arc from 270° to 180° (counter-clockwise)
+    // In standard unit circle: 270° = 3π/2 (pointing down), 180° = π (pointing left)
+    // Going counter-clockwise from 270° to 180° is 90 degrees
+    final startAngle = 3 * math.pi / 2; // 270 degrees (pointing down/bottom)
+    final numSegments = 90; // Segments for 90-degree arc
+
+    // Go counter-clockwise from 270° to 180° (90 degrees total = π/2 radians)
+    // Counter-clockwise means negative angle step: 270° → 180° = -90°
+    final angleStep = -math.pi / 2 / numSegments; // Negative for counter-clockwise
+
+    for (int i = 0; i < numSegments; i++) {
+      // Calculate angles along the arc (going counter-clockwise)
+      double angle1 = startAngle + i * angleStep;
+      double angle2 = startAngle + (i + 1) * angleStep;
+
+      // Calculate points on the arc
+      // In screen coordinates (y increases downward), we need to negate the y component
+      // from standard math coordinates to account for the flipped y-axis
+      final x1 = (centerX + radius * math.cos(angle1)).round();
+      final y1 = (centerY - radius * math.sin(angle1)).round(); // Negate for screen coords
+      final x2 = (centerX + radius * math.cos(angle2)).round();
+      final y2 = (centerY - radius * math.sin(angle2)).round(); // Negate for screen coords
 
       img.drawLine(
         canvas,
