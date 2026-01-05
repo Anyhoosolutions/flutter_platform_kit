@@ -50,6 +50,11 @@ class PngGenerator {
       await _drawEdges(canvas);
       _logger.info('Edges drawn');
 
+      // Draw back-edge arrows to indicate cycles
+      _logger.info('Drawing back-edge arrows...');
+      await _drawBackEdges(canvas);
+      _logger.info('Back-edge arrows drawn');
+
       // Draw nodes (screenshots)
       _logger.info('Drawing ${layout.nodes.length} nodes...');
       await _drawNodes(canvas);
@@ -149,6 +154,7 @@ class PngGenerator {
   Future<void> _drawEdges(img.Image canvas) async {
     // Track drawn edges to avoid duplicates (important for cyclic graphs)
     final drawnEdges = <String>{};
+    final backEdgesSet = layout.backEdges.map((e) => '${e.from}->${e.to}').toSet();
 
     for (final edge in layout.edges) {
       // Create a unique key for this edge
@@ -157,6 +163,11 @@ class PngGenerator {
       // Skip if we've already drawn this edge (handles cycles)
       if (drawnEdges.contains(edgeKey)) {
         _logger.fine('Skipping duplicate edge: $edgeKey');
+        continue;
+      }
+
+      // Skip back edges - they will be drawn separately as curved arrows
+      if (backEdgesSet.contains(edgeKey)) {
         continue;
       }
 
@@ -187,7 +198,226 @@ class PngGenerator {
       _drawArrowhead(canvas, endX, endY, startX, startY);
     }
 
-    _logger.info('Drew ${drawnEdges.length} unique edges (${layout.edges.length} total edges in graph)');
+    _logger.info('Drew ${drawnEdges.length} unique forward edges (${layout.edges.length} total edges in graph)');
+  }
+
+  Future<void> _drawBackEdges(img.Image canvas) async {
+    final backEdges = layout.backEdges;
+
+    if (backEdges.isEmpty) {
+      return;
+    }
+
+    // Calculate offsets for each back edge to avoid overlaps
+    final offsets = _calculateBackEdgeOffsets(backEdges);
+
+    // Track which target nodes already have back arrows (for optimization)
+    final targetsWithBackArrows = <String>{};
+
+    for (int i = 0; i < backEdges.length; i++) {
+      final edge = backEdges[i];
+      final fromNode = layout.nodesMap[edge.from];
+      final toNode = layout.nodesMap[edge.to];
+
+      if (fromNode == null || toNode == null) {
+        _logger.warning('Back edge references missing node: ${edge.from} -> ${edge.to}');
+        continue;
+      }
+
+      // Draw all back edges (even if target already has one)
+      final offset = offsets[i];
+      _drawBackEdgeArrow(canvas, fromNode, toNode, offset);
+      targetsWithBackArrows.add(edge.to);
+    }
+
+    _logger.info('Drew ${backEdges.length} back-edge arrows');
+  }
+
+  /// Calculate vertical offsets for back edges to avoid overlaps
+  List<int> _calculateBackEdgeOffsets(List<Edge> backEdges) {
+    final baseOffset = 30;
+    final offsetPerLevel = 40;
+    final offsets = <int>[];
+
+    for (int i = 0; i < backEdges.length; i++) {
+      offsets.add(baseOffset + i * offsetPerLevel);
+    }
+
+    return offsets;
+  }
+
+  void _drawBackEdgeArrow(img.Image canvas, PositionedNode fromNode, PositionedNode toNode, int offset) {
+    _logger.info('Drawing back-edge arrow from ${fromNode.screen.name} to ${toNode.screen.name} with offset $offset');
+    final color = img.ColorRgb8(arrowColorR, arrowColorG, arrowColorB);
+
+    // Calculate bottom Y position (including text) - use the maximum of both nodes
+    final fromBottomY = fromNode.y + GraphLayout.nodeHeight + GraphLayout.textPadding + GraphLayout.textHeight;
+    final toBottomY = toNode.y + GraphLayout.nodeHeight + GraphLayout.textPadding + GraphLayout.textHeight;
+    final bottomY = fromBottomY > toBottomY ? fromBottomY : toBottomY;
+
+    // Start point: bottom center of the "to" node (where the cycle returns to)
+    final startX = toNode.x + GraphLayout.nodeWidth ~/ 2;
+    final startY = bottomY;
+
+    // End point: bottom center of the "from" node (where the cycle originates)
+    final endX = fromNode.x + GraphLayout.nodeWidth ~/ 2;
+    final endY = bottomY;
+
+    // The path: start -> down by offset -> horizontally -> up by offset -> end
+    final downY = startY + offset;
+    final cornerRadius = 15.0;
+
+    // Determine direction (left or right)
+    final goingLeft = startX > endX;
+
+    // Calculate path segments
+    // 1. Vertical down from start (with rounded corner at bottom)
+    final verticalDownEndY = downY - cornerRadius;
+    _logger.info('Drawing vertical down line from ($startX, $startY) to ($startX, $verticalDownEndY)');
+    _drawLine(canvas, startX, startY, startX, verticalDownEndY.round(), arrowThickness);
+
+    // 2. Rounded corner: down to horizontal
+    // Corner center is at the intersection point: (startX, downY)
+    final corner1CenterX = startX;
+    final corner1CenterY = downY;
+    if (goingLeft) {
+      // Turning left: arc from vertical line end to horizontal line start
+      // Start: (startX, downY - radius) at angle 3π/2 from center (pointing "up" = smaller y)
+      // End: (startX - radius, downY) at angle π from center (pointing left)
+      _drawArcFromTo(
+        canvas,
+        corner1CenterX,
+        corner1CenterY,
+        cornerRadius,
+        3 * math.pi / 2, // Start angle (where vertical line ends)
+        math.pi, // End angle (left)
+        color,
+      );
+    } else {
+      // Turning right: arc from vertical line end to horizontal line start
+      // Start: (startX, downY - radius) at angle 3π/2 from center
+      // End: (startX + radius, downY) at angle 0 from center (pointing right)
+      _drawArcFromTo(
+        canvas,
+        corner1CenterX,
+        corner1CenterY,
+        cornerRadius,
+        3 * math.pi / 2, // Start angle (where vertical line ends)
+        0, // End angle (right)
+        color,
+        clockwise: true,
+      );
+    }
+
+    // 3. Horizontal segment
+    final horizontalStartX = goingLeft ? startX - cornerRadius : startX + cornerRadius;
+    final horizontalEndX = goingLeft ? endX + cornerRadius : endX - cornerRadius;
+    _drawLine(canvas, horizontalStartX.round(), downY, horizontalEndX.round(), downY, arrowThickness);
+
+    // 4. Rounded corner: horizontal to up
+    // Corner center is at the intersection point: (endX, downY)
+    final corner2CenterX = endX;
+    final corner2CenterY = downY;
+    if (goingLeft) {
+      // Turning up from left: arc from left (π) to up (3π/2), counter-clockwise
+      // Start: (endX - radius, downY) at angle π from center
+      // End: (endX, downY - radius) at angle 3π/2 from center
+      _drawArcFromTo(
+        canvas,
+        corner2CenterX,
+        corner2CenterY,
+        cornerRadius,
+        math.pi, // Start angle (left)
+        3 * math.pi / 2, // End angle (up)
+        color,
+      );
+    } else {
+      // Turning up from right: arc from right (0) to up (3π/2), clockwise
+      // Start: (endX + radius, downY) at angle 0 from center
+      // End: (endX, downY - radius) at angle 3π/2 from center
+      _drawArcFromTo(
+        canvas,
+        corner2CenterX,
+        corner2CenterY,
+        cornerRadius,
+        0, // Start angle (right)
+        3 * math.pi / 2, // End angle (up)
+        color,
+        clockwise: true,
+      );
+    }
+
+    // 5. Vertical up to end
+    final verticalUpStartY = downY - cornerRadius;
+    _drawLine(canvas, endX, verticalUpStartY.round(), endX, endY, arrowThickness);
+
+    // Draw arrowhead at the end
+    _drawArrowhead(canvas, endX, endY, startX, startY);
+  }
+
+  /// Draw an arc from startAngle to endAngle
+  /// [clockwise] if true, draws the arc clockwise (shorter path), otherwise counter-clockwise
+  void _drawArcFromTo(
+    img.Image canvas,
+    int centerX,
+    int centerY,
+    double radius,
+    double startAngle,
+    double endAngle,
+    img.Color color, {
+    bool clockwise = false,
+  }) {
+    final numSegments = 30; // More segments for smoother arcs
+
+    // Normalize angles to [0, 2π)
+    double normalizedStart = startAngle % (2 * math.pi);
+    if (normalizedStart < 0) normalizedStart += 2 * math.pi;
+    double normalizedEnd = endAngle % (2 * math.pi);
+    if (normalizedEnd < 0) normalizedEnd += 2 * math.pi;
+
+    // Calculate angle difference
+    double angleDiff = normalizedEnd - normalizedStart;
+
+    // Determine the correct direction
+    if (clockwise) {
+      // Clockwise: go the shorter negative way
+      if (angleDiff > 0) {
+        // If positive difference, go backwards (subtract 2π)
+        angleDiff -= 2 * math.pi;
+      }
+      // If already negative, use as-is (it's already going clockwise)
+    } else {
+      // Counter-clockwise: go the shorter positive way
+      if (angleDiff < 0) {
+        // If negative difference, wrap around (add 2π)
+        angleDiff += 2 * math.pi;
+      }
+      // If already positive, use as-is (it's already going counter-clockwise)
+    }
+
+    final angleStep = angleDiff / numSegments;
+
+    for (int i = 0; i < numSegments; i++) {
+      // Calculate angles along the arc
+      double angle1 = normalizedStart + i * angleStep;
+      double angle2 = normalizedStart + (i + 1) * angleStep;
+
+      // Calculate points on the arc
+      final x1 = (centerX + radius * math.cos(angle1)).round();
+      final y1 = (centerY + radius * math.sin(angle1)).round();
+      final x2 = (centerX + radius * math.cos(angle2)).round();
+      final y2 = (centerY + radius * math.sin(angle2)).round();
+
+      img.drawLine(
+        canvas,
+        x1: x1,
+        y1: y1,
+        x2: x2,
+        y2: y2,
+        color: color,
+        thickness: arrowThickness.toDouble(),
+      );
+    }
   }
 
   void _drawLine(

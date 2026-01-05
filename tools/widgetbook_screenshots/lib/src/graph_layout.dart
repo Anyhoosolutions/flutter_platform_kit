@@ -362,6 +362,29 @@ class GraphLayout {
   List<PositionedNode> get nodes => nodesMap.values.toList();
   List<Edge> get edges => _edges;
 
+  /// Get back edges: forward edges that go from right to left in the layout
+  /// (i.e., edges where the source node is at a higher level than the target node)
+  List<Edge> get backEdges {
+    final backEdgesList = <Edge>[];
+
+    for (final edge in _edges) {
+      final fromNode = nodesMap[edge.from];
+      final toNode = nodesMap[edge.to];
+
+      // Skip if nodes don't exist (shouldn't happen, but safety check)
+      if (fromNode == null || toNode == null) {
+        continue;
+      }
+
+      // Back edge: source node is to the right of target node (higher level)
+      if (fromNode.level > toNode.level) {
+        backEdgesList.add(edge);
+      }
+    }
+
+    return backEdgesList;
+  }
+
   /// Get the total dimensions needed for the canvas
   (int width, int height) getDimensions() {
     if (nodesMap.isEmpty) {
@@ -370,6 +393,7 @@ class GraphLayout {
 
     int maxX = 0;
     int maxY = 0;
+    int minY = double.maxFinite.toInt();
 
     for (final node in nodesMap.values) {
       final nodeRight = node.x + nodeWidth;
@@ -377,8 +401,17 @@ class GraphLayout {
       final nodeBottom = node.y + nodeHeight + textPadding + textHeight;
       if (nodeRight > maxX) maxX = nodeRight;
       if (nodeBottom > maxY) maxY = nodeBottom;
+      if (node.y < minY) minY = node.y;
     }
 
-    return (maxX + padding, maxY + padding);
+    // Account for back-edge arrows that extend below nodes
+    // Calculate how much extra space we need based on number of back edges
+    final backEdgesList = backEdges;
+    final baseOffset = 30;
+    final offsetPerLevel = 40; // Additional offset per overlapping level
+    final maxOffset = baseOffset + (backEdgesList.length > 0 ? offsetPerLevel * (backEdgesList.length - 1) : 0);
+    final extraBottomSpace = backEdgesList.isNotEmpty ? maxOffset + 20 : 0; // Add some padding
+
+    return (maxX + padding, maxY + padding + extraBottomSpace);
   }
 }
