@@ -36,7 +36,7 @@ jobs:
 
       - name: Get dependencies
         run: |
-          for package in packages/*/ tools/freezed_to_ts/; do
+          for package in packages/*/ tools/*/; do
             if [ -f "$package/pubspec.yaml" ]; then
               echo "Getting dependencies for $(basename $package)"
               cd $package
@@ -47,7 +47,7 @@ jobs:
 
       - name: Run "flutter analyze" in each package
         run: |
-          for package in packages/*/ tools/freezed_to_ts/; do
+          for package in packages/*/ tools/*/; do
             if [ -f "$package/pubspec.yaml" ]; then
               echo "🔍 Analyzing $(basename $package)"
               cd $package
@@ -58,7 +58,7 @@ jobs:
 
       - name: Run tests for packages with test files
         run: |
-          for package in packages/*/ tools/freezed_to_ts/; do
+          for package in packages/*/ tools/*/; do
             package_name=$(basename "$package")
             test_dir="$package/test"
             
