@@ -247,7 +247,7 @@ class PngGenerator {
   }
 
   void _drawBackEdgeArrow(img.Image canvas, PositionedNode fromNode, PositionedNode toNode, int offset) {
-    final color = img.ColorRgb8(arrowColorR, arrowColorG, arrowColorB);
+    // final color = img.ColorRgb8(arrowColorR, arrowColorG, arrowColorB);
 
     // Calculate bottom Y position (including text) - use the maximum of both nodes
     final fromBottomY = fromNode.y + GraphLayout.nodeHeight + GraphLayout.textPadding + GraphLayout.textHeight;

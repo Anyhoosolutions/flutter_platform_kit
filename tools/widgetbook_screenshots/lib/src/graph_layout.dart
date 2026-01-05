@@ -409,7 +409,7 @@ class GraphLayout {
     final backEdgesList = backEdges;
     final baseOffset = 30;
     final offsetPerLevel = 40; // Additional offset per overlapping level
-    final maxOffset = baseOffset + (backEdgesList.length > 0 ? offsetPerLevel * (backEdgesList.length - 1) : 0);
+    final maxOffset = baseOffset + (backEdgesList.isNotEmpty ? offsetPerLevel * (backEdgesList.length - 1) : 0);
     final extraBottomSpace = backEdgesList.isNotEmpty ? maxOffset + 20 : 0; // Add some padding
 
     return (maxX + padding, maxY + padding + extraBottomSpace);

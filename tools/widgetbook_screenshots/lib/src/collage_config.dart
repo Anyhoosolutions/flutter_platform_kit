@@ -42,7 +42,7 @@ class CollageConfig {
   final int titleFontSize;
   final int cornerRadius;
   final Map<int, int> columnTops; // Maps column number to top position
-  final int? titlePadding; // Padding between screenshot and title (null = use default)
+  final int? titleOffset; // Pixels below screenshot edge to place title top (null = use default)
   final int? screenSpacing; // Spacing between screens in same column (null = use default)
   final int? horizontalPadding; // Horizontal padding on left/right (null = use default)
   final int? columnSpacing; // Spacing between columns (null = use default)
@@ -59,7 +59,7 @@ class CollageConfig {
     this.titleFontSize = 24,
     this.cornerRadius = 0,
     Map<int, int>? columnTops,
-    this.titlePadding,
+    this.titleOffset,
     this.screenSpacing,
     this.horizontalPadding,
     this.columnSpacing,
@@ -100,7 +100,7 @@ class CollageConfig {
       titleFontSize: json['titleFontSize'] as int? ?? 24,
       cornerRadius: json['cornerRadius'] as int? ?? 0,
       columnTops: columnTops,
-      titlePadding: json['titlePadding'] != null ? (json['titlePadding'] as num).toInt() : null,
+      titleOffset: json['titleOffset'] != null ? (json['titleOffset'] as num).toInt() : null,
       screenSpacing: json['screenSpacing'] != null ? (json['screenSpacing'] as num).toInt() : null,
       horizontalPadding: json['horizontalPadding'] != null ? (json['horizontalPadding'] as num).toInt() : null,
       columnSpacing: json['columnSpacing'] != null ? (json['columnSpacing'] as num).toInt() : null,

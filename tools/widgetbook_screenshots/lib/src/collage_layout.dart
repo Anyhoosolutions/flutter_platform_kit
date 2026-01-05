@@ -8,7 +8,7 @@ class PositionedCollageScreen {
   final int width;
   final int height;
   final int titleX; // Center X for title
-  final int titleY; // Baseline Y for title
+  final int titleY; // Top Y for title (will be converted to baseline in drawing code)
 
   PositionedCollageScreen({
     required this.screen,
@@ -32,7 +32,7 @@ class CollageLayout {
   static const int defaultHorizontalPadding = 20; // Default horizontal padding on left/right
   static const int defaultColumnSpacing = 20; // Default space between columns
   static const int defaultVerticalSpacing = 20; // Default space between screens in same column
-  static const int defaultTitlePadding = 8; // Default space between screenshot and text
+  static const int defaultTitleOffset = 8; // Default pixels below screenshot edge to place title
 
   // Calculated dimensions (set during layout building)
   late final int screenshotWidth;
@@ -77,7 +77,8 @@ class CollageLayout {
 
     // Step 2: Calculate title heights (0 if titles are not used)
     if (config.useTitles) {
-      actualTitleHeight = config.titleFontSize; // Actual font size
+      // Map font size to actual font height (matching font selection logic in CollageGenerator)
+      actualTitleHeight = _getActualFontHeight(config.titleFontSize);
       titleSpacingHeight = _getFontSpacingHeight(config.titleFontSize); // Minimal descender height for spacing
     } else {
       actualTitleHeight = 0;
@@ -112,14 +113,10 @@ class CollageLayout {
 
       // Step 4: Position each screen in this column and build the position map
       for (final screen in screensInColumn) {
-        final titlePadding = config.useTitles ? (config.titlePadding ?? defaultTitlePadding) : 0;
-        // When titlePadding = 0, we need to account for font height to prevent text overlap
-        // drawString uses baseline Y, which is near the bottom of text. To position text
-        // below the screenshot when padding is 0, we add the font height to the baseline Y.
-        final titleBaselineY = currentY +
-            screenshotHeight +
-            titlePadding +
-            (titlePadding == 0 && config.useTitles ? actualTitleHeight : 0);
+        // Use titleOffset if provided, otherwise use default
+        final titleOffset = config.useTitles ? (config.titleOffset ?? defaultTitleOffset) : 0;
+        // Calculate title top-left Y position: screenshot bottom + offset
+        final titleTopY = currentY + screenshotHeight + titleOffset;
         screensMap[screen.name] = PositionedCollageScreen(
           screen: screen,
           x: currentX,
@@ -127,23 +124,22 @@ class CollageLayout {
           width: screenshotWidth,
           height: screenshotHeight,
           titleX: currentX + screenshotWidth ~/ 2,
-          titleY: titleBaselineY,
+          titleY: titleTopY, // Now represents top-left Y, will be converted to baseline in drawing
         );
 
         // Move down for next screen
         currentY += screenshotHeight;
 
         // Add title space if titles are enabled
+        // Note: titleOffset is only for visual positioning, not included in spacing calculation
         if (config.useTitles) {
-          final titlePadding = config.titlePadding ?? defaultTitlePadding;
-          // When titlePadding = 0, titleY already includes fontHeight to position text below screenshot.
-          // The text extends from approximately (titleY - fontHeight) to (titleY + titleSpacingHeight),
-          // so we need to account for the full text height: fontHeight + titleSpacingHeight.
-          // When titlePadding > 0, add padding + spacing.
-          currentY += titlePadding == 0 ? actualTitleHeight + titleSpacingHeight : titlePadding + titleSpacingHeight;
+          // Text extends from titleTopY to titleTopY + actualTitleHeight
+          // Add space for the title text height plus spacing for descenders
+          currentY += actualTitleHeight + titleSpacingHeight;
         }
 
-        // Add spacing before next screen (after title or after screen if no title)
+        // Add spacing before next screen (independent of titleOffset)
+        // This is the gap between screens (or between title and next screen)
         final screenSpacing = config.screenSpacing ?? defaultVerticalSpacing;
         currentY += screenSpacing;
       }
@@ -169,8 +165,8 @@ class CollageLayout {
       final screenRight = positionedScreen.x + positionedScreen.width;
       final screenBottom = positionedScreen.y + positionedScreen.height;
       if (config.useTitles) {
-        final titlePadding = config.titlePadding ?? defaultTitlePadding;
-        final textBottom = screenBottom + titlePadding + actualTitleHeight;
+        final titleOffset = config.titleOffset ?? defaultTitleOffset;
+        final textBottom = screenBottom + titleOffset + actualTitleHeight;
         if (textBottom > maxY) maxY = textBottom;
       } else {
         if (screenBottom > maxY) maxY = screenBottom;
@@ -179,6 +175,28 @@ class CollageLayout {
     }
 
     return (width: maxX + horizontalPadding, height: maxY);
+  }
+
+  /// Get the actual font height based on font size (matching font selection logic)
+  /// This maps the configured font size to the actual bitmap font height that will be used
+  int _getActualFontHeight(int fontSize) {
+    // Match the font selection logic in CollageGenerator._drawText
+    if (fontSize == 14) {
+      return 14;
+    } else if (fontSize == 24) {
+      return 24;
+    } else if (fontSize == 48) {
+      return 48;
+    } else {
+      // Default mapping based on ranges
+      if (fontSize < 20) {
+        return 14; // arial14
+      } else if (fontSize < 36) {
+        return 24; // arial24
+      } else {
+        return 48; // arial48
+      }
+    }
   }
 
   /// Get the height to add after the text baseline for spacing calculations

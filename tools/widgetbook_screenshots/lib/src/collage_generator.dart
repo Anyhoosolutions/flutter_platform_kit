@@ -17,7 +17,7 @@ class CollageGenerator {
   static const int textColorR = 33; // #212529 dark gray/black
   static const int textColorG = 37;
   static const int textColorB = 41;
-  static const int defaultTitlePadding = 10; // Default space between screenshot and text
+  // Note: defaultTitleOffset is defined in CollageLayout, not used here
 
   CollageGenerator(this.config, this.layout);
 
@@ -132,7 +132,18 @@ class CollageGenerator {
     }
   }
 
-  void _drawText(img.Image canvas, String text, int centerX, int baselineY) {
+  /// Get the height of a bitmap font
+  int _getFontHeight(img.BitmapFont font) {
+    // Bitmap fonts typically have characters that define the height
+    // We can estimate from the font size or use a known mapping
+    if (font == arial14) return 14;
+    if (font == arial24) return 24;
+    if (font == arial48) return 48;
+    // Fallback: try to get height from first character if available
+    return 24; // Default fallback
+  }
+
+  void _drawText(img.Image canvas, String text, int centerX, int topY) {
     try {
       // Select font based on titleFontSize
       img.BitmapFont font;
@@ -171,9 +182,15 @@ class CollageGenerator {
       // Create color for text
       final textColor = img.ColorRgb8(textColorR, textColorG, textColorB);
 
-      // drawString uses baseline Y coordinate. The titleY from position map is already
-      // calculated correctly by the layout (accounting for font height when titlePadding = 0)
-      final drawY = baselineY;
+      // Convert top-left Y to baseline Y for drawString
+      // For bitmap fonts, most of the text height is ABOVE the baseline
+      // To position text so its TOP is at topY, the baseline needs to be
+      // positioned such that the text above the baseline starts at topY
+      final fontHeight = _getFontHeight(font);
+      // For arial fonts, approximately 80-85% of the font height is above the baseline
+      // We use 80% to ensure text doesn't extend too far down
+      final baselineOffset = (fontHeight * 0.8).round();
+      final baselineY = topY + baselineOffset;
 
       // Draw text using drawString function
       img.drawString(
@@ -181,7 +198,7 @@ class CollageGenerator {
         text,
         font: font,
         x: textX,
-        y: drawY,
+        y: baselineY.round(),
         color: textColor,
       );
     } catch (e) {

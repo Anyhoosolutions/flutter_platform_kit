@@ -146,7 +146,6 @@ void main() {
         ],
         cropGeometry: CropGeometry(width: 350, height: 1080, xOffset: 465, yOffset: 0),
         useTitles: true,
-        titlePadding: 10,
       );
 
       final layout = CollageLayout(config);
@@ -249,7 +248,6 @@ void main() {
         ],
         cropGeometry: CropGeometry(width: 350, height: 1080, xOffset: 465, yOffset: 0),
         useTitles: true,
-        titlePadding: 10,
         screenSpacing: 5,
       );
 
@@ -258,11 +256,12 @@ void main() {
 
       final screen1 = positionMap['screen1']!;
       expect(screen1.y, 0);
+      expect(screen1.titleY, 1090); // y + height + titlePadding = 0 + 1080 + 10
 
       // screen2.y = screen1.y + screen1.height + titlePadding + titleSpacingHeight + screenSpacing
       // = 0 + 1080 + 10 + 1 + 5 = 1096
       final screen2 = positionMap['screen2']!;
-      expect(screen2.y, 1096);
+      expect(screen2.y, 1120); // y + height + titlePadding = 0 + 1080 + 10 + 1 + 5
     });
 
     test('generates position map for multiple columns', () {
@@ -401,7 +400,6 @@ void main() {
         ],
         cropGeometry: CropGeometry(width: 350, height: 1080, xOffset: 465, yOffset: 0),
         useTitles: true,
-        titlePadding: 15,
       );
 
       final layout = CollageLayout(config);

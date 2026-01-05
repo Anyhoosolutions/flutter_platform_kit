@@ -9,16 +9,19 @@
 	},
 	"scale": 1.0,
 	"backgroundColor": "#de6e47",
-	"useTitles": false,
-	"titleFontSize": 20,
 	"cornerRadius": 50,
-	"titlePadding": 0,
-	"screenSpacing": 0,
-	"horizontalPadding": 0,
-	"columnSpacing": 50,
+
+	"useTitles": true,
+	"titleFontSize": 24,
+	"titleOffset": -12,
+
+	"screenSpacing": 40,
+	"horizontalPadding": 20,
+	"columnSpacing": 40,
+
 	"columns": {
 		"0": {
-			"top": 0
+			"top": 10
 		},
 		"1": {
 			"top": -240

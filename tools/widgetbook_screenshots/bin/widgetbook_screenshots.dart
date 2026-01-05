@@ -142,7 +142,7 @@ void main(List<String> arguments) async {
       if (firstImage != null) {
         actualScreenshotWidth = firstImage.width;
         actualScreenshotHeight = firstImage.height;
-        logger.info('First screenshot dimensions: ${actualScreenshotWidth}x${actualScreenshotHeight}');
+        logger.info('First screenshot dimensions: ${actualScreenshotWidth}x$actualScreenshotHeight');
       } else {
         logger.warning('Could not load first screenshot, using configured dimensions');
       }
