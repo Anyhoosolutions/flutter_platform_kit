@@ -1,4 +1,4 @@
-0.0.2
+## 0.0.2
 
  - Support for dark mode navigation graph
  - Support for cyclic graphs
