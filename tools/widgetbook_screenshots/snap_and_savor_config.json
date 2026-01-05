@@ -12,19 +12,19 @@
 			"name": "home_page",
 			"title": "Home Page",
 			"path": "pages/home/homepage/homepage",
-			"navigatesTo": ["recipe_list_page"]
+			"navigatesTo": ["recipe_list_page", "recipe_details_page"]
 		},
 		{
 			"name": "recipe_list_page",
 			"title": "Recipe List Page",
 			"path": "pages/recipe/recipelistpage/recipelistpage",
-			"navigatesTo": ["recipe_details_page"]
+			"navigatesTo": []
 		},
 		{
 			"name": "recipe_details_page",
 			"title": "Recipe Details Page",
 			"path": "pages/recipe/recipedetailspage/recipedetailspage",
-			"navigatesTo": ["recipe_list_page", "home_page"]
+			"navigatesTo": []
 		}
 	]
 }

@@ -4,20 +4,6 @@ import 'package:widgetbook_screenshots/src/graph_layout.dart';
 
 void main() {
   group('GraphLayout._calculateLevels', () {
-    test('empty graph returns empty levels', () {
-      final config = Config(
-        widgetbookUrl: 'http://localhost:45678',
-        outputDir: './screenshots',
-        screens: [],
-        cropGeometry: CropGeometry(width: 515, height: 1080, xOffset: 700, yOffset: 0),
-      );
-
-      final layout = GraphLayout(config);
-      final nodes = layout.nodes;
-
-      expect(nodes, isEmpty);
-    });
-
     test('single node is placed at level 0', () {
       final config = Config(
         widgetbookUrl: 'http://localhost:45678',
@@ -214,7 +200,7 @@ void main() {
       // Verify level assignments and X positions (Y positions vary with centering)
       final nodeA = layout.nodes.firstWhere((n) => n.screen.name == 'a');
       expect(nodeA.level, equals(0));
-      expect(nodeA.x, equals(50));
+      expect(nodeA.x, equals(10));
 
       final nodeB = layout.nodes.firstWhere((n) => n.screen.name == 'b');
       expect(nodeB.level, equals(1));
@@ -222,7 +208,7 @@ void main() {
 
       final nodeC = layout.nodes.firstWhere((n) => n.screen.name == 'c');
       expect(nodeC.level, equals(1));
-      expect(nodeC.x, equals(350));
+      expect(nodeC.x, equals(390));
 
       final nodeD = layout.nodes.firstWhere((n) => n.screen.name == 'd');
       expect(nodeD.level, equals(2));

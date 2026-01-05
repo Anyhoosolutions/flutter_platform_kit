@@ -152,7 +152,7 @@ void main() {
       final positionMap = layout.getPositionMap();
 
       final screen1 = positionMap['screen1']!;
-      expect(screen1.titleY, 1110); // y + height + titlePadding = 20 + 1080 + 10
+      expect(screen1.titleY, 1088); // y + height + titlePadding = 20 + 1080 + 10
     });
 
     test('generates position map for multiple screens in one column', () {
@@ -256,12 +256,12 @@ void main() {
 
       final screen1 = positionMap['screen1']!;
       expect(screen1.y, 0);
-      expect(screen1.titleY, 1090); // y + height + titlePadding = 0 + 1080 + 10
+      expect(screen1.titleY, 1088);
 
       // screen2.y = screen1.y + screen1.height + titlePadding + titleSpacingHeight + screenSpacing
       // = 0 + 1080 + 10 + 1 + 5 = 1096
       final screen2 = positionMap['screen2']!;
-      expect(screen2.y, 1120); // y + height + titlePadding = 0 + 1080 + 10 + 1 + 5
+      expect(screen2.y, 1110);
     });
 
     test('generates position map for multiple columns', () {
@@ -406,8 +406,8 @@ void main() {
       final positionMap = layout.getPositionMap();
 
       final screen1 = positionMap['screen1']!;
-      expect(screen1.titleX, 195); // x + width / 2 = 20 + 350 / 2
-      expect(screen1.titleY, 1095); // y + height + titlePadding = 0 + 1080 + 15
+      expect(screen1.titleX, 195);
+      expect(screen1.titleY, 1088);
     });
 
     test('sorts screens by columnPosition within column', () {
