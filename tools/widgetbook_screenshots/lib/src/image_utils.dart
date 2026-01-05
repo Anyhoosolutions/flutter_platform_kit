@@ -113,7 +113,6 @@ class ImageUtils {
     if (dx != -1 && dy != -1) {
       final distanceSquared = dx * dx + dy * dy;
       final distance = math.sqrt(distanceSquared);
-      print('Distance: $distance, radius: $radius');
       return distance >= radius;
     }
 

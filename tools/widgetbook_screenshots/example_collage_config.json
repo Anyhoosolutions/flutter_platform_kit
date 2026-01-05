@@ -8,30 +8,51 @@
 		"yOffset": 0
 	},
 	"scale": 1.0,
-	"backgroundColor": "#ff0000",
+	"backgroundColor": "#de6e47",
 	"useTitles": true,
 	"titleFontSize": 40,
 	"cornerRadius": 50,
 	"screens": [
 		{
-			"name": "One",
-			"title": "One Page",
+			"name": "home_page",
+			"title": "Home Page",
 			"path": "pages/home/homepage/homepage",
 			"column": 0,
 			"columnPosition": 0
 		},
 		{
-			"name": "another_page",
-			"title": "Another Page",
+			"name": "recipe_list",
+			"title": "Recipe List",
 			"path": "pages/recipe/recipelistpage/recipelistpage",
 			"column": 0,
 			"columnPosition": 1
 		},
 		{
-			"name": "third_page",
-			"title": "Third Page",
+			"name": "recipe_details",
+			"title": "Recipe Details",
 			"path": "pages/recipe/recipedetailspage/recipedetailspage",
 			"column": 1,
+			"columnPosition": 0
+		},
+		{
+			"name": "add_recipe",
+			"title": "Add Recipe",
+			"path": "pages/recipe/addrecipemanuallypage/addrecipemanuallypage",
+			"column": 1,
+			"columnPosition": 1
+		},
+		{
+			"name": "edit_recipe",
+			"title": "Edit Recipe",
+			"path": "pages/recipe/addrecipemanuallypage/editrecipemanuallypage",
+			"column": 1,
+			"columnPosition": 2
+		},
+		{
+			"name": "profile",
+			"title": "Profile",
+			"path": "pages/profile/profilepage/profilepage",
+			"column": 2,
 			"columnPosition": 0
 		}
 	]
