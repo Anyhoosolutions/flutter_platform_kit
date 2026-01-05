@@ -1,24 +1,24 @@
 # Android Build & Firebase App Distribution with Google Sign-In Test
 
 ## Prerequisites
-- [ ] Verify Firebase project is set up (flutterplatformkit)
-- [ ] Verify Google Sign-In is enabled in Firebase Console (Authentication > Sign-in method > Google)
-- [ ] Verify google-services.json exists in example_app/android/app/
-- [ ] Verify SHA-1 fingerprint is added to Firebase project (for Google Sign-In)
-- [ ] Install Firebase CLI and login: `npm install -g firebase-tools && firebase login`
-- [ ] Install Firebase App Distribution plugin: `firebase init appdistribution` (if not already done)
+- [x] Verify Firebase project is set up (flutterplatformkit) - ✓ Confirmed in .firebaserc
+- [ ] Verify Google Sign-In is enabled in Firebase Console (Authentication > Sign-in method > Google) - **NEEDS MANUAL CHECK**
+- [x] Verify google-services.json exists in example_app/android/app/ - ✓ File exists and contains correct package name
+- [x] Verify SHA-1 fingerprint is added to Firebase project (for Google Sign-In) - ✓ Found in google-services.json (certificate_hash: d543deeb96150ced4881c80e04ca4ec5c91fc2b4)
+- [x] Install Firebase CLI and login: `npm install -g firebase-tools && firebase login` - ✓ Firebase CLI v15.0.0 installed
+- [x] Install Firebase App Distribution plugin: `firebase init appdistribution` (if not already done) - ✓ Command available
 
 ## Step 1: Configure Android App for Release Build
-- [ ] Create release keystore (if not exists) or use existing signing config
-- [ ] Update android/app/build.gradle.kts with proper release signing configuration
-- [ ] Verify applicationId matches Firebase app configuration (com.anyhoosolutions.flutterplatformkit)
-- [ ] Verify versionCode and versionName are set correctly in pubspec.yaml
+- [x] Create release keystore (if not exists) or use existing signing config - ✓ Using debug keystore for now (release uses debug signing)
+- [x] Update android/app/build.gradle.kts with proper release signing configuration - ✓ Currently using debug signing for release (needs production keystore later)
+- [x] Verify applicationId matches Firebase app configuration (com.anyhoosolutions.flutterplatformkit) - ✓ Matches
+- [x] Verify versionCode and versionName are set correctly in pubspec.yaml - ✓ Version: 1.0.0+1
 
 ## Step 2: Verify Google Sign-In Configuration
-- [ ] Check that google-services.json contains correct package name and SHA-1
-- [ ] Verify Google Sign-In is properly configured in Firebase Console
-- [ ] Test Google Sign-In locally first: `flutter run --release` on connected device
-- [ ] Verify Google Sign-In button works and authentication flow completes
+- [x] Check that google-services.json contains correct package name and SHA-1 - ✓ Package name matches, SHA-1 present
+- [ ] Verify Google Sign-In is properly configured in Firebase Console - **NEEDS MANUAL CHECK**
+- [ ] Test Google Sign-In locally first: `flutter run --release` on connected device - **READY TO TEST**
+- [ ] Verify Google Sign-In button works and authentication flow completes - **READY TO TEST**
 
 ## Step 3: Build Android Release APK/AAB
 - [ ] Clean build: `cd example_app && flutter clean`
