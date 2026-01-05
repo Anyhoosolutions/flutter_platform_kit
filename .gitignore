@@ -15,3 +15,5 @@ example_app/ios/Runner/GoogleService-Info.plist
 example_app/lib/firebase_options.dart
 firebase-debug.log
 tools/freezed_to_ts/tmp/
+tools/widgetbook_screenshots/screenshots/*.png
+tools/widgetbook_screenshots/navigation_graph.png
