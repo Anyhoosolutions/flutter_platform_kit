@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:args/args.dart';
 import 'package:logging/logging.dart';
+import 'package:path/path.dart' as path;
 import 'package:widgetbook_screenshots/widgetbook_screenshots.dart';
 
 void main(List<String> arguments) async {
@@ -127,8 +128,32 @@ void main(List<String> arguments) async {
 
     // Generate collage
     logger.info('\n🖼️  Generating collage...');
+    logger.info('Loading first screenshot to get actual dimensions...');
+
+    // Load first screenshot to get actual dimensions (assuming all screenshots are the same size)
+    int? actualScreenshotWidth;
+    int? actualScreenshotHeight;
+    if (config.screens.isNotEmpty) {
+      final imageUtils = ImageUtils();
+      final firstScreen = config.screens.first;
+      final filename = config.getFilename(firstScreen);
+      final screenshotPath = path.join(config.outputDir, filename);
+      final firstImage = await imageUtils.loadImage(screenshotPath);
+      if (firstImage != null) {
+        actualScreenshotWidth = firstImage.width;
+        actualScreenshotHeight = firstImage.height;
+        logger.info('First screenshot dimensions: ${actualScreenshotWidth}x${actualScreenshotHeight}');
+      } else {
+        logger.warning('Could not load first screenshot, using configured dimensions');
+      }
+    }
+
     logger.info('Creating collage layout...');
-    final layout = CollageLayout(config);
+    final layout = CollageLayout(
+      config,
+      actualScreenshotWidth: actualScreenshotWidth,
+      actualScreenshotHeight: actualScreenshotHeight,
+    );
     logger.info('Collage layout created, creating collage generator...');
     final generator = CollageGenerator(config, layout);
     logger.info('Collage generator created, generating PNG...');

@@ -105,9 +105,11 @@ class CollageGenerator {
           );
         }
 
-        // Center the screenshot if it's smaller than the target size (due to aspect ratio preservation)
+        // Place screenshot at exact position from position map
+        // Center horizontally if screenshot is smaller than target width (due to aspect ratio preservation)
         final offsetX = positionedScreen.x + (positionedScreen.width - processedScreenshot.width) ~/ 2;
-        final offsetY = positionedScreen.y + (positionedScreen.height - processedScreenshot.height) ~/ 2;
+        // Use exact y position from position map (no vertical centering)
+        final offsetY = positionedScreen.y;
 
         // Draw screenshot on canvas
         img.compositeImage(
@@ -130,7 +132,7 @@ class CollageGenerator {
     }
   }
 
-  void _drawText(img.Image canvas, String text, int centerX, int y) {
+  void _drawText(img.Image canvas, String text, int centerX, int baselineY) {
     try {
       // Select font based on titleFontSize
       img.BitmapFont font;
@@ -169,13 +171,17 @@ class CollageGenerator {
       // Create color for text
       final textColor = img.ColorRgb8(textColorR, textColorG, textColorB);
 
+      // drawString uses baseline Y coordinate. The titleY from position map is already
+      // calculated correctly by the layout (accounting for font height when titlePadding = 0)
+      final drawY = baselineY;
+
       // Draw text using drawString function
       img.drawString(
         canvas,
         text,
         font: font,
         x: textX,
-        y: y,
+        y: drawY,
         color: textColor,
       );
     } catch (e) {

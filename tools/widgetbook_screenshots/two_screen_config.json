@@ -15,7 +15,7 @@
 	"titlePadding": 0,
 	"screenSpacing": 0,
 	"horizontalPadding": 0,
-	"columnSpacing": 50,
+	"columnSpacing": 0,
 	"columns": {
 		"0": {
 			"top": 0
@@ -41,34 +41,6 @@
 			"path": "pages/recipe/recipelistpage/recipelistpage",
 			"column": 0,
 			"columnPosition": 1
-		},
-		{
-			"name": "recipe_details",
-			"title": "Recipe Details",
-			"path": "pages/recipe/recipedetailspage/recipedetailspage",
-			"column": 1,
-			"columnPosition": 0
-		},
-		{
-			"name": "add_recipe",
-			"title": "Add Recipe",
-			"path": "pages/recipe/addrecipemanuallypage/addrecipemanuallypage",
-			"column": 1,
-			"columnPosition": 1
-		},
-		{
-			"name": "edit_recipe",
-			"title": "Edit Recipe",
-			"path": "pages/recipe/addrecipemanuallypage/editrecipemanuallypage",
-			"column": 1,
-			"columnPosition": 2
-		},
-		{
-			"name": "profile",
-			"title": "P",
-			"path": "pages/profile/profilepage/profilepage",
-			"column": 2,
-			"columnPosition": 0
 		}
 	]
 }

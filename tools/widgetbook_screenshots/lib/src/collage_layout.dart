@@ -40,8 +40,12 @@ class CollageLayout {
   late final int titleSpacingHeight; // Height to add after title baseline for spacing (descender height)
   late final int actualTitleHeight; // Actual font size/line height
 
-  CollageLayout(this.config) {
-    _buildLayout();
+  /// Creates a CollageLayout with optional actual screenshot dimensions.
+  /// If [actualScreenshotWidth] and [actualScreenshotHeight] are provided,
+  /// they will be used instead of the configured cropGeometry dimensions.
+  /// This allows the layout to match the actual image sizes.
+  CollageLayout(this.config, {int? actualScreenshotWidth, int? actualScreenshotHeight}) {
+    _buildLayout(actualScreenshotWidth: actualScreenshotWidth, actualScreenshotHeight: actualScreenshotHeight);
   }
 
   /// Get the scaled screenshot dimensions (all screenshots are the same size)
@@ -60,10 +64,16 @@ class CollageLayout {
     return Map.from(screensMap);
   }
 
-  void _buildLayout() {
+  void _buildLayout({int? actualScreenshotWidth, int? actualScreenshotHeight}) {
     // Step 1: Calculate screenshot dimensions after scaling (all screenshots are the same size)
-    screenshotWidth = (baseScreenshotWidth * config.scale).round();
-    screenshotHeight = (baseScreenshotHeight * config.scale).round();
+    // Use actual dimensions if provided, otherwise use configured dimensions
+    if (actualScreenshotWidth != null && actualScreenshotHeight != null) {
+      screenshotWidth = (actualScreenshotWidth * config.scale).round();
+      screenshotHeight = (actualScreenshotHeight * config.scale).round();
+    } else {
+      screenshotWidth = (baseScreenshotWidth * config.scale).round();
+      screenshotHeight = (baseScreenshotHeight * config.scale).round();
+    }
 
     // Step 2: Calculate title heights (0 if titles are not used)
     if (config.useTitles) {
@@ -103,6 +113,13 @@ class CollageLayout {
       // Step 4: Position each screen in this column and build the position map
       for (final screen in screensInColumn) {
         final titlePadding = config.useTitles ? (config.titlePadding ?? defaultTitlePadding) : 0;
+        // When titlePadding = 0, we need to account for font height to prevent text overlap
+        // drawString uses baseline Y, which is near the bottom of text. To position text
+        // below the screenshot when padding is 0, we add the font height to the baseline Y.
+        final titleBaselineY = currentY +
+            screenshotHeight +
+            titlePadding +
+            (titlePadding == 0 && config.useTitles ? actualTitleHeight : 0);
         screensMap[screen.name] = PositionedCollageScreen(
           screen: screen,
           x: currentX,
@@ -110,7 +127,7 @@ class CollageLayout {
           width: screenshotWidth,
           height: screenshotHeight,
           titleX: currentX + screenshotWidth ~/ 2,
-          titleY: currentY + screenshotHeight + titlePadding,
+          titleY: titleBaselineY,
         );
 
         // Move down for next screen
@@ -119,7 +136,11 @@ class CollageLayout {
         // Add title space if titles are enabled
         if (config.useTitles) {
           final titlePadding = config.titlePadding ?? defaultTitlePadding;
-          currentY += titlePadding + titleSpacingHeight;
+          // When titlePadding = 0, titleY already includes fontHeight to position text below screenshot.
+          // The text extends from approximately (titleY - fontHeight) to (titleY + titleSpacingHeight),
+          // so we need to account for the full text height: fontHeight + titleSpacingHeight.
+          // When titlePadding > 0, add padding + spacing.
+          currentY += titlePadding == 0 ? actualTitleHeight + titleSpacingHeight : titlePadding + titleSpacingHeight;
         }
 
         // Add spacing before next screen (after title or after screen if no title)
