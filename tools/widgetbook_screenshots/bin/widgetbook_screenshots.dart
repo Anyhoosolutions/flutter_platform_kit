@@ -28,6 +28,11 @@ void main(List<String> arguments) async {
       'skip-screenshots',
       help: 'Skip screenshot capture (use existing screenshots)',
       defaultsTo: false,
+    )
+    ..addFlag(
+      'skip-existing-screenshots',
+      help: 'Skip screenshot capture if file already exists (capture only missing screenshots)',
+      defaultsTo: false,
     );
 
   final argResults = parser.parse(arguments);
@@ -35,6 +40,7 @@ void main(List<String> arguments) async {
   final configPath = argResults['config'] as String;
   final outputPath = argResults['output'] as String;
   final skipScreenshots = argResults['skip-screenshots'] as bool;
+  final skipExistingScreenshots = argResults['skip-existing-screenshots'] as bool;
 
   // Load config
   final logger = Logger('main');
@@ -55,7 +61,7 @@ void main(List<String> arguments) async {
   // Capture screenshots
   if (!skipScreenshots) {
     logger.info('\n📸 Capturing screenshots...');
-    final capturer = ScreenshotCapturer(config);
+    final capturer = ScreenshotCapturer(config, skipExisting: skipExistingScreenshots);
     final success = await capturer.captureAll();
     if (!success) {
       logger.warning('Some screenshots failed to capture. Continuing anyway...');

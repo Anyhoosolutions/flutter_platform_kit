@@ -4,11 +4,18 @@ import 'package:logging/logging.dart';
 import 'package:path/path.dart' as path;
 import 'package:widgetbook_screenshots/src/config.dart';
 
+enum CaptureResult {
+  success,
+  skipped,
+  failed,
+}
+
 class ScreenshotCapturer {
   final Logger _logger = Logger('ScreenshotCapturer');
   final Config config;
+  final bool skipExisting;
 
-  ScreenshotCapturer(this.config);
+  ScreenshotCapturer(this.config, {this.skipExisting = false});
 
   /// Captures screenshots for all screens using Playwright CLI
   Future<bool> captureAll() async {
@@ -31,22 +38,40 @@ class ScreenshotCapturer {
     }
 
     int successCount = 0;
+    int skippedCount = 0;
     for (final screen in config.screens) {
-      final success = await _captureScreen(screen);
-      if (success) {
+      final result = await _captureScreen(screen);
+      if (result == CaptureResult.success) {
         successCount++;
+      } else if (result == CaptureResult.skipped) {
+        skippedCount++;
+        successCount++; // Count skipped as success for overall status
       }
     }
 
-    _logger.info('Captured $successCount/${config.screens.length} screenshots');
+    if (skippedCount > 0) {
+      _logger.info(
+          'Captured $successCount/${config.screens.length} screenshots ($skippedCount skipped, ${successCount - skippedCount} new)');
+    } else {
+      _logger.info('Captured $successCount/${config.screens.length} screenshots');
+    }
     return successCount == config.screens.length;
   }
 
-  Future<bool> _captureScreen(Screen screen) async {
+  Future<CaptureResult> _captureScreen(Screen screen) async {
     File? tempFile;
     try {
       final url = config.getFullUrl(screen);
       final outputPath = path.join(config.outputDir, screen.filename);
+
+      // Check if file already exists and skip if requested
+      if (skipExisting) {
+        final outputFile = File(outputPath);
+        if (outputFile.existsSync()) {
+          _logger.info('⏭️  Skipping ${screen.name} (file already exists: ${screen.filename})');
+          return CaptureResult.skipped;
+        }
+      }
 
       _logger.info('Capturing screenshot for ${screen.name}...');
       _logger.fine('  URL: $url');
@@ -74,27 +99,27 @@ class ScreenshotCapturer {
         _logger.warning(
           'Failed to capture screenshot for ${screen.name}: ${result.stderr}',
         );
-        return false;
+        return CaptureResult.failed;
       }
 
       // Verify temp file was created
       if (!tempFile.existsSync()) {
         _logger.warning('Screenshot temp file not created: ${tempFile.path}');
-        return false;
+        return CaptureResult.failed;
       }
 
       // Crop the screenshot
       final cropSuccess = await _cropScreenshot(tempFile, outputPath);
       if (!cropSuccess) {
         _logger.warning('Failed to crop screenshot for ${screen.name}');
-        return false;
+        return CaptureResult.failed;
       }
 
       _logger.info('✅ Captured and cropped: ${screen.filename}');
-      return true;
+      return CaptureResult.success;
     } catch (e) {
       _logger.warning('Error capturing screenshot for ${screen.name}: $e');
-      return false;
+      return CaptureResult.failed;
     } finally {
       // Clean up temp file
       try {
