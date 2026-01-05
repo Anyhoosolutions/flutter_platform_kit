@@ -41,5 +41,5 @@ A package for handling logging in and logging out.
 
 ### freezed_to_ts
 
-### 
+### widgetbook_screenshots
 

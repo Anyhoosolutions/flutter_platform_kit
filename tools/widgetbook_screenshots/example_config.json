@@ -9,112 +9,21 @@
 	},
 	"screens": [
 		{
-			"name": "home_page",
-			"title": "Home Page",
-			"path": "pages/home/homepage/homepage",
-			"navigatesTo": ["recipe_list", "profile", "shopping_list"]
+			"name": "One",
+			"title": "One Page",
+			"path": "anyhoo_app_bar/anyhooappbar/anyhooappbar",
+			"navigatesTo": ["another_page", "third_page"]
 		},
 		{
-			"name": "recipe_list",
-			"title": "Recipe List",
-			"path": "pages/recipe/recipelistpage/recipelistpage",
-			"navigatesTo": [
-				"recipe_details",
-				"add_recipe_choice",
-				"manage_groups",
-				"add_group"
-			]
+			"name": "another_page",
+			"title": "Another Page",
+			"path": "anyhoo_core/errorpage/errorpage",
+			"navigatesTo": [""]
 		},
 		{
-			"name": "add_recipe_choice",
-			"title": "Add Recipe Choice",
-			"path": "pages/recipe/addrecipechoicepage/addrecipechoicepage",
-			"navigatesTo": [
-				"add_recipe_image",
-				"add_recipe_web_link",
-				"add_recipe_youtube_link",
-				"add_recipe_manually"
-			]
-		},
-		{
-			"name": "add_recipe_image",
-			"title": "Add Recipe From Image",
-			"path": "pages/recipe/adddataforparsingrecipepage/addimageforparsingrecipepage",
-			"navigatesTo": ["recipe_details"]
-		},
-		{
-			"name": "add_recipe_web_link",
-			"title": "Add Recipe From Web Link",
-			"path": "pages/recipe/adddataforparsingrecipepage/addweblinkforparsingrecipepage",
-			"navigatesTo": ["recipe_details"]
-		},
-		{
-			"name": "add_recipe_youtube_link",
-			"title": "Add Recipe From YouTube Link",
-			"path": "pages/recipe/adddataforparsingrecipepage/addweblinkforparsingrecipepage",
-			"navigatesTo": ["recipe_details"]
-		},
-		{
-			"name": "add_recipe_manually",
-			"title": "Add Recipe Manually",
-			"path": "pages/recipe/addrecipemanuallypage/addrecipemanuallypage",
-			"navigatesTo": ["recipe_details"]
-		},
-		{
-			"name": "recipe_details",
-			"title": "Recipe Details",
-			"path": "pages/recipe/recipedetailspage/recipedetailspage",
-			"navigatesTo": ["edit_recipe_manually"]
-		},
-		{
-			"name": "edit_recipe_manually",
-			"title": "Edit Recipe Manually",
-			"path": "pages/recipe/addrecipemanuallypage/editrecipemanuallypage",
-			"navigatesTo": []
-		},
-
-		{
-			"name": "manage_groups",
-			"title": "Manage Groups",
-			"path": "pages/groups/managerecipegroupspage/managerecipegroupspage",
-			"navigatesTo": ["add_group"]
-		},
-		{
-			"name": "add_group",
-			"title": "Add Group",
-			"path": "pages/groups/addgrouppage/addgrouppage",
-			"navigatesTo": []
-		},
-
-		{
-			"name": "profile",
-			"title": "Profile",
-			"path": "pages/profile/profilepage/profilepage",
-			"navigatesTo": ["profile_edit", "user_preferences"]
-		},
-		{
-			"name": "profile_edit",
-			"title": "Profile Edit",
-			"path": "pages/profile/profilepage/profilepage",
-			"navigatesTo": []
-		},
-		{
-			"name": "user_preferences",
-			"title": "User Preferences",
-			"path": "pages/profile/userpreferencespage/userpreferencespage",
-			"navigatesTo": []
-		},
-
-		{
-			"name": "shopping_list",
-			"title": "Shopping List",
-			"path": "pages/shoppinglists/shoppinglistpage/shoppinglistpage",
-			"navigatesTo": ["edit_shopping_list"]
-		},
-		{
-			"name": "edit_shopping_list",
-			"title": "Edit Shopping List",
-			"path": "pages/shoppinglists/editshoppinglistpage/editshoppinglistpage",
+			"name": "third_page",
+			"title": "Third Page",
+			"path": "anyhoo_app_bar/anyhoobottombar/anyhoobottombar",
 			"navigatesTo": []
 		}
 	]

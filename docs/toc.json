@@ -183,6 +183,20 @@
 							"subpages": []
 						}
 					]
+				},
+
+				{
+					"filepath": "widgetbook_screenshots/README.md",
+					"name": "Widgetbook Screenshots",
+					"title": "Widgetbook Screenshots",
+					"subpages": [
+						{
+							"filepath": "widgetbook_screenshots/CHANGELOG.md",
+							"name": "Changelog",
+							"title": "Changelog",
+							"subpages": []
+						}
+					]
 				}
 			]
 		}

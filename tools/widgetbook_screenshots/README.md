@@ -107,13 +107,17 @@ widgetbook_screenshots --config config.json --output ./output/navigation.png
 
 # Skip screenshot capture (use existing screenshots)
 widgetbook_screenshots --config config.json --skip-screenshots
+
+# Skip only existing screenshots (capture missing ones)
+widgetbook_screenshots --config config.json --skip-existing-screenshots
 ```
 
 ### Command-Line Options
 
 - `-c, --config`: (Required) Path to JSON configuration file
 - `-o, --output`: (Optional) Output path for navigation graph PNG (default: `./navigation_graph.png`)
-- `--skip-screenshots`: (Optional) Skip screenshot capture and use existing screenshots in output directory
+- `--skip-screenshots`: (Optional) Skip all screenshot capture and use existing screenshots in output directory
+- `--skip-existing-screenshots`: (Optional) Skip screenshot capture only if file already exists (capture missing screenshots)
 
 ## How It Works
 
@@ -128,7 +132,13 @@ widgetbook_screenshots --config config.json --skip-screenshots
   - Multiple screens leading to one screen
   - One screen leading to multiple screens
   - Circular dependencies (breaks cycles by placing nodes in appropriate levels)
+- **Branch Separation**: Automatically identifies separate navigation paths from root nodes and visually separates them:
+  - Groups nodes by their branch/path for better visual organization
+  - Adds extra vertical spacing between different branches
+  - Creates parallel horizontal lanes for each branch to improve readability
+  - Makes it easier to follow independent navigation flows
 - Positions nodes to minimize edge crossings
+- Centers all levels around a common midpoint for balanced layout
 
 ## Example Workflow
 
@@ -149,6 +159,20 @@ widgetbook_screenshots --config config.json --skip-screenshots
 4. The tool will:
    - Capture screenshots to `./screenshots/` (or your configured `outputDir`)
    - Generate `navigation.png` with the navigation graph
+   - Automatically organize screens into separate branches for better visual clarity
+
+### Incremental Updates
+
+To update only missing screenshots without re-capturing existing ones:
+
+```bash
+widgetbook_screenshots --config config.json --skip-existing-screenshots
+```
+
+This is useful when:
+- Adding new screens to your navigation flow
+- Some screenshots failed to capture initially
+- You want to preserve existing screenshots while capturing new ones
 
 ## Output
 
