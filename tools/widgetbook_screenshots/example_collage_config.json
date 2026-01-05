@@ -10,6 +10,7 @@
 	"scale": 1.0,
 	"backgroundColor": "#de6e47",
 	"cornerRadius": 50,
+	"height": 800,
 
 	"useTitles": true,
 	"titleFontSize": 24,

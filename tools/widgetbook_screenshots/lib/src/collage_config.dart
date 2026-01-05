@@ -46,6 +46,8 @@ class CollageConfig {
   final int? screenSpacing; // Spacing between screens in same column (null = use default)
   final int? horizontalPadding; // Horizontal padding on left/right (null = use default)
   final int? columnSpacing; // Spacing between columns (null = use default)
+  final int?
+      height; // Fixed height for collage image (null = auto-calculate). If smaller than content, will cut off. If larger, adds padding at bottom.
 
   CollageConfig({
     required this.widgetbookUrl,
@@ -63,6 +65,7 @@ class CollageConfig {
     this.screenSpacing,
     this.horizontalPadding,
     this.columnSpacing,
+    this.height,
   }) : columnTops = columnTops ?? {};
 
   factory CollageConfig.fromJsonFile(String filePath, {bool darkMode = false}) {
@@ -104,6 +107,7 @@ class CollageConfig {
       screenSpacing: json['screenSpacing'] != null ? (json['screenSpacing'] as num).toInt() : null,
       horizontalPadding: json['horizontalPadding'] != null ? (json['horizontalPadding'] as num).toInt() : null,
       columnSpacing: json['columnSpacing'] != null ? (json['columnSpacing'] as num).toInt() : null,
+      height: json['height'] != null ? (json['height'] as num).toInt() : null,
     );
   }
 

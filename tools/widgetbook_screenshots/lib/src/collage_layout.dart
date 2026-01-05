@@ -174,7 +174,10 @@ class CollageLayout {
       if (screenRight > maxX) maxX = screenRight;
     }
 
-    return (width: maxX + horizontalPadding, height: maxY);
+    // Use configured height if provided, otherwise use calculated height
+    final finalHeight = config.height ?? maxY;
+
+    return (width: maxX + horizontalPadding, height: finalHeight);
   }
 
   /// Get the actual font height based on font size (matching font selection logic)
