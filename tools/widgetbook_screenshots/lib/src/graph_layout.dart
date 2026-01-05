@@ -34,6 +34,7 @@ class GraphLayout {
   static const int nodeHeight = 400;
   static const int horizontalSpacing = 100; // Space between levels
   static const int verticalSpacing = 50; // Space between nodes in same level
+  static const int branchSpacing = 100; // Extra spacing between different branches
   static const int padding = 50; // Padding around entire graph
   static const int textHeight = 20; // Height for text labels below screenshots
   static const int textPadding = 10; // Space between screenshot and text
@@ -52,6 +53,9 @@ class GraphLayout {
 
     // Calculate levels using topological sort (handles cycles by breaking them)
     final levels = _calculateLevels();
+
+    // Identify separate branches from root nodes for better visual separation
+    final branchMap = _identifyBranches();
 
     // Find the level with the most nodes to use as reference for centering
     int maxNodeCount = 0;
@@ -76,28 +80,54 @@ class GraphLayout {
       graphMidpoint = padding + nodeHeight ~/ 2;
     }
 
-    // Position nodes based on levels, all centered around the reference midpoint
+    // Position nodes based on levels, grouped by branches for better separation
     int currentX = padding;
     for (int level = 0; level < levels.length; level++) {
       final nodesInLevel = levels[level];
       if (nodesInLevel.isEmpty) continue;
 
-      final nodeCount = nodesInLevel.length;
-      final totalHeight = nodeCount * nodeHeight + (nodeCount - 1) * verticalSpacing;
+      // Group nodes by branch
+      final nodesByBranch = <String, List<String>>{};
+      for (final nodeName in nodesInLevel) {
+        final branch = branchMap[nodeName] ?? 'default';
+        nodesByBranch.putIfAbsent(branch, () => []).add(nodeName);
+      }
+
+      // Sort branches for consistent ordering
+      final sortedBranches = nodesByBranch.keys.toList()..sort();
+
+      // Calculate total height including branch spacing
+      int totalHeight = 0;
+      for (final branch in sortedBranches) {
+        final branchNodes = nodesByBranch[branch]!;
+        if (totalHeight > 0) {
+          totalHeight += branchSpacing; // Add spacing between branches
+        }
+        totalHeight += branchNodes.length * nodeHeight + (branchNodes.length - 1) * verticalSpacing;
+      }
 
       // Center this level around the reference midpoint
-      // Start Y is calculated so the entire group is centered around graphMidpoint
       int currentY = graphMidpoint - totalHeight ~/ 2;
 
-      for (final screenName in nodesInLevel) {
-        final screen = config.screens.firstWhere((s) => s.name == screenName);
-        nodesMap[screenName] = PositionedNode(
-          screen: screen,
-          x: currentX,
-          y: currentY,
-          level: level,
-        );
-        currentY += nodeHeight + verticalSpacing;
+      // Position nodes grouped by branch
+      for (final branch in sortedBranches) {
+        final branchNodes = nodesByBranch[branch]!..sort(); // Sort within branch for consistency
+
+        // Add spacing before this branch (except first)
+        if (currentY > graphMidpoint - totalHeight ~/ 2) {
+          currentY += branchSpacing;
+        }
+
+        for (final screenName in branchNodes) {
+          final screen = config.screens.firstWhere((s) => s.name == screenName);
+          nodesMap[screenName] = PositionedNode(
+            screen: screen,
+            x: currentX,
+            y: currentY,
+            level: level,
+          );
+          currentY += nodeHeight + verticalSpacing;
+        }
       }
 
       currentX += nodeWidth + horizontalSpacing;
@@ -197,6 +227,81 @@ class GraphLayout {
     }
 
     return result;
+  }
+
+  /// Identify separate branches from root nodes for visual grouping
+  /// Returns a map from node name to branch identifier
+  Map<String, String> _identifyBranches() {
+    final Map<String, String> branchMap = {};
+    final Map<String, List<String>> graph = {};
+    final Map<String, int> inDegree = {};
+
+    // Build graph and calculate in-degrees
+    for (final screen in config.screens) {
+      graph[screen.name] = [];
+      inDegree[screen.name] = 0;
+    }
+
+    for (final edge in _edges) {
+      graph[edge.from]!.add(edge.to);
+      inDegree[edge.to] = (inDegree[edge.to] ?? 0) + 1;
+    }
+
+    // Find root nodes (nodes with no incoming edges)
+    final rootNodes = <String>[];
+    for (final screen in config.screens) {
+      if (inDegree[screen.name] == 0) {
+        rootNodes.add(screen.name);
+      }
+    }
+
+    // If no root nodes, use first screen as root
+    if (rootNodes.isEmpty && config.screens.isNotEmpty) {
+      rootNodes.add(config.screens.first.name);
+    }
+
+    // For each root node, identify its branches
+    for (final root in rootNodes) {
+      branchMap[root] = root; // Root nodes are their own branch
+
+      // Get direct children of root (first-level branches)
+      final directChildren = graph[root] ?? [];
+
+      // Traverse from each direct child to assign all descendants to that branch
+      // Use BFS to assign nodes to the branch that reaches them first (shortest path)
+      for (final branchStart in directChildren) {
+        final branchId = branchStart;
+        final queue = <String>[branchStart];
+        final visited = <String>{branchStart};
+
+        while (queue.isNotEmpty) {
+          final current = queue.removeAt(0);
+
+          // Assign current node to this branch if not already assigned to another branch
+          // This ensures nodes are assigned to the first branch that reaches them
+          if (!branchMap.containsKey(current)) {
+            branchMap[current] = branchId;
+          }
+
+          // Process children
+          for (final child in graph[current] ?? []) {
+            if (!visited.contains(child)) {
+              visited.add(child);
+              queue.add(child);
+            }
+          }
+        }
+      }
+    }
+
+    // Assign any remaining nodes (part of cycles or unreachable) to a default branch
+    for (final screen in config.screens) {
+      if (!branchMap.containsKey(screen.name)) {
+        branchMap[screen.name] = 'default';
+      }
+    }
+
+    return branchMap;
   }
 
   List<PositionedNode> get nodes => nodesMap.values.toList();
