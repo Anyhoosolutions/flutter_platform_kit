@@ -33,14 +33,32 @@ void main(List<String> arguments) async {
       'skip-existing-screenshots',
       help: 'Skip screenshot capture if file already exists (capture only missing screenshots)',
       defaultsTo: false,
+    )
+    ..addFlag(
+      'dark-mode',
+      help: 'Capture screenshots in dark mode (appends dark mode knobs to URL)',
+      defaultsTo: false,
     );
 
   final argResults = parser.parse(arguments);
 
   final configPath = argResults['config'] as String;
-  final outputPath = argResults['output'] as String;
+  var outputPath = argResults['output'] as String;
   final skipScreenshots = argResults['skip-screenshots'] as bool;
   final skipExistingScreenshots = argResults['skip-existing-screenshots'] as bool;
+  final darkMode = argResults['dark-mode'] as bool;
+
+  // Add "-dark" suffix to output filename if dark mode is enabled
+  if (darkMode) {
+    final pathParts = outputPath.split('.');
+    if (pathParts.length > 1) {
+      final extension = pathParts.removeLast();
+      final basePath = pathParts.join('.');
+      outputPath = '$basePath-dark.$extension';
+    } else {
+      outputPath = '$outputPath-dark';
+    }
+  }
 
   // Load config
   final logger = Logger('main');
@@ -48,7 +66,7 @@ void main(List<String> arguments) async {
 
   Config config;
   try {
-    config = Config.fromJsonFile(configPath);
+    config = Config.fromJsonFile(configPath, darkMode: darkMode);
   } catch (e) {
     logger.severe('Failed to load config: $e');
     exit(1);
@@ -57,6 +75,9 @@ void main(List<String> arguments) async {
   logger.info('Widgetbook URL: ${config.widgetbookUrl}');
   logger.info('Output directory: ${config.outputDir}');
   logger.info('Screens: ${config.screens.length}');
+  if (darkMode) {
+    logger.info('Dark mode: enabled');
+  }
 
   // Capture screenshots
   if (!skipScreenshots) {

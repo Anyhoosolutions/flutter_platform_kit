@@ -58,15 +58,17 @@ class Config {
   final String outputDir;
   final List<Screen> screens;
   final CropGeometry cropGeometry;
+  final bool darkMode;
 
   Config({
     required this.widgetbookUrl,
     required this.outputDir,
     required this.screens,
     required this.cropGeometry,
+    this.darkMode = false,
   });
 
-  factory Config.fromJsonFile(String filePath) {
+  factory Config.fromJsonFile(String filePath, {bool darkMode = false}) {
     final file = File(filePath);
     if (!file.existsSync()) {
       throw Exception('Config file not found: $filePath');
@@ -80,12 +82,28 @@ class Config {
       outputDir: json['outputDir'] as String? ?? './screenshots',
       screens: (json['screens'] as List<dynamic>).map((e) => Screen.fromJson(e as Map<String, dynamic>)).toList(),
       cropGeometry: CropGeometry.fromJson(json['cropGeometry'] as Map<String, dynamic>?),
+      darkMode: darkMode,
     );
   }
 
   String getFullUrl(Screen screen) {
     final baseUrl = widgetbookUrl.endsWith('/') ? widgetbookUrl.substring(0, widgetbookUrl.length - 1) : widgetbookUrl;
     final path = screen.path.startsWith('/') ? screen.path.substring(1) : screen.path;
-    return '$baseUrl/#/?path=$path';
+    var url = '$baseUrl/#/?path=$path';
+
+    // Append dark mode knobs if dark mode is enabled
+    if (darkMode) {
+      url += '&knobs={Theme%20mode:dark}';
+    }
+
+    return url;
+  }
+
+  /// Get the filename for a screen, including dark mode suffix if applicable
+  String getFilename(Screen screen) {
+    if (darkMode) {
+      return '${screen.name}-dark.png';
+    }
+    return screen.filename;
   }
 }

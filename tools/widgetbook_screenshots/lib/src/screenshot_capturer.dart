@@ -62,13 +62,14 @@ class ScreenshotCapturer {
     File? tempFile;
     try {
       final url = config.getFullUrl(screen);
-      final outputPath = path.join(config.outputDir, screen.filename);
+      final filename = config.getFilename(screen);
+      final outputPath = path.join(config.outputDir, filename);
 
       // Check if file already exists and skip if requested
       if (skipExisting) {
         final outputFile = File(outputPath);
         if (outputFile.existsSync()) {
-          _logger.info('⏭️  Skipping ${screen.name} (file already exists: ${screen.filename})');
+          _logger.info('⏭️  Skipping ${screen.name} (file already exists: $filename)');
           return CaptureResult.skipped;
         }
       }
@@ -115,7 +116,7 @@ class ScreenshotCapturer {
         return CaptureResult.failed;
       }
 
-      _logger.info('✅ Captured and cropped: ${screen.filename}');
+      _logger.info('✅ Captured and cropped: $filename');
       return CaptureResult.success;
     } catch (e) {
       _logger.warning('Error capturing screenshot for ${screen.name}: $e');

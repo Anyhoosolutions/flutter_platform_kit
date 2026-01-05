@@ -63,7 +63,8 @@ class PngGenerator {
 
   Future<void> _drawNodes(img.Image canvas) async {
     for (final node in layout.nodes) {
-      final screenshotPath = path.join(config.outputDir, node.screen.filename);
+      final filename = config.getFilename(node.screen);
+      final screenshotPath = path.join(config.outputDir, filename);
       final file = File(screenshotPath);
 
       if (!file.existsSync()) {
