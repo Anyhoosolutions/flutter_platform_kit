@@ -65,7 +65,7 @@
 			"name": "edit_recipe_manually",
 			"title": "Edit Recipe Manually",
 			"path": "pages/recipe/addrecipemanuallypage/editrecipemanuallypage",
-			"navigatesTo": ["recipe_details"]
+			"navigatesTo": []
 		}
 	]
 }

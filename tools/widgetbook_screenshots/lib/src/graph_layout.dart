@@ -139,17 +139,37 @@ class GraphLayout {
     }
 
     // BFS to assign levels
+    // Use a set to track which nodes need processing to avoid duplicates
+    final processingSet = <String>{};
     while (queue.isNotEmpty) {
       final current = queue.removeAt(0);
+      processingSet.remove(current);
       final currentLevel = levels[current]!;
 
       for (final neighbor in graph[current] ?? []) {
+        final newLevel = currentLevel + 1;
         if (!levels.containsKey(neighbor)) {
-          levels[neighbor] = currentLevel + 1;
-          queue.add(neighbor);
-        } else if (levels[neighbor]! <= currentLevel) {
-          // Cycle detected - place neighbor in next level
-          levels[neighbor] = currentLevel + 1;
+          // First time seeing this neighbor
+          levels[neighbor] = newLevel;
+          if (!processingSet.contains(neighbor)) {
+            queue.add(neighbor);
+            processingSet.add(neighbor);
+          }
+        } else {
+          final neighborLevel = levels[neighbor]!;
+          if (neighborLevel == currentLevel) {
+            // Cycle detected (back edge to same level) - break it by placing neighbor in next level
+            // Don't re-queue to avoid infinite loops in tight cycles
+            levels[neighbor] = currentLevel + 1;
+          } else if (neighborLevel < newLevel) {
+            // Longer path found - update level and re-process neighbors
+            levels[neighbor] = newLevel;
+            if (!processingSet.contains(neighbor)) {
+              queue.add(neighbor);
+              processingSet.add(neighbor);
+            }
+          }
+          // If neighborLevel >= newLevel, no update needed
         }
       }
     }
