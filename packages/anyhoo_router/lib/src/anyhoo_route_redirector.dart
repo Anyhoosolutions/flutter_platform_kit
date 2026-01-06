@@ -27,9 +27,20 @@ class AnyhooRouteRedirector {
 
   String? redirect(BuildContext context, GoRouterState state) {
     final uri = state.uri;
-    final originalPath = uri.path;
+    // When redirects are re-evaluated due to auth state changes, state.matchedLocation
+    // might not reflect the current location. Get the actual current location from the router.
+    final router = GoRouter.of(context);
+    final currentLocation = router.routeInformationProvider.value.uri.path;
+    // Use matchedLocation if available and matches current location, otherwise use currentLocation
+    final originalPath =
+        (state.matchedLocation.isNotEmpty && _normalizePath(state.matchedLocation) == _normalizePath(currentLocation))
+        ? state.matchedLocation
+        : currentLocation;
     log.info('redirect called for originalPath: $originalPath');
-    log.info('allPaths: ${allPaths.join(', ')}');
+    log.info('state.uri.path: ${uri.path}');
+    log.info('state.matchedLocation: ${state.matchedLocation}');
+    log.info('currentLocation from router: $currentLocation');
+    // log.info('allPaths: ${allPaths.join(', ')}');
 
     // Check if user is on login path but already logged in - redirect to initial path
     log.info('authCubit: $authCubit');
@@ -42,6 +53,14 @@ class AnyhooRouteRedirector {
       log.info('user: $user');
       if (user != null) {
         log.info('User is logged in but on login path, redirecting to initial path');
+        // Explicitly navigate to initial path when redirect is triggered by refreshListenable
+        // This ensures the navigation actually happens when auth state changes
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (router.routeInformationProvider.value.uri.path == loginPath) {
+            log.info('Explicitly navigating to $initialPath');
+            router.go(initialPath);
+          }
+        });
         return redirecting(originalPath, initialPath);
       }
     }
