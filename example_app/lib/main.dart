@@ -70,7 +70,12 @@ class MyApp extends StatelessWidget {
         PhoneNumberEnhanceUserService(),
       ],
     );
-    final appRouter = AnyhooRouter(routes: $appRoutes, authCubit: authCubit).getGoRouter();
+    final appRouter = AnyhooRouter(
+      routes: $appRoutes,
+      authCubit: authCubit,
+      initialPath: '/login',
+      debugLogDiagnostics: true,
+    ).getGoRouter();
 
     return MultiRepositoryProvider(
       providers: [
