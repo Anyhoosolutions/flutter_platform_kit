@@ -109,7 +109,8 @@ void main() {
         authService: mockAuthService,
         converter: testConverter,
       );
-      expect(cubit.state.user, equals(null));
+      expect(cubit.state.isLoading, equals(false));
+      expect(cubit.state.user?.email, equals("test@example.com"));
     });
 
     group('Auth State Changes', () {
