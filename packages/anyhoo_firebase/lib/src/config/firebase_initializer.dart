@@ -126,6 +126,9 @@ class FirebaseInitializer {
         } else {
           _log.warning('!! Emulator enabled but host is null');
         }
+      } else {
+        _log.info('!! Auth emulator is DISABLED - using production Firebase Auth');
+        _log.info('!! Firebase Auth will connect to: https://identitytoolkit.googleapis.com');
       }
     } catch (e, stackTrace) {
       _log.info('!! Error: $e');

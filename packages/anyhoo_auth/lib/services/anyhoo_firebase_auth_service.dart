@@ -81,6 +81,11 @@ class AnyhooFirebaseAuthService<T extends AnyhooUser> implements AnyhooAuthServi
   Future<void> loginWithGoogle() async {
     try {
       _log.info('=== Starting Google Sign-In process ===');
+      if (_firebaseAuth.currentUser != null) {
+        _log.info('User already logged in, logging out first');
+        logout();
+      }
+
       if (kIsWeb) {
         _log.info('Platform: Web');
         // For web, check if we're returning from a redirect
@@ -129,17 +134,29 @@ class AnyhooFirebaseAuthService<T extends AnyhooUser> implements AnyhooAuthServi
         _log.info('✓ Firebase credential created');
 
         _log.info('Signing in to Firebase with credential...');
+        _log.info('Firebase Auth instance: ${_firebaseAuth.app.name}');
+        _log.info('Firebase Auth app options: ${_firebaseAuth.app.options.projectId}');
+        _log.info('Firebase Auth current user before sign-in: ${_firebaseAuth.currentUser?.uid ?? 'null'}');
+        _log.info('Credential idToken length: ${googleAuth.idToken?.length ?? 0}');
+        _log.info('Credential idToken preview: ${googleAuth.idToken?.substring(0, 50) ?? 'null'}...');
+
+        // Try to catch the actual error before timeout
         try {
+          const timeoutSeconds = 15;
           final userCredential = await _firebaseAuth.signInWithCredential(credential).timeout(
-            const Duration(seconds: 30),
+            const Duration(seconds: timeoutSeconds),
             onTimeout: () {
-              _log.severe('Firebase signInWithCredential timed out after 30 seconds');
-              throw TimeoutException('Firebase authentication timed out', const Duration(seconds: 30));
+              _log.severe('Firebase signInWithCredential timed out after $timeoutSeconds seconds');
+              _log.severe('This might indicate a network connectivity issue or Firebase project configuration problem');
+              _log.severe('Check if Firebase Auth is configured to use emulator (it should NOT be)');
+              throw TimeoutException('Firebase authentication timed out', const Duration(seconds: timeoutSeconds));
             },
           );
           _log.info('✓✓✓ Google Sign-In completed successfully! User ID: ${userCredential.user?.uid} ===');
         } catch (e, stackTrace) {
           _log.severe('Error during Firebase signInWithCredential', e, stackTrace);
+          _log.severe('Error type: ${e.runtimeType}');
+          _log.severe('Error message: ${e.toString()}');
           rethrow;
         }
       }

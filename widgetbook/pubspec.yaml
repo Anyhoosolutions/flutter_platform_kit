@@ -16,9 +16,14 @@ dependencies:
   image: ^4.5.4
   cross_file: ^0.3.4+2
   flutter_form_builder: ^10.2.0
+  bloc_test: ^10.0.0
+  bloc: ^9.0.0
+  flutter_bloc: ^9.1.1
 
   anyhoo_image_selector:
     path: ../packages/anyhoo_image_selector
+  anyhoo_auth:
+    path: ../packages/anyhoo_auth
   anyhoo_core:
     path: ../packages/anyhoo_core
   anyhoo_firebase:

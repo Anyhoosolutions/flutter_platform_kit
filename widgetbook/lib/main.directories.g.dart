@@ -15,6 +15,8 @@ import 'package:widgetbook_workspace/anyhoo_app_bar/anyhoo_app_bar.dart'
     as _widgetbook_workspace_anyhoo_app_bar_anyhoo_app_bar;
 import 'package:widgetbook_workspace/anyhoo_app_bar/anyhoo_bottom_bar.dart'
     as _widgetbook_workspace_anyhoo_app_bar_anyhoo_bottom_bar;
+import 'package:widgetbook_workspace/anyhoo_auth/login_widget.dart'
+    as _widgetbook_workspace_anyhoo_auth_login_widget;
 import 'package:widgetbook_workspace/anyhoo_core/error_display_widget.dart'
     as _widgetbook_workspace_anyhoo_core_error_display_widget;
 import 'package:widgetbook_workspace/anyhoo_core/error_page.dart'
@@ -56,6 +58,20 @@ final directories = <_widgetbook.WidgetbookNode>[
             name: 'AnyhooBottomBar',
             builder:
                 _widgetbook_workspace_anyhoo_app_bar_anyhoo_bottom_bar.build,
+          ),
+        ],
+      ),
+    ],
+  ),
+  _widgetbook.WidgetbookFolder(
+    name: 'anyhoo_auth',
+    children: [
+      _widgetbook.WidgetbookComponent(
+        name: 'LoginWidget',
+        useCases: [
+          _widgetbook.WidgetbookUseCase(
+            name: 'LoginWidget',
+            builder: _widgetbook_workspace_anyhoo_auth_login_widget.build,
           ),
         ],
       ),

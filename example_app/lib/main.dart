@@ -29,7 +29,14 @@ void main() async {
 
   final arguments = await ArgumentsParser.getArguments();
 
-  final emulatorConfig = EmulatorConfig(hostIp: 'localhost', authPort: 21201, firestorePort: 21203, storagePort: 21204);
+  // Disable Auth emulator for Google Sign-In to work (Google Sign-In doesn't work with emulator)
+  final emulatorConfig = EmulatorConfig(
+    hostIp: 'localhost',
+    authPort: 21201,
+    firestorePort: 21203,
+    storagePort: 21204,
+    overrideUseFirebaseEmulator: false, // Disable Auth emulator to allow Google Sign-In
+  );
   final firebaseInitializer = FirebaseInitializer(arguments: arguments, emulatorConfig: emulatorConfig);
   await firebaseInitializer.initialize(DefaultFirebaseOptions.currentPlatform);
 
@@ -55,7 +62,20 @@ class MyApp extends StatelessWidget {
     final converter = ExampleUserConverter();
     final AnyhooAuthService authService = AnyhooFirebaseAuthService(firebaseAuth: firebaseInitializer.getAuth());
 
-    final appRouter = AnyhooRouter(routes: $appRoutes).getGoRouter();
+    final authCubit = AnyhooAuthCubit<ExampleUser>(
+      authService: authService,
+      converter: converter,
+      enhanceUserServices: [
+        AnyhooFirebaseEnhanceUserService(path: 'users', firestore: firebaseInitializer.getFirestore()),
+        PhoneNumberEnhanceUserService(),
+      ],
+    );
+    final appRouter = AnyhooRouter(
+      routes: $appRoutes,
+      authCubit: authCubit,
+      initialPath: '/',
+      debugLogDiagnostics: true,
+    ).getGoRouter();
 
     return MultiRepositoryProvider(
       providers: [
@@ -67,16 +87,7 @@ class MyApp extends StatelessWidget {
       child: MultiBlocProvider(
         providers: [
           BlocProvider(create: (_) => loggingConfiguration.loggingCubit!),
-          BlocProvider<AnyhooAuthCubit<ExampleUser>>(
-            create: (_) => AnyhooAuthCubit<ExampleUser>(
-              authService: authService,
-              converter: converter,
-              enhanceUserServices: [
-                AnyhooFirebaseEnhanceUserService(path: 'users', firestore: firebaseInitializer.getFirestore()),
-                PhoneNumberEnhanceUserService(),
-              ],
-            ),
-          ),
+          BlocProvider<AnyhooAuthCubit<ExampleUser>>(create: (_) => authCubit),
         ],
         child: MaterialApp.router(title: 'Example app', routerConfig: appRouter),
       ),

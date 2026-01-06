@@ -1,3 +1,8 @@
+## 0.0.12
+
+* Small fix for Google log in
+* Logging
+
 ## 0.0.11
  
 * Update UploadTask API

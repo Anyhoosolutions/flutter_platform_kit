@@ -12,7 +12,7 @@ void main() {
       Logger.root.level = Level.ALL;
       Logger.root.onRecord.listen((record) {
         // ignore: avoid_print
-        print('LOG: ${record.level.name}: ${record.time}: ${record.message}');
+        // print('LOG: ${record.level.name}: ${record.time}: ${record.message}');
       });
 
       const testImagePath = 'assets/images/test_image.png';

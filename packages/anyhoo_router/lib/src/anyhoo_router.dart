@@ -41,7 +41,7 @@ class AnyhooRouter {
     final rootNavigatorKey = GlobalKey<NavigatorState>();
     final navDrawerShellNavigatorKey = GlobalKey<NavigatorState>();
     final router = GoRouter(
-      initialLocation: '/',
+      initialLocation: initialPath,
       navigatorKey: rootNavigatorKey,
       debugLogDiagnostics: debugLogDiagnostics,
       observers: [routeStackObserver],

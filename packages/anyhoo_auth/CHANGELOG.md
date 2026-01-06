@@ -1,3 +1,12 @@
+## 0.0.27
+
+* Change to use freezed for AnyhooAuthState
+
+## 0.0.26
+
+* Small fix for Google log in
+* Logging
+
 ## 0.0.25
 
 * Adding logging for Google Sign in

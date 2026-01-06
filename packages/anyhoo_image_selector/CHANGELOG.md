@@ -1,4 +1,4 @@
-## 0.0.9 
+## 0.0.9
  
 * Trying to fix Showing preselected image in AnyhooFormImageSelector
 
