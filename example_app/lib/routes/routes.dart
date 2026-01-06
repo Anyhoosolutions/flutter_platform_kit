@@ -145,15 +145,6 @@ class LoggingRoute extends GoRouteData with $LoggingRoute {
   Widget build(BuildContext context, GoRouterState state) {
     return LoggingPage();
   }
-
-  @override
-  String? redirect(BuildContext context, GoRouterState state) {
-    final user = context.read<AnyhooAuthCubit<ExampleUser>>().state.user;
-    if (user == null) {
-      return '/login';
-    }
-    return null;
-  }
 }
 
 @immutable
