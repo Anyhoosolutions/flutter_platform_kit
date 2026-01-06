@@ -1,5 +1,6 @@
 // ignore_for_file: deprecated_member_use
 
+import 'package:anyhoo_auth/widgets/login_widget_settings.dart';
 import 'package:anyhoo_core/anyhoo_core.dart';
 import 'package:flutter/material.dart';
 import 'package:widgetbook/widgetbook.dart';
@@ -13,8 +14,24 @@ import 'package:anyhoo_auth/widgets/login_widget.dart';
 Widget build(BuildContext context) {
   final colorSchemeOptions = ['red', 'green', 'purple'];
   final colorScheme = context.knobs.list(label: 'Color scheme', options: colorSchemeOptions, initialOption: 'purple');
+  final showLogo = context.knobs.boolean(label: 'Show logo', initialValue: true);
+  final showEmailSignIn = context.knobs.boolean(label: 'Show email sign in', initialValue: true);
+  final showGoogleSignIn = context.knobs.boolean(label: 'Show google sign in', initialValue: true);
+  final showAppleSignIn = context.knobs.boolean(label: 'Show apple sign in', initialValue: true);
+  final showAnonymousSignIn = context.knobs.boolean(label: 'Show anonymous sign in', initialValue: true);
 
-  final innerWidget = LoginWidget<AnyhooUser>(title: 'Login', assetLogoPath: 'assets/images/baking.png');
+  final loginWidgetSettings = LoginWidgetSettings(
+    showEmailSignIn: showEmailSignIn,
+    showGoogleSignIn: showGoogleSignIn,
+    showAppleSignIn: showAppleSignIn,
+    showAnonymousSignIn: showAnonymousSignIn,
+  );
+
+  final innerWidget = LoginWidget<AnyhooUser>(
+    title: 'Example App',
+    assetLogoPath: showLogo ? 'assets/images/baking.png' : null,
+    loginWidgetSettings: loginWidgetSettings,
+  );
 
   final widget = Theme(
     data: ThemeData(colorScheme: getColorScheme(colorScheme)),
