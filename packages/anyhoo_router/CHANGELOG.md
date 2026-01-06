@@ -1,3 +1,7 @@
+## 0.0.16
+ 
+* Try and make sure redirect if logged in (especially on startup when state isn't ready and timing issues might arise)
+
 ## 0.0.15
  
 * Change GoRouterWrapper from being a static class

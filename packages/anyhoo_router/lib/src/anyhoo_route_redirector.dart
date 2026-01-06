@@ -31,6 +31,15 @@ class AnyhooRouteRedirector {
     log.info('redirect called for originalPath: $originalPath');
     log.info('allPaths: ${allPaths.join(', ')}');
 
+    // Check if user is on login path but already logged in - redirect to initial path
+    if (authCubit != null && _normalizePath(originalPath) == _normalizePath(loginPath)) {
+      final user = authCubit!.state.user;
+      if (user != null) {
+        log.info('User is logged in but on login path, redirecting to initial path');
+        return redirecting(originalPath, initialPath);
+      }
+    }
+
     if (!_pathMatchesAnyRoute(originalPath)) {
       log.info('route not found, redirecting to /');
       return redirecting(originalPath, '$redirectNotFound?originalPath=$originalPath');
@@ -191,5 +200,15 @@ class AnyhooRouteRedirector {
       return segment.toLowerCase();
     }).toList();
     return normalizedSegments.join('/');
+  }
+
+  /// Normalizes a path for comparison (removes trailing slashes, lowercases)
+  String _normalizePath(String path) {
+    String normalized = path.toLowerCase();
+    // Remove trailing slash except for root path
+    if (normalized.endsWith('/') && normalized != '/') {
+      normalized = normalized.substring(0, normalized.length - 1);
+    }
+    return normalized;
   }
 }
