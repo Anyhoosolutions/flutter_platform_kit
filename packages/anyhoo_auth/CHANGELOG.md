@@ -1,3 +1,7 @@
+## 0.0.25
+
+* Adding logging for Google Sign in
+
 ## 0.0.24
 
 * AuthState to start at `null`
