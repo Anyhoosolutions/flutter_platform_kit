@@ -1,42 +1,17 @@
-import 'package:anyhoo_core/anyhoo_core.dart';
+import 'package:anyhoo_core/models/anyhoo_user.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-/// State for authentication.
-class AnyhooAuthState<T extends AnyhooUser> {
-  /// Current authenticated user, null if not logged in.
-  final T? user;
+part 'anyhoo_auth_state.freezed.dart';
 
-  /// Whether a login/logout operation is in progress.
-  final bool isLoading;
-
-  /// Error message if an operation failed, null otherwise.
-  final String? errorMessage;
-
-  const AnyhooAuthState({
-    this.user,
-    this.isLoading = false,
-    this.errorMessage,
-  });
-
-  /// Whether a user is currently authenticated.
-  bool get isAuthenticated => user != null;
-
-  /// Create a copy of this state with updated values.
-  AnyhooAuthState<T> copyWith({
+@freezed
+abstract class AnyhooAuthState<T extends AnyhooUser> with _$AnyhooAuthState<T> {
+  const factory AnyhooAuthState({
     T? user,
-    bool? isLoading,
+    @Default(false) bool isLoading,
     String? errorMessage,
-    bool clearError = false,
-    bool clearUser = false,
-  }) {
-    return AnyhooAuthState<T>(
-      user: clearUser ? null : (user ?? this.user),
-      isLoading: isLoading ?? this.isLoading,
-      errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
-    );
-  }
+  }) = _AnyhooAuthState<T>;
 
-  @override
-  String toString() {
-    return 'AuthState(user: ${user?.toJson()}, isLoading: $isLoading, errorMessage: $errorMessage)';
-  }
+  const AnyhooAuthState._();
+
+  bool get isAuthenticated => user != null;
 }
