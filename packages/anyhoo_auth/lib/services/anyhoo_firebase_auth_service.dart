@@ -144,7 +144,7 @@ class AnyhooFirebaseAuthService<T extends AnyhooUser> implements AnyhooAuthServi
         try {
           const timeoutSeconds = 15;
           final userCredential = await _firebaseAuth.signInWithCredential(credential).timeout(
-            const Duration(seconds: timeoutSeconds), // Increased timeout to 60 seconds
+            const Duration(seconds: timeoutSeconds),
             onTimeout: () {
               _log.severe('Firebase signInWithCredential timed out after $timeoutSeconds seconds');
               _log.severe('This might indicate a network connectivity issue or Firebase project configuration problem');
