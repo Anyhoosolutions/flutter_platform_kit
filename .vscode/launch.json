@@ -25,7 +25,7 @@
       "request": "launch",
       "type": "dart",
       "program": "example_app/lib/main.dart",
-      "deviceId": "9B271FFBA0010W",
+      "deviceId": "47051FDAP00524",
       "args": []
     },
     {

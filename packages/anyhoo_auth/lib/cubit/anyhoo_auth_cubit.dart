@@ -46,6 +46,8 @@ class AnyhooAuthCubit<T extends AnyhooUser> extends Cubit<AnyhooAuthState<T>> {
   }
 
   void init() {
+    emit(state.copyWith(clearUser: true, isLoading: true));
+
     _authStateSubscription = authService.authStateChanges.listen(
       (Map<String, dynamic>? user) async {
         _log.info('Auth state changed (user): $user');
@@ -66,6 +68,10 @@ class AnyhooAuthCubit<T extends AnyhooUser> extends Cubit<AnyhooAuthState<T>> {
         emit(state.copyWith(errorMessage: error.toString(), isLoading: false));
       },
     );
+
+    final userData = authService.currentUser;
+    final user = userData != null ? converter.fromJson(userData) : null;
+    emit(state.copyWith(isLoading: false, user: user));
   }
 
   @override
@@ -196,5 +202,11 @@ class AnyhooAuthCubit<T extends AnyhooUser> extends Cubit<AnyhooAuthState<T>> {
 
   T copyAnyhooUser(T user) {
     return converter.fromJson(user.toJson());
+  }
+
+  @override
+  void onChange(Change<AnyhooAuthState<T>> change) {
+    super.onChange(change);
+    _log.info('Auth state changed: ${change.toString().substringSafe(0, 60)}...');
   }
 }

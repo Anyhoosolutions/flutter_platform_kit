@@ -32,8 +32,14 @@ class AnyhooRouteRedirector {
     log.info('allPaths: ${allPaths.join(', ')}');
 
     // Check if user is on login path but already logged in - redirect to initial path
+    log.info('authCubit: $authCubit');
+    log.info('authCubit state: ${authCubit?.state}');
+    log.info('loginPath: $loginPath');
+    log.info('originalPath: $originalPath');
+
     if (authCubit != null && _normalizePath(originalPath) == _normalizePath(loginPath)) {
       final user = authCubit!.state.user;
+      log.info('user: $user');
       if (user != null) {
         log.info('User is logged in but on login path, redirecting to initial path');
         return redirecting(originalPath, initialPath);
