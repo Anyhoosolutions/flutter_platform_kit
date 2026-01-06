@@ -19,8 +19,11 @@ import 'package:example_app/pages/waitingPageDemo/waiting_page_demo_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:logging/logging.dart';
 
 part 'routes.g.dart';
+
+final _log = Logger('Routes');
 
 @TypedGoRoute<HomeScreenRoute>(
   path: '/',
@@ -87,6 +90,15 @@ class AuthRoute extends GoRouteData with $AuthRoute {
   @override
   Widget build(BuildContext context, GoRouterState state) {
     return AuthDemoPage();
+  }
+
+  @override
+  String? redirect(BuildContext context, GoRouterState state) {
+    final user = context.read<AnyhooAuthCubit<ExampleUser>>().state.user;
+    if (user != null) {
+      return '/';
+    }
+    return null;
   }
 }
 
@@ -159,6 +171,18 @@ class LoginRoute extends GoRouteData with $LoginRoute {
       appBar: AppBar(title: const Text('Login')),
       body: LoginWidget<ExampleUser>(title: 'Example app', assetLogoPath: 'assets/images/logo.webp', cubit: cubit),
     );
+  }
+
+  @override
+  String? redirect(BuildContext context, GoRouterState state) {
+    final user = context.read<AnyhooAuthCubit<ExampleUser>>().state.user;
+    _log.info('LoginRoute redirect: user: $user');
+    if (user != null) {
+      _log.info('LoginRoute redirect: user is not null, redirecting to /');
+      return '/';
+    }
+    _log.info('LoginRoute redirect: user is null, returning null');
+    return null;
   }
 }
 
