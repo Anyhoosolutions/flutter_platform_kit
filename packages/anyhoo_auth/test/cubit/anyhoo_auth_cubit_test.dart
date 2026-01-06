@@ -83,7 +83,7 @@ void main() {
       Logger.root.level = Level.ALL;
       Logger.root.onRecord.listen((record) {
         // ignore: avoid_print
-        // print('${record.level.name}: ${record.time}: ${record.message}');
+        print('${record.level.name}: ${record.time}: ${record.message}');
       });
     });
 
@@ -149,6 +149,10 @@ void main() {
       });
 
       test('emits state with null user when auth state changes to signed out', () async {
+        // Start with a logged-in user
+        final testUser = TestUser(id: '123', email: 'test@example.com');
+        when(() => mockAuthService.currentUser).thenReturn(testUser.toJson());
+
         // Mock stream controller
         final controller = StreamController<Map<String, dynamic>?>();
         when(() => mockAuthService.authStateChanges).thenAnswer((_) => controller.stream);
@@ -158,9 +162,10 @@ void main() {
           converter: testConverter,
         );
 
-        // Wait for init
+        // Wait for init to complete (which will emit initial state with user)
         await Future.delayed(Duration.zero);
 
+        // Now add null to simulate sign out
         controller.add(null);
 
         await expectLater(
