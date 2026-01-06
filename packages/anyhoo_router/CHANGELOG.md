@@ -1,3 +1,8 @@
+## 0.0.17
+
+* Small fix for Google log in
+* Logging
+
 ## 0.0.16
  
 * Try and make sure redirect if logged in (especially on startup when state isn't ready and timing issues might arise)
