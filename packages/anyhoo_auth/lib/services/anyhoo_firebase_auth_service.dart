@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:anyhoo_auth/services/anyhoo_auth_service.dart';
 import 'package:anyhoo_core/models/anyhoo_user.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
@@ -78,7 +80,9 @@ class AnyhooFirebaseAuthService<T extends AnyhooUser> implements AnyhooAuthServi
   @override
   Future<void> loginWithGoogle() async {
     try {
+      _log.info('=== Starting Google Sign-In process ===');
       if (kIsWeb) {
+        _log.info('Platform: Web');
         // For web, check if we're returning from a redirect
         final redirectResult = await _firebaseAuth.getRedirectResult();
         if (redirectResult.user != null) {
@@ -88,35 +92,59 @@ class AnyhooFirebaseAuthService<T extends AnyhooUser> implements AnyhooAuthServi
         }
 
         // Otherwise, initiate a new sign-in with redirect
+        _log.info('Initiating Google Sign-In redirect...');
         final googleProvider = firebase_auth.GoogleAuthProvider();
         await _firebaseAuth.signInWithRedirect(googleProvider);
         // The redirect will happen, and when the user returns,
         // getRedirectResult() will be called again on the next page load
         throw Exception('Google Sign-In redirect initiated. Please complete sign-in in the popup/redirect.');
       } else {
+        _log.info('Platform: Mobile (iOS/Android)');
         // For mobile platforms (iOS/Android), use google_sign_in package
+        _log.info('Creating GoogleSignIn instance...');
         final googleSignIn = GoogleSignIn.instance;
 
         // Initialize (required in v7)
+        _log.info('Initializing GoogleSignIn (this may take a moment)...');
         await googleSignIn.initialize();
+        _log.info('✓ GoogleSignIn initialized successfully');
 
         // Sign in using authenticate() method
+        _log.info('Calling GoogleSignIn.authenticate()...');
         final googleUser = await googleSignIn.authenticate();
+        _log.info('✓ GoogleSignIn.authenticate() completed. User email: ${googleUser.email}');
 
         // Obtain the auth details from the request
+        _log.info('Obtaining authentication details...');
         final googleAuth = googleUser.authentication;
+        _log.info('✓ Auth details obtained. idToken: ${googleAuth.idToken?.substring(0, 20) ?? 'null'}...');
 
         // Create a new credential
         // Note: In google_sign_in v7, accessToken may not be available
         // Firebase Auth can work with just idToken for Google Sign-In
+        _log.info('Creating Firebase credential...');
         final credential = firebase_auth.GoogleAuthProvider.credential(
           idToken: googleAuth.idToken,
         );
+        _log.info('✓ Firebase credential created');
 
-        await _firebaseAuth.signInWithCredential(credential);
+        _log.info('Signing in to Firebase with credential...');
+        try {
+          final userCredential = await _firebaseAuth.signInWithCredential(credential).timeout(
+            const Duration(seconds: 30),
+            onTimeout: () {
+              _log.severe('Firebase signInWithCredential timed out after 30 seconds');
+              throw TimeoutException('Firebase authentication timed out', const Duration(seconds: 30));
+            },
+          );
+          _log.info('✓✓✓ Google Sign-In completed successfully! User ID: ${userCredential.user?.uid} ===');
+        } catch (e, stackTrace) {
+          _log.severe('Error during Firebase signInWithCredential', e, stackTrace);
+          rethrow;
+        }
       }
-    } catch (e) {
-      _log.severe('Error logging in with Google', e);
+    } catch (e, stackTrace) {
+      _log.severe('✗✗✗ Error logging in with Google', e, stackTrace);
       throw Exception('Google Sign-In failed: $e');
     }
   }
