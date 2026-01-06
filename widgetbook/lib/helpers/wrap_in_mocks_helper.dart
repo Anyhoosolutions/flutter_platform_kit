@@ -1,12 +1,14 @@
 import 'dart:math';
 import 'dart:typed_data';
 
+import 'package:anyhoo_auth/cubit/anyhoo_auth_cubit.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 // import 'package:flutter_bloc/flutter_bloc.dart';
 // import 'package:widgetbook/widgetbook.dart';
 import 'package:widgetbook_workspace/helpers/device_frame_wrapper.dart';
 // import 'package:widgetbook_workspace/helpers/image_loader.dart';
-// import 'package:widgetbook_workspace/helpers/mock_generator.dart';
+import 'package:widgetbook_workspace/helpers/mock_generator.dart';
 import 'package:image/image.dart' as img;
 
 import 'package:cross_file/cross_file.dart';
@@ -15,7 +17,7 @@ class WrapInMocksHelper {
   Widget wrapInMocks(BuildContext context, Widget child) {
     // final theme = Theme.of(context);
 
-    // final mockGenerator = MockGenerator();
+    final mockGenerator = MockGenerator();
 
     // final isLoading = context.knobs.boolean(label: 'Show shimmer', initialValue: false);
     final deviceFrameWrapper = DeviceFrameWrapper.wrapInDeviceFrame(context, child);
@@ -34,7 +36,10 @@ class WrapInMocksHelper {
     //     }
     //     final (imageFile, imageBytes) = snapshot.data!;
 
-    return deviceFrameWrapper;
+    return MultiBlocProvider(
+      providers: [BlocProvider<AnyhooAuthCubit>(create: (context) => mockGenerator.getMockAuthCubit())],
+      child: deviceFrameWrapper,
+    );
     //   },
     // );
   }
