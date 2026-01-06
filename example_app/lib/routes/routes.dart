@@ -23,6 +23,7 @@ import 'package:logging/logging.dart';
 
 part 'routes.g.dart';
 
+// ignore: unused_element
 final _log = Logger('Routes');
 
 @TypedGoRoute<HomeScreenRoute>(
@@ -144,6 +145,15 @@ class LoggingRoute extends GoRouteData with $LoggingRoute {
   Widget build(BuildContext context, GoRouterState state) {
     return LoggingPage();
   }
+
+  @override
+  String? redirect(BuildContext context, GoRouterState state) {
+    final user = context.read<AnyhooAuthCubit<ExampleUser>>().state.user;
+    if (user == null) {
+      return '/login';
+    }
+    return null;
+  }
 }
 
 @immutable
@@ -171,18 +181,6 @@ class LoginRoute extends GoRouteData with $LoginRoute {
       appBar: AppBar(title: const Text('Login')),
       body: LoginWidget<ExampleUser>(title: 'Example app', assetLogoPath: 'assets/images/logo.webp', cubit: cubit),
     );
-  }
-
-  @override
-  String? redirect(BuildContext context, GoRouterState state) {
-    final user = context.read<AnyhooAuthCubit<ExampleUser>>().state.user;
-    _log.info('LoginRoute redirect: user: $user');
-    if (user != null) {
-      _log.info('LoginRoute redirect: user is not null, redirecting to /');
-      return '/';
-    }
-    _log.info('LoginRoute redirect: user is null, returning null');
-    return null;
   }
 }
 
