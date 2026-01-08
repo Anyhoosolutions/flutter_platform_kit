@@ -33,7 +33,7 @@ Widget build(BuildContext context) {
                 : icon == 'filter_list'
                 ? Icons.filter_list
                 : Icons.filter_list_off,
-            searchText: searchText,
+            labelText: searchText,
             showIncludeEverythingCheckbox: showIncludeEverythingCheckbox,
             onChanged: (value) {
               // ignore: avoid_print
