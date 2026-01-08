@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 
 class AnyhooSearchBar extends StatefulWidget {
-  final String searchText;
   final bool showIncludeEverythingCheckbox;
   final void Function(String) onChanged;
   final void Function(bool)? onIncludeEverythingChanged;
   final IconData icon;
+  final String labelText;
 
   const AnyhooSearchBar({
     super.key,
-    this.searchText = 'Search...',
+    this.labelText = 'Search...',
     this.showIncludeEverythingCheckbox = false,
     required this.onChanged,
     this.onIncludeEverythingChanged,
@@ -22,10 +22,22 @@ class AnyhooSearchBar extends StatefulWidget {
 
 class _AnyhooSearchBarState extends State<AnyhooSearchBar> {
   bool includeEverything = false;
+  late final TextEditingController searchController;
+
+  @override
+  void initState() {
+    super.initState();
+    searchController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final TextEditingController searchController = TextEditingController();
     final theme = Theme.of(context);
     return SliverToBoxAdapter(
       child: Padding(
@@ -39,7 +51,7 @@ class _AnyhooSearchBarState extends State<AnyhooSearchBar> {
                   controller: searchController,
                   onChanged: widget.onChanged,
                   decoration: InputDecoration(
-                    hintText: widget.searchText,
+                    labelText: widget.labelText,
                     hintStyle: TextStyle(color: theme.colorScheme.primary, fontSize: 16),
                     prefixIcon: Icon(widget.icon, color: theme.colorScheme.primary),
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide.none),
