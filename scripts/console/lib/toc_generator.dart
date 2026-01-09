@@ -14,13 +14,20 @@ class TocGenerator {
   /// Generate and update toc.json
   Future<void> generate() async {
     print('🔍 Scanning packages and tools for documentation files...');
+    print('📂 Project root: $projectRoot');
+    print('📄 TOC path: $tocPath');
 
     // Read existing toc.json to preserve top-level structure
     final existingToc = await _readExistingToc();
 
     // Generate package sections
+    print('\n📦 Generating packages section...');
     final flutterPackagesSection = await _generatePackagesSection('packages');
+    print('✅ Found ${flutterPackagesSection.length} packages');
+
+    print('\n🔧 Generating tools section...');
     final toolsSection = await _generatePackagesSection('tools');
+    print('✅ Found ${toolsSection.length} tools');
 
     // Find the flutter_packages and tools sections in existing toc
     final updatedSubpages = _updateSubpages(
@@ -37,7 +44,7 @@ class TocGenerator {
 
     // Write updated toc.json
     await _writeToc(updatedToc);
-    print('✅ Successfully updated toc.json');
+    print('\n✅ Successfully updated toc.json');
   }
 
   /// Read existing toc.json
@@ -53,21 +60,31 @@ class TocGenerator {
   /// Generate sections for packages or tools
   Future<List<Map<String, dynamic>>> _generatePackagesSection(String directory) async {
     final packagesDir = Directory('$projectRoot/$directory');
+    print('📁 Scanning directory: ${packagesDir.path}');
     if (!await packagesDir.exists()) {
+      print('⚠️  Directory does not exist: ${packagesDir.path}');
       return [];
     }
 
     final packages = <Map<String, dynamic>>[];
+    int dirCount = 0;
 
     await for (final entity in packagesDir.list()) {
       if (entity is Directory) {
+        dirCount++;
         final packageName = entity.path.split('/').last;
+        print('  📦 Found package: $packageName');
         final packageDocs = await _generatePackageDocs(packageName, directory);
         if (packageDocs != null) {
           packages.add(packageDocs);
+          print('  ✅ Added package: $packageName');
+        } else {
+          print('  ⚠️  Skipped package: $packageName (no README.md)');
         }
       }
     }
+
+    print('📊 Found $dirCount directories, added ${packages.length} packages');
 
     // Sort packages alphabetically
     packages.sort((a, b) => (a['name'] as String).compareTo(b['name'] as String));
@@ -83,7 +100,7 @@ class TocGenerator {
     }
 
     // Check if README.md exists
-    final readmePath = File('$packageDir/README.md');
+    final readmePath = File('${packageDir.path}/README.md');
     if (!await readmePath.exists()) {
       return null; // Skip packages without README
     }
@@ -95,7 +112,7 @@ class TocGenerator {
     final subpages = <Map<String, dynamic>>[];
 
     // Always add CHANGELOG.md if it exists
-    final changelogPath = File('$packageDir/CHANGELOG.md');
+    final changelogPath = File('${packageDir.path}/CHANGELOG.md');
     if (await changelogPath.exists()) {
       subpages.add({
         'filepath': '$packageName/CHANGELOG.md',
@@ -106,11 +123,11 @@ class TocGenerator {
     }
 
     // Find files in docs/ directory
-    final docsDir = Directory('$packageDir/docs');
+    final docsDir = Directory('${packageDir.path}/docs');
     if (await docsDir.exists()) {
       await for (final entity in docsDir.list(recursive: true)) {
         if (entity is File && entity.path.endsWith('.md')) {
-          final relativePath = entity.path.replaceFirst('$packageDir/docs/', '');
+          final relativePath = entity.path.replaceFirst('${packageDir.path}/docs/', '');
           final docName = _getDocName(relativePath);
           subpages.add({
             'filepath': '$packageName/$relativePath',
@@ -178,12 +195,17 @@ class TocGenerator {
     List<Map<String, dynamic>> flutterPackages,
     List<Map<String, dynamic>> tools,
   ) {
+    print('\n🔄 Updating subpages...');
+    print('  📦 Flutter packages to add: ${flutterPackages.length}');
+    print('  🔧 Tools to add: ${tools.length}');
+    
     return existingSubpages.map((subpage) {
       final subpageMap = subpage as Map<String, dynamic>;
       final filepath = subpageMap['filepath'] as String;
 
       // Replace flutter_packages.md section
       if (filepath == 'flutter_packages.md') {
+        print('  ✅ Found flutter_packages.md, updating with ${flutterPackages.length} packages');
         return {
           ...subpageMap,
           'subpages': flutterPackages,
@@ -192,6 +214,7 @@ class TocGenerator {
 
       // Replace tools.md section
       if (filepath == 'tools.md') {
+        print('  ✅ Found tools.md, updating with ${tools.length} tools');
         return {
           ...subpageMap,
           'subpages': tools,
