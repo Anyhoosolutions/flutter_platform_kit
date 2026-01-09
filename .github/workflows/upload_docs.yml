@@ -111,11 +111,8 @@ jobs:
         uses: actions/cache@v3
         with:
           path: |
-            .pub-cache/bin
-            .pub-cache/global_packages
-            .pub-cache/hosted
+            ~/.pub-cache
             .dart_tool
-            .packages
           key: ${{ runner.os }}-dart-${{ hashFiles('**/pubspec.yaml') }}
 
       - name: Run main deployment
@@ -330,11 +327,8 @@ jobs:
         uses: actions/cache@v3
         with:
           path: |
-            .pub-cache/bin
-            .pub-cache/global_packages
-            .pub-cache/hosted
+            ~/.pub-cache
             .dart_tool
-            .packages
           key: ${{ runner.os }}-dart-${{ hashFiles('**/pubspec.yaml') }}
 
       - name: Run non-main deployment
