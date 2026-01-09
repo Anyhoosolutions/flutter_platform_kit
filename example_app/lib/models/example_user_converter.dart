@@ -1,4 +1,5 @@
 import 'package:anyhoo_auth/anyhoo_auth.dart';
+import 'package:anyhoo_core/utils/json_utils.dart';
 import 'example_user.dart';
 
 /// Converter for ExampleUser.
@@ -9,7 +10,7 @@ class ExampleUserConverter implements AnyhooUserConverter<ExampleUser> {
   ExampleUser fromJson(Map<String, dynamic> json) {
     final values = {'name': json['name'] ?? 'No name at all', 'avatarUrl': json['photoURL'], ...json};
 
-    return ExampleUser.fromJson(values);
+    return safeFromJson(ExampleUser.fromJson, values);
   }
 
   @override
