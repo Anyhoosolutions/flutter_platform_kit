@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:anyhoo_auth/services/anyhoo_auth_service.dart';
 import 'package:anyhoo_core/models/anyhoo_user.dart';
+import 'package:anyhoo_logging/anyhoo_logging.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:google_sign_in/google_sign_in.dart';
@@ -71,8 +72,9 @@ class AnyhooFirebaseAuthService<T extends AnyhooUser> implements AnyhooAuthServi
         email: email,
         password: password,
       );
-    } catch (e) {
+    } catch (e, stackTrace) {
       _log.severe('Error logging in with email and password', e);
+      SentryHelper.captureException(e, stackTrace: stackTrace, fatal: false);
       rethrow;
     }
   }
@@ -149,7 +151,9 @@ class AnyhooFirebaseAuthService<T extends AnyhooUser> implements AnyhooAuthServi
               _log.severe('Firebase signInWithCredential timed out after $timeoutSeconds seconds');
               _log.severe('This might indicate a network connectivity issue or Firebase project configuration problem');
               _log.severe('Check if Firebase Auth is configured to use emulator (it should NOT be)');
-              throw TimeoutException('Firebase authentication timed out', const Duration(seconds: timeoutSeconds));
+              final timeoutError = TimeoutException('Firebase authentication timed out', const Duration(seconds: timeoutSeconds));
+              SentryHelper.captureException(timeoutError, fatal: false);
+              throw timeoutError;
             },
           );
           _log.info('✓✓✓ Google Sign-In completed successfully! User ID: ${userCredential.user?.uid} ===');
@@ -157,11 +161,13 @@ class AnyhooFirebaseAuthService<T extends AnyhooUser> implements AnyhooAuthServi
           _log.severe('Error during Firebase signInWithCredential', e, stackTrace);
           _log.severe('Error type: ${e.runtimeType}');
           _log.severe('Error message: ${e.toString()}');
+          SentryHelper.captureException(e, stackTrace: stackTrace, fatal: false);
           rethrow;
         }
       }
     } catch (e, stackTrace) {
       _log.severe('✗✗✗ Error logging in with Google', e, stackTrace);
+      SentryHelper.captureException(e, stackTrace: stackTrace, fatal: false);
       throw Exception('Google Sign-In failed: $e');
     }
   }
@@ -183,8 +189,9 @@ class AnyhooFirebaseAuthService<T extends AnyhooUser> implements AnyhooAuthServi
       );
       await _firebaseAuth.signInWithCredential(credential);
       return;
-    } catch (e) {
+    } catch (e, stackTrace) {
       _log.severe('Error logging in with Apple', e);
+      SentryHelper.captureException(e, stackTrace: stackTrace, fatal: false);
       rethrow;
     }
   }
@@ -201,8 +208,9 @@ class AnyhooFirebaseAuthService<T extends AnyhooUser> implements AnyhooAuthServi
     _log.info('Logging out');
     try {
       await _firebaseAuth.signOut();
-    } catch (e) {
+    } catch (e, stackTrace) {
       _log.severe('Error logging out', e);
+      SentryHelper.captureException(e, stackTrace: stackTrace, fatal: false);
       rethrow;
     }
   }

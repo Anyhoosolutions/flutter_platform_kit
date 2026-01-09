@@ -75,6 +75,13 @@ packages:
       relative: true
     source: path
     version: "0.0.9"
+  anyhoo_logging:
+    dependency: transitive
+    description:
+      path: "../packages/anyhoo_logging"
+      relative: true
+    source: path
+    version: "0.0.1"
   anyhoo_remote_config:
     dependency: "direct main"
     description:
@@ -95,7 +102,7 @@ packages:
       path: "../packages/anyhoo_search_bar"
       relative: true
     source: path
-    version: "0.0.1"
+    version: "0.0.2"
   anyhoo_shimmer:
     dependency: "direct main"
     description:

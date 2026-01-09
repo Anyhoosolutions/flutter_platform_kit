@@ -5,6 +5,7 @@ import 'package:anyhoo_auth/models/anyhoo_user_converter.dart';
 import 'package:anyhoo_core/anyhoo_core.dart';
 import 'package:anyhoo_auth/services/anyhoo_auth_service.dart';
 import 'package:anyhoo_auth/cubit/anyhoo_auth_state.dart';
+import 'package:anyhoo_logging/anyhoo_logging.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:logging/logging.dart';
 
@@ -40,10 +41,7 @@ class AnyhooAuthCubit<T extends AnyhooUser> extends Cubit<AnyhooAuthState<T>> {
   final List<AnyhooEnhanceUserService<T>> enhanceUserServices;
   StreamSubscription<Map<String, dynamic>?>? _authStateSubscription;
 
-  AnyhooAuthCubit(
-      {required this.authService,
-      required this.converter,
-      this.enhanceUserServices = const []})
+  AnyhooAuthCubit({required this.authService, required this.converter, this.enhanceUserServices = const []})
       : super(AnyhooAuthState<T>(user: null)) {
     init();
   }
@@ -60,23 +58,22 @@ class AnyhooAuthCubit<T extends AnyhooUser> extends Cubit<AnyhooAuthState<T>> {
           } else {
             var enhancedUserData = {...user};
             for (final enhanceUserService in enhanceUserServices) {
-              enhancedUserData =
-                  await enhanceUserService.enhanceUser(enhancedUserData);
-              _log.info(
-                  'Enhanced user data: ${enhancedUserData.toString().substringSafe(0, 55)}...');
+              enhancedUserData = await enhanceUserService.enhanceUser(enhancedUserData);
+              _log.info('Enhanced user data: ${enhancedUserData.toString().substringSafe(0, 55)}...');
             }
             final enhancedUser = converter.fromJson(enhancedUserData);
-            _log.info(
-                'Emitting new state with user: ${enhancedUser.toJson().toString().substringSafe(0, 55)}...');
+            _log.info('Emitting new state with user: ${enhancedUser.toJson().toString().substringSafe(0, 55)}...');
             emit(state.copyWith(user: enhancedUser, isLoading: false));
           }
-        } catch (e) {
+        } catch (e, stackTrace) {
           _log.severe('Error in auth state stream', e);
+          SentryHelper.captureException(e, stackTrace: stackTrace, fatal: false);
           emit(state.copyWith(errorMessage: e.toString(), isLoading: false));
         }
       },
-      onError: (error) {
+      onError: (error, stackTrace) {
         _log.severe('Error in auth state stream', error);
+        SentryHelper.captureException(error, stackTrace: stackTrace, fatal: false);
         emit(state.copyWith(errorMessage: error.toString(), isLoading: false));
       },
     );
@@ -100,8 +97,9 @@ class AnyhooAuthCubit<T extends AnyhooUser> extends Cubit<AnyhooAuthState<T>> {
 
     try {
       await authService.loginWithEmailAndPassword(email, password);
-    } catch (e) {
+    } catch (e, stackTrace) {
       _log.severe('Error logging in with email and password', e);
+      SentryHelper.captureException(e, stackTrace: stackTrace, fatal: false);
       emit(state.copyWith(
         isLoading: false,
         errorMessage: e.toString(),
@@ -118,8 +116,9 @@ class AnyhooAuthCubit<T extends AnyhooUser> extends Cubit<AnyhooAuthState<T>> {
 
     try {
       await authService.loginWithGoogle();
-    } catch (e) {
+    } catch (e, stackTrace) {
       _log.severe('Error logging in with Google', e);
+      SentryHelper.captureException(e, stackTrace: stackTrace, fatal: false);
       emit(state.copyWith(
         isLoading: false,
         errorMessage: e.toString(),
@@ -136,8 +135,9 @@ class AnyhooAuthCubit<T extends AnyhooUser> extends Cubit<AnyhooAuthState<T>> {
 
     try {
       await authService.loginWithApple();
-    } catch (e) {
+    } catch (e, stackTrace) {
       _log.severe('Error logging in with Apple', e);
+      SentryHelper.captureException(e, stackTrace: stackTrace, fatal: false);
       emit(state.copyWith(
         isLoading: false,
         errorMessage: e.toString(),
@@ -154,8 +154,9 @@ class AnyhooAuthCubit<T extends AnyhooUser> extends Cubit<AnyhooAuthState<T>> {
 
     try {
       await authService.loginWithAnonymous();
-    } catch (e) {
+    } catch (e, stackTrace) {
       _log.severe('Error logging in with anonymous', e);
+      SentryHelper.captureException(e, stackTrace: stackTrace, fatal: false);
       emit(state.copyWith(
         isLoading: false,
         errorMessage: e.toString(),
@@ -173,8 +174,9 @@ class AnyhooAuthCubit<T extends AnyhooUser> extends Cubit<AnyhooAuthState<T>> {
       await authService.logout();
       // Don't manually emit user: null here - let the authStateChanges stream handle it
       // The stream listener will emit the updated state with user: null and isLoading: false
-    } catch (e) {
+    } catch (e, stackTrace) {
       _log.severe('Error logging out', e);
+      SentryHelper.captureException(e, stackTrace: stackTrace, fatal: false);
       emit(state.copyWith(
         isLoading: false,
         errorMessage: e.toString(),
@@ -192,10 +194,10 @@ class AnyhooAuthCubit<T extends AnyhooUser> extends Cubit<AnyhooAuthState<T>> {
       for (final enhanceUserService in enhanceUserServices) {
         enhancedUserData = await enhanceUserService.saveUser(enhancedUserData);
       }
-      emit(state.copyWith(
-          isLoading: false, errorMessage: null, user: enhancedUserData));
-    } catch (e) {
+      emit(state.copyWith(isLoading: false, errorMessage: null, user: enhancedUserData));
+    } catch (e, stackTrace) {
       _log.severe('Error saving user', e);
+      SentryHelper.captureException(e, stackTrace: stackTrace, fatal: false);
       emit(state.copyWith(isLoading: false, errorMessage: e.toString()));
       rethrow;
     }
@@ -220,7 +222,6 @@ class AnyhooAuthCubit<T extends AnyhooUser> extends Cubit<AnyhooAuthState<T>> {
   @override
   void onChange(Change<AnyhooAuthState<T>> change) {
     super.onChange(change);
-    _log.info(
-        'Auth state changed: ${change.toString().substringSafe(0, 60)}...');
+    _log.info('Auth state changed: ${change.toString().substringSafe(0, 60)}...');
   }
 }
