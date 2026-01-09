@@ -94,19 +94,23 @@ class SentryServiceImpl implements SentryService {
   //   String? username,
   //   Map<String, dynamic>? data,
   // }) {
-  //   Sentry.setUser(
-  //     User(
-  //       id: id,
-  //       email: email,
-  //       username: username,
-  //       data: data,
-  //     ),
-  //   );
+  //   Sentry.configureScope((scope) {
+  //     scope.setUser(
+  //       SentryUser(
+  //         id: id,
+  //         email: email,
+  //         username: username,
+  //         data: data,
+  //       ),
+  //     );
+  //   });
   // }
   //
   // @override
   // void clearUser() {
-  //   Sentry.setUser(null);
+  //   Sentry.configureScope((scope) {
+  //     scope.setUser(null);
+  //   });
   // }
   //
   // @override
