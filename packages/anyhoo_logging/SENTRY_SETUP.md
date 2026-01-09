@@ -33,7 +33,7 @@ class AppSentryService implements SentryService {
   Future<void> captureException(
     Object error, {
     StackTrace? stackTrace,
-    Object? hint,
+    Hint? hint,
     bool fatal = false,
   }) async {
     await Sentry.captureException(
@@ -50,7 +50,7 @@ class AppSentryService implements SentryService {
   Future<void> captureMessage(
     String message, {
     String level = 'error',
-    Object? hint,
+    Hint? hint,
   }) async {
     await Sentry.captureMessage(
       message,

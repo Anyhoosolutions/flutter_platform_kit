@@ -1,5 +1,6 @@
 import 'package:anyhoo_logging/src/sentry_service.dart';
 import 'package:logging/logging.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 
 /// Global Sentry service instance.
 /// This is set when Sentry is initialized in the app.
@@ -33,7 +34,7 @@ class SentryHelper {
   ///   SentryHelper.captureException(e, stackTrace: stackTrace);
   /// }
   /// ```
-  static Future<void> captureException(Object error, {StackTrace? stackTrace, Object? hint, bool fatal = false}) async {
+  static Future<void> captureException(Object error, {StackTrace? stackTrace, Hint? hint, bool fatal = false}) async {
     if (_sentryService != null) {
       await _sentryService!.captureException(error, stackTrace: stackTrace, hint: hint, fatal: fatal);
     }
@@ -42,7 +43,7 @@ class SentryHelper {
   /// Reports a message to Sentry if available.
   ///
   /// This is a no-op if Sentry is not configured.
-  static Future<void> captureMessage(String message, {String level = 'error', Object? hint}) async {
+  static Future<void> captureMessage(String message, {String level = 'error', Hint? hint}) async {
     if (_sentryService != null) {
       await _sentryService!.captureMessage(message, level: level, hint: hint);
     }
