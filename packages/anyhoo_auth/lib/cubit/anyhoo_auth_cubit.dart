@@ -62,7 +62,7 @@ class AnyhooAuthCubit<T extends AnyhooUser> extends Cubit<AnyhooAuthState<T>> {
               enhancedUserData = await enhanceUserService.enhanceUser(enhancedUserData);
               _log.info('Enhanced user data: ${enhancedUserData.toString().substringSafe(0, 55)}...');
             }
-            final enhancedUser = safeFromJson((json) => converter.fromJson(json), enhancedUserData);
+            final enhancedUser = safeFromJson(converter.fromJson, enhancedUserData);
             _log.info('Emitting new state with user: ${enhancedUser.toJson().toString().substringSafe(0, 55)}...');
             emit(state.copyWith(user: enhancedUser, isLoading: false));
           }
@@ -80,7 +80,7 @@ class AnyhooAuthCubit<T extends AnyhooUser> extends Cubit<AnyhooAuthState<T>> {
     );
 
     final userData = authService.currentUser;
-    final user = userData != null ? safeFromJson((json) => converter.fromJson(json), userData) : null;
+    final user = userData != null ? safeFromJson(converter.fromJson, userData) : null;
     emit(state.copyWith(isLoading: false, user: user));
   }
 
