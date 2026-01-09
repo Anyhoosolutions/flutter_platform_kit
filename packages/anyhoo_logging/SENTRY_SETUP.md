@@ -108,9 +108,9 @@ class AppSentryService implements SentryService {
   }
 
   @override
-  void setExtra(String key, dynamic value) {
+  void setContexts(String key, dynamic value) {
     Sentry.configureScope((scope) {
-      scope.setExtra(key, value);
+      scope.setContexts(key, value);
     });
   }
 

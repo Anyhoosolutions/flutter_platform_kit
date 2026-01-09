@@ -45,9 +45,9 @@ abstract class SentryService {
   /// [value] - Tag value
   void setTag(String key, String value);
 
-  /// Sets extra context data for Sentry.
+  /// Sets context data for Sentry.
   ///
   /// [key] - Context key
-  /// [value] - Context value
-  void setExtra(String key, dynamic value);
+  /// [value] - Context value (can be a Map, String, or other dynamic value)
+  void setContexts(String key, dynamic value);
 }

@@ -121,9 +121,9 @@ class SentryServiceImpl implements SentryService {
   // }
   //
   // @override
-  // void setExtra(String key, dynamic value) {
+  // void setContexts(String key, dynamic value) {
   //   Sentry.configureScope((scope) {
-  //     scope.setExtra(key, value);
+  //     scope.setContexts(key, value);
   //   });
   // }
   //
@@ -181,7 +181,7 @@ class SentryServiceImpl implements SentryService {
   }
 
   @override
-  void setExtra(String key, dynamic value) {
+  void setContexts(String key, dynamic value) {
     // Implementation would go here
     throw UnimplementedError('This is a reference implementation. Implement using sentry_flutter package.');
   }
