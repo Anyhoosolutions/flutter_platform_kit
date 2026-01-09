@@ -128,6 +128,9 @@ jobs:
   run-non-main:
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref != 'refs/heads/main')
+    permissions:
+      pull-requests: write
+      contents: read
 
     steps:
       - name: Checkout code
@@ -343,6 +346,7 @@ jobs:
           dart bin/console.dart --commitHash=$GIT_COMMIT_HASH
 
       - name: Build PR docs link
+        if: github.event_name == 'pull_request'
         run: |
           COMMIT_HASH=$(git rev-parse HEAD)
           PR_DOCS_URL="https://anyhoosolutions.web.app/documentation/$COMMIT_HASH"
@@ -350,6 +354,7 @@ jobs:
           echo "PR Documentation URL: $PR_DOCS_URL"
 
       - name: Comment PR
+        if: github.event_name == 'pull_request'
         uses: thollander/actions-comment-pull-request@v3
         with:
           message: |
