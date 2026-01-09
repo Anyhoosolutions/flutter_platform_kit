@@ -19,6 +19,19 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Set up Dart
+        uses: dart-lang/setup-dart@v1
+        with:
+          sdk: "3.5"
+
+      - name: Generate toc.json
+        run: |
+          cd scripts/console
+          dart pub get --no-precompile
+          dart bin/generate_toc.dart
+          cd ../..
+          cat docs/toc.json
+
       - name: Copy CHANGELOGs to docs
         run: |
           # Copy each package's CHANGELOG.md to docs/{package_name}/CHANGELOG.md
@@ -51,6 +64,44 @@ jobs:
             fi
           done
 
+      - name: Copy package docs directories
+        run: |
+          # Copy all files from each package's docs/ directory to docs/{package_name}/
+          for package_dir in packages/*/ tools/*/; do
+            package_name=$(basename "$package_dir")
+            docs_dir="$package_dir/docs"
+            
+            if [ -d "$docs_dir" ]; then
+              mkdir -p "docs/$package_name"
+              # Copy all files from the package's docs directory, preserving structure
+              find "$docs_dir" -type f -name "*.md" | while read -r doc_file; do
+                # Get relative path from docs_dir
+                rel_path="${doc_file#$docs_dir/}"
+                target_dir="docs/$package_name/$(dirname "$rel_path")"
+                mkdir -p "$target_dir"
+                cp "$doc_file" "docs/$package_name/$rel_path"
+                echo "✅ Copied $package_name/docs/$rel_path to docs/$package_name/$rel_path"
+              done
+            else
+              echo "ℹ️  No docs/ directory found for $package_name"
+            fi
+          done
+
+      - name: Copy additional documentation files from package root
+        run: |
+          # Copy any additional .md files from package root (excluding README.md and CHANGELOG.md)
+          for package_dir in packages/*/ tools/*/; do
+            package_name=$(basename "$package_dir")
+            
+            # Find all .md files in package root that aren't README.md or CHANGELOG.md
+            find "$package_dir" -maxdepth 1 -type f -name "*.md" ! -name "README.md" ! -name "CHANGELOG.md" | while read -r doc_file; do
+              filename=$(basename "$doc_file")
+              mkdir -p "docs/$package_name"
+              cp "$doc_file" "docs/$package_name/$filename"
+              echo "✅ Copied $package_name/$filename to docs/$package_name/$filename"
+            done
+          done
+
       - name: Set up Dart
         uses: dart-lang/setup-dart@v1
         with:
@@ -60,11 +111,8 @@ jobs:
         uses: actions/cache@v3
         with:
           path: |
-            .pub-cache/bin
-            .pub-cache/global_packages
-            .pub-cache/hosted
+            ~/.pub-cache
             .dart_tool
-            .packages
           key: ${{ runner.os }}-dart-${{ hashFiles('**/pubspec.yaml') }}
 
       - name: Run main deployment
@@ -77,6 +125,9 @@ jobs:
   run-non-main:
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref != 'refs/heads/main')
+    permissions:
+      pull-requests: write
+      contents: read
 
     steps:
       - name: Checkout code
@@ -179,6 +230,20 @@ jobs:
             echo "ℹ️  No package changes detected, skipping CHANGELOG verification"
           fi
 
+      - name: Set up Dart
+        uses: dart-lang/setup-dart@v1
+        with:
+          sdk: "3.5"
+
+      - name: Generate toc.json
+        if: github.event_name == 'pull_request'
+        run: |
+          cd scripts/console
+          dart pub get --no-precompile
+          dart bin/generate_toc.dart
+          cd ../..
+          cat docs/toc.json
+
       - name: Copy CHANGELOGs to docs
         if: github.event_name == 'pull_request'
         run: |
@@ -213,6 +278,46 @@ jobs:
             fi
           done
 
+      - name: Copy package docs directories
+        if: github.event_name == 'pull_request'
+        run: |
+          # Copy all files from each package's docs/ directory to docs/{package_name}/
+          for package_dir in packages/*/ tools/*/; do
+            package_name=$(basename "$package_dir")
+            docs_dir="$package_dir/docs"
+            
+            if [ -d "$docs_dir" ]; then
+              mkdir -p "docs/$package_name"
+              # Copy all files from the package's docs directory, preserving structure
+              find "$docs_dir" -type f -name "*.md" | while read -r doc_file; do
+                # Get relative path from docs_dir
+                rel_path="${doc_file#$docs_dir/}"
+                target_dir="docs/$package_name/$(dirname "$rel_path")"
+                mkdir -p "$target_dir"
+                cp "$doc_file" "docs/$package_name/$rel_path"
+                echo "✅ Copied $package_name/docs/$rel_path to docs/$package_name/$rel_path"
+              done
+            else
+              echo "ℹ️  No docs/ directory found for $package_name"
+            fi
+          done
+
+      - name: Copy additional documentation files from package root
+        if: github.event_name == 'pull_request'
+        run: |
+          # Copy any additional .md files from package root (excluding README.md and CHANGELOG.md)
+          for package_dir in packages/*/ tools/*/; do
+            package_name=$(basename "$package_dir")
+            
+            # Find all .md files in package root that aren't README.md or CHANGELOG.md
+            find "$package_dir" -maxdepth 1 -type f -name "*.md" ! -name "README.md" ! -name "CHANGELOG.md" | while read -r doc_file; do
+              filename=$(basename "$doc_file")
+              mkdir -p "docs/$package_name"
+              cp "$doc_file" "docs/$package_name/$filename"
+              echo "✅ Copied $package_name/$filename to docs/$package_name/$filename"
+            done
+          done
+
       - name: Set up Dart
         uses: dart-lang/setup-dart@v1
         with:
@@ -222,11 +327,8 @@ jobs:
         uses: actions/cache@v3
         with:
           path: |
-            .pub-cache/bin
-            .pub-cache/global_packages
-            .pub-cache/hosted
+            ~/.pub-cache
             .dart_tool
-            .packages
           key: ${{ runner.os }}-dart-${{ hashFiles('**/pubspec.yaml') }}
 
       - name: Run non-main deployment
@@ -238,11 +340,16 @@ jobs:
           dart bin/console.dart --commitHash=$GIT_COMMIT_HASH
 
       - name: Build PR docs link
+        if: github.event_name == 'pull_request'
         run: |
-          echo "pr_docs_link=$(git rev-parse HEAD | head -c 7)" >> $GITHUB_ENV
+          COMMIT_HASH=$(git rev-parse HEAD)
+          PR_DOCS_URL="https://anyhoosolutions.web.app/documentation/$COMMIT_HASH"
+          echo "pr_docs_link=$PR_DOCS_URL" >> $GITHUB_ENV
+          echo "PR Documentation URL: $PR_DOCS_URL"
 
-      # - name: Comment PR
-      #   uses: thollander/actions-comment-pull-request@v3
-      #   with:
-      #     message: |
-      #       https://anywhostudios--anywhostudios-8eef2.us-central1.hosted.app/projects/${{ env.pr_docs_link }}
+      - name: Comment PR
+        if: github.event_name == 'pull_request'
+        uses: thollander/actions-comment-pull-request@v3
+        with:
+          message: |
+            ${{ env.pr_docs_link }}

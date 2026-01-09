@@ -7,3 +7,5 @@ library anyhoo_logging;
 
 export 'src/logging_configuration.dart';
 export 'src/logging_cubit.dart';
+export 'src/sentry_service.dart';
+export 'src/sentry_helper.dart';

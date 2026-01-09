@@ -2,6 +2,7 @@ import 'package:anyhoo_core/models/arguments.dart';
 import 'package:anyhoo_core/widgets/error_display_widget.dart';
 import 'package:anyhoo_firebase/src/config/emulator_config.dart';
 import 'package:anyhoo_firebase/src/os_tool.dart';
+import 'package:anyhoo_logging/anyhoo_logging.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -78,14 +79,16 @@ class FirebaseInitializer {
         try {
           final existingApp = Firebase.app();
           _firebaseApp = existingApp;
-        } catch (getAppError) {
+        } catch (getAppError, getAppStackTrace) {
           _log.severe('!! Failed to get existing app after duplicate error: $getAppError');
+          SentryHelper.captureException(getAppError, stackTrace: getAppStackTrace, fatal: true);
           rethrow;
         }
       }
 
       _log.severe('!! Error initializing Firebase: $e');
       _log.severe('!! Stack trace: $stackTrace');
+      SentryHelper.captureException(e, stackTrace: stackTrace, fatal: true);
       rethrow;
     }
   }
@@ -133,6 +136,7 @@ class FirebaseInitializer {
     } catch (e, stackTrace) {
       _log.info('!! Error: $e');
       _log.info('!! Stack trace: $stackTrace');
+      SentryHelper.captureException(e, stackTrace: stackTrace, fatal: false);
       if (!kIsWeb) {
         FirebaseCrashlytics.instance.log('Error: $e');
       }
@@ -173,6 +177,7 @@ class FirebaseInitializer {
     } catch (e, stackTrace) {
       _log.info('!! Error: $e');
       _log.info('!! Stack trace: $stackTrace');
+      SentryHelper.captureException(e, stackTrace: stackTrace, fatal: false);
       if (!kIsWeb) {
         FirebaseCrashlytics.instance.log('Error: $e');
       }
@@ -247,6 +252,7 @@ class FirebaseInitializer {
     } catch (e, stackTrace) {
       _log.info('!! Error: $e');
       _log.info('!! Stack trace: $stackTrace');
+      SentryHelper.captureException(e, stackTrace: stackTrace, fatal: false);
       if (!kIsWeb) {
         FirebaseCrashlytics.instance.log('Error: $e');
       }
@@ -270,14 +276,16 @@ class FirebaseInitializer {
         errorDetails.exception,
         errorDetails.stack,
       );
+      SentryHelper.captureException(errorDetails.exception, stackTrace: errorDetails.stack, fatal: true);
       return ErrorDisplayWidget(errorDetails: errorDetails);
     };
 
-    // Pass all uncaught asynchronous errors that aren't handled by the Flutter framework to Crashlytics
+    // Pass all uncaught asynchronous errors that aren't handled by the Flutter framework to Crashlytics and Sentry
     PlatformDispatcher.instance.onError = (error, stack) {
       if ((!kDebugMode && !kIsWeb) || (arguments.useFirebaseAnalytics ?? false)) {
         FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
       }
+      SentryHelper.captureException(error, stackTrace: stack, fatal: true);
       return true;
     };
 
@@ -296,8 +304,9 @@ class FirebaseInitializer {
           _log.info('XX Firebase Analytics disabled in maestro test');
         }
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
       _log.severe('XX Failed to initialize Firebase Analytics: $e');
+      SentryHelper.captureException(e, stackTrace: stackTrace, fatal: false);
     }
   }
 }

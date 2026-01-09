@@ -25,13 +25,13 @@ This tool automates the process of:
 
 ```bash
 # Activate the tool globally
-dart pub global activate --source git https://github.com/lidholm/flutter_platform_kit.git --git-path tools/widgetbook_screenshots
+dart pub global activate --source git https://github.com/anyhoosolutions/flutter_platform_kit.git --git-path tools/widgetbook_screenshots
 
 # Using a specific branch
-dart pub global activate --source git https://github.com/lidholm/flutter_platform_kit.git --git-path tools/widgetbook_screenshots --git-ref main
+dart pub global activate --source git https://github.com/anyhoosolutions/flutter_platform_kit.git --git-path tools/widgetbook_screenshots --git-ref main
 
 # Using a tag/version
-dart pub global activate --source git https://github.com/lidholm/flutter_platform_kit.git --git-path tools/widgetbook_screenshots --git-ref v0.1.0
+dart pub global activate --source git https://github.com/anyhoosolutions/flutter_platform_kit.git --git-path tools/widgetbook_screenshots --git-ref v0.1.0
 ```
 
 ### From Local Clone

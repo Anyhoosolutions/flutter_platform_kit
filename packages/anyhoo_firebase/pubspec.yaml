@@ -1,6 +1,6 @@
 name: anyhoo_firebase
 description: "A new Flutter package project."
-version: 0.0.12
+version: 0.0.13
 homepage: https://anyhoosolutions.web.app/documentation/flutter_platform_kit
 publish_to: none
 
@@ -19,6 +19,8 @@ dependencies:
   logging: ^1.3.0
   anyhoo_core:
     path: ../anyhoo_core
+  anyhoo_logging:
+    path: ../anyhoo_logging
   firebase_analytics: ^12.0.4
   firebase_remote_config: ^6.1.2
   freezed_annotation: ^3.1.0

@@ -1,3 +1,7 @@
+## 0.0.28
+
+* Add Sentry logging
+
 ## 0.0.27
 
 * Change to use freezed for AnyhooAuthState

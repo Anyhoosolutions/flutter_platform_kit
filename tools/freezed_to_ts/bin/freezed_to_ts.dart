@@ -57,7 +57,8 @@ void main(List<String> arguments) async {
   final converter = FreezedToTsConverter();
   for (final file in filesToProcess) {
     final content = await file.readAsString();
-    if (content.contains('@freezed')) {
+    // Learn both freezed classes and enums
+    if (content.contains('@freezed') || content.contains('enum ')) {
       converter.learn(content);
     }
   }
@@ -73,13 +74,14 @@ Future<void> _processFile(
   FreezedToTsConverter converter,
 ) async {
   final content = await file.readAsString();
-  if (!content.contains('@freezed')) return;
+  // Process files with either freezed classes or enums
+  if (!content.contains('@freezed') && !content.contains('enum ')) return;
 
   print('Processing ${file.path}...');
   final tsContent = converter.convert(content);
 
   if (tsContent.isEmpty) {
-    print('  -> No freezed classes found.');
+    print('  -> No freezed classes or enums found.');
     return;
   }
 

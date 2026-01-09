@@ -1,3 +1,7 @@
+## 0.0.11
+
+- Handle maps and enums
+
 ## 0.0.10
 
 - Allow to skip fields when generating

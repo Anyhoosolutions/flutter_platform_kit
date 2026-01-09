@@ -1,3 +1,7 @@
+## 0.0.13
+
+* Add Sentry logging
+
 ## 0.0.12
 
 * Small fix for Google log in

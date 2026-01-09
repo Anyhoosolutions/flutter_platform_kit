@@ -1,10 +1,14 @@
 import 'package:anyhoo_logging/src/logging_cubit.dart';
+import 'package:anyhoo_logging/src/sentry_helper.dart';
+import 'package:anyhoo_logging/src/sentry_service.dart';
 import 'package:logging/logging.dart';
 
 class LoggingConfiguration {
   final Level logLevel;
   final Map<String, Level> loggers = {};
   final LoggingCubit? loggingCubit;
+  final SentryService? sentryService;
+  final Level? sentryLogLevelFilter;
 
   LoggingConfiguration({
     required this.logLevel,
@@ -12,6 +16,8 @@ class LoggingConfiguration {
     required List<String> loggersAtWarning,
     required List<String> loggersAtSevere,
     this.loggingCubit,
+    this.sentryService,
+    this.sentryLogLevelFilter,
   }) {
     for (final logger in loggersAtInfo) {
       loggers[logger] = Level.INFO;
@@ -22,6 +28,12 @@ class LoggingConfiguration {
     for (final logger in loggersAtSevere) {
       loggers[logger] = Level.SEVERE;
     }
+
+    // Set the global Sentry service if provided
+    if (sentryService != null) {
+      setSentryService(sentryService);
+    }
+
     _setupLogging();
   }
 
@@ -38,6 +50,14 @@ class LoggingConfiguration {
       // if (profile?.trackLogs ?? false) {
       if (loggingCubit != null) {
         loggingCubit!.log(record);
+      }
+
+      // Forward to Sentry if available and meets level filter
+      if (sentryService != null) {
+        // If filter is set, only forward logs at or above the filter level
+        if (sentryLogLevelFilter == null || record.level >= sentryLogLevelFilter!) {
+          SentryHelper.captureLogRecord(record);
+        }
       }
     });
 

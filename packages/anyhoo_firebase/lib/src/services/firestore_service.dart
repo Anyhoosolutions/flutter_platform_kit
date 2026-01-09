@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:anyhoo_logging/anyhoo_logging.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:logging/logging.dart';
 
@@ -81,8 +82,9 @@ class FirestoreService {
     try {
       final docRef = await firestore.doc(path).get();
       return docRef.data();
-    } catch (e) {
+    } catch (e, stackTrace) {
       _log.warning('Error getting document at $path: $e');
+      SentryHelper.captureException(e, stackTrace: stackTrace, fatal: false);
       rethrow;
     }
   }
@@ -131,7 +133,8 @@ class FirestoreService {
   Future<void> updateDocument(String path, String id, Map<String, dynamic> data) async {
     try {
       return firestore.collection(path).doc(id).update(data);
-    } catch (e) {
+    } catch (e, stackTrace) {
+      SentryHelper.captureException(e, stackTrace: stackTrace, fatal: false);
       throw Exception('Failed to update document at $path $id: $e');
     }
   }
