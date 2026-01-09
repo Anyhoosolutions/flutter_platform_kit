@@ -83,20 +83,29 @@ class FileReader {
   }
 
   Future<List<Page>> readPages(TableOfContent tableOfContent) async {
-    final files = await listFilesInDirectory(docsDirectoryPrefix);
-    final pageFilepaths =
-        files.where((f) => f.endsWith('.md')).map((f) => f.replaceAll('$docsDirectoryPrefix/', '')).toList();
+    // Collect all filepaths from TOC recursively
+    final tocFilepaths = _collectFilepaths(tableOfContent);
 
     final output = <Page>[];
-    for (final pageFilepath in pageFilepaths) {
-      final content = await readFile(pageFilepath);
+    for (final pageFilepath in tocFilepaths) {
+      // Check if file exists before trying to read it
+      final filePath =
+          pageFilepath.startsWith(docsDirectoryPrefix) ? pageFilepath : '$docsDirectoryPrefix/$pageFilepath';
+      final file = File(filePath);
 
-      final tocItem = findTocItem(tableOfContent, pageFilepath);
-      if (tocItem == null) {
-        throw Exception(
-          "Couldn't find ToC Item: $pageFilepath",
-        );
+      if (!await file.exists()) {
+        print('⚠️  Warning: File not found in docs directory: $pageFilepath (skipping)');
+        continue;
       }
+
+      final content = await readFile(pageFilepath);
+      final tocItem = findTocItem(tableOfContent, pageFilepath);
+
+      if (tocItem == null) {
+        print('⚠️  Warning: Couldn\'t find ToC Item for: $pageFilepath (skipping)');
+        continue;
+      }
+
       output.add(Page(
           id: tocItem.id,
           name: tocItem.tocTitle,
@@ -107,6 +116,15 @@ class FileReader {
     }
 
     return output;
+  }
+
+  /// Recursively collect all filepaths from TOC structure
+  List<String> _collectFilepaths(TableOfContent toc) {
+    final filepaths = <String>[toc.filepath];
+    for (final subpage in toc.subpages) {
+      filepaths.addAll(_collectFilepaths(subpage));
+    }
+    return filepaths;
   }
 
   TableOfContent? findTocItem(TableOfContent toc, String pageFilepath) {
