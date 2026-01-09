@@ -148,6 +148,18 @@
 							"name": "Changelog",
 							"title": "Changelog",
 							"subpages": []
+						},
+						{
+							"filepath": "anyhoo_logging/SENTRY_SETUP.md",
+							"name": "Sentry Setup",
+							"title": "Sentry Setup",
+							"subpages": []
+						},
+						{
+							"filepath": "anyhoo_logging/EXAMPLE_USAGE.md",
+							"name": "Example Usage",
+							"title": "Example Usage",
+							"subpages": []
 						}
 					]
 				},
