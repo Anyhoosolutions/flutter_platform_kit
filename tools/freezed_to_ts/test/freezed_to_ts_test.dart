@@ -829,5 +829,30 @@ export interface Recipe {
 
       expect(result, equals(expectedTsCode));
     });
+
+    test('converts standalone enum file without freezed classes', () {
+      const dartCode = r'''
+        enum UserRole {
+          admin,
+          moderator,
+          user,
+          guest,
+        }
+      ''';
+
+      final converter = FreezedToTsConverter();
+      converter.learn(dartCode);
+      final result = converter.convert(dartCode);
+
+      final expectedTsCode = r'''export enum UserRole {
+  admin = "admin",
+  moderator = "moderator",
+  user = "user",
+  guest = "guest",
+}
+''';
+
+      expect(result, equals(expectedTsCode));
+    });
   });
 }

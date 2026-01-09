@@ -245,6 +245,12 @@ class FreezedToTsConverter {
         }
       }
 
+      // If still no import found but we know this class exists, generate import based on file name pattern
+      if (importPath == null && _knownFreezedClasses.contains(referencedClass)) {
+        final expectedFileName = _classNameToFileName(referencedClass);
+        importPath = _convertDartImportToTs(expectedFileName);
+      }
+
       if (importPath != null) {
         relativeImports.add('import type { $referencedClass } from "$importPath";');
       }
@@ -313,6 +319,12 @@ class FreezedToTsConverter {
         }
       }
 
+      // If still no import found but we know this enum exists, generate import based on file name pattern
+      if (importPath == null && _knownEnums.contains(referencedEnum)) {
+        final expectedFileName = _classNameToFileName(referencedEnum);
+        importPath = _convertDartImportToTs(expectedFileName);
+      }
+
       if (importPath != null) {
         relativeImports.add('import type { $referencedEnum } from "$importPath";');
       }
@@ -330,7 +342,7 @@ class FreezedToTsConverter {
       output.writeln(import);
     }
 
-    // Add blank line if there are relative imports or if we have enums to output
+    // Add blank line if there are relative imports (to separate from content) or if we have enums to output
     if (relativeImports.isNotEmpty || enumDeclarations.isNotEmpty) {
       output.writeln('');
     }
