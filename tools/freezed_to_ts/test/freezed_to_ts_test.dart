@@ -36,8 +36,7 @@ void main() {
       converter.learn(dartCode);
       final result = converter.convert(dartCode);
 
-      final expectedTsCode =
-          r'''import type { Timestamp } from "firebase-admin/firestore";
+      final expectedTsCode = r'''import type { Timestamp } from "firebase-admin/firestore";
 export interface User {
   id: string;
   email: string;
@@ -92,8 +91,7 @@ export interface User {
       converter.learn(addressCode);
       converter.learn(userCode);
 
-      final expectedUserTs =
-          r'''import type { Timestamp } from "firebase-admin/firestore";
+      final expectedUserTs = r'''import type { Timestamp } from "firebase-admin/firestore";
 import type { Address } from "./address";
 
 export interface User {
@@ -176,8 +174,7 @@ export interface User {
       converter.learn(recipeShortCode);
       converter.learn(userGroupCode);
 
-      final expectedUserGroupTs =
-          r'''import type { Timestamp } from "firebase-admin/firestore";
+      final expectedUserGroupTs = r'''import type { Timestamp } from "firebase-admin/firestore";
 import type { RecipeShort } from "./recipe_short";
 
 export interface UserGroup {
@@ -201,8 +198,7 @@ export interface UserGroup {
 ''';
 
       final userGroupResult = converter.convert(userGroupCode);
-      expect(userGroupResult, equals(expectedUserGroupTs),
-          reason: 'UserGroup should include import for RecipeShort');
+      expect(userGroupResult, equals(expectedUserGroupTs), reason: 'UserGroup should include import for RecipeShort');
 
       final recipeShortResult = converter.convert(recipeShortCode);
       expect(recipeShortResult, equals(expectedRecipeShortTs));
@@ -245,8 +241,7 @@ export interface UserGroup {
       converter.learn(dartCode);
       final result = converter.convert(dartCode);
 
-      final expectedTsCode =
-          r'''import type { Timestamp } from "firebase-admin/firestore";
+      final expectedTsCode = r'''import type { Timestamp } from "firebase-admin/firestore";
 export interface Task {
   id: string | null;
   name: string;
@@ -303,8 +298,7 @@ export interface Task {
 }
 ''';
 
-      final expectedUserProfileTs =
-          r'''import type { ThemeType } from "./theme_type";
+      final expectedUserProfileTs = r'''import type { ThemeType } from "./theme_type";
 
 export interface UserProfile {
   id: string;
@@ -323,8 +317,7 @@ export interface UserProfile {
           reason: 'UserProfile should include import for ThemeType enum');
     });
 
-    test('validates full file output with enum and freezed class in same file',
-        () {
+    test('validates full file output with enum and freezed class in same file', () {
       final converter = FreezedToTsConverter();
 
       const fullFileCode = r'''
@@ -369,12 +362,10 @@ export interface UserSettings {
 
       final result = converter.convert(fullFileCode);
       expect(result, equals(expectedFullFileTs),
-          reason:
-              'Full file should output enum and interface without importing enum from elsewhere');
+          reason: 'Full file should output enum and interface without importing enum from elsewhere');
     });
 
-    test('validates full file output with multiple enums and freezed classes',
-        () {
+    test('validates full file output with multiple enums and freezed classes', () {
       final converter = FreezedToTsConverter();
 
       const fullFileCode = r'''
@@ -428,8 +419,7 @@ export interface UserSettings {
 
       converter.learn(fullFileCode);
 
-      final expectedFullFileTs =
-          r'''import type { Timestamp } from "firebase-admin/firestore";
+      final expectedFullFileTs = r'''import type { Timestamp } from "firebase-admin/firestore";
 
 export enum Priority {
   low = "low",
@@ -461,13 +451,10 @@ export interface Task {
 
       final result = converter.convert(fullFileCode);
       expect(result, equals(expectedFullFileTs),
-          reason:
-              'Full file should output all enums and interfaces in correct order without duplicate imports');
+          reason: 'Full file should output all enums and interfaces in correct order without duplicate imports');
     });
 
-    test(
-        'validates multiple input files generate correct multiple output files',
-        () {
+    test('validates multiple input files generate correct multiple output files', () {
       final converter = FreezedToTsConverter();
 
       // File 1: Enum definition
@@ -534,8 +521,7 @@ export interface Task {
 }
 ''';
 
-      final expectedUserProfileOutput =
-          r'''import type { Settings } from "./settings";
+      final expectedUserProfileOutput = r'''import type { Settings } from "./settings";
 
 export interface UserProfile {
   id: string;
@@ -544,8 +530,7 @@ export interface UserProfile {
 }
 ''';
 
-      final expectedSettingsOutput =
-          r'''import type { ThemeType } from "./theme_type";
+      final expectedSettingsOutput = r'''import type { ThemeType } from "./theme_type";
 
 export interface Settings {
   userId: string;
@@ -556,8 +541,7 @@ export interface Settings {
 
       // Convert each file and validate output
       final themeTypeResult = converter.convert(themeTypeFile);
-      expect(themeTypeResult, equals(expectedThemeTypeOutput),
-          reason: 'ThemeType file should output enum definition');
+      expect(themeTypeResult, equals(expectedThemeTypeOutput), reason: 'ThemeType file should output enum definition');
 
       final userProfileResult = converter.convert(userProfileFile);
       expect(userProfileResult, equals(expectedUserProfileOutput),
@@ -707,8 +691,7 @@ export interface UploadInfo {
 }
 ''';
 
-      final expectedParseTextOutput =
-          r'''import type { Timestamp } from "firebase-admin/firestore";
+      final expectedParseTextOutput = r'''import type { Timestamp } from "firebase-admin/firestore";
 import type { RecipeUploadType } from "./upload_info";
 
 export enum ParsingTextStatus {
@@ -732,8 +715,7 @@ export interface ParseText {
 }
 ''';
 
-      final expectedParseDataForRecipeOutput =
-          r'''import type { Timestamp } from "firebase-admin/firestore";
+      final expectedParseDataForRecipeOutput = r'''import type { Timestamp } from "firebase-admin/firestore";
 import type { RecipeUploadType } from "./upload_info";
 
 export enum ParsingDataForRecipeStatus {
@@ -771,11 +753,9 @@ export interface ParsingDataForRecipe {
       expect(parseTextResult, equals(expectedParseTextOutput),
           reason: 'ParseText file should output interface with enum import');
 
-      final parseDataForRecipeResult =
-          converter.convert(parseDataForRecipeFile);
+      final parseDataForRecipeResult = converter.convert(parseDataForRecipeFile);
       expect(parseDataForRecipeResult, equals(expectedParseDataForRecipeOutput),
-          reason:
-              'ParseDataForRecipe file should output interface with enum import');
+          reason: 'ParseDataForRecipe file should output interface with enum import');
     });
 
     test('skips fields annotated with @JsonKey(ignore: true)', () {
@@ -809,6 +789,41 @@ export interface ParsingDataForRecipe {
   id: string;
   username: string;
   display_name: string | null;
+}
+''';
+
+      expect(result, equals(expectedTsCode));
+    });
+
+    test('converts Map fields with specific value types correctly', () {
+      const dartCode = r'''
+        import 'package:cloud_firestore/cloud_firestore.dart';
+        import 'package:freezed_annotation/freezed_annotation.dart';
+
+        part 'recipe.freezed.dart';
+        part 'recipe.g.dart';
+
+        @freezed
+        class Recipe with _$Recipe {
+          const factory Recipe({
+            required String id,
+            required Map<String, bool> favoritedByUsers,
+            required Map<String, DateTime>? lastViewedAtByUsers,
+          }) = _Recipe;
+
+          factory Recipe.fromJson(Map<String, Object?> json) => _$RecipeFromJson(json);
+        }
+      ''';
+
+      final converter = FreezedToTsConverter();
+      converter.learn(dartCode);
+      final result = converter.convert(dartCode);
+
+      final expectedTsCode = r'''import type { Timestamp } from "firebase-admin/firestore";
+export interface Recipe {
+  id: string;
+  favoritedByUsers: { [key: string]: boolean };
+  lastViewedAtByUsers: { [key: string]: Timestamp } | null;
 }
 ''';
 
