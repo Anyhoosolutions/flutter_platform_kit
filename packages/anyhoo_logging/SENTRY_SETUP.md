@@ -33,7 +33,7 @@ class AppSentryService implements SentryService {
   Future<void> captureException(
     Object error, {
     StackTrace? stackTrace,
-    Object? hint,
+    Hint? hint,
     bool fatal = false,
   }) async {
     await Sentry.captureException(
@@ -50,7 +50,7 @@ class AppSentryService implements SentryService {
   Future<void> captureMessage(
     String message, {
     String level = 'error',
-    Object? hint,
+    Hint? hint,
   }) async {
     await Sentry.captureMessage(
       message,
@@ -81,19 +81,23 @@ class AppSentryService implements SentryService {
     String? username,
     Map<String, dynamic>? data,
   }) {
-    Sentry.setUser(
-      User(
-        id: id,
-        email: email,
-        username: username,
-        data: data,
-      ),
-    );
+    Sentry.configureScope((scope) {
+      scope.setUser(
+        SentryUser(
+          id: id,
+          email: email,
+          username: username,
+          data: data,
+        ),
+      );
+    });
   }
 
   @override
   void clearUser() {
-    Sentry.setUser(null);
+    Sentry.configureScope((scope) {
+      scope.setUser(null);
+    });
   }
 
   @override
@@ -104,9 +108,9 @@ class AppSentryService implements SentryService {
   }
 
   @override
-  void setExtra(String key, dynamic value) {
+  void setContexts(String key, dynamic value) {
     Sentry.configureScope((scope) {
-      scope.setExtra(key, value);
+      scope.setContexts(key, value);
     });
   }
 

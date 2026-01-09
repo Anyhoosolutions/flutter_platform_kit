@@ -1,5 +1,6 @@
 import 'package:anyhoo_logging/src/sentry_service.dart';
 import 'package:logging/logging.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 
 /// Global Sentry service instance.
 /// This is set when Sentry is initialized in the app.
@@ -33,7 +34,7 @@ class SentryHelper {
   ///   SentryHelper.captureException(e, stackTrace: stackTrace);
   /// }
   /// ```
-  static Future<void> captureException(Object error, {StackTrace? stackTrace, Object? hint, bool fatal = false}) async {
+  static Future<void> captureException(Object error, {StackTrace? stackTrace, Hint? hint, bool fatal = false}) async {
     if (_sentryService != null) {
       await _sentryService!.captureException(error, stackTrace: stackTrace, hint: hint, fatal: fatal);
     }
@@ -42,7 +43,7 @@ class SentryHelper {
   /// Reports a message to Sentry if available.
   ///
   /// This is a no-op if Sentry is not configured.
-  static Future<void> captureMessage(String message, {String level = 'error', Object? hint}) async {
+  static Future<void> captureMessage(String message, {String level = 'error', Hint? hint}) async {
     if (_sentryService != null) {
       await _sentryService!.captureMessage(message, level: level, hint: hint);
     }
@@ -76,11 +77,11 @@ class SentryHelper {
     _sentryService?.setTag(key, value);
   }
 
-  /// Sets extra context data in Sentry if available.
+  /// Sets context data in Sentry if available.
   ///
   /// This is a no-op if Sentry is not configured.
-  static void setExtra(String key, dynamic value) {
-    _sentryService?.setExtra(key, value);
+  static void setContexts(String key, dynamic value) {
+    _sentryService?.setContexts(key, value);
   }
 
   /// Converts a LogRecord level to a Sentry level string.
@@ -106,24 +107,21 @@ class SentryHelper {
 
     // For severe errors, capture as exception
     if (record.level >= Level.SEVERE && record.error != null) {
-      await _sentryService!.captureException(
-        record.error!,
-        stackTrace: record.stackTrace,
-        hint: {'message': record.message, 'logger': record.loggerName, 'time': record.time.toIso8601String()},
-        fatal: false,
-      );
+      final hint = Hint()
+        ..set('message', record.message)
+        ..set('logger', record.loggerName)
+        ..set('time', record.time.toIso8601String());
+      await _sentryService!.captureException(record.error!, stackTrace: record.stackTrace, hint: hint, fatal: false);
     } else {
       // For other levels, capture as message or breadcrumb
       if (record.level >= Level.WARNING) {
-        await _sentryService!.captureMessage(
-          record.message,
-          level: level,
-          hint: {
-            'logger': record.loggerName,
-            'time': record.time.toIso8601String(),
-            if (record.error != null) 'error': record.error.toString(),
-          },
-        );
+        final hint = Hint()
+          ..set('logger', record.loggerName)
+          ..set('time', record.time.toIso8601String());
+        if (record.error != null) {
+          hint.set('error', record.error.toString());
+        }
+        await _sentryService!.captureMessage(record.message, level: level, hint: hint);
       } else {
         // For info/debug, add as breadcrumb
         _sentryService!.addBreadcrumb(message: record.message, category: record.loggerName, level: level);
