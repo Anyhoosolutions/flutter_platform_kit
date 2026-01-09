@@ -107,23 +107,29 @@ class SentryHelper {
 
     // For severe errors, capture as exception
     if (record.level >= Level.SEVERE && record.error != null) {
+      final hint = Hint()
+        ..set('message', record.message)
+        ..set('logger', record.loggerName)
+        ..set('time', record.time.toIso8601String());
       await _sentryService!.captureException(
         record.error!,
         stackTrace: record.stackTrace,
-        hint: {'message': record.message, 'logger': record.loggerName, 'time': record.time.toIso8601String()},
+        hint: hint,
         fatal: false,
       );
     } else {
       // For other levels, capture as message or breadcrumb
       if (record.level >= Level.WARNING) {
+        final hint = Hint()
+          ..set('logger', record.loggerName)
+          ..set('time', record.time.toIso8601String());
+        if (record.error != null) {
+          hint.set('error', record.error.toString());
+        }
         await _sentryService!.captureMessage(
           record.message,
           level: level,
-          hint: {
-            'logger': record.loggerName,
-            'time': record.time.toIso8601String(),
-            if (record.error != null) 'error': record.error.toString(),
-          },
+          hint: hint,
         );
       } else {
         // For info/debug, add as breadcrumb
