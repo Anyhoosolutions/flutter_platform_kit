@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:anyhoo_auth/services/anyhoo_enhance_user_service.dart';
 import 'package:anyhoo_auth/models/anyhoo_user_converter.dart';
 import 'package:anyhoo_core/anyhoo_core.dart';
+import 'package:anyhoo_core/utils/json_utils.dart';
 import 'package:anyhoo_auth/services/anyhoo_auth_service.dart';
 import 'package:anyhoo_auth/cubit/anyhoo_auth_state.dart';
 import 'package:anyhoo_logging/anyhoo_logging.dart';
@@ -61,7 +62,7 @@ class AnyhooAuthCubit<T extends AnyhooUser> extends Cubit<AnyhooAuthState<T>> {
               enhancedUserData = await enhanceUserService.enhanceUser(enhancedUserData);
               _log.info('Enhanced user data: ${enhancedUserData.toString().substringSafe(0, 55)}...');
             }
-            final enhancedUser = converter.fromJson(enhancedUserData);
+            final enhancedUser = safeFromJson((json) => converter.fromJson(json), enhancedUserData);
             _log.info('Emitting new state with user: ${enhancedUser.toJson().toString().substringSafe(0, 55)}...');
             emit(state.copyWith(user: enhancedUser, isLoading: false));
           }
@@ -79,7 +80,7 @@ class AnyhooAuthCubit<T extends AnyhooUser> extends Cubit<AnyhooAuthState<T>> {
     );
 
     final userData = authService.currentUser;
-    final user = userData != null ? converter.fromJson(userData) : null;
+    final user = userData != null ? safeFromJson((json) => converter.fromJson(json), userData) : null;
     emit(state.copyWith(isLoading: false, user: user));
   }
 
@@ -211,12 +212,12 @@ class AnyhooAuthCubit<T extends AnyhooUser> extends Cubit<AnyhooAuthState<T>> {
       enhancedUserData = await enhanceUserService.enhanceUser(enhancedUserData);
     }
 
-    final updatedUser = converter.fromJson(enhancedUserData);
+    final updatedUser = safeFromJson((json) => converter.fromJson(json), enhancedUserData);
     emit(state.copyWith(user: updatedUser, isLoading: false));
   }
 
   T copyAnyhooUser(T user) {
-    return converter.fromJson(user.toJson());
+    return safeFromJson((json) => converter.fromJson(json), user.toJson());
   }
 
   @override
