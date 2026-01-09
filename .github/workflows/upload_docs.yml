@@ -8,7 +8,7 @@ on:
     types: [opened, synchronize, reopened]
 
 env:
-  # Setting an environment variable with the value of a configuration variable
+  # Setting an environment variable with the value of a configuration variable.
   UPLOAD_URL: ${{ vars.UPLOAD_URL }}
 
 jobs:
