@@ -344,10 +344,13 @@ jobs:
 
       - name: Build PR docs link
         run: |
-          echo "pr_docs_link=$(git rev-parse HEAD | head -c 7)" >> $GITHUB_ENV
+          COMMIT_HASH=$(git rev-parse HEAD)
+          PR_DOCS_URL="https://anyhoosolutions.web.app/documentation/$COMMIT_HASH"
+          echo "pr_docs_link=$PR_DOCS_URL" >> $GITHUB_ENV
+          echo "PR Documentation URL: $PR_DOCS_URL"
 
-      # - name: Comment PR
-      #   uses: thollander/actions-comment-pull-request@v3
-      #   with:
-      #     message: |
-      #       https://anywhostudios--anywhostudios-8eef2.us-central1.hosted.app/projects/${{ env.pr_docs_link }}
+      - name: Comment PR
+        uses: thollander/actions-comment-pull-request@v3
+        with:
+          message: |
+            ${{ env.pr_docs_link }}
