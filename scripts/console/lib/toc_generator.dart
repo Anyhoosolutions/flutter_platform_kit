@@ -198,13 +198,18 @@ class TocGenerator {
     print('\n🔄 Updating subpages...');
     print('  📦 Flutter packages to add: ${flutterPackages.length}');
     print('  🔧 Tools to add: ${tools.length}');
-    
-    return existingSubpages.map((subpage) {
+
+    bool hasFlutterPackages = false;
+    bool hasTools = false;
+
+    // Update existing subpages and check if flutter_packages and tools exist
+    final updatedSubpages = existingSubpages.map((subpage) {
       final subpageMap = subpage as Map<String, dynamic>;
       final filepath = subpageMap['filepath'] as String;
 
       // Replace flutter_packages.md section
       if (filepath == 'flutter_packages.md') {
+        hasFlutterPackages = true;
         print('  ✅ Found flutter_packages.md, updating with ${flutterPackages.length} packages');
         return {
           ...subpageMap,
@@ -214,6 +219,7 @@ class TocGenerator {
 
       // Replace tools.md section
       if (filepath == 'tools.md') {
+        hasTools = true;
         print('  ✅ Found tools.md, updating with ${tools.length} tools');
         return {
           ...subpageMap,
@@ -224,6 +230,33 @@ class TocGenerator {
       // Keep other subpages as-is
       return subpageMap;
     }).toList();
+
+    // Convert to mutable list
+    final result = <dynamic>[...updatedSubpages];
+
+    // Add flutter_packages.md if it doesn't exist
+    if (!hasFlutterPackages && flutterPackages.isNotEmpty) {
+      print('  ➕ Adding flutter_packages.md section with ${flutterPackages.length} packages');
+      result.add({
+        'filepath': 'flutter_packages.md',
+        'name': 'Flutter packages',
+        'title': 'Flutter packages',
+        'subpages': flutterPackages,
+      });
+    }
+
+    // Add tools.md if it doesn't exist
+    if (!hasTools && tools.isNotEmpty) {
+      print('  ➕ Adding tools.md section with ${tools.length} tools');
+      result.add({
+        'filepath': 'tools.md',
+        'name': 'Tools',
+        'title': 'Tools',
+        'subpages': tools,
+      });
+    }
+
+    return result;
   }
 
   /// Write updated toc.json
