@@ -1,3 +1,7 @@
+## 0.0.14
+
+* safeFromJson
+
 ## 0.0.13
 
 * Simplify AnyhooUser

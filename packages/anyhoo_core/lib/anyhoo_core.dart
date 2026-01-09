@@ -12,3 +12,4 @@ export 'widgets/waiting_page.dart';
 export 'observers/simple_bloc_observer.dart';
 export 'device_utils.dart';
 export 'extensions/anyhoo_string_extensions.dart';
+export 'utils/json_utils.dart';
