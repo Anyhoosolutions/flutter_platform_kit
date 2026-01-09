@@ -1,3 +1,7 @@
+## 0.0.29
+
+* safeFromJson
+
 ## 0.0.28
 
 * Add Sentry logging
