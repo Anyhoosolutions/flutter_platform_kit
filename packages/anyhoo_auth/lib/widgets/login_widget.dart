@@ -103,29 +103,7 @@ class _LoginWidgetState<T extends AnyhooUser> extends State<LoginWidget<T>> {
       stream: cubit.stream,
       initialData: cubit.state,
       builder: (context, snapshot) {
-        final state = snapshot.data!;
-
-        // Handle state changes
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (state.isAuthenticated && state.user != null) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                    'Welcome, ${state.user?.toJson()['email'] ?? 'User'}!'), // TODO: A function that gets the email/name whatever?
-                backgroundColor: Theme.of(context).primaryColor,
-              ),
-            );
-          }
-          if (state.errorMessage != null) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.errorMessage!),
-                backgroundColor: Theme.of(context).colorScheme.error,
-              ),
-            );
-          }
-        });
-
+        // Note: SnackBar handling is done in _subscribeToCubit() to avoid duplicates
         return SafeArea(
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(24.0),
