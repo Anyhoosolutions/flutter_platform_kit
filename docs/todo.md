@@ -15,5 +15,5 @@
 - [x] Check for version in pubspec.yaml
 - [ ] Move RemoteConfigCubit here 
 - [x] Support creating account
-- [ ] Move encrypt/decrpyt scripts here?
-- [ ] Move upload documentation script here?
+- [x] Move encrypt/decrpyt scripts here
+- [x] Move upload documentation script here
