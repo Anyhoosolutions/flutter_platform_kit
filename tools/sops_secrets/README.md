@@ -70,13 +70,13 @@ creation_rules:
 
 Add these entries to your `.gitignore`:
 ```
-# SOPS configuration (contains public key - OK to commit)
-# .sops.yaml  # Actually, this can be committed since it only contains the public key
+  # SOPS configuration (contains public key - OK to commit)
+  # .sops.yaml  # Actually, this can be committed since it only contains the public key
 
-# Age private key (NEVER commit this!)
+  # Age private key (NEVER commit this!)
 age-key.txt
 
-# Decrypted secrets (never commit these)
+  # Decrypted secrets (never commit these)
 .env
 *.jks
 google-services.json
@@ -85,8 +85,8 @@ firebase_service_account.json
 firebase_options.dart
 key.properties
 
-# Encrypted secrets directory (commit this)
-# secrets/  # Actually, commit the encrypted files
+  # Encrypted secrets directory (commit this)
+  # secrets/  # Actually, commit the encrypted files
 ```
 
 ### 4. Create `scripts/secrets-config.txt`
