@@ -94,10 +94,10 @@ key.properties
 Create a configuration file that lists which files to encrypt/decrypt:
 
 ```
-# Secrets Configuration
-# Format: |filename|directory|
-# filename: name of the unencrypted file
-# directory: where the file can be found (relative to project root, use . for current directory)
+  # Secrets Configuration
+  # Format: |filename|directory|
+  # filename: name of the unencrypted file
+  # directory: where the file can be found (relative to project root, use . for current directory)
 
 |.env|.|
 |firebase_service_account.json|.|
@@ -120,10 +120,10 @@ Create a configuration file that lists which files to encrypt/decrypt:
 If you want to replace placeholders in files after decryption:
 
 ```
-# Secrets Replacement Configuration
-# Format: |variable name|filepath|
-# variable name: the name of the variable in .env
-# filepath: the path to the file in which to replace the variable
+  # Secrets Replacement Configuration
+  # Format: |variable name|filepath|
+  # variable name: the name of the variable in .env
+  # filepath: the path to the file in which to replace the variable
 
 |YOUR_GOOGLE_SIGN_IN_OAUTH_CLIENT_ID|web/index.html|
 |YOUR_API_KEY|android/app/src/main/res/values/strings.xml|
@@ -140,10 +140,10 @@ You can use these scripts in several ways:
 Download and execute the script directly from GitHub:
 
 ```bash
-# From your repository root
+  # From your repository root
 curl -sSL https://raw.githubusercontent.com/Anyhoosolutions/flutter_platform_kit/main/tools/sops_secrets/encrypt-secrets.sh | bash
 
-# Or specify the project directory explicitly
+  # Or specify the project directory explicitly
 curl -sSL https://raw.githubusercontent.com/Anyhoosolutions/flutter_platform_kit/main/tools/sops_secrets/encrypt-secrets.sh | bash -s -- /path/to/your/repo
 ```
 
@@ -157,10 +157,10 @@ curl -sSL https://raw.githubusercontent.com/Anyhoosolutions/flutter_platform_kit
 If you have the `flutter_platform_kit` repository cloned locally:
 
 ```bash
-# From your repository root
+  # From your repository root
 /path/to/flutter_platform_kit/tools/sops_secrets/encrypt-secrets.sh
 
-# Or specify the project directory explicitly
+  # Or specify the project directory explicitly
 /path/to/flutter_platform_kit/tools/sops_secrets/encrypt-secrets.sh /path/to/your/repo
 ```
 
@@ -169,13 +169,13 @@ If you have the `flutter_platform_kit` repository cloned locally:
 Download the scripts once and keep them locally:
 
 ```bash
-# Download the scripts
+  # Download the scripts
 mkdir -p ~/bin/sops-scripts
 curl -o ~/bin/sops-scripts/encrypt-secrets.sh https://raw.githubusercontent.com/Anyhoosolutions/flutter_platform_kit/main/tools/sops_secrets/encrypt-secrets.sh
 curl -o ~/bin/sops-scripts/decrypt-secrets.sh https://raw.githubusercontent.com/Anyhoosolutions/flutter_platform_kit/main/tools/sops_secrets/decrypt-secrets.sh
 chmod +x ~/bin/sops-scripts/*.sh
 
-# Use them from anywhere
+  # Use them from anywhere
 ~/bin/sops-scripts/encrypt-secrets.sh /path/to/your/repo
 ```
 
@@ -252,10 +252,10 @@ You can create a local wrapper script in your repository for easier access:
 #!/bin/bash
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
-# Using GitHub raw URL (recommended)
+  # Using GitHub raw URL (recommended)
 curl -sSL https://raw.githubusercontent.com/Anyhoosolutions/flutter_platform_kit/main/tools/sops_secrets/encrypt-secrets.sh | bash -s -- "$PROJECT_ROOT"
-# Or using a local clone (if available):
-# /path/to/flutter_platform_kit/tools/sops_secrets/encrypt-secrets.sh "$PROJECT_ROOT"
+  # Or using a local clone (if available):
+  # /path/to/flutter_platform_kit/tools/sops_secrets/encrypt-secrets.sh "$PROJECT_ROOT"
 ```
 
 **`scripts/decrypt.sh`**:
@@ -263,10 +263,10 @@ curl -sSL https://raw.githubusercontent.com/Anyhoosolutions/flutter_platform_kit
 #!/bin/bash
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
-# Using GitHub raw URL (recommended)
+  # Using GitHub raw URL (recommended)
 curl -sSL https://raw.githubusercontent.com/Anyhoosolutions/flutter_platform_kit/main/tools/sops_secrets/decrypt-secrets.sh | bash -s -- "$PROJECT_ROOT"
-# Or using a local clone (if available):
-# /path/to/flutter_platform_kit/tools/sops_secrets/decrypt-secrets.sh "$PROJECT_ROOT"
+  # Or using a local clone (if available):
+  # /path/to/flutter_platform_kit/tools/sops_secrets/decrypt-secrets.sh "$PROJECT_ROOT"
 ```
 
 Make them executable:
