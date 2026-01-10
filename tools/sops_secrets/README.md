@@ -15,20 +15,20 @@ Reusable scripts for encrypting and decrypting sensitive files using [SOPS](http
 
 1. **Install SOPS**:
    ```bash
-   # macOS
+     # macOS
    brew install sops
    
-   # Linux
-   # See: https://github.com/mozilla/sops#install
+     # Linux
+     # See: https://github.com/mozilla/sops#install
    ```
 
 2. **Install age** (for key generation):
    ```bash
-   # macOS
+     # macOS
    brew install age
    
-   # Linux
-   # See: https://github.com/FiloSottile/age#installation
+     # Linux
+     # See: https://github.com/FiloSottile/age#installation
    ```
 
 ## Setup for a New Repository
@@ -38,12 +38,12 @@ Reusable scripts for encrypting and decrypting sensitive files using [SOPS](http
 Each repository should have its own age key pair. Generate one:
 
 ```bash
-# Generate a new key pair
+  # Generate a new key pair
 age-keygen -o age-key.txt
 
-# The output will show your public key (save this!)
-# Example output:
-# Public key: age1jdgm6w6u36mejy7dy9cf45wvuv5v56ldxvautxg65rkgxpe7u94sp7gzrc
+  # The output will show your public key (save this!)
+  # Example output:
+  # Public key: age1jdgm6w6u36mejy7dy9cf45wvuv5v56ldxvautxg65rkgxpe7u94sp7gzrc
 ```
 
 **Important**: 
@@ -205,23 +205,23 @@ The script will:
 Decrypt files for local development:
 
 ```bash
-# Make sure you have your age key available
-# Option 1: Place age-key.txt in repository root
+  # Make sure you have your age key available
+  # Option 1: Place age-key.txt in repository root
 cp /path/to/secure/storage/age-key.txt /path/to/your/repo/age-key.txt
 
-# Option 2: Use environment variable (recommended for CI/CD)
+  # Option 2: Use environment variable (recommended for CI/CD)
 export SOPS_AGE_KEY=$(cat /path/to/secure/storage/age-key.txt)
 
-# Option 3: Set SOPS_AGE_KEY_FILE
+  # Option 3: Set SOPS_AGE_KEY_FILE
 export SOPS_AGE_KEY_FILE=/path/to/secure/storage/age-key.txt
 
-# Decrypt using GitHub raw URL (recommended)
+  # Decrypt using GitHub raw URL (recommended)
 curl -sSL https://raw.githubusercontent.com/Anyhoosolutions/flutter_platform_kit/main/tools/sops_secrets/decrypt-secrets.sh | bash
 
-# Or specify the project directory explicitly
+  # Or specify the project directory explicitly
 curl -sSL https://raw.githubusercontent.com/Anyhoosolutions/flutter_platform_kit/main/tools/sops_secrets/decrypt-secrets.sh | bash -s -- /path/to/your/repo
 
-# Or if using a local clone
+  # Or if using a local clone
 /path/to/flutter_platform_kit/tools/sops_secrets/decrypt-secrets.sh /path/to/your/repo
 ```
 
