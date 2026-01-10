@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:console/documentation_uploader/models/upload_data.dart';
+import 'package:upload_documentation/documentation_uploader/models/upload_data.dart';
 import 'package:http/http.dart' as http;
 
 class Uploader {
@@ -17,7 +17,7 @@ class Uploader {
 
   Future<int> upload() async {
     final jsonString = jsonEncode(uploadData.toJson());
-    print(jsonString);
+    // print(jsonString);
 
     final url = Uri.parse(getUploadUrl());
 

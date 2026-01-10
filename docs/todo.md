@@ -14,3 +14,6 @@
 - [ ] Admin role
 - [x] Check for version in pubspec.yaml
 - [ ] Move RemoteConfigCubit here 
+- [x] Support creating account
+- [x] Move encrypt/decrpyt scripts here
+- [x] Move upload documentation script here

@@ -1,5 +1,5 @@
-import 'package:console/documentation_uploader/models/toc_json_content.dart';
-import 'package:console/documentation_uploader/utils.dart';
+import 'package:upload_documentation/documentation_uploader/models/toc_json_content.dart';
+import 'package:upload_documentation/documentation_uploader/utils.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'table_of_content.freezed.dart';
@@ -18,20 +18,16 @@ class TableOfContent with _$TableOfContent {
     @Default(null) List<String>? onlyAllowedUsers,
   }) = _TableOfContent;
 
-  factory TableOfContent.fromJson(Map<String, dynamic> json) =>
-      _$TableOfContentFromJson(json);
+  factory TableOfContent.fromJson(Map<String, dynamic> json) => _$TableOfContentFromJson(json);
 
-  static TableOfContent fromTocJsonContent(
-      TocJsonContent toc, List<String>? allowedUsers) {
+  static TableOfContent fromTocJsonContent(TocJsonContent toc, List<String>? allowedUsers) {
     return TableOfContent(
       id: Utils.hash(toc.filepath),
       tocTitle: toc.name,
       pageTitle: toc.title,
       filepath: toc.filepath,
       onlyAllowedUsers: toc.onlyAllowedUsers ? allowedUsers : null,
-      subpages: toc.subpages
-          .map((page) => fromTocJsonContent(page, allowedUsers))
-          .toList(),
+      subpages: toc.subpages.map((page) => fromTocJsonContent(page, allowedUsers)).toList(),
     );
   }
 }

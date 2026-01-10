@@ -1,0 +1,11 @@
+# SOPS Configuration Example
+# Copy this file to your repository root as .sops.yaml
+# Replace YOUR_PUBLIC_KEY_HERE with your actual age public key
+#
+# To get your public key:
+#   1. Generate a key pair: age-keygen -o age-key.txt
+#   2. Copy the public key from the output
+#   3. Replace YOUR_PUBLIC_KEY_HERE below
+
+creation_rules:
+    - age: 'YOUR_PUBLIC_KEY_HERE'

@@ -1,24 +1,30 @@
 import 'dart:io';
 import 'dart:convert';
-import 'package:console/documentation_uploader/models/page.dart';
+import 'package:path/path.dart' as path;
+import 'package:upload_documentation/documentation_uploader/models/contact_person.dart';
+import 'package:upload_documentation/documentation_uploader/models/metadata.dart';
+import 'package:upload_documentation/documentation_uploader/models/page.dart';
+import 'package:upload_documentation/documentation_uploader/models/table_of_content.dart';
+import 'package:upload_documentation/documentation_uploader/models/toc_json_content.dart';
 import 'package:yaml/yaml.dart';
 
-import 'models/contact_person.dart';
-import 'models/metadata.dart';
-import 'models/table_of_content.dart';
-import 'models/toc_json_content.dart';
-
-const docsDirectoryPrefix = '../../docs';
-
 class FileReader {
-  FileReader({required this.isBranch, required this.commitHash});
+  FileReader({
+    required this.isBranch,
+    required this.commitHash,
+    required this.projectRoot,
+  });
 
   final bool isBranch;
   final String? commitHash;
+  final String projectRoot;
+
+  String get docsDirectory => path.join(projectRoot, 'docs');
 
   Future<String> readFile(String filePath) async {
-    if (!filePath.startsWith(docsDirectoryPrefix)) {
-      filePath = '$docsDirectoryPrefix/$filePath';
+    // If filePath is relative, make it relative to docs directory
+    if (!path.isAbsolute(filePath)) {
+      filePath = path.join(docsDirectory, filePath);
     }
 
     try {
@@ -50,13 +56,13 @@ class FileReader {
   }
 
   Future<List<String>?> readAllowedUsers() async {
-    final yamlString = await readFile('$docsDirectoryPrefix/metadata.yml');
+    final yamlString = await readFile('metadata.yml');
     var yamlMap = loadYaml(yamlString);
     return (yamlMap['allowedUsers'] as YamlList?)?.map((u) => u as String).toList();
   }
 
   Future<TableOfContent> readTableOfContent(List<String>? allowedUsers) async {
-    final tocString = await readFile('$docsDirectoryPrefix/toc.json');
+    final tocString = await readFile('toc.json');
     final aa = jsonDecode(tocString) as Map<String, dynamic>;
     final tocJsonContent = TocJsonContent.fromJson(aa);
 
@@ -65,7 +71,7 @@ class FileReader {
   }
 
   Future<Metadata> readMetadata(TableOfContent tableOfContent) async {
-    final yamlString = await readFile('$docsDirectoryPrefix/metadata.yml');
+    final yamlString = await readFile('metadata.yml');
     var yamlMap = loadYaml(yamlString) as YamlMap;
 
     final allowedUsers = (yamlMap['allowedUsers'] as YamlList?)?.map((u) => u.toString()).toList();
@@ -83,29 +89,20 @@ class FileReader {
   }
 
   Future<List<Page>> readPages(TableOfContent tableOfContent) async {
-    // Collect all filepaths from TOC recursively
-    final tocFilepaths = _collectFilepaths(tableOfContent);
+    final files = await listFilesInDirectory(docsDirectory);
+    final pageFilepaths =
+        files.where((f) => f.endsWith('.md')).map((f) => path.relative(f, from: docsDirectory)).toList();
 
     final output = <Page>[];
-    for (final pageFilepath in tocFilepaths) {
-      // Check if file exists before trying to read it
-      final filePath =
-          pageFilepath.startsWith(docsDirectoryPrefix) ? pageFilepath : '$docsDirectoryPrefix/$pageFilepath';
-      final file = File(filePath);
-
-      if (!await file.exists()) {
-        print('⚠️  Warning: File not found in docs directory: $pageFilepath (skipping)');
-        continue;
-      }
-
+    for (final pageFilepath in pageFilepaths) {
       final content = await readFile(pageFilepath);
+
       final tocItem = findTocItem(tableOfContent, pageFilepath);
-
       if (tocItem == null) {
-        print('⚠️  Warning: Couldn\'t find ToC Item for: $pageFilepath (skipping)');
-        continue;
+        throw Exception(
+          "Couldn't find ToC Item: $pageFilepath",
+        );
       }
-
       output.add(Page(
           id: tocItem.id,
           name: tocItem.tocTitle,
@@ -116,15 +113,6 @@ class FileReader {
     }
 
     return output;
-  }
-
-  /// Recursively collect all filepaths from TOC structure
-  List<String> _collectFilepaths(TableOfContent toc) {
-    final filepaths = <String>[toc.filepath];
-    for (final subpage in toc.subpages) {
-      filepaths.addAll(_collectFilepaths(subpage));
-    }
-    return filepaths;
   }
 
   TableOfContent? findTocItem(TableOfContent toc, String pageFilepath) {

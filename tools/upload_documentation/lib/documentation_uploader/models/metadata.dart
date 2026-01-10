@@ -1,5 +1,5 @@
-import 'package:console/documentation_uploader/models/contact_person.dart';
-import 'package:console/documentation_uploader/models/table_of_content.dart';
+import 'package:upload_documentation/documentation_uploader/models/contact_person.dart';
+import 'package:upload_documentation/documentation_uploader/models/table_of_content.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'metadata.freezed.dart';
