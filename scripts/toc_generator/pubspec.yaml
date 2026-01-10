@@ -1,4 +1,4 @@
-name: console
+name: toc_generator
 description: A command-line tool for generating toc.json by scanning packages and tools directories for documentation files.
 version: 1.0.0
 repository: https://github.com/Anyhoosolutions/flutter_platform_kit
@@ -10,4 +10,4 @@ environment:
 
 dev_dependencies:
   lints: ^4.0.0
-  test: ">=1.25.0 <2.0.0"
+  test: '>=1.25.0 <2.0.0'

@@ -26,7 +26,7 @@ jobs:
 
       - name: Generate toc.json
         run: |
-          cd scripts/console
+          cd scripts/toc_generator
           dart pub get --no-precompile
           dart bin/generate_toc.dart
           cd ../..
@@ -238,7 +238,7 @@ jobs:
       - name: Generate toc.json
         if: github.event_name == 'pull_request'
         run: |
-          cd scripts/console
+          cd scripts/toc_generator
           dart pub get --no-precompile
           dart bin/generate_toc.dart
           cd ../..

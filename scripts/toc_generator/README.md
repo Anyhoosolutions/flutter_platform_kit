@@ -7,7 +7,7 @@ A command-line tool for generating `toc.json` by automatically scanning the `pac
 From the project root:
 
 ```bash
-cd scripts/console
+cd scripts/toc_generator
 dart pub get
 dart bin/generate_toc.dart
 ```
@@ -15,7 +15,7 @@ dart bin/generate_toc.dart
 Or from anywhere:
 
 ```bash
-cd /path/to/flutter_platform_kit/scripts/console
+cd /path/to/flutter_platform_kit/scripts/toc_generator
 dart pub get
 dart bin/generate_toc.dart
 ```
