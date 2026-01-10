@@ -117,10 +117,10 @@ jobs:
 
       - name: Run main deployment
         run: |
-          cd scripts/console
+          cd tools/upload_documentation
           dart pub get --no-precompile
           echo $UPLOAD_URL
-          dart bin/console.dart
+          dart bin/upload_documentation.dart --projectRoot=${{ github.workspace }}
 
   run-non-main:
     runs-on: ubuntu-latest
@@ -333,11 +333,11 @@ jobs:
 
       - name: Run non-main deployment
         run: |
-          cd scripts/console
+          cd tools/upload_documentation
           dart pub get --no-precompile
           export GIT_COMMIT_HASH=$(git rev-parse HEAD)
           echo $UPLOAD_URL
-          dart bin/console.dart --commitHash=$GIT_COMMIT_HASH
+          dart bin/upload_documentation.dart --projectRoot=${{ github.workspace }} --commitHash=$GIT_COMMIT_HASH
 
       - name: Build PR docs link
         if: github.event_name == 'pull_request'
