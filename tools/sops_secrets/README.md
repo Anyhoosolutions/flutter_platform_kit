@@ -133,9 +133,28 @@ This is useful for replacing placeholders in files like `index.html` or XML file
 
 ## Usage
 
-### Encrypt Files
+You can use these scripts in several ways:
 
-Encrypt files using the script from your repository:
+### Option 1: Download from GitHub (Recommended for CI/CD)
+
+Download and execute the script directly from GitHub:
+
+```bash
+# From your repository root
+curl -sSL https://raw.githubusercontent.com/Anyhoosolutions/flutter_platform_kit/main/tools/sops_secrets/encrypt-secrets.sh | bash
+
+# Or specify the project directory explicitly
+curl -sSL https://raw.githubusercontent.com/Anyhoosolutions/flutter_platform_kit/main/tools/sops_secrets/encrypt-secrets.sh | bash -s -- /path/to/your/repo
+```
+
+For decryption:
+```bash
+curl -sSL https://raw.githubusercontent.com/Anyhoosolutions/flutter_platform_kit/main/tools/sops_secrets/decrypt-secrets.sh | bash
+```
+
+### Option 2: Clone and Use Locally
+
+If you have the `flutter_platform_kit` repository cloned locally:
 
 ```bash
 # From your repository root
@@ -144,6 +163,25 @@ Encrypt files using the script from your repository:
 # Or specify the project directory explicitly
 /path/to/flutter_platform_kit/tools/sops_secrets/encrypt-secrets.sh /path/to/your/repo
 ```
+
+### Option 3: Download to a Local Script
+
+Download the scripts once and keep them locally:
+
+```bash
+# Download the scripts
+mkdir -p ~/bin/sops-scripts
+curl -o ~/bin/sops-scripts/encrypt-secrets.sh https://raw.githubusercontent.com/Anyhoosolutions/flutter_platform_kit/main/tools/sops_secrets/encrypt-secrets.sh
+curl -o ~/bin/sops-scripts/decrypt-secrets.sh https://raw.githubusercontent.com/Anyhoosolutions/flutter_platform_kit/main/tools/sops_secrets/decrypt-secrets.sh
+chmod +x ~/bin/sops-scripts/*.sh
+
+# Use them from anywhere
+~/bin/sops-scripts/encrypt-secrets.sh /path/to/your/repo
+```
+
+### Encrypt Files
+
+Encrypt files using any of the methods above:
 
 The script will:
 1. Read `scripts/secrets-config.txt` to find files to encrypt
@@ -171,16 +209,19 @@ Decrypt files for local development:
 # Option 1: Place age-key.txt in repository root
 cp /path/to/secure/storage/age-key.txt /path/to/your/repo/age-key.txt
 
-# Option 2: Use environment variable
+# Option 2: Use environment variable (recommended for CI/CD)
 export SOPS_AGE_KEY=$(cat /path/to/secure/storage/age-key.txt)
 
 # Option 3: Set SOPS_AGE_KEY_FILE
 export SOPS_AGE_KEY_FILE=/path/to/secure/storage/age-key.txt
 
-# Decrypt
-/path/to/flutter_platform_kit/tools/sops_secrets/decrypt-secrets.sh
+# Decrypt using GitHub raw URL (recommended)
+curl -sSL https://raw.githubusercontent.com/Anyhoosolutions/flutter_platform_kit/main/tools/sops_secrets/decrypt-secrets.sh | bash
 
 # Or specify the project directory explicitly
+curl -sSL https://raw.githubusercontent.com/Anyhoosolutions/flutter_platform_kit/main/tools/sops_secrets/decrypt-secrets.sh | bash -s -- /path/to/your/repo
+
+# Or if using a local clone
 /path/to/flutter_platform_kit/tools/sops_secrets/decrypt-secrets.sh /path/to/your/repo
 ```
 
@@ -211,7 +252,10 @@ You can create a local wrapper script in your repository for easier access:
 #!/bin/bash
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
-/path/to/flutter_platform_kit/tools/sops_secrets/encrypt-secrets.sh "$PROJECT_ROOT"
+# Using GitHub raw URL (recommended)
+curl -sSL https://raw.githubusercontent.com/Anyhoosolutions/flutter_platform_kit/main/tools/sops_secrets/encrypt-secrets.sh | bash -s -- "$PROJECT_ROOT"
+# Or using a local clone (if available):
+# /path/to/flutter_platform_kit/tools/sops_secrets/encrypt-secrets.sh "$PROJECT_ROOT"
 ```
 
 **`scripts/decrypt.sh`**:
@@ -219,7 +263,10 @@ PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 #!/bin/bash
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
-/path/to/flutter_platform_kit/tools/sops_secrets/decrypt-secrets.sh "$PROJECT_ROOT"
+# Using GitHub raw URL (recommended)
+curl -sSL https://raw.githubusercontent.com/Anyhoosolutions/flutter_platform_kit/main/tools/sops_secrets/decrypt-secrets.sh | bash -s -- "$PROJECT_ROOT"
+# Or using a local clone (if available):
+# /path/to/flutter_platform_kit/tools/sops_secrets/decrypt-secrets.sh "$PROJECT_ROOT"
 ```
 
 Make them executable:
@@ -261,7 +308,7 @@ jobs:
         env:
           SOPS_AGE_KEY: ${{ secrets.AGE_KEY }}
         run: |
-          /path/to/flutter_platform_kit/tools/sops_secrets/decrypt-secrets.sh
+          curl -sSL https://raw.githubusercontent.com/Anyhoosolutions/flutter_platform_kit/main/tools/sops_secrets/decrypt-secrets.sh | bash
       
       - name: Build app
         run: flutter build apk
@@ -281,7 +328,7 @@ build:
     - |
       # Decrypt secrets
       export SOPS_AGE_KEY="$AGE_KEY"
-      /path/to/flutter_platform_kit/tools/sops_secrets/decrypt-secrets.sh
+      curl -sSL https://raw.githubusercontent.com/Anyhoosolutions/flutter_platform_kit/main/tools/sops_secrets/decrypt-secrets.sh | bash
   script:
     - flutter build apk
   variables:
