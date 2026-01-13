@@ -55,7 +55,7 @@ Widget build(BuildContext context) {
 ColorScheme getColorScheme(String colorScheme) {
   final cs = ColorScheme.fromSeed(seedColor: Colors.white);
   return switch (colorScheme) {
-    'red' => cs.copyWith(primary: Colors.red),
+    'red' => cs.copyWith(primary: Colors.red), // TODO: Check what color icons are
     'green' => cs.copyWith(primary: Colors.green),
     'purple' => cs.copyWith(primary: Colors.purple),
     _ => cs,
