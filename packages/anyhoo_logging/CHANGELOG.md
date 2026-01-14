@@ -1,3 +1,7 @@
+## 0.0.5
+
+* Remove direct Sentry dependency
+
 ## 0.0.4
 
 * Latest Sentry version

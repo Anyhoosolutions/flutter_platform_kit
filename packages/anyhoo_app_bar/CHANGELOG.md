@@ -1,3 +1,7 @@
+## 0.0.6
+ 
+* Change color for app bar icon
+
 ## 0.0.5
  
 * Update to GoRouterWrapper
