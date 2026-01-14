@@ -1,5 +1,7 @@
 // Utility functions for JSON parsing and error handling.
 
+import 'package:anyhoo_logging/anyhoo_logging.dart';
+
 /// Safely calls a fromJson function with enhanced error messages
 /// when type cast errors occur due to null values or missing fields.
 ///
@@ -22,7 +24,7 @@
 T safeFromJson<T>(T Function(Map<String, dynamic>) fromJson, Map<String, dynamic> json) {
   try {
     return fromJson(json);
-  } catch (e) {
+  } catch (e, stackTrace) {
     // If it's a type cast error, provide more context about null/missing fields
     if (e.toString().contains("type 'Null' is not a subtype") || e.toString().contains("is not a subtype")) {
       final nullFields = <String>[];
@@ -40,7 +42,17 @@ T safeFromJson<T>(T Function(Map<String, dynamic>) fromJson, Map<String, dynamic
           'Full JSON: $json. '
           'Original error: $e';
 
-      throw FormatException(errorMessage, e);
+      final formatException = FormatException(errorMessage, e);
+
+      // Log to Sentry with additional context
+      SentryHelper.captureException(
+        formatException,
+        stackTrace: stackTrace,
+        extraInfo: {'type': T.toString(), 'nullFields': nullFields, 'availableKeys': json.keys.toList(), 'json': json},
+        fatal: false,
+      );
+
+      throw formatException;
     }
     rethrow;
   }
