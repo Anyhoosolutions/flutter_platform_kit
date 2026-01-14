@@ -279,7 +279,7 @@ class _LoginWidgetState<T extends AnyhooUser> extends State<LoginWidget<T>> {
       Text(
         widget.title,
         style: Theme.of(context).textTheme.displayMedium?.copyWith(
-              color: Theme.of(context).colorScheme.primary,
+              color: Theme.of(context).colorScheme.onSurface,
               fontWeight: FontWeight.bold,
             ),
         textAlign: TextAlign.center,
@@ -293,7 +293,7 @@ class _LoginWidgetState<T extends AnyhooUser> extends State<LoginWidget<T>> {
       Text(
         _isSignUp ? 'Create your account' : 'Sign in to continue',
         style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-              color: Theme.of(context).colorScheme.secondary,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
         textAlign: TextAlign.center,
       ),
@@ -374,9 +374,8 @@ class _LoginWidgetState<T extends AnyhooUser> extends State<LoginWidget<T>> {
             _isSignUp = !_isSignUp;
           });
         },
-        child: Text(
-          _isSignUp ? 'Already have an account? Sign In' : 'Don\'t have an account? Sign Up',
-        ),
+        child: Text(_isSignUp ? 'Already have an account? Sign In' : 'Don\'t have an account? Sign Up',
+            style: Theme.of(context).textTheme.bodyMedium),
       ),
       const SizedBox(height: 32)
     ];

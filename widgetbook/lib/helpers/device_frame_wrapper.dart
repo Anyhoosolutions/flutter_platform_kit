@@ -42,7 +42,12 @@ class DeviceFrameWrapper {
       'green': ColorScheme.fromSeed(seedColor: Colors.green),
       'purple': ColorScheme.fromSeed(seedColor: Colors.purple),
       'lightblue': ColorScheme.fromSeed(seedColor: Colors.lightBlue),
-      'brown': ColorScheme.fromSeed(seedColor: Colors.brown, onPrimaryContainer: Colors.blue),
+      'brown': ColorScheme.fromSeed(
+        seedColor: Colors.brown,
+        onPrimaryContainer: Colors.blue,
+        surface: Colors.brown[100],
+        onSurface: Colors.green,
+      ),
     };
     final colorSchemeSelection = context.knobs.list(
       label: 'Color scheme',
