@@ -6,7 +6,7 @@ import 'package:widgetbook/widgetbook.dart';
 import 'device_frame_widget.dart';
 
 class DeviceFrameWrapper {
-  static Widget wrapInDeviceFrame(BuildContext context, Widget child) {
+  static Widget wrapInDeviceFrame(BuildContext context, Widget child, {ThemeData? theme}) {
     final deviceTypeSelection = context.knobs.list(
       label: 'Device type',
       options: Devices.all.map((e) => e.name).toList(),
@@ -42,7 +42,7 @@ class DeviceFrameWrapper {
       orientation: orientation,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        // theme: AppTheme.lightTheme,
+        theme: theme,
         // darkTheme: AppTheme.darkTheme,
         themeMode: themeMode,
         // localizationsDelegates: AppLocalizations.localizationsDelegates,

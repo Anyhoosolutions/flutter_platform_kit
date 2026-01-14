@@ -41,19 +41,3 @@ Widget build(BuildContext context) {
 
   return WrapInMocksHelper().wrapInMocks(context, widget);
 }
-
-ColorScheme getColorScheme(String colorScheme) {
-  final color = switch (colorScheme) {
-    'red' => Colors.red,
-    'green' => Colors.green,
-    'purple' => Colors.purple,
-    _ => Colors.white,
-  };
-  final cs = ColorScheme.fromSeed(seedColor: color);
-  return switch (colorScheme) {
-    'red' => cs.copyWith(primary: Colors.red, brightness: Brightness.dark),
-    'green' => cs.copyWith(primary: Colors.green, brightness: Brightness.dark),
-    'purple' => cs.copyWith(primary: Colors.purple, brightness: Brightness.dark),
-    _ => cs,
-  };
-}
