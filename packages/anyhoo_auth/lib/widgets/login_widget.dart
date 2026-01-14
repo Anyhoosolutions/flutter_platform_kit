@@ -279,7 +279,6 @@ class _LoginWidgetState<T extends AnyhooUser> extends State<LoginWidget<T>> {
       Text(
         widget.title,
         style: Theme.of(context).textTheme.displayMedium?.copyWith(
-              color: Theme.of(context).colorScheme.onSurface,
               fontWeight: FontWeight.bold,
             ),
         textAlign: TextAlign.center,
@@ -292,9 +291,7 @@ class _LoginWidgetState<T extends AnyhooUser> extends State<LoginWidget<T>> {
       const SizedBox(height: 8),
       Text(
         _isSignUp ? 'Create your account' : 'Sign in to continue',
-        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-              color: Theme.of(context).colorScheme.onSurface,
-            ),
+        style: Theme.of(context).textTheme.bodyLarge,
         textAlign: TextAlign.center,
       ),
     ];
@@ -400,7 +397,7 @@ class _LoginWidgetState<T extends AnyhooUser> extends State<LoginWidget<T>> {
           child: Text(
             'OR',
             style: TextStyle(
-              color: Theme.of(context).colorScheme.secondary,
+              color: Theme.of(context).colorScheme.outline,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -490,9 +487,7 @@ class _LoginWidgetState<T extends AnyhooUser> extends State<LoginWidget<T>> {
   Widget _getTermsAndPrivacy() {
     return Text(
       'By continuing, you agree to our Terms of Service and Privacy Policy',
-      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-            color: Theme.of(context).colorScheme.secondary,
-          ),
+      style: Theme.of(context).textTheme.bodySmall,
       textAlign: TextAlign.center,
     );
   }
