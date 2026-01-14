@@ -8,7 +8,7 @@ import 'package:widgetbook_workspace/helpers/wrap_in_mocks_helper.dart';
 
 @widgetbook.UseCase(name: 'AnyhooAppBar', type: AnyhooAppBar, path: 'anyhoo_app_bar')
 Widget build(BuildContext context) {
-  final colorSchemeOptions = ['green', 'purple', 'red'];
+  final colorSchemeOptions = ['green', 'purple', 'red', 'lightblue', 'brown'];
   final colorScheme = context.knobs.list(label: 'Color scheme', options: colorSchemeOptions, initialOption: 'purple');
 
   final isLoading = context.knobs.boolean(label: 'Is loading', initialValue: false);
@@ -21,6 +21,15 @@ Widget build(BuildContext context) {
     initialOption: 'none',
   );
   final backgroundColorValue = backgroundColor == 'none' ? null : backgroundColorOptions[backgroundColor];
+
+  final iconColorOptions = {'none': null, 'brown': Colors.brown, 'orange': Colors.orange, 'white': Colors.white};
+  final iconColor = context.knobs.list(
+    label: 'Icon color',
+    options: iconColorOptions.keys.toList(),
+    initialOption: 'none',
+  );
+  final iconColorValue = iconColor == 'none' ? null : iconColorOptions[iconColor];
+
   final showActionButtons = context.knobs.boolean(label: 'Show action buttons', initialValue: true);
   final showBackButton = context.knobs.boolean(label: 'Show back button', initialValue: true);
 
@@ -51,6 +60,7 @@ Widget build(BuildContext context) {
             actionButtons: showActionButtons ? actionButtons : [],
             isLoading: isLoading,
             backgroundColor: backgroundColorValue,
+            iconColor: iconColorValue,
           ),
           SliverList.builder(
             itemCount: 100,
@@ -69,9 +79,11 @@ Widget build(BuildContext context) {
 ColorScheme getColorScheme(String colorScheme) {
   final cs = ColorScheme.fromSeed(seedColor: Colors.white);
   return switch (colorScheme) {
-    'red' => cs.copyWith(primary: Colors.red),
-    'green' => cs.copyWith(primary: Colors.green),
-    'purple' => cs.copyWith(primary: Colors.purple),
+    'red' => ColorScheme.fromSeed(seedColor: Colors.red),
+    'green' => ColorScheme.fromSeed(seedColor: Colors.green),
+    'purple' => ColorScheme.fromSeed(seedColor: Colors.purple),
+    'lightblue' => ColorScheme.fromSeed(seedColor: Colors.lightBlue),
+    'brown' => ColorScheme.fromSeed(seedColor: Colors.brown, onPrimaryContainer: Colors.blue),
     _ => cs,
   };
 }

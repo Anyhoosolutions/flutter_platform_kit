@@ -15,6 +15,7 @@ class AnyhooAppBar extends StatefulWidget {
     this.backButtonIcon,
     this.isLoading = false,
     this.backgroundColor,
+    this.iconColor,
   });
   final bool hasBackButton;
   final String? title;
@@ -24,6 +25,7 @@ class AnyhooAppBar extends StatefulWidget {
   final ScrollController? scrollController;
   final bool isLoading;
   final Color? backgroundColor;
+  final Color? iconColor;
   @override
   State<AnyhooAppBar> createState() => _AnyhooAppBarState();
 }
@@ -213,7 +215,7 @@ class _AnyhooAppBarState extends State<AnyhooAppBar> {
             child: IconButton(
               icon: Container(
                 padding: const EdgeInsets.all(8),
-                child: Icon(ab.icon, color: Colors.black),
+                child: Icon(ab.icon, color: widget.iconColor ?? Theme.of(context).colorScheme.onPrimaryContainer),
               ),
               onPressed: ab.onTap,
             ),
