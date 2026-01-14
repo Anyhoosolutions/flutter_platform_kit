@@ -4,50 +4,24 @@ import 'dart:typed_data';
 import 'package:anyhoo_auth/cubit/anyhoo_auth_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:widgetbook/widgetbook.dart';
-// import 'package:flutter_bloc/flutter_bloc.dart';
-// import 'package:widgetbook/widgetbook.dart';
 import 'package:widgetbook_workspace/helpers/device_frame_wrapper.dart';
-// import 'package:widgetbook_workspace/helpers/image_loader.dart';
 import 'package:widgetbook_workspace/helpers/mock_generator.dart';
 import 'package:image/image.dart' as img;
 import 'package:cross_file/cross_file.dart';
 
 class WrapInMocksHelper {
   Widget wrapInMocks(BuildContext context, Widget child) {
-    final colorSchemeOptions = {
-      'red': ColorScheme.fromSeed(seedColor: Colors.red),
-      'green': ColorScheme.fromSeed(seedColor: Colors.green),
-      'purple': ColorScheme.fromSeed(seedColor: Colors.purple),
-      'lightblue': ColorScheme.fromSeed(seedColor: Colors.lightBlue),
-      'brown': ColorScheme.fromSeed(seedColor: Colors.brown, onPrimaryContainer: Colors.blue),
-    };
-    // ignore: deprecated_member_use
-    final colorSchemeSelection = context.knobs.list(
-      label: 'Color scheme',
-      options: colorSchemeOptions.keys.toList(),
-      initialOption: 'brown',
-    );
-    final colorScheme = colorSchemeOptions[colorSchemeSelection];
-    print('colorSchemeSelection: $colorSchemeSelection');
-    print('colorScheme: ${colorScheme}');
-
     final mockGenerator = MockGenerator();
 
-    // final isLoading = context.knobs.boolean(label: 'Show shimmer', initialValue: false);
-
-    final themeData = ThemeData.from(colorScheme: colorScheme ?? ColorScheme.fromSeed(seedColor: Colors.blue));
-
-    final themedChild = MultiBlocProvider(
-      providers: [BlocProvider<AnyhooAuthCubit>(create: (context) => mockGenerator.getMockAuthCubit())],
-      child: child,
+    final deviceFrameWrapper = DeviceFrameWrapper.wrapInDeviceFrame(
+      context,
+      MultiBlocProvider(
+        providers: [BlocProvider<AnyhooAuthCubit>(create: (context) => mockGenerator.getMockAuthCubit())],
+        child: child,
+      ),
     );
 
-    final deviceFrameWrapper = DeviceFrameWrapper.wrapInDeviceFrame(context, themedChild, theme: themeData);
-
     return deviceFrameWrapper;
-    //   },
-    // );
   }
 }
 

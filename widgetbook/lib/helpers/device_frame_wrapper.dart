@@ -6,7 +6,7 @@ import 'package:widgetbook/widgetbook.dart';
 import 'device_frame_widget.dart';
 
 class DeviceFrameWrapper {
-  static Widget wrapInDeviceFrame(BuildContext context, Widget child, {ThemeData? theme}) {
+  static Widget wrapInDeviceFrame(BuildContext context, Widget child) {
     final deviceTypeSelection = context.knobs.list(
       label: 'Device type',
       options: Devices.all.map((e) => e.name).toList(),
@@ -37,12 +37,28 @@ class DeviceFrameWrapper {
     );
     final orientation = orientationSelection == 'portrait' ? Orientation.portrait : Orientation.landscape;
 
+    final colorSchemeOptions = {
+      'red': ColorScheme.fromSeed(seedColor: Colors.red),
+      'green': ColorScheme.fromSeed(seedColor: Colors.green),
+      'purple': ColorScheme.fromSeed(seedColor: Colors.purple),
+      'lightblue': ColorScheme.fromSeed(seedColor: Colors.lightBlue),
+      'brown': ColorScheme.fromSeed(seedColor: Colors.brown, onPrimaryContainer: Colors.blue),
+    };
+    final colorSchemeSelection = context.knobs.list(
+      label: 'Color scheme',
+      options: colorSchemeOptions.keys.toList(),
+      initialOption: 'brown',
+    );
+    final colorScheme = colorSchemeOptions[colorSchemeSelection];
+
+    final themeData = ThemeData.from(colorScheme: colorScheme ?? ColorScheme.fromSeed(seedColor: Colors.blue));
+
     return DeviceFrameWidget(
       deviceType: deviceType,
       orientation: orientation,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        theme: theme,
+        theme: themeData,
         // darkTheme: AppTheme.darkTheme,
         themeMode: themeMode,
         // localizationsDelegates: AppLocalizations.localizationsDelegates,
