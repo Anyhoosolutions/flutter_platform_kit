@@ -56,8 +56,28 @@ encrypt_file() {
     local encrypted_path="$2"
 
     if [ -f "$file_path" ]; then
-        # Check if encrypted file exists and is newer than source file
-        if [ -f "$encrypted_path" ] && [ "$encrypted_path" -nt "$file_path" ]; then
+        # Check if we need to re-encrypt
+        local needs_encryption=true
+        
+        if [ -f "$encrypted_path" ]; then
+            # Check if encrypted file is newer than source file
+            # The -nt operator returns true if file1 is newer than file2 (based on mtime)
+            if [ "$encrypted_path" -nt "$file_path" ]; then
+                # Encrypted file is newer than source, but also check if .sops.yaml changed
+                # (which would require re-encryption even if timestamps say otherwise)
+                if [ -f "$PROJECT_DIR/.sops.yaml" ] && [ "$PROJECT_DIR/.sops.yaml" -nt "$encrypted_path" ]; then
+                    # .sops.yaml is newer, need to re-encrypt
+                    needs_encryption=true
+                else
+                    # Encrypted file is newer and .sops.yaml hasn't changed
+                    needs_encryption=false
+                fi
+            fi
+            # If encrypted file is not newer (or equal), we need to encrypt
+        fi
+        # If encrypted file doesn't exist, we need to encrypt
+        
+        if [ "$needs_encryption" = false ]; then
             echo "⏭️  Skipping $file_path (already up to date)"
             return
         fi

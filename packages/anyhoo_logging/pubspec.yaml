@@ -1,6 +1,6 @@
 name: anyhoo_logging
 description: "A package for logging."
-version: 0.0.4
+version: 0.0.5
 homepage: https://anyhoosolutions.web.app/documentation/flutter_platform_kit
 publish_to: none
 
@@ -13,7 +13,6 @@ dependencies:
     sdk: flutter
   flutter_bloc: ^9.1.1
   logging: ^1.3.0
-  sentry_flutter: ^9.9.2
 
 dev_dependencies:
   flutter_test:

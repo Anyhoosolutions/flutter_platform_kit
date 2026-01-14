@@ -1,5 +1,3 @@
-import 'package:sentry_flutter/sentry_flutter.dart';
-
 /// Abstract interface for Sentry error reporting service.
 ///
 /// This allows packages to report errors to Sentry without directly depending
@@ -12,14 +10,19 @@ abstract class SentryService {
   /// [stackTrace] - Optional stack trace
   /// [hint] - Optional hint/context about the error
   /// [fatal] - Whether this is a fatal error (defaults to false)
-  Future<void> captureException(Object error, {StackTrace? stackTrace, Hint? hint, bool fatal = false});
+  Future<void> captureException(
+    Object error, {
+    StackTrace? stackTrace,
+    Map<String, dynamic>? extraInfo,
+    bool fatal = false,
+  });
 
   /// Reports a message to Sentry.
   ///
   /// [message] - The message to report
   /// [level] - The severity level (defaults to 'error')
   /// [hint] - Optional hint/context
-  Future<void> captureMessage(String message, {String level = 'error', Hint? hint});
+  Future<void> captureMessage(String message, {String level = 'error', Map<String, dynamic>? extraInfo});
 
   /// Adds breadcrumb to Sentry.
   ///

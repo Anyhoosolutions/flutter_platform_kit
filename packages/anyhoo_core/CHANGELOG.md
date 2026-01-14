@@ -1,3 +1,7 @@
+## 0.0.15
+
+* Report json parsing error to sentry
+
 ## 0.0.14
 
 * safeFromJson

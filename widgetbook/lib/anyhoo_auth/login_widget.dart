@@ -12,8 +12,6 @@ import 'package:anyhoo_auth/widgets/login_widget.dart';
 
 @widgetbook.UseCase(name: 'LoginWidget', type: LoginWidget, path: 'anyhoo_auth')
 Widget build(BuildContext context) {
-  final colorSchemeOptions = ['red', 'green', 'purple'];
-  final colorScheme = context.knobs.list(label: 'Color scheme', options: colorSchemeOptions, initialOption: 'purple');
   final showLogo = context.knobs.boolean(label: 'Show logo', initialValue: true);
   final showEmailSignIn = context.knobs.boolean(label: 'Show email sign in', initialValue: true);
   final showGoogleSignIn = context.knobs.boolean(label: 'Show google sign in', initialValue: true);
@@ -33,20 +31,7 @@ Widget build(BuildContext context) {
     loginWidgetSettings: loginWidgetSettings,
   );
 
-  final widget = Theme(
-    data: ThemeData(colorScheme: getColorScheme(colorScheme)),
-    child: Scaffold(body: Center(child: innerWidget)),
-  );
+  final widget = Scaffold(body: Center(child: innerWidget));
 
   return WrapInMocksHelper().wrapInMocks(context, widget);
-}
-
-ColorScheme getColorScheme(String colorScheme) {
-  final cs = ColorScheme.fromSeed(seedColor: Colors.white);
-  return switch (colorScheme) {
-    'red' => cs.copyWith(primary: Colors.red),
-    'green' => cs.copyWith(primary: Colors.green),
-    'purple' => cs.copyWith(primary: Colors.purple),
-    _ => cs,
-  };
 }

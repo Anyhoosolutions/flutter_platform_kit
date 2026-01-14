@@ -1,42 +1,43 @@
-import 'package:anyhoo_logging/src/sentry_service.dart';
-import 'package:sentry_flutter/sentry_flutter.dart';
+// import 'package:anyhoo_logging/src/sentry_service.dart';
+// import 'package:sentry_flutter/sentry_flutter.dart';
 
-/// Example implementation of SentryService using the sentry_flutter package.
-///
-/// This is a reference implementation. Apps should create their own implementation
-/// based on their Sentry setup. This file is not exported by default to avoid
-/// requiring sentry_flutter as a dependency.
-///
-/// To use this, apps would need to:
-/// 1. Add sentry_flutter to their pubspec.yaml
-/// 2. Copy this implementation or create their own
-/// 3. Initialize Sentry in their main() function
-/// 4. Pass the implementation to LoggingConfiguration
-///
-/// Example usage:
-/// ```dart
-/// import 'package:sentry_flutter/sentry_flutter.dart';
-///
-/// void main() async {
-///   await SentryFlutter.init(
-///     (options) {
-///       options.dsn = 'YOUR_SENTRY_DSN';
-///     },
-///     appRunner: () {
-///       final sentryService = SentryServiceImpl();
-///       final loggingConfig = LoggingConfiguration(
-///         logLevel: Level.INFO,
-///         loggersAtInfo: [],
-///         loggersAtWarning: [],
-///         loggersAtSevere: [],
-///         sentryService: sentryService,
-///       );
-///       runApp(MyApp(loggingConfig: loggingConfig));
-///     },
-///   );
-/// }
-/// ```
-class SentryServiceImpl implements SentryService {
+// Example implementation of SentryService using the sentry_flutter package.
+//
+// This is a reference implementation. Apps should create their own implementation
+// based on their Sentry setup. This file is not exported by default to avoid
+// requiring sentry_flutter as a dependency.
+//
+// To use this, apps would need to:
+// 1. Add sentry_flutter to their pubspec.yaml
+// 2. Copy this implementation or create their own
+// 3. Initialize Sentry in their main() function
+// 4. Pass the implementation to LoggingConfiguration
+//
+// Example usage:
+// ```dart
+// import 'package:sentry_flutter/sentry_flutter.dart';
+//
+// void main() async {
+//   await SentryFlutter.init(
+//     (options) {
+//       options.dsn = 'YOUR_SENTRY_DSN';
+//     },
+//     appRunner: () {
+//       final sentryService = SentryServiceImpl();
+//       final loggingConfig = LoggingConfiguration(
+//         logLevel: Level.INFO,
+//         loggersAtInfo: [],
+//         loggersAtWarning: [],
+//         loggersAtSevere: [],
+//         sentryService: sentryService,
+//       );
+//       runApp(MyApp(loggingConfig: loggingConfig));
+//     },
+//   );
+// }
+// ```
+// 
+// class SentryServiceImpl implements SentryService {
   // Note: This is a placeholder. In a real implementation, you would use
   // the sentry_flutter package's Sentry class methods.
   //
@@ -143,46 +144,4 @@ class SentryServiceImpl implements SentryService {
   //       return SentryLevel.info;
   //   }
   // }
-
-  @override
-  Future<void> captureException(Object error, {StackTrace? stackTrace, Hint? hint, bool fatal = false}) async {
-    // Implementation would go here
-    throw UnimplementedError('This is a reference implementation. Implement using sentry_flutter package.');
-  }
-
-  @override
-  Future<void> captureMessage(String message, {String level = 'error', Hint? hint}) async {
-    // Implementation would go here
-    throw UnimplementedError('This is a reference implementation. Implement using sentry_flutter package.');
-  }
-
-  @override
-  void addBreadcrumb({required String message, String? category, String level = 'info'}) {
-    // Implementation would go here
-    throw UnimplementedError('This is a reference implementation. Implement using sentry_flutter package.');
-  }
-
-  @override
-  void setUser({String? id, String? email, String? username, Map<String, dynamic>? data}) {
-    // Implementation would go here
-    throw UnimplementedError('This is a reference implementation. Implement using sentry_flutter package.');
-  }
-
-  @override
-  void clearUser() {
-    // Implementation would go here
-    throw UnimplementedError('This is a reference implementation. Implement using sentry_flutter package.');
-  }
-
-  @override
-  void setTag(String key, String value) {
-    // Implementation would go here
-    throw UnimplementedError('This is a reference implementation. Implement using sentry_flutter package.');
-  }
-
-  @override
-  void setContexts(String key, dynamic value) {
-    // Implementation would go here
-    throw UnimplementedError('This is a reference implementation. Implement using sentry_flutter package.');
-  }
-}
+// }

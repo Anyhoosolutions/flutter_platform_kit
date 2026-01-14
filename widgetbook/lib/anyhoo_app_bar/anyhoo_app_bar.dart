@@ -8,9 +8,6 @@ import 'package:widgetbook_workspace/helpers/wrap_in_mocks_helper.dart';
 
 @widgetbook.UseCase(name: 'AnyhooAppBar', type: AnyhooAppBar, path: 'anyhoo_app_bar')
 Widget build(BuildContext context) {
-  final colorSchemeOptions = ['green', 'purple', 'red'];
-  final colorScheme = context.knobs.list(label: 'Color scheme', options: colorSchemeOptions, initialOption: 'purple');
-
   final isLoading = context.knobs.boolean(label: 'Is loading', initialValue: false);
   final useImage = context.knobs.boolean(label: 'Use image', initialValue: false);
 
@@ -21,6 +18,15 @@ Widget build(BuildContext context) {
     initialOption: 'none',
   );
   final backgroundColorValue = backgroundColor == 'none' ? null : backgroundColorOptions[backgroundColor];
+
+  final iconColorOptions = {'none': null, 'brown': Colors.brown, 'orange': Colors.orange, 'white': Colors.white};
+  final iconColor = context.knobs.list(
+    label: 'Icon color',
+    options: iconColorOptions.keys.toList(),
+    initialOption: 'none',
+  );
+  final iconColorValue = iconColor == 'none' ? null : iconColorOptions[iconColor];
+
   final showActionButtons = context.knobs.boolean(label: 'Show action buttons', initialValue: true);
   final showBackButton = context.knobs.boolean(label: 'Show back button', initialValue: true);
 
@@ -37,41 +43,29 @@ Widget build(BuildContext context) {
         ]
       : <ActionButtonInfo>[];
 
-  final widget = Theme(
-    data: ThemeData(colorScheme: getColorScheme(colorScheme)),
-    child: Scaffold(
-      body: CustomScrollView(
-        controller: scrollController,
-        slivers: [
-          AnyhooAppBar(
-            scrollController: scrollController,
-            hasBackButton: showBackButton,
-            title: 'Example App Bar',
-            imageUrl: useImage ? imgUrl : null,
-            actionButtons: showActionButtons ? actionButtons : [],
-            isLoading: isLoading,
-            backgroundColor: backgroundColorValue,
-          ),
-          SliverList.builder(
-            itemCount: 100,
-            itemBuilder: (context, index) {
-              return Text('Item $index');
-            },
-          ),
-        ],
-      ),
+  final widget = Scaffold(
+    body: CustomScrollView(
+      controller: scrollController,
+      slivers: [
+        AnyhooAppBar(
+          scrollController: scrollController,
+          hasBackButton: showBackButton,
+          title: 'Example App Bar',
+          imageUrl: useImage ? imgUrl : null,
+          actionButtons: showActionButtons ? actionButtons : [],
+          isLoading: isLoading,
+          backgroundColor: backgroundColorValue,
+          iconColor: iconColorValue,
+        ),
+        SliverList.builder(
+          itemCount: 100,
+          itemBuilder: (context, index) {
+            return Text('Item $index');
+          },
+        ),
+      ],
     ),
   );
 
   return WrapInMocksHelper().wrapInMocks(context, widget);
-}
-
-ColorScheme getColorScheme(String colorScheme) {
-  final cs = ColorScheme.fromSeed(seedColor: Colors.white);
-  return switch (colorScheme) {
-    'red' => cs.copyWith(primary: Colors.red),
-    'green' => cs.copyWith(primary: Colors.green),
-    'purple' => cs.copyWith(primary: Colors.purple),
-    _ => cs,
-  };
 }

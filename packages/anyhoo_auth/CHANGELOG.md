@@ -1,3 +1,7 @@
+## 0.0.30
+
+* Change colors for Login widget
+
 ## 0.0.29
 
 * safeFromJson

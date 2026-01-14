@@ -37,12 +37,33 @@ class DeviceFrameWrapper {
     );
     final orientation = orientationSelection == 'portrait' ? Orientation.portrait : Orientation.landscape;
 
+    final colorSchemeOptions = {
+      'red': ColorScheme.fromSeed(seedColor: Colors.red),
+      'green': ColorScheme.fromSeed(seedColor: Colors.green),
+      'purple': ColorScheme.fromSeed(seedColor: Colors.purple),
+      'lightblue': ColorScheme.fromSeed(seedColor: Colors.lightBlue),
+      'brown': ColorScheme.fromSeed(
+        seedColor: Colors.brown,
+        onPrimaryContainer: Colors.blue,
+        surface: Colors.brown[100],
+        onSurface: Colors.green,
+      ),
+    };
+    final colorSchemeSelection = context.knobs.list(
+      label: 'Color scheme',
+      options: colorSchemeOptions.keys.toList(),
+      initialOption: 'brown',
+    );
+    final colorScheme = colorSchemeOptions[colorSchemeSelection];
+
+    final themeData = ThemeData.from(colorScheme: colorScheme ?? ColorScheme.fromSeed(seedColor: Colors.blue));
+
     return DeviceFrameWidget(
       deviceType: deviceType,
       orientation: orientation,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        // theme: AppTheme.lightTheme,
+        theme: themeData,
         // darkTheme: AppTheme.darkTheme,
         themeMode: themeMode,
         // localizationsDelegates: AppLocalizations.localizationsDelegates,
