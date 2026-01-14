@@ -8,19 +8,13 @@ import 'package:anyhoo_shimmer/anyhoo_shimmer.dart';
 
 @widgetbook.UseCase(name: 'Shimmer', type: AnyhooShimmer, path: 'anyhoo_shimmer')
 Widget build(BuildContext context) {
-  final colorSchemeOptions = ['green', 'purple', 'red'];
-  final colorScheme = context.knobs.list(label: 'Color scheme', options: colorSchemeOptions, initialOption: 'purple');
-
   final isLoading = context.knobs.boolean(label: 'Is loading', initialValue: true);
 
-  final widget = Theme(
-    data: ThemeData(colorScheme: getColorScheme(colorScheme)),
-    child: Center(
-      child: SizedBox(
-        width: 300,
-        height: 30,
-        child: AnyhooShimmer(child: isLoading ? Text('Hello world...') : ShimmerShapes.text()),
-      ),
+  final widget = Center(
+    child: SizedBox(
+      width: 300,
+      height: 30,
+      child: AnyhooShimmer(child: isLoading ? Text('Hello world...') : ShimmerShapes.text()),
     ),
   );
 

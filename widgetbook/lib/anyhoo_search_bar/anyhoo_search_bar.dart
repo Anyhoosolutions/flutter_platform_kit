@@ -9,9 +9,6 @@ import 'package:widgetbook_workspace/helpers/wrap_in_mocks_helper.dart';
 
 @widgetbook.UseCase(name: 'Default', type: AnyhooSearchBar, path: 'anyhoo_search_bar')
 Widget build(BuildContext context) {
-  final colorSchemeOptions = ['red', 'green', 'purple'];
-  final colorScheme = context.knobs.list(label: 'Color scheme', options: colorSchemeOptions, initialOption: 'red');
-
   final showIncludeEverythingCheckbox = context.knobs.boolean(
     label: 'Show include everything checkbox',
     initialValue: false,
@@ -21,31 +18,28 @@ Widget build(BuildContext context) {
   final iconOptions = ['search', 'filter_list', 'filter_list_off'];
   final icon = context.knobs.list(label: 'Icon', options: iconOptions, initialOption: 'search');
 
-  final widget = Theme(
-    data: ThemeData(colorScheme: getColorScheme(colorScheme)),
-    child: Center(
-      child: CustomScrollView(
-        slivers: [
-          AnyhooAppBar(hasBackButton: false, title: 'Example app', imageUrl: null, actionButtons: []),
-          AnyhooSearchBar(
-            icon: icon == 'search'
-                ? Icons.search
-                : icon == 'filter_list'
-                ? Icons.filter_list
-                : Icons.filter_list_off,
-            labelText: searchText,
-            showIncludeEverythingCheckbox: showIncludeEverythingCheckbox,
-            onChanged: (value) {
-              // ignore: avoid_print
-              print('value: $value');
-            },
-            onIncludeEverythingChanged: (value) {
-              // ignore: avoid_print
-              print('value: $value');
-            },
-          ),
-        ],
-      ),
+  final widget = Center(
+    child: CustomScrollView(
+      slivers: [
+        AnyhooAppBar(hasBackButton: false, title: 'Example app', imageUrl: null, actionButtons: []),
+        AnyhooSearchBar(
+          icon: icon == 'search'
+              ? Icons.search
+              : icon == 'filter_list'
+              ? Icons.filter_list
+              : Icons.filter_list_off,
+          labelText: searchText,
+          showIncludeEverythingCheckbox: showIncludeEverythingCheckbox,
+          onChanged: (value) {
+            // ignore: avoid_print
+            print('value: $value');
+          },
+          onIncludeEverythingChanged: (value) {
+            // ignore: avoid_print
+            print('value: $value');
+          },
+        ),
+      ],
     ),
   );
 
