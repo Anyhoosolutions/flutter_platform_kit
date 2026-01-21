@@ -2,16 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart';
 
-final log = Logger('GoRouterWrapper');
+final _log = Logger('GoRouterWrapper');
 
 class GoRouterWrapper {
   void go(BuildContext context, String path) {
-    log.info('Going to $path');
+    _log.info('Going to $path');
     GoRouter.of(context).go(path);
   }
 
   Future<Object?> push(BuildContext context, String path, {Object? extra}) {
-    log.info('Pushing $path');
+    _log.info('Pushing $path');
     if (extra != null) {
       return GoRouter.of(context).push(path, extra: extra);
     } else {
@@ -21,11 +21,11 @@ class GoRouterWrapper {
 
   void pop(BuildContext context, Object? extra) {
     if (extra == null) {
-      log.info('Popping without extra');
+      _log.info('Popping without extra');
       GoRouter.of(context).pop();
       return;
     }
-    log.info('Popping with extra: $extra');
+    _log.info('Popping with extra: $extra');
     GoRouter.of(context).pop(extra);
   }
 }

@@ -177,6 +177,8 @@ class _AnyhooAppBarState extends State<AnyhooAppBar> {
       flexibleSpace: AnyhooShimmer(
         child: FlexibleSpaceBar(centerTitle: true, title: _getTitle(), background: _getBackgroundImage()),
       ),
+
+      // TODO: Add a line at the bottom?
     );
   }
 
