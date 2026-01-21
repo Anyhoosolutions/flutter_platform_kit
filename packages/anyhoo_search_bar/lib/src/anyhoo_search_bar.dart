@@ -43,17 +43,12 @@ class _AnyhooSearchBarState extends State<AnyhooSearchBar> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final child = Padding(
       padding: const EdgeInsets.all(16.0),
       child: Row(
         children: [
           Expanded(
-            child: SearchBar(
-              controller: searchController,
-              hintText: widget.labelText,
-              leading: Icon(widget.icon, color: theme.colorScheme.primary),
-            ),
+            child: SearchBar(controller: searchController, hintText: widget.labelText, leading: Icon(widget.icon)),
           ),
           if (widget.showIncludeEverythingCheckbox)
             Checkbox(
