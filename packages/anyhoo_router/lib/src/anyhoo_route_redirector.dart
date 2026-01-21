@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart';
 
-final log = Logger('RouteRedirector');
+final _log = Logger('AnyhooRouteRedirector');
 
 class AnyhooRouteRedirector {
   final List<RouteBase> routes;
@@ -36,28 +36,28 @@ class AnyhooRouteRedirector {
         (state.matchedLocation.isNotEmpty && _normalizePath(state.matchedLocation) == _normalizePath(currentLocation))
         ? state.matchedLocation
         : currentLocation;
-    log.info('redirect called for originalPath: $originalPath');
-    log.info('state.uri.path: ${uri.path}');
-    log.info('state.matchedLocation: ${state.matchedLocation}');
-    log.info('currentLocation from router: $currentLocation');
+    _log.info('redirect called for originalPath: $originalPath');
+    _log.info('state.uri.path: ${uri.path}');
+    _log.info('state.matchedLocation: ${state.matchedLocation}');
+    _log.info('currentLocation from router: $currentLocation');
     // log.info('allPaths: ${allPaths.join(', ')}');
 
     // Check if user is on login path but already logged in - redirect to initial path
-    log.info('authCubit: $authCubit');
-    log.info('authCubit state: ${authCubit?.state}');
-    log.info('loginPath: $loginPath');
-    log.info('originalPath: $originalPath');
+    _log.info('authCubit: $authCubit');
+    _log.info('authCubit state: ${authCubit?.state}');
+    _log.info('loginPath: $loginPath');
+    _log.info('originalPath: $originalPath');
 
     if (authCubit != null && _normalizePath(originalPath) == _normalizePath(loginPath)) {
       final user = authCubit!.state.user;
-      log.info('user: $user');
+      _log.info('user: $user');
       if (user != null) {
-        log.info('User is logged in but on login path, redirecting to initial path');
+        _log.info('User is logged in but on login path, redirecting to initial path');
         // Explicitly navigate to initial path when redirect is triggered by refreshListenable
         // This ensures the navigation actually happens when auth state changes
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (router.routeInformationProvider.value.uri.path == loginPath) {
-            log.info('Explicitly navigating to $initialPath');
+            _log.info('Explicitly navigating to $initialPath');
             router.go(initialPath);
           }
         });
@@ -69,13 +69,13 @@ class AnyhooRouteRedirector {
     if (authCubit != null && _normalizePath(originalPath) == _normalizePath(loginPath)) {
       final user = authCubit!.state.user;
       if (user != null) {
-        log.info('User is logged in but on login path, redirecting to initial path');
+        _log.info('User is logged in but on login path, redirecting to initial path');
         return redirecting(originalPath, initialPath);
       }
     }
 
     if (!_pathMatchesAnyRoute(originalPath)) {
-      log.info('route not found, redirecting to /');
+      _log.info('route not found, redirecting to /');
       return redirecting(originalPath, '$redirectNotFound?originalPath=$originalPath');
     }
 
@@ -107,7 +107,7 @@ class AnyhooRouteRedirector {
           path = path.substring(0, path.length - 1);
         }
 
-        log.info('Deep link redirect: ${uri.toString()} -> $path');
+        _log.info('Deep link redirect: ${uri.toString()} -> $path');
         return redirecting(originalPath, path);
       }
     }
@@ -125,11 +125,11 @@ class AnyhooRouteRedirector {
 
   String? redirecting(String originalPath, String? redirectTo) {
     if (redirectTo == null) {
-      log.info('no redirecting needed. Will go to $originalPath');
+      _log.info('no redirecting needed. Will go to $originalPath');
       return null;
     }
 
-    log.info('...redirecting to $redirectTo instead of $originalPath');
+    _log.info('...redirecting to $redirectTo instead of $originalPath');
     return redirectTo;
   }
 
