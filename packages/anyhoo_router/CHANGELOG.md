@@ -1,3 +1,7 @@
+## 0.0.18
+
+* Private logger
+
 ## 0.0.17
 
 * Small fix for Google log in

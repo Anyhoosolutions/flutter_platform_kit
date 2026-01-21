@@ -17,3 +17,5 @@
 - [x] Support creating account
 - [x] Move encrypt/decrpyt scripts here
 - [x] Move upload documentation script here
+- [ ] Update AnyhooUser when enhance user data sees new value
+- [ ] Add line at bottom of AppBar
