@@ -1,3 +1,7 @@
+## 0.0.5
+
+* No theme color for search icon
+
 ## 0.0.4
 
 * Use SearchBar widget from Material 3
