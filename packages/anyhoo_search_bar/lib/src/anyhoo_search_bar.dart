@@ -24,12 +24,15 @@ class AnyhooSearchBar extends StatefulWidget {
 
 class _AnyhooSearchBarState extends State<AnyhooSearchBar> {
   bool includeEverything = false;
-  late final TextEditingController searchController;
+  late final SearchController searchController;
 
   @override
   void initState() {
     super.initState();
-    searchController = TextEditingController();
+    searchController = SearchController();
+    searchController.addListener(() {
+      widget.onChanged(searchController.text);
+    });
   }
 
   @override
@@ -46,27 +49,10 @@ class _AnyhooSearchBarState extends State<AnyhooSearchBar> {
       child: Row(
         children: [
           Expanded(
-            child: Container(
-              decoration: BoxDecoration(color: const Color(0xFFFFF0E6), borderRadius: BorderRadius.circular(80)),
-              child: TextField(
-                controller: searchController,
-                onChanged: widget.onChanged,
-                decoration: InputDecoration(
-                  labelText: widget.labelText,
-                  hintStyle: TextStyle(color: theme.colorScheme.primary, fontSize: 16),
-                  prefixIcon: Icon(widget.icon, color: theme.colorScheme.primary),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide.none),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30),
-                    borderSide: BorderSide.none,
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30),
-                    borderSide: BorderSide.none,
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-                ),
-              ),
+            child: SearchBar(
+              controller: searchController,
+              hintText: widget.labelText,
+              leading: Icon(widget.icon, color: theme.colorScheme.primary),
             ),
           ),
           if (widget.showIncludeEverythingCheckbox)
@@ -79,11 +65,7 @@ class _AnyhooSearchBarState extends State<AnyhooSearchBar> {
                 });
               },
             ),
-          if (widget.showIncludeEverythingCheckbox)
-            Text(
-              'Full',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: theme.colorScheme.primary),
-            ),
+          if (widget.showIncludeEverythingCheckbox) Text('Full'),
         ],
       ),
     );
