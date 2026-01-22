@@ -17,11 +17,14 @@ class SelectedImage {
 
   final String? url;
 
+  final String? mimeType;
+
   const SelectedImage({
     this.path,
     this.selectedFile,
     this.selectedImage,
     this.url,
+    this.mimeType,
   });
 
   /// Returns true if an image is selected (any of the three types).
@@ -32,6 +35,6 @@ class SelectedImage {
 
   @override
   String toString() {
-    return 'SelectedImage(path: $path, selectedFile: ${selectedFile?.lengthSync()}, selectedImage: ${selectedImage?.length})';
+    return 'SelectedImage(path: $path, selectedFile: ${selectedFile?.lengthSync()}, selectedImage: ${selectedImage?.length}), mimeType: $mimeType';
   }
 }

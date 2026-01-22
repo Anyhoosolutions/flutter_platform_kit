@@ -1,3 +1,7 @@
+## 0.0.14
+
+* Allow uploading to Storage with mime type
+
 ## 0.0.13
 
 * Add Sentry logging

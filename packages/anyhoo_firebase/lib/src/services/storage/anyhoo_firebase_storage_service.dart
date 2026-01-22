@@ -28,8 +28,13 @@ class AnyhooFirebaseStorageService implements AnyhooStorageService {
   }
 
   @override
-  AnyhooUploadTask uploadFileFromBytes(String path, Uint8List bytes) {
-    final uploadTask = storage.ref(path).putData(bytes);
+  AnyhooUploadTask uploadFileFromBytes(String path, Uint8List bytes, {String? mimeType}) {
+    late UploadTask uploadTask;
+    if (mimeType == null) {
+      uploadTask = storage.ref(path).putData(bytes);
+    } else {
+      uploadTask = storage.ref(path).putData(bytes, SettableMetadata(contentType: mimeType));
+    }
     return AnyhooFirebaseUploadTask(uploadTask: uploadTask);
   }
 }

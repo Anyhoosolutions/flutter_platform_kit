@@ -1,4 +1,5 @@
 import 'dart:io';
+
 import 'package:anyhoo_image_selector/cubit/image_selector_state.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -30,16 +31,21 @@ class ImageSelectorCubit extends Cubit<ImageSelectorState> {
 
       if (xFile != null) {
         if (kIsWeb) {
-          Uint8List imageDataBytes = await xFile.readAsBytes();
+          // On web, read bytes from XFile
+          final Uint8List imageBytes = await xFile.readAsBytes();
           emit(ImageSelectorState(
-            selectedImage: imageDataBytes,
+            mimeType: xFile.mimeType,
+            selectedImage: imageBytes,
             sourceType: source == ImageSource.camera ? ImageSourceType.camera : ImageSourceType.gallery,
+            isLoading: false,
           ));
         } else {
+          // On mobile, store the File object
           final File file = File(xFile.path);
           emit(ImageSelectorState(
             selectedFile: file,
             sourceType: source == ImageSource.camera ? ImageSourceType.camera : ImageSourceType.gallery,
+            isLoading: false,
           ));
         }
       } else {

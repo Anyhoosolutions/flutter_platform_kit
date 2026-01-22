@@ -17,6 +17,7 @@ class ImageSelectorState {
   final ImageSourceType sourceType;
   final bool isLoading;
   final String? errorMessage;
+  final String? mimeType;
 
   const ImageSelectorState({
     this.selectedFile,
@@ -25,6 +26,7 @@ class ImageSelectorState {
     this.sourceType = ImageSourceType.none,
     this.isLoading = false,
     this.errorMessage,
+    this.mimeType,
   });
 
   // Helper method to copy/update state
@@ -35,6 +37,7 @@ class ImageSelectorState {
     ImageSourceType? sourceType,
     bool? isLoading,
     String? errorMessage,
+    String? mimeType,
   }) {
     return ImageSelectorState(
       selectedFile: selectedFile,
@@ -43,6 +46,7 @@ class ImageSelectorState {
       sourceType: sourceType ?? this.sourceType,
       isLoading: isLoading ?? this.isLoading,
       errorMessage: errorMessage, // We keep the last error unless cleared
+      mimeType: mimeType ?? this.mimeType,
     );
   }
 }

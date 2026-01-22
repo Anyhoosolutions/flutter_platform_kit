@@ -22,7 +22,7 @@ class AnyhooFakeStorageService implements AnyhooStorageService {
   }
 
   @override
-  AnyhooUploadTask uploadFileFromBytes(String path, Uint8List bytes) {
+  AnyhooUploadTask uploadFileFromBytes(String path, Uint8List bytes, {String? mimeType}) {
     return AnyhooFakeUploadTask();
   }
 }
