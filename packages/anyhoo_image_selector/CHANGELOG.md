@@ -1,3 +1,7 @@
+## 0.0.10
+
+* Allow uploading to Storage with mime type
+
 ## 0.0.9
  
 * Trying to fix Showing preselected image in AnyhooFormImageSelector
