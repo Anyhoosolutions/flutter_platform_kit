@@ -129,7 +129,9 @@ class _ImageSelectorView extends StatelessWidget {
             }
 
             if (showStockPhotos) {
-              return _showStockPhotos(context, stockAssetPaths);
+              return ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: min(parentWidth, 600)),
+                  child: _showStockPhotos(context, stockAssetPaths));
             }
 
             final showImage = shouldShowImage(imageSelectorState);
@@ -234,7 +236,8 @@ class _ImageSelectorView extends StatelessWidget {
                     color: Colors.white,
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.cancel, size: 48)))),
+                  child: const Icon(Icons.cancel, size: 48, color: Colors.black)))),
+      // TODO: Colors should either be from theme or settable
     ]);
   }
 
