@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:anyhoo_image_selector/cubit/image_selector_state.dart';
@@ -117,34 +118,39 @@ class _ImageSelectorView extends StatelessWidget {
       },
       child: LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
-          final parentWidth = constraints.maxWidth;
+          try {
+            final parentWidth = constraints.maxWidth;
 
-          final imageSelectorState = context.watch<ImageSelectorCubit>().state;
-          final showStockPhotos = context.watch<ShowStockPhotosCubit>().state;
+            final imageSelectorState = context.watch<ImageSelectorCubit>().state;
+            final showStockPhotos = context.watch<ShowStockPhotosCubit>().state;
 
-          if (imageSelectorState.isLoading) {
-            return const Center(child: CircularProgressIndicator()); // TODO: Shimmer
+            if (imageSelectorState.isLoading) {
+              return const Center(child: CircularProgressIndicator()); // TODO: Shimmer
+            }
+
+            if (showStockPhotos) {
+              return _showStockPhotos(context, stockAssetPaths);
+            }
+
+            final showImage = shouldShowImage(imageSelectorState);
+
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Display the selected image preview
+                if (showImage)
+                  FutureBuilder<Widget>(
+                      future: _buildImagePreview(context, imageSelectorState, parentWidth),
+                      builder: (context, snapshot) {
+                        return snapshot.data ?? const SizedBox.shrink();
+                      }),
+                if (!showImage) getEmptyIconAndButtonsLayout(context, parentWidth),
+              ],
+            );
+          } catch (e) {
+            _log.severe('Error building image selector', e);
+            return Center(child: Text('Error: ${e.toString()}'));
           }
-
-          if (showStockPhotos) {
-            return _showStockPhotos(context, stockAssetPaths);
-          }
-
-          final showImage = shouldShowImage(imageSelectorState);
-
-          return Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Display the selected image preview
-              if (showImage)
-                FutureBuilder<Widget>(
-                    future: _buildImagePreview(context, imageSelectorState, parentWidth),
-                    builder: (context, snapshot) {
-                      return snapshot.data ?? const SizedBox.shrink();
-                    }),
-              if (!showImage) getEmptyIconAndButtonsLayout(context, parentWidth),
-            ],
-          );
         },
       ),
     );
@@ -164,6 +170,10 @@ class _ImageSelectorView extends StatelessWidget {
     return shouldShow;
   }
 
+  double getImageWidth(double parentWidth) {
+    return min(parentWidth * 0.9, 300);
+  }
+
   Future<Widget> _buildImagePreview(BuildContext context, ImageSelectorState state, double parentWidth) async {
     Widget image;
     Uint8List? imageBytes;
@@ -176,17 +186,20 @@ class _ImageSelectorView extends StatelessWidget {
 
     if (imageBytes != null) {
       _log.info('Showing memory image');
-      image = Image.memory(key: const Key('memory-image'), imageBytes, width: parentWidth * 0.9, fit: BoxFit.cover);
+      image = Image.memory(
+          key: const Key('memory-image'), imageBytes, width: getImageWidth(parentWidth), fit: BoxFit.cover);
     } else if (state.selectedFile != null) {
       _log.info('Showing file image');
-      image =
-          Image.file(key: const Key('file-image'), state.selectedFile!, width: parentWidth * 0.9, fit: BoxFit.cover);
+      image = Image.file(
+          key: const Key('file-image'), state.selectedFile!, width: getImageWidth(parentWidth), fit: BoxFit.cover);
     } else if (state.path != null && state.path!.startsWith('http')) {
       _log.info('Showing network image');
-      image = Image.network(key: const Key('network-image'), state.path!, width: parentWidth * 0.9, fit: BoxFit.cover);
+      image = Image.network(
+          key: const Key('network-image'), state.path!, width: getImageWidth(parentWidth), fit: BoxFit.cover);
     } else if (state.path != null) {
       _log.info('Showing asset image');
-      image = Image.asset(key: const Key('asset-image'), state.path!, width: parentWidth * 0.9, fit: BoxFit.cover);
+      image =
+          Image.asset(key: const Key('asset-image'), state.path!, width: getImageWidth(parentWidth), fit: BoxFit.cover);
     } else {
       _log.info('Showing empty image');
       image = Container(
