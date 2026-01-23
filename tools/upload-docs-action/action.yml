@@ -13,10 +13,6 @@ inputs:
     description: "Root directory of the project (defaults to workspace)"
     required: false
     default: ${{ github.workspace }}
-  upload_tool_path:
-    description: "Path to the upload_documentation tool"
-    required: false
-    default: "tools/upload_documentation"
   commit_hash:
     description: "Optional commit hash for branch-based deployments"
     required: false
@@ -42,14 +38,40 @@ runs:
           .dart_tool
         key: ${{ runner.os }}-dart-${{ hashFiles('**/pubspec.yaml') }}
 
+    - name: Checkout upload tool
+      shell: bash
+      run: |
+        echo "Checking out upload tool from repository..."
+        UPLOAD_TOOL_PATH="tools/upload_documentation"
+        TOOL_DIR=$(dirname "$UPLOAD_TOOL_PATH")
+        mkdir -p "$TOOL_DIR"
+        git clone --depth 1 --branch main https://github.com/Anyhoosolutions/flutter_platform_kit.git /tmp/flutter_platform_kit
+        if [ -d "/tmp/flutter_platform_kit/$UPLOAD_TOOL_PATH" ]; then
+          cp -r /tmp/flutter_platform_kit/$UPLOAD_TOOL_PATH "$UPLOAD_TOOL_PATH"
+          echo "✅ Upload tool checked out to $UPLOAD_TOOL_PATH"
+        else
+          echo "❌ Error: Upload tool path '$UPLOAD_TOOL_PATH' not found in repository"
+          exit 1
+        fi
+        rm -rf /tmp/flutter_platform_kit
+
     - name: Run documentation upload
       shell: bash
       env:
         UPLOAD_URL: ${{ inputs.upload_url }}
       run: |
-        cd ${{ inputs.upload_tool_path }}
+        UPLOAD_TOOL_PATH="tools/upload_documentation"
+        if [ ! -d "$UPLOAD_TOOL_PATH" ]; then
+          echo "❌ Error: Upload tool directory not found at $UPLOAD_TOOL_PATH"
+          exit 1
+        fi
+        cd "$UPLOAD_TOOL_PATH" || exit 1
+        if [ ! -f "bin/upload_documentation.dart" ]; then
+          echo "❌ Error: upload_documentation.dart not found in $UPLOAD_TOOL_PATH/bin/"
+          exit 1
+        fi
         dart pub get --no-precompile
-        echo $UPLOAD_URL
+        echo "UPLOAD_URL: $UPLOAD_URL"
         if [ -n "${{ inputs.commit_hash }}" ]; then
           export GIT_COMMIT_HASH=${{ inputs.commit_hash }}
           dart bin/upload_documentation.dart --projectRoot=${{ inputs.project_root }} --commitHash=${{ inputs.commit_hash }}
