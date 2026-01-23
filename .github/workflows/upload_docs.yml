@@ -139,7 +139,7 @@ jobs:
 
       - name: Prepare documentation
         if: github.event_name == 'pull_request'
-        uses: ./tools/prepare-docs-action
+        uses: ./.github/actions/prepare-docs
 
       - name: Upload documentation
         uses: ./tools/upload-docs-action
