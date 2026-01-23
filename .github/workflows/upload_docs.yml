@@ -102,25 +102,12 @@ jobs:
             done
           done
 
-      - name: Set up Dart
-        uses: dart-lang/setup-dart@v1
+      - name: Upload documentation
+        uses: ./tools/upload-docs-action
         with:
-          sdk: "3.5"
-
-      - name: Cache Dart packages
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.pub-cache
-            .dart_tool
-          key: ${{ runner.os }}-dart-${{ hashFiles('**/pubspec.yaml') }}
-
-      - name: Run main deployment
-        run: |
-          cd tools/upload_documentation
-          dart pub get --no-precompile
-          echo $UPLOAD_URL
-          dart bin/upload_documentation.dart --projectRoot=${{ github.workspace }}
+          upload_url: ${{ vars.UPLOAD_URL }}
+          dart_sdk: "3.5"
+          commit_hash: ""
 
   run-non-main:
     runs-on: ubuntu-latest
@@ -318,38 +305,10 @@ jobs:
             done
           done
 
-      - name: Set up Dart
-        uses: dart-lang/setup-dart@v1
+      - name: Upload documentation
+        uses: ./tools/upload-docs-action
         with:
-          sdk: "3.5"
-
-      - name: Cache Dart packages
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.pub-cache
-            .dart_tool
-          key: ${{ runner.os }}-dart-${{ hashFiles('**/pubspec.yaml') }}
-
-      - name: Run non-main deployment
-        run: |
-          cd tools/upload_documentation
-          dart pub get --no-precompile
-          export GIT_COMMIT_HASH=$(git rev-parse HEAD)
-          echo $UPLOAD_URL
-          dart bin/upload_documentation.dart --projectRoot=${{ github.workspace }} --commitHash=$GIT_COMMIT_HASH
-
-      - name: Build PR docs link
-        if: github.event_name == 'pull_request'
-        run: |
-          COMMIT_HASH=$(git rev-parse HEAD)
-          PR_DOCS_URL="https://anyhoosolutions.web.app/documentation/$COMMIT_HASH"
-          echo "pr_docs_link=$PR_DOCS_URL" >> $GITHUB_ENV
-          echo "PR Documentation URL: $PR_DOCS_URL"
-
-      - name: Comment PR
-        if: github.event_name == 'pull_request'
-        uses: thollander/actions-comment-pull-request@v3
-        with:
-          message: |
-            ${{ env.pr_docs_link }}
+          upload_url: ${{ vars.UPLOAD_URL }}
+          dart_sdk: "3.5"
+          commit_hash: ${{ github.sha }}
+          pr_docs_base_url: "https://anyhoosolutions.web.app/documentation"
