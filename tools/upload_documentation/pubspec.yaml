@@ -1,6 +1,6 @@
 name: upload_documentation
 description: A command-line tool for uploading documentation to a documentation service. Reads documentation files from a docs directory and uploads them via HTTP.
-version: 1.0.0
+version: 1.0.1
 repository: https://github.com/Anyhoosolutions/flutter_platform_kit
 
 environment:
