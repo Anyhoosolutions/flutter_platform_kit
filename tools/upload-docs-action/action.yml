@@ -1,0 +1,65 @@
+name: "Upload Documentation"
+description: "Upload documentation to the documentation service"
+
+inputs:
+  upload_url:
+    description: "The URL endpoint for uploading documentation"
+    required: true
+  dart_sdk:
+    description: "Dart SDK version to use"
+    required: false
+    default: "3.5"
+  project_root:
+    description: "Root directory of the project (defaults to workspace)"
+    required: false
+    default: ${{ github.workspace }}
+  upload_tool_path:
+    description: "Path to the upload_documentation tool"
+    required: false
+    default: "tools/upload_documentation"
+  commit_hash:
+    description: "Optional commit hash for branch-based deployments"
+    required: false
+    default: ""
+  pr_docs_base_url:
+    description: "Base URL for PR documentation links (e.g., https://example.com/documentation)"
+    required: false
+    default: ""
+
+runs:
+  using: "composite"
+  steps:
+    - name: Set up Dart
+      uses: dart-lang/setup-dart@v1
+      with:
+        sdk: ${{ inputs.dart_sdk }}
+
+    - name: Cache Dart packages
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.pub-cache
+          .dart_tool
+        key: ${{ runner.os }}-dart-${{ hashFiles('**/pubspec.yaml') }}
+
+    - name: Run documentation upload
+      shell: bash
+      env:
+        UPLOAD_URL: ${{ inputs.upload_url }}
+      run: |
+        cd ${{ inputs.upload_tool_path }}
+        dart pub get --no-precompile
+        echo $UPLOAD_URL
+        if [ -n "${{ inputs.commit_hash }}" ]; then
+          export GIT_COMMIT_HASH=${{ inputs.commit_hash }}
+          dart bin/upload_documentation.dart --projectRoot=${{ inputs.project_root }} --commitHash=${{ inputs.commit_hash }}
+        else
+          dart bin/upload_documentation.dart --projectRoot=${{ inputs.project_root }}
+        fi
+
+    - name: Comment PR
+      if: github.event_name == 'pull_request' && inputs.commit_hash != '' && inputs.pr_docs_base_url != ''
+      uses: thollander/actions-comment-pull-request@v3
+      with:
+        message: |
+          ${{ inputs.pr_docs_base_url }}/${{ inputs.commit_hash }}
