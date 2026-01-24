@@ -140,6 +140,7 @@ runs:
       id: firebase-app-id
       if: inputs.deploy == 'true' && inputs.firebase_app_id == ''
       run: |
+        set -e
         FIREBASE_JSON="${{ inputs.firebase_json_path }}"
         APP_ID_PATH="${{ inputs.app_id_path }}"
 
@@ -150,28 +151,13 @@ runs:
           exit 1
         fi
 
-        # Extract app ID using Python, supporting nested paths like "flutter.platforms.android.default.appId"
-        APP_ID=$(python3 - << EOF
-import json
-import sys
+        SCRIPT_PATH="${{ github.action_path }}/extract_app_id.py"
+        if [ ! -f "$SCRIPT_PATH" ]; then
+          echo "❌ Helper script not found: $SCRIPT_PATH"
+          exit 1
+        fi
 
-firebase_json = "$FIREBASE_JSON"
-app_id_path = "$APP_ID_PATH"
-
-with open(firebase_json) as f:
-    data = json.load(f)
-
-current = data
-try:
-    for key in app_id_path.split('.'):
-        current = current[key]
-except KeyError as e:
-    print(f"Failed to traverse path '{app_id_path}'. Missing key: {e}", file=sys.stderr)
-    sys.exit(1)
-
-print(current)
-EOF
-)
+        APP_ID=$(python3 "$SCRIPT_PATH" "$FIREBASE_JSON" "$APP_ID_PATH")
 
         if [ -z "$APP_ID" ]; then
           echo "❌ Could not extract Android app ID from $FIREBASE_JSON"

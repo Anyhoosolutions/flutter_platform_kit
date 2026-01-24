@@ -1,3 +1,7 @@
+## 1.0.3
+
+- Try to fix APK deployment. Try 2
+
 ## 1.0.2
 
 - Try to fix APK deployment
