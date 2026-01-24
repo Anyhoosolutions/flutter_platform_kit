@@ -28,13 +28,15 @@ class Uploader {
         body: jsonString,
       );
 
-      if (response.statusCode == 200) {
+      final statusCode = response.statusCode;
+      if (statusCode == 200 || statusCode == 201) {
         print('Upload successful: ${response.body}');
       } else {
-        print('Failed to upload: ${response.statusCode}');
+        print('Failed to upload: $statusCode');
         print(response.body);
+        throw HttpException('Upload failed with status $statusCode: ${response.body}');
       }
-      return response.statusCode;
+      return statusCode;
     } catch (e) {
       print('Error occurred: $e');
       rethrow;
