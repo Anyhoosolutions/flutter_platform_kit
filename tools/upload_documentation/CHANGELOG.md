@@ -1,3 +1,7 @@
+## 1.0.2
+
+- Fixing to break if fail to upload
+
 ## 1.0.1
 
 - Checkout upload tool
