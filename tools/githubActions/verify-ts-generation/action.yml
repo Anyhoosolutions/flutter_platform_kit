@@ -42,12 +42,98 @@ inputs:
     description: "Space-separated patterns to exclude when checking for changes (e.g., '*.freezed.dart *.g.dart')"
     required: false
     default: "*.freezed.dart *.g.dart"
+  quick_check:
+    description: "Quick check mode: only verify changed Dart models have matching generated TypeScript files (doesn't run generation script)"
+    required: false
+    default: "false"
 
 runs:
   using: "composite"
   steps:
+    - name: Quick check - Changed Dart models have matching generated TypeScript files
+      if: inputs.quick_check == 'true'
+      shell: bash
+      run: |
+        echo "🔍 Quick check: Verifying changed Dart freezed models have matching generated TypeScript files..."
+
+        # Check if source models directory exists
+        if [ ! -d "${{ inputs.source_models_path }}" ]; then
+          echo "⚠️  ${{ inputs.source_models_path }}/ directory not found, skipping check"
+          exit 0
+        fi
+
+        # Get the base branch for comparison
+        if [ "${{ github.event_name }}" == "pull_request" ]; then
+          BASE_BRANCH="${{ github.event.pull_request.base.ref }}"
+          BASE_REF="${{ github.event.pull_request.base.sha }}"
+        else
+          BASE_BRANCH="main"
+          BASE_REF="HEAD~1"
+        fi
+        
+        echo "Comparing against base: $BASE_BRANCH"
+
+        # Try to fetch the base branch for comparison
+        git fetch origin "$BASE_BRANCH:$BASE_BRANCH" 2>/dev/null || echo "Could not fetch base branch, comparing against HEAD"
+
+        # Build exclude pattern for git diff
+        EXCLUDE_PATTERNS="${{ inputs.exclude_patterns }}"
+        EXCLUDE_ARGS=""
+        for pattern in $EXCLUDE_PATTERNS; do
+          EXCLUDE_ARGS="$EXCLUDE_ARGS ':!$pattern'"
+        done
+
+        # Find changed Dart model files (excluding generated files)
+        CHANGED_DART=$(git diff --name-only "$BASE_REF" HEAD -- "${{ inputs.source_models_path }}"/*.dart $EXCLUDE_ARGS 2>/dev/null || \
+                      git diff --name-only "$BASE_BRANCH" HEAD -- "${{ inputs.source_models_path }}"/*.dart $EXCLUDE_ARGS 2>/dev/null || \
+                      git diff --name-only HEAD~1 HEAD -- "${{ inputs.source_models_path }}"/*.dart $EXCLUDE_ARGS 2>/dev/null || \
+                      echo "")
+
+        if [ -z "$CHANGED_DART" ]; then
+          echo "✅ No Dart model files changed in this PR"
+          exit 0
+        fi
+
+        echo "📁 Changed Dart model files:"
+        echo "$CHANGED_DART" | sed 's/^/  - /'
+        echo ""
+
+        FAILED=0
+
+        # Check each changed Dart file has corresponding generated TypeScript file
+        for dart_file in $CHANGED_DART; do
+          model_name=$(basename "$dart_file" .dart)
+          ts_file="${{ inputs.generated_models_path }}/${model_name}.ts"
+
+          echo "Checking generated file for $model_name..."
+
+          if [ ! -f "$ts_file" ]; then
+            echo "  ❌ Missing: $ts_file"
+            FAILED=1
+          else
+            # Check if the generated file was also changed
+            if git diff --name-only "$BASE_REF" HEAD -- "$ts_file" 2>/dev/null | grep -q "$ts_file" || \
+               git diff --name-only "$BASE_BRANCH" HEAD -- "$ts_file" 2>/dev/null | grep -q "$ts_file" || \
+               git diff --name-only HEAD~1 HEAD -- "$ts_file" 2>/dev/null | grep -q "$ts_file"; then
+              echo "  ✅ Found and changed: $ts_file"
+            else
+              echo "  ⚠️  Found but not changed: $ts_file (may need regeneration)"
+              FAILED=1
+            fi
+          fi
+        done
+
+        echo ""
+        if [ $FAILED -eq 1 ]; then
+          echo "❌ Some generated files are missing or out of sync with changed Dart models."
+          echo "   Please run '${{ inputs.generation_script_path }}' and commit the generated files."
+          exit 1
+        else
+          echo "✅ All changed Dart models have matching generated TypeScript files!"
+        fi
+
     - name: Check for relevant changes
-      if: inputs.check_for_changes == 'true'
+      if: inputs.check_for_changes == 'true' && inputs.quick_check != 'true'
       shell: bash
       id: check-relevant-changes
       run: |
@@ -100,33 +186,33 @@ runs:
         fi
 
     - name: Set up Flutter
-      if: inputs.check_for_changes != 'true' || steps.check-relevant-changes.outputs.has_changes != 'false'
+      if: inputs.quick_check != 'true' && (inputs.check_for_changes != 'true' || steps.check-relevant-changes.outputs.has_changes != 'false')
       uses: subosito/flutter-action@v2
       with:
         flutter-version: ${{ inputs.flutter_version }}
         channel: ${{ inputs.flutter_channel }}
 
     - name: Set up Node.js
-      if: inputs.check_for_changes != 'true' || steps.check-relevant-changes.outputs.has_changes != 'false'
+      if: inputs.quick_check != 'true' && (inputs.check_for_changes != 'true' || steps.check-relevant-changes.outputs.has_changes != 'false')
       uses: actions/setup-node@v4
       with:
         node-version: ${{ inputs.node_version }}
 
     - name: Set up JDK
-      if: inputs.check_for_changes != 'true' || steps.check-relevant-changes.outputs.has_changes != 'false'
+      if: inputs.quick_check != 'true' && (inputs.check_for_changes != 'true' || steps.check-relevant-changes.outputs.has_changes != 'false')
       uses: actions/setup-java@v4
       with:
         java-version: ${{ inputs.java_version }}
         distribution: ${{ inputs.java_distribution }}
 
     - name: Get Flutter dependencies
-      if: inputs.check_for_changes != 'true' || steps.check-relevant-changes.outputs.has_changes != 'false'
+      if: inputs.quick_check != 'true' && (inputs.check_for_changes != 'true' || steps.check-relevant-changes.outputs.has_changes != 'false')
       shell: bash
       run: |
         flutter pub get
 
     - name: Generate TypeScript code from freezed models
-      if: inputs.check_for_changes != 'true' || steps.check-relevant-changes.outputs.has_changes != 'false'
+      if: inputs.quick_check != 'true' && (inputs.check_for_changes != 'true' || steps.check-relevant-changes.outputs.has_changes != 'false')
       shell: bash
       run: |
         if [ -f "${{ inputs.generation_script_path }}" ]; then
@@ -138,7 +224,7 @@ runs:
         fi
 
     - name: Check for uncommitted changes in generated files
-      if: inputs.check_for_changes != 'true' || steps.check-relevant-changes.outputs.has_changes != 'false'
+      if: inputs.quick_check != 'true' && (inputs.check_for_changes != 'true' || steps.check-relevant-changes.outputs.has_changes != 'false')
       shell: bash
       id: check-changes
       run: |
@@ -193,7 +279,7 @@ runs:
         fi
 
     - name: Verify generated files exist
-      if: inputs.check_for_changes != 'true' || steps.check-relevant-changes.outputs.has_changes != 'false'
+      if: inputs.quick_check != 'true' && (inputs.check_for_changes != 'true' || steps.check-relevant-changes.outputs.has_changes != 'false')
       shell: bash
       run: |
         echo "🔍 Verifying generated TypeScript files exist..."
@@ -245,7 +331,7 @@ runs:
         echo "✅ All generated files exist!"
 
     - name: Show diff if files are out of sync
-      if: failure()
+      if: failure() && inputs.quick_check != 'true'
       shell: bash
       run: |
         echo "📋 Detailed differences in generated files:"

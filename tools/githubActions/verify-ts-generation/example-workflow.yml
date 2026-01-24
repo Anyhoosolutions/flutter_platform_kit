@@ -30,3 +30,21 @@ jobs:
 
       - name: Verify TypeScript generation
         uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/verify-ts-generation@main
+
+  quick-ts-check:
+    name: Quick TypeScript Generation Check (WIP)
+    runs-on: ubuntu-latest
+
+    # Only run for WIP PRs
+    if: ${{ contains(github.event.pull_request.title, 'WIP') }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Full history to compare changes
+
+      - name: Quick check - Changed Dart models have matching generated TypeScript files
+        uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/verify-ts-generation@main
+        with:
+          quick_check: "true"
