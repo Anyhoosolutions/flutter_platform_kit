@@ -61,12 +61,16 @@ Verifies that TypeScript files generated from Dart freezed models are up to date
     SOPS_AGE_KEY: ${{ secrets.SOPS_AGE_KEY }}
 ```
 
-### [build-widgetbook](./build-widgetbook/)
-Builds Widgetbook web application by running build_runner and flutter build web.
+### [build-deploy-flutter-web](./build-deploy-flutter-web/)
+Builds Flutter web applications and deploys them to Firebase Hosting. Supports multiple apps, Widgetbook builds, and custom output directories.
 
 **Usage:**
 ```yaml
-- uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/build-widgetbook@main
+- uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/build-deploy-flutter-web@main
+  with:
+    target_file: "lib/main.dart"
+    firebase_project_id: "my-project-id"
+    firebase_hosting_target: "app"
 ```
 
 ## Structure

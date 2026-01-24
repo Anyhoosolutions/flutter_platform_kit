@@ -1,0 +1,55 @@
+name: Deploy Flutter Web
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.38.4"
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      # Example 1: Simple build and deploy
+      - name: Build and deploy main app
+        uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/build-deploy-flutter-web@main
+        with:
+          target_file: "lib/main.dart"
+          firebase_project_id: "my-project-id"
+          firebase_hosting_target: "app"
+
+      # Example 2: Widgetbook build and deploy
+      - name: Build and deploy Widgetbook
+        uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/build-deploy-flutter-web@main
+        with:
+          is_widgetbook: "true"
+          widgetbook_dir: "widgetbook"
+          firebase_project_id: "my-project-id"
+          firebase_hosting_target: "widgetbook"
+
+      # Example 3: Multiple apps with custom output directories
+      - name: Build and deploy restaurant app
+        uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/build-deploy-flutter-web@main
+        with:
+          target_file: "lib/restaurant/restaurant_main.dart"
+          copy_to_output: "true"
+          output_dir: "web_restaurant"
+          firebase_project_id: "my-project-id"
+          firebase_hosting_target: "restaurant"
+
+      # Example 4: Deploy with multiple services
+      - name: Build and deploy with functions
+        uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/build-deploy-flutter-web@main
+        with:
+          target_file: "lib/main.dart"
+          firebase_project_id: "my-project-id"
+          firebase_deploy_only: "hosting:app,functions,firestore,storage"
+          firebase_deploy_args: "--non-interactive"
