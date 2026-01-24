@@ -18,6 +18,22 @@ jobs:
         with:
           app_name: "My App"
           verify_files: "lib/firebase_options.dart,firebase_service_account.json"
+          # Analysis options
+          update_analysis_options: "true"
+          analysis_options_ci_file: "analysis_options.yaml-ci"
+          # Firebase setup
+          setup_firebase: "true"
+          firebase_project_id: "my-project-id"
+          firebase_service_account_path: "firebase_service_account.json"
+          # Functions build
+          build_functions: "true"
+          functions_path: "functions"
+          functions_chmod_biome: "true"
+          # Flutter setup
+          setup_flutter: "true"
+          flutter_version: "3.38.4"
+          flutter_channel: "stable"
+          flutter_analyze: "true"
         env:
           SOPS_AGE_KEY: ${{ secrets.SOPS_AGE_KEY }}
 
@@ -26,3 +42,7 @@ jobs:
       # - Environment variables from .env are loaded
       # - Release notes are in deploy/release_notes.txt
       # - release_info.dart has been updated with build info
+      # - Firebase CLI is installed and authenticated
+      # - Functions are built and ready
+      # - Flutter is set up and dependencies are cached
+      # - Flutter analyze has been run
