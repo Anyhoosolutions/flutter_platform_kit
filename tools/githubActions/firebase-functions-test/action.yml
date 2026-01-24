@@ -67,20 +67,54 @@ runs:
     - name: Install Firebase Emulator
       shell: bash
       run: |
+        set -e
+        echo "Installing Firebase CLI..."
         npm install -g firebase-tools
+        echo "✅ Firebase CLI installed: $(firebase --version)"
 
     - name: Install Dependencies
       shell: bash
       run: |
+        set -e
         cd "${{ inputs.functions_path }}"
+        echo "Running install command: ${{ inputs.install_command }}"
         ${{ inputs.install_command }}
 
     - name: Build TypeScript
       if: inputs.build_command != ''
       shell: bash
       run: |
+        set -e
         cd "${{ inputs.functions_path }}"
+        echo "Running build command: ${{ inputs.build_command }}"
         ${{ inputs.build_command }}
+        echo "✅ Build completed successfully"
+
+    - name: Verify Functions Directory
+      shell: bash
+      run: |
+        set -e
+        cd "${{ inputs.functions_path }}"
+        echo "Verifying functions directory structure..."
+        echo "Current directory: $(pwd)"
+        echo "Directory contents:"
+        ls -la
+        if [ ! -f "package.json" ]; then
+          echo "❌ Error: package.json not found in ${{ inputs.functions_path }}"
+          exit 1
+        fi
+        # Check for common entry points
+        if [ -f "index.js" ]; then
+          echo "✅ Found index.js"
+        elif [ -f "lib/index.js" ]; then
+          echo "✅ Found lib/index.js"
+        elif [ -f "src/index.js" ]; then
+          echo "✅ Found src/index.js"
+        else
+          echo "⚠️  Warning: No index.js found in common locations (root, lib/, or src/)"
+          echo "Firebase Functions typically expects an entry point file"
+        fi
+        echo "✅ Functions directory verified"
 
     - name: Run Functions Tests
       shell: bash
@@ -92,5 +126,7 @@ runs:
         GCLOUD_PROJECT: ${{ inputs.firebase_project_id }}
         NODE_ENV: "test"
       run: |
+        set -e
         cd "${{ inputs.functions_path }}"
+        echo "Running tests with Firebase emulators..."
         firebase --project ${{ inputs.firebase_project_id }} emulators:exec --only ${{ inputs.emulators }} "${{ inputs.test_command }}"
