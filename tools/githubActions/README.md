@@ -22,6 +22,14 @@ Checks if a version has been updated in a pull request compared to the base bran
 - uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/check-version@main
 ```
 
+### [firebase-functions-quality](./firebase-functions-quality/)
+Runs linting and tests for Firebase Functions. Supports configurable linters and test commands.
+
+**Usage:**
+```yaml
+- uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/firebase-functions-quality@main
+```
+
 ## Structure
 
 Each action is in its own subdirectory with:
