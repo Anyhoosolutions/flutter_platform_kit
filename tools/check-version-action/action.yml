@@ -1,0 +1,93 @@
+name: "Check Version"
+description: "Check if version has been updated in a pull request compared to the base branch"
+
+inputs:
+  base_branch:
+    description: "Base branch to compare against (defaults to PR base branch or main)"
+    required: false
+    default: ""
+  version_file:
+    description: "Path to the version file (e.g., pubspec.yaml, package.json)"
+    required: false
+    default: "pubspec.yaml"
+  version_pattern:
+    description: 'Pattern to extract version (e.g., ''version:'' for pubspec.yaml, ''"version":'' for package.json)'
+    required: false
+    default: "version:"
+  fail_if_same:
+    description: "Whether to fail if version is the same (default: true)"
+    required: false
+    default: "true"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Determine base branch
+      shell: bash
+      id: base
+      run: |
+        if [ -n "${{ inputs.base_branch }}" ]; then
+          BASE_REF="${{ inputs.base_branch }}"
+        elif [ "${{ github.event_name }}" == "pull_request" ]; then
+          BASE_REF="${{ github.event.pull_request.base.ref }}"
+        else
+          BASE_REF="main"
+        fi
+        echo "base_ref=$BASE_REF" >> $GITHUB_OUTPUT
+        echo "Using base branch: $BASE_REF"
+
+    - name: Checkout base branch
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ steps.base.outputs.base_ref }}
+        path: base
+
+    - name: Compare versions
+      shell: bash
+      run: |
+        BASE_REF="${{ steps.base.outputs.base_ref }}"
+        VERSION_FILE="${{ inputs.version_file }}"
+        VERSION_PATTERN="${{ inputs.version_pattern }}"
+
+        # Extract version from current branch
+        if [ ! -f "$VERSION_FILE" ]; then
+          echo "❌ Error: Version file '$VERSION_FILE' not found in current branch"
+          exit 1
+        fi
+        CURRENT_VERSION=$(grep "$VERSION_PATTERN" "$VERSION_FILE" | sed "s/$VERSION_PATTERN//" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | head -n 1)
+
+        # Extract version from base branch
+        if [ ! -f "base/$VERSION_FILE" ]; then
+          echo "❌ Error: Version file '$VERSION_FILE' not found in base branch '$BASE_REF'"
+          exit 1
+        fi
+        BASE_VERSION=$(grep "$VERSION_PATTERN" "base/$VERSION_FILE" | sed "s/$VERSION_PATTERN//" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | head -n 1)
+
+        echo "Base branch version ($BASE_REF): $BASE_VERSION"
+        echo "Current branch version: $CURRENT_VERSION"
+
+        if [ -z "$CURRENT_VERSION" ]; then
+          echo "❌ Error: Could not extract version from current branch"
+          exit 1
+        fi
+
+        if [ -z "$BASE_VERSION" ]; then
+          echo "❌ Error: Could not extract version from base branch"
+          exit 1
+        fi
+
+        if [ "$CURRENT_VERSION" == "$BASE_VERSION" ]; then
+          if [ "${{ inputs.fail_if_same }}" == "true" ]; then
+            echo "❌ Error: The version in $VERSION_FILE has not been updated."
+            echo "   Base branch ($BASE_REF): $BASE_VERSION"
+            echo "   Current branch: $CURRENT_VERSION"
+            exit 1
+          else
+            echo "⚠️  Warning: The version in $VERSION_FILE is the same as the base branch."
+            echo "   Version: $CURRENT_VERSION"
+          fi
+        else
+          echo "✅ Success: The version in $VERSION_FILE has been updated."
+          echo "   Base branch ($BASE_REF): $BASE_VERSION"
+          echo "   Current branch: $CURRENT_VERSION"
+        fi
