@@ -73,6 +73,18 @@ Builds Flutter web applications and deploys them to Firebase Hosting. Supports m
     firebase_hosting_target: "app"
 ```
 
+### [build-deploy-flutter-apk](./build-deploy-flutter-apk/)
+Builds Flutter APK files and deploys them to Firebase App Distribution. Supports flavors, release notes, and tester groups.
+
+**Usage:**
+```yaml
+- uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/build-deploy-flutter-apk@main
+  with:
+    target_file: "lib/main.dart"
+    flavor: "shucked"
+    groups: "testers"
+```
+
 ## Structure
 
 Each action is in its own subdirectory with:
