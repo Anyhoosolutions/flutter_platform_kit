@@ -1,0 +1,21 @@
+name: Tests Firebase Functions
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  firebase-functions-tests:
+    runs-on: ubuntu-latest
+    # Skip if PR title contains "WIP: "
+    if: ${{ !contains(github.event.pull_request.title, 'WIP') }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/firebase-functions-test@main
+        with:
+          firebase_project_id: "your-project-id"
+          firebase_auth_emulator_host: "127.0.0.1:9099"
+          firestore_emulator_host: "127.0.0.1:8080"
+          firebase_functions_emulator_host: "127.0.0.1:5001"

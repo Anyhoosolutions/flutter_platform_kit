@@ -30,6 +30,16 @@ Runs linting and tests for Firebase Functions. Supports configurable linters and
 - uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/firebase-functions-quality@main
 ```
 
+### [firebase-functions-test](./firebase-functions-test/)
+Runs tests for Firebase Functions using Firebase Emulators. Handles Node.js, Java setup, and emulator configuration.
+
+**Usage:**
+```yaml
+- uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/firebase-functions-test@main
+  with:
+    firebase_project_id: "your-project-id"
+```
+
 ## Structure
 
 Each action is in its own subdirectory with:

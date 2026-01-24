@@ -1,0 +1,96 @@
+name: "Firebase Functions Test"
+description: "Run tests for Firebase Functions using Firebase Emulators"
+
+inputs:
+  functions_path:
+    description: "Path to the functions directory"
+    required: false
+    default: "functions"
+  node_version:
+    description: "Node.js version to use"
+    required: false
+    default: "20"
+  java_version:
+    description: "Java version to use"
+    required: false
+    default: "21"
+  java_distribution:
+    description: "Java distribution to use"
+    required: false
+    default: "temurin"
+  firebase_project_id:
+    description: "Firebase project ID for emulator"
+    required: true
+  install_command:
+    description: "Command to install dependencies"
+    required: false
+    default: "npm install"
+  build_command:
+    description: "Command to build TypeScript/compile code (set to empty string to skip)"
+    required: false
+    default: "npm run build"
+  test_command:
+    description: "Command to run tests"
+    required: false
+    default: "npm test"
+  emulators:
+    description: "Comma-separated list of emulators to start (e.g., 'functions,firestore')"
+    required: false
+    default: "functions,firestore"
+  firebase_auth_emulator_host:
+    description: "Firebase Auth emulator host"
+    required: false
+    default: "127.0.0.1:9099"
+  firestore_emulator_host:
+    description: "Firestore emulator host"
+    required: false
+    default: "127.0.0.1:8080"
+  firebase_functions_emulator_host:
+    description: "Firebase Functions emulator host"
+    required: false
+    default: "127.0.0.1:5001"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node_version }}
+
+    - name: Set up JDK
+      uses: actions/setup-java@v4
+      with:
+        java-version: ${{ inputs.java_version }}
+        distribution: ${{ inputs.java_distribution }}
+
+    - name: Install Firebase Emulator
+      shell: bash
+      run: |
+        npm install -g firebase-tools
+
+    - name: Install Dependencies
+      shell: bash
+      run: |
+        cd "${{ inputs.functions_path }}"
+        ${{ inputs.install_command }}
+
+    - name: Build TypeScript
+      if: inputs.build_command != ''
+      shell: bash
+      run: |
+        cd "${{ inputs.functions_path }}"
+        ${{ inputs.build_command }}
+
+    - name: Run Functions Tests
+      shell: bash
+      env:
+        CI: "true"
+        FIREBASE_AUTH_EMULATOR_HOST: ${{ inputs.firebase_auth_emulator_host }}
+        FIRESTORE_EMULATOR_HOST: ${{ inputs.firestore_emulator_host }}
+        FIREBASE_FUNCTIONS_EMULATOR_HOST: ${{ inputs.firebase_functions_emulator_host }}
+        GCLOUD_PROJECT: ${{ inputs.firebase_project_id }}
+        NODE_ENV: "test"
+      run: |
+        cd "${{ inputs.functions_path }}"
+        firebase --project ${{ inputs.firebase_project_id }} emulators:exec --only ${{ inputs.emulators }} "${{ inputs.test_command }}"
