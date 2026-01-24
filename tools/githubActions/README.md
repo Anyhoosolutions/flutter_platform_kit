@@ -48,6 +48,27 @@ Verifies that TypeScript files generated from Dart freezed models are up to date
 - uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/verify-ts-generation@main
 ```
 
+### [prepare-deployment](./prepare-deployment/)
+**Combined action** that verifies version bump, decrypts SOPS secrets, loads environment variables, generates release notes, and updates release_info.dart. All steps are configurable and can be enabled/disabled individually.
+
+**Usage:**
+```yaml
+- uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/prepare-deployment@main
+  with:
+    app_name: "My App"
+    verify_files: "lib/firebase_options.dart,firebase_service_account.json"
+  env:
+    SOPS_AGE_KEY: ${{ secrets.SOPS_AGE_KEY }}
+```
+
+### [build-widgetbook](./build-widgetbook/)
+Builds Widgetbook web application by running build_runner and flutter build web.
+
+**Usage:**
+```yaml
+- uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/build-widgetbook@main
+```
+
 ## Structure
 
 Each action is in its own subdirectory with:

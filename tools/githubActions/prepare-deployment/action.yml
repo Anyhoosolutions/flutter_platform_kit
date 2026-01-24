@@ -1,0 +1,426 @@
+name: "Prepare Deployment"
+description: "Verify version bump, decrypt SOPS secrets, load environment variables, generate release notes, and update release_info.dart"
+
+inputs:
+  # Version verification inputs
+  verify_version:
+    description: "Whether to verify version bump"
+    required: false
+    default: "true"
+  version_file:
+    description: "Path to the version file (e.g., pubspec.yaml)"
+    required: false
+    default: "pubspec.yaml"
+  version_pattern:
+    description: "Pattern to extract version (e.g., 'version:')"
+    required: false
+    default: "version:"
+  require_build_number_increase:
+    description: "Whether to require build number (after +) to increase"
+    required: false
+    default: "true"
+  fail_if_no_previous_version:
+    description: "Whether to fail if no previous version is found"
+    required: false
+    default: "true"
+
+  # SOPS decryption inputs
+  decrypt_secrets:
+    description: "Whether to decrypt SOPS secrets"
+    required: false
+    default: "true"
+  sops_version:
+    description: "SOPS version to install"
+    required: false
+    default: "v3.7.3"
+  decrypt_script_url:
+    description: "URL to the decrypt-secrets.sh script"
+    required: false
+    default: "https://raw.githubusercontent.com/Anyhoosolutions/flutter_platform_kit/main/tools/sops_secrets/decrypt-secrets.sh"
+  verify_files:
+    description: "Comma-separated list of files to verify exist after decryption"
+    required: false
+    default: ""
+
+  # Environment loading inputs
+  load_env:
+    description: "Whether to load environment variables from .env"
+    required: false
+    default: "true"
+  env_file:
+    description: "Path to the .env file"
+    required: false
+    default: ".env"
+  env_fail_if_missing:
+    description: "Whether to fail if .env file is not found"
+    required: false
+    default: "true"
+
+  # Release notes inputs
+  generate_release_notes:
+    description: "Whether to generate release notes"
+    required: false
+    default: "true"
+  release_notes_output:
+    description: "Path to output file for release notes"
+    required: false
+    default: "deploy/release_notes.txt"
+  app_name:
+    description: "Application name for release notes header"
+    required: false
+    default: ""
+  commit_count:
+    description: "Number of commits to include in release notes"
+    required: false
+    default: "10"
+
+  # Release info inputs
+  update_release_info:
+    description: "Whether to update release_info.dart file"
+    required: false
+    default: "true"
+  release_info_path:
+    description: "Path to release_info.dart file"
+    required: false
+    default: "lib/features/about/release_info.dart"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Verify version was bumped
+      shell: bash
+      id: version-check
+      if: inputs.verify_version == 'true'
+      run: |
+        set -e  # Exit on any error
+
+        VERSION_FILE="${{ inputs.version_file }}"
+        VERSION_PATTERN="${{ inputs.version_pattern }}"
+
+        # Get current version from version file
+        if [ ! -f "$VERSION_FILE" ]; then
+          echo "❌ Error: Version file '$VERSION_FILE' not found"
+          exit 1
+        fi
+
+        current_version=$(grep "$VERSION_PATTERN" "$VERSION_FILE" | sed "s/$VERSION_PATTERN//" | tr -d ' ' | head -n 1)
+        echo "Current version: $current_version"
+        echo "CURRENT_VERSION=$current_version" >> $GITHUB_ENV
+        echo "current_version=$current_version" >> $GITHUB_OUTPUT
+
+        # Get the previous version - compare against base branch for PRs, HEAD~1 for pushes
+        echo "🔍 Checking if version was changed..."
+
+        if [ "${{ github.event_name }}" = "pull_request" ]; then
+          # For PRs, compare against the base branch
+          BASE_BRANCH="${{ github.event.pull_request.base.ref }}"
+          echo "📋 Comparing PR branch against base branch: $BASE_BRANCH"
+          git fetch origin $BASE_BRANCH:$BASE_BRANCH || true
+          if git rev-parse "$BASE_BRANCH" >/dev/null 2>&1; then
+            previous_version=$(git show "$BASE_BRANCH:$VERSION_FILE" 2>/dev/null | grep "$VERSION_PATTERN" | sed "s/$VERSION_PATTERN//" | tr -d ' ' | head -n 1) || previous_version=""
+          else
+            previous_version=""
+          fi
+        else
+          # For pushes, compare against HEAD~1
+          echo "📋 Comparing against previous commit (HEAD~1)"
+          if git rev-parse HEAD~1 >/dev/null 2>&1; then
+            previous_version=$(git show HEAD~1:"$VERSION_FILE" 2>/dev/null | grep "$VERSION_PATTERN" | sed "s/$VERSION_PATTERN//" | tr -d ' ' | head -n 1) || previous_version=""
+          else
+            previous_version=""
+          fi
+        fi
+
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        echo "📊 Version Comparison:"
+        echo "   Previous version:  $previous_version"
+        echo "   Current version:   $current_version"
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+        # If no previous version exists
+        if [ -z "$previous_version" ]; then
+          if [ "${{ inputs.fail_if_no_previous_version }}" = "true" ]; then
+            echo ""
+            echo "❌ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+            echo "❌ NO PREVIOUS VERSION FOUND!"
+            echo "❌ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+            echo "❌"
+            echo "❌ This appears to be the first deployment or the previous"
+            echo "❌ commit doesn't have a $VERSION_FILE file."
+            echo "❌"
+            echo "❌ For safety, automated deployment requires a previous version"
+            echo "❌ to compare against. Please deploy manually for the first time."
+            echo "❌"
+            echo "❌ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+            exit 1
+          else
+            echo "⚠️  No previous version found, but continuing anyway"
+            echo "version_changed=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+        # Check if version changed
+        elif [ "$current_version" = "$previous_version" ]; then
+          echo ""
+          echo "❌ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "❌ VERSION CHECK FAILED!"
+          echo "❌ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "❌"
+          echo "❌ The version in $VERSION_FILE has NOT changed!"
+          echo "❌   Previous: $previous_version"
+          echo "❌   Current:  $current_version"
+          echo "❌"
+          echo "❌ You must bump the version before deploying."
+          echo "❌"
+          echo "❌ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          exit 1
+        else
+          # Version changed - now verify it's actually higher if required
+          if [ "${{ inputs.require_build_number_increase }}" = "true" ]; then
+            # Extract build number (after +)
+            current_version_code=$(echo "$current_version" | sed 's/.*+//')
+            previous_version_code=$(echo "$previous_version" | sed 's/.*+//')
+
+            echo ""
+            echo "✅ Version changed detected!"
+            echo "   Version code: $previous_version_code → $current_version_code"
+
+            # Verify the build number increased
+            if [ -z "$current_version_code" ] || [ -z "$previous_version_code" ]; then
+              echo ""
+              echo "⚠️  Warning: Could not extract build numbers from versions"
+              echo "   Previous: $previous_version"
+              echo "   Current:  $current_version"
+              echo "   Build numbers should be after '+' (e.g., 1.0.0+123)"
+            elif [ "$current_version_code" -le "$previous_version_code" ]; then
+              echo ""
+              echo "❌ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+              echo "❌ VERSION CODE NOT HIGHER!"
+              echo "❌ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+              echo "❌"
+              echo "❌ Version changed but build number is NOT higher:"
+              echo "❌   Previous: $previous_version (code: $previous_version_code)"
+              echo "❌   Current:  $current_version (code: $current_version_code)"
+              echo "❌"
+              echo "❌ Build number must increase (the number after +)"
+              echo "❌"
+              echo "❌ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+              exit 1
+            else
+              echo ""
+              echo "✅ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+              echo "✅ VERSION CHECK PASSED!"
+              echo "✅ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+              echo "✅ Version bumped: $previous_version → $current_version"
+              echo "✅ Build number increased: $previous_version_code → $current_version_code"
+              echo "✅ Proceeding with deployment..."
+              echo "✅ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+              echo ""
+              echo "version_changed=true" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo ""
+            echo "✅ Version changed: $previous_version → $current_version"
+            echo "version_changed=true" >> $GITHUB_OUTPUT
+          fi
+        fi
+
+    - name: Install SOPS
+      shell: bash
+      if: inputs.decrypt_secrets == 'true'
+      run: |
+        echo "📦 Installing SOPS ${{ inputs.sops_version }}..."
+        wget -O sops https://github.com/mozilla/sops/releases/download/${{ inputs.sops_version }}/sops-${{ inputs.sops_version }}.linux
+        chmod +x sops
+        sudo mv sops /usr/local/bin/
+        echo "✅ SOPS installed"
+        sops --version
+
+    - name: Decrypt secrets with SOPS
+      shell: bash
+      if: inputs.decrypt_secrets == 'true'
+      env:
+        SOPS_AGE_KEY: ${{ secrets.SOPS_AGE_KEY }}
+      run: |
+        echo "🔓 Decrypting secrets with SOPS..."
+        curl -sSL "${{ inputs.decrypt_script_url }}" | bash
+        echo "✅ Secrets decrypted"
+
+    - name: Verify decrypted files
+      shell: bash
+      if: inputs.decrypt_secrets == 'true' && inputs.verify_files != ''
+      run: |
+        echo "🔍 Verifying decrypted files..."
+        IFS=',' read -ra FILES <<< "${{ inputs.verify_files }}"
+        FAILED=0
+
+        for file in "${FILES[@]}"; do
+          file=$(echo "$file" | xargs)  # Trim whitespace
+          if [ -f "$file" ]; then
+            echo "✅ $file exists ($(wc -c < "$file") bytes)"
+
+            # If it's a JSON file, verify it's valid JSON
+            if [[ "$file" == *.json ]]; then
+              if python3 -m json.tool "$file" > /dev/null 2>&1; then
+                echo "✅ $file is valid JSON"
+              else
+                echo "❌ $file is not valid JSON"
+                FAILED=1
+              fi
+            fi
+          else
+            echo "❌ $file not found"
+            FAILED=1
+          fi
+        done
+
+        if [ $FAILED -eq 1 ]; then
+          echo "❌ Some required files are missing or invalid"
+          exit 1
+        fi
+
+        echo "✅ All required files verified"
+
+    - name: Load environment variables from .env
+      shell: bash
+      if: inputs.load_env == 'true'
+      run: |
+        ENV_FILE="${{ inputs.env_file }}"
+
+        echo "🔍 Loading environment variables from $ENV_FILE file..."
+
+        if [ -f "$ENV_FILE" ]; then
+          echo "✅ $ENV_FILE file exists"
+          echo "📏 File size: $(wc -c < "$ENV_FILE") bytes"
+          echo "📋 Variables found in $ENV_FILE (names only):"
+          grep -v '^#' "$ENV_FILE" | grep '=' | cut -d'=' -f1 || echo "No variables found"
+
+          # Load variables into GitHub Environment
+          while IFS='=' read -r key value; do
+            # Skip comments and empty lines
+            if [[ ! "$key" =~ ^# ]] && [[ -n "$key" ]]; then
+              # Remove quotes from value if present
+              value=$(echo "$value" | sed 's/^"//; s/"$//')
+              echo "$key=$value" >> $GITHUB_ENV
+              echo "✅ Loaded: $key"
+            fi
+          done < "$ENV_FILE"
+
+          echo "✅ Environment variables loaded successfully"
+        else
+          if [ "${{ inputs.env_fail_if_missing }}" = "true" ]; then
+            echo "❌ $ENV_FILE file not found!"
+            ls -la | grep env || echo "No .env files in directory"
+            exit 1
+          else
+            echo "⚠️  $ENV_FILE file not found, but continuing anyway"
+          fi
+        fi
+
+    - name: Generate release notes
+      shell: bash
+      if: inputs.generate_release_notes == 'true'
+      run: |
+        OUTPUT_FILE="${{ inputs.release_notes_output }}"
+        APP_NAME="${{ inputs.app_name }}"
+        VERSION="${{ inputs.version }}"
+        COMMIT_COUNT="${{ inputs.commit_count }}"
+
+        # Use version from env if not provided
+        if [ -z "$VERSION" ] && [ -n "$CURRENT_VERSION" ]; then
+          VERSION="$CURRENT_VERSION"
+        fi
+
+        echo "🔍 Generating release notes..."
+
+        # Create output directory if it doesn't exist
+        OUTPUT_DIR=$(dirname "$OUTPUT_FILE")
+        if [ ! -d "$OUTPUT_DIR" ]; then
+          mkdir -p "$OUTPUT_DIR"
+        fi
+
+        # Get commit messages since last merge to main
+        COMMIT_MESSAGES=$(git log --oneline --no-merges -$COMMIT_COUNT | head -$COMMIT_COUNT)
+
+        # Use GitHub's context variables for accurate commit info
+        # For PRs, use the head commit; for pushes, use github.sha
+        if [ "${{ github.event_name }}" = "pull_request" ]; then
+          COMMIT_HASH="${{ github.event.pull_request.head.sha }}"
+          CURRENT_BRANCH="${{ github.event.pull_request.head.ref }}"
+        else
+          COMMIT_HASH="${{ github.sha }}"
+          CURRENT_BRANCH="${{ github.ref_name }}"
+        fi
+        COMMIT_HASH_SHORT="${COMMIT_HASH:0:7}"
+
+        # Build header
+        if [ -n "$APP_NAME" ]; then
+          HEADER="$APP_NAME - Release $VERSION"
+        else
+          HEADER="Release $VERSION"
+        fi
+
+        # Create release notes file
+        cat > "$OUTPUT_FILE" << EOF
+        $HEADER
+        Build: #${{ github.run_number }}
+        Branch: ${CURRENT_BRANCH}
+        Commit: ${COMMIT_HASH_SHORT}
+
+        Changes in this release:
+        ${COMMIT_MESSAGES}
+
+        Deployed on: $(date '+%Y-%m-%d %H:%M:%S')
+        EOF
+
+        echo "📝 Release notes:"
+        cat "$OUTPUT_FILE"
+        echo "✅ Release notes generated and saved to $OUTPUT_FILE"
+
+        # Set output for the file path
+        echo "release_notes_file=$OUTPUT_FILE" >> $GITHUB_OUTPUT
+
+    - name: Update release_info.dart
+      shell: bash
+      if: inputs.update_release_info == 'true'
+      run: |
+        RELEASE_INFO_PATH="${{ inputs.release_info_path }}"
+        VERSION=""
+
+        # Use version from env if not provided
+        if [ -n "$CURRENT_VERSION" ]; then
+          VERSION="$CURRENT_VERSION"
+        fi
+
+        if [ -z "$VERSION" ]; then
+          echo "❌ Version not provided and CURRENT_VERSION not set"
+          exit 1
+        fi
+
+        echo "🔍 Updating $RELEASE_INFO_PATH with build information..."
+
+        # Check if file exists
+        if [ ! -f "$RELEASE_INFO_PATH" ]; then
+          echo "❌ File not found: $RELEASE_INFO_PATH"
+          exit 1
+        fi
+
+        # Set variables from GitHub context
+        if [ "${{ github.event_name }}" = "pull_request" ]; then
+          COMMIT_HASH="${{ github.event.pull_request.head.sha }}"
+          CURRENT_BRANCH="${{ github.event.pull_request.head.ref }}"
+        else
+          COMMIT_HASH="${{ github.sha }}"
+          CURRENT_BRANCH="${{ github.ref_name }}"
+        fi
+        COMMIT_HASH_SHORT="${COMMIT_HASH:0:7}"
+        BUILD_DATE=$(date '+%Y-%m-%d %H:%M:%S')
+
+        # Update release_info.dart file
+        sed -i "s/static final String version = '.*';/static final String version = '$VERSION';/" "$RELEASE_INFO_PATH"
+        sed -i "s/static final String buildDate = '.*';/static final String buildDate = '${BUILD_DATE}';/" "$RELEASE_INFO_PATH"
+        sed -i "s/static final String commitHash = '.*';/static final String commitHash = '${COMMIT_HASH}';/" "$RELEASE_INFO_PATH"
+        sed -i "s/static final String branch = '.*';/static final String branch = '${CURRENT_BRANCH}';/" "$RELEASE_INFO_PATH"
+        sed -i "s/static final String commitHashShort = '.*';/static final String commitHashShort = '${COMMIT_HASH_SHORT}';/" "$RELEASE_INFO_PATH"
+
+        echo "✅ Updated $RELEASE_INFO_PATH:"
+        cat "$RELEASE_INFO_PATH"
