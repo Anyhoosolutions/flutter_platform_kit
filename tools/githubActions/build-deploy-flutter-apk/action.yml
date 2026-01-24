@@ -150,8 +150,28 @@ runs:
           exit 1
         fi
 
-        # Extract app ID using Python
-        APP_ID=$(python3 -c "import json; data = json.load(open('$FIREBASE_JSON')); print(data['$APP_ID_PATH'])")
+        # Extract app ID using Python, supporting nested paths like "flutter.platforms.android.default.appId"
+        APP_ID=$(python3 - << EOF
+import json
+import sys
+
+firebase_json = "$FIREBASE_JSON"
+app_id_path = "$APP_ID_PATH"
+
+with open(firebase_json) as f:
+    data = json.load(f)
+
+current = data
+try:
+    for key in app_id_path.split('.'):
+        current = current[key]
+except KeyError as e:
+    print(f"Failed to traverse path '{app_id_path}'. Missing key: {e}", file=sys.stderr)
+    sys.exit(1)
+
+print(current)
+EOF
+)
 
         if [ -z "$APP_ID" ]; then
           echo "❌ Could not extract Android app ID from $FIREBASE_JSON"
