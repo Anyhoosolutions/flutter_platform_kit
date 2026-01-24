@@ -40,6 +40,14 @@ Runs tests for Firebase Functions using Firebase Emulators. Handles Node.js, Jav
     firebase_project_id: "your-project-id"
 ```
 
+### [verify-ts-generation](./verify-ts-generation/)
+Verifies that TypeScript files generated from Dart freezed models are up to date. Checks for changes, generates files, and verifies they match committed versions.
+
+**Usage:**
+```yaml
+- uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/verify-ts-generation@main
+```
+
 ## Structure
 
 Each action is in its own subdirectory with:
