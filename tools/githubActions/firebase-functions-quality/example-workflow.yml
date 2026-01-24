@@ -1,0 +1,20 @@
+name: Code Quality
+
+on:
+  # push:
+  #   branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    # Skip if PR title contains "WIP: "
+    if: ${{ !contains(github.event.pull_request.title, 'WIP') }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run quality checks
+        uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/firebase-functions-quality@main

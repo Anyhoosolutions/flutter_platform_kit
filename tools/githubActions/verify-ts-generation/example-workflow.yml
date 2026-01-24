@@ -1,0 +1,32 @@
+name: Verify TypeScript Generation from Freezed
+
+# This workflow verifies that:
+# 1. TypeScript files generated from Dart freezed models are up to date
+# 2. Generated files exist for all freezed models
+#
+# It runs on pull requests and pushes to main branch.
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+jobs:
+  verify-ts-generation:
+    name: Verify TypeScript Generation from Freezed
+    runs-on: ubuntu-latest
+
+    # Skip if PR title contains "WIP: "
+    if: ${{ !contains(github.event.pull_request.title, 'WIP') || github.event_name == 'push' }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Full history for git diff
+
+      - name: Verify TypeScript generation
+        uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/verify-ts-generation@main

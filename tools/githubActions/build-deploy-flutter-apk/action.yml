@@ -1,0 +1,230 @@
+name: "Build and Deploy Flutter APK"
+description: "Build Flutter APK and deploy to Firebase App Distribution"
+
+inputs:
+  # Build inputs
+  target_file:
+    description: "Target Dart file to build (e.g., lib/main.dart)"
+    required: true
+  flavor:
+    description: "Build flavor (e.g., shucked, production)"
+    required: false
+    default: ""
+  build_mode:
+    description: "Build mode (release, debug, profile)"
+    required: false
+    default: "release"
+  build_args:
+    description: "Additional arguments for flutter build apk (e.g., --no-tree-shake-icons)"
+    required: false
+    default: ""
+  apk_output_path:
+    description: "Path to the built APK file (relative to workspace root)"
+    required: false
+    default: "build/app/outputs/apk/release/app-release.apk"
+
+  # Gradle caching
+  cache_gradle:
+    description: "Whether to cache Gradle dependencies"
+    required: false
+    default: "true"
+
+  # Firebase App ID
+  firebase_app_id:
+    description: "Firebase Android App ID. If not provided, will be extracted from firebase.json"
+    required: false
+    default: ""
+  firebase_json_path:
+    description: "Path to firebase.json file"
+    required: false
+    default: "firebase.json"
+  app_id_path:
+    description: "Path in firebase.json to extract app ID (e.g., 'flutter.platforms.android.default.appId')"
+    required: false
+    default: "flutter.platforms.android.default.appId"
+
+  # Deployment inputs
+  deploy:
+    description: "Whether to deploy to Firebase App Distribution"
+    required: false
+    default: "true"
+  firebase_project_id:
+    description: "Firebase project ID"
+    required: false
+    default: ""
+  release_notes_file:
+    description: "Path to release notes file"
+    required: false
+    default: "deploy/release_notes.txt"
+  release_notes:
+    description: "Release notes text (alternative to release_notes_file)"
+    required: false
+    default: ""
+  groups:
+    description: "Comma-separated list of tester groups (e.g., 'testers,qa')"
+    required: false
+    default: "testers"
+  testers:
+    description: "Comma-separated list of tester emails"
+    required: false
+    default: ""
+  service_account_path:
+    description: "Path to Firebase service account JSON file"
+    required: false
+    default: "firebase_service_account.json"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Cache Gradle dependencies
+      uses: actions/cache@v3
+      if: inputs.cache_gradle == 'true'
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+          android/.gradle
+        key: ${{ runner.os }}-gradle-${{ hashFiles('android/**/*.gradle*', 'android/**/gradle-wrapper.properties') }}
+        restore-keys: |
+          ${{ runner.os }}-gradle-
+
+    - name: Build Flutter APK
+      shell: bash
+      run: |
+        TARGET_FILE="${{ inputs.target_file }}"
+        FLAVOR="${{ inputs.flavor }}"
+        BUILD_MODE="${{ inputs.build_mode }}"
+        BUILD_ARGS="${{ inputs.build_args }}"
+
+        echo "🔍 Building Flutter APK..."
+        echo "📋 Target: $TARGET_FILE"
+        echo "📋 Mode: $BUILD_MODE"
+
+        # Build command
+        BUILD_CMD="flutter build apk --$BUILD_MODE"
+
+        # Add flavor if provided
+        if [ -n "$FLAVOR" ]; then
+          BUILD_CMD="$BUILD_CMD --flavor $FLAVOR"
+          echo "📋 Flavor: $FLAVOR"
+        fi
+
+        # Add target file
+        BUILD_CMD="$BUILD_CMD -t $TARGET_FILE"
+
+        # Add additional arguments
+        if [ -n "$BUILD_ARGS" ]; then
+          BUILD_CMD="$BUILD_CMD $BUILD_ARGS"
+        fi
+
+        echo "🚀 Running: $BUILD_CMD"
+        $BUILD_CMD
+
+        echo "✅ APK build completed"
+
+        # Determine APK path if not explicitly set
+        if [ "${{ inputs.apk_output_path }}" = "build/app/outputs/apk/release/app-release.apk" ]; then
+          # Auto-detect APK path based on flavor
+          if [ -n "$FLAVOR" ]; then
+            # Try flavor-specific path
+            FLAVOR_APK_PATH="build/app/outputs/apk/$FLAVOR/release/app-$FLAVOR-release.apk"
+            if [ -f "$FLAVOR_APK_PATH" ]; then
+              echo "APK_OUTPUT_PATH=$FLAVOR_APK_PATH" >> $GITHUB_ENV
+              echo "📦 Detected APK at: $FLAVOR_APK_PATH"
+            fi
+          fi
+        fi
+
+    - name: Extract Firebase Android App ID
+      shell: bash
+      id: firebase-app-id
+      if: inputs.deploy == 'true' && inputs.firebase_app_id == ''
+      run: |
+        FIREBASE_JSON="${{ inputs.firebase_json_path }}"
+        APP_ID_PATH="${{ inputs.app_id_path }}"
+
+        echo "🔍 Extracting Firebase Android App ID from $FIREBASE_JSON..."
+
+        if [ ! -f "$FIREBASE_JSON" ]; then
+          echo "❌ Firebase JSON file not found: $FIREBASE_JSON"
+          exit 1
+        fi
+
+        # Extract app ID using Python
+        APP_ID=$(python3 -c "import json; data = json.load(open('$FIREBASE_JSON')); print(data['$APP_ID_PATH'])")
+
+        if [ -z "$APP_ID" ]; then
+          echo "❌ Could not extract Android app ID from $FIREBASE_JSON"
+          echo "📋 Tried path: $APP_ID_PATH"
+          exit 1
+        fi
+
+        echo "✅ Extracted Android app ID: $APP_ID"
+        echo "FIREBASE_APP_ID_ANDROID=$APP_ID" >> $GITHUB_ENV
+        echo "app_id=$APP_ID" >> $GITHUB_OUTPUT
+
+    - name: Set Firebase App ID
+      shell: bash
+      if: inputs.deploy == 'true' && inputs.firebase_app_id != ''
+      run: |
+        echo "✅ Using provided Firebase Android App ID: ${{ inputs.firebase_app_id }}"
+        echo "FIREBASE_APP_ID_ANDROID=${{ inputs.firebase_app_id }}" >> $GITHUB_ENV
+
+    - name: Deploy to Firebase App Distribution
+      shell: bash
+      if: inputs.deploy == 'true'
+      env:
+        GOOGLE_APPLICATION_CREDENTIALS: ${{ github.workspace }}/${{ inputs.service_account_path }}
+      run: |
+        # Use environment variable if set (auto-detected), otherwise use input
+        if [ -n "$APK_OUTPUT_PATH" ]; then
+          APK_PATH="$APK_OUTPUT_PATH"
+        else
+          APK_PATH="${{ inputs.apk_output_path }}"
+        fi
+        RELEASE_NOTES_FILE="${{ inputs.release_notes_file }}"
+        RELEASE_NOTES="${{ inputs.release_notes }}"
+        GROUPS="${{ inputs.groups }}"
+        TESTERS="${{ inputs.testers }}"
+
+        echo "🔍 Using service account authentication"
+        echo "📋 Service account file: $GOOGLE_APPLICATION_CREDENTIALS"
+        echo "🔍 Using Firebase Android App ID: $FIREBASE_APP_ID_ANDROID"
+
+        # Check if APK exists
+        if [ ! -f "$APK_PATH" ]; then
+          echo "❌ APK file not found: $APK_PATH"
+          exit 1
+        fi
+
+        echo "📦 APK file: $APK_PATH ($(du -h "$APK_PATH" | cut -f1))"
+
+        # Build deploy command
+        DEPLOY_CMD="firebase appdistribution:distribute \"$APK_PATH\" --app \"$FIREBASE_APP_ID_ANDROID\""
+
+        # Add release notes
+        if [ -n "$RELEASE_NOTES_FILE" ] && [ -f "$RELEASE_NOTES_FILE" ]; then
+          DEPLOY_CMD="$DEPLOY_CMD --release-notes-file \"$RELEASE_NOTES_FILE\""
+          echo "📝 Using release notes from: $RELEASE_NOTES_FILE"
+        elif [ -n "$RELEASE_NOTES" ]; then
+          DEPLOY_CMD="$DEPLOY_CMD --release-notes \"$RELEASE_NOTES\""
+          echo "📝 Using provided release notes text"
+        fi
+
+        # Add groups
+        if [ -n "$GROUPS" ]; then
+          DEPLOY_CMD="$DEPLOY_CMD --groups \"$GROUPS\""
+          echo "👥 Distributing to groups: $GROUPS"
+        fi
+
+        # Add testers
+        if [ -n "$TESTERS" ]; then
+          DEPLOY_CMD="$DEPLOY_CMD --testers \"$TESTERS\""
+          echo "👥 Distributing to testers: $TESTERS"
+        fi
+
+        echo "🚀 Deploying to Firebase App Distribution..."
+        echo "📋 Command: $DEPLOY_CMD"
+        $DEPLOY_CMD
+
+        echo "✅ Deployment completed"

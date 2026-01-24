@@ -1,0 +1,274 @@
+name: "Verify TypeScript Generation"
+description: "Verify that TypeScript files generated from Dart freezed models are up to date"
+
+inputs:
+  source_models_path:
+    description: "Path to source Dart models directory (e.g., lib/sharedModels)"
+    required: false
+    default: "lib/sharedModels"
+  generated_models_path:
+    description: "Path to generated TypeScript models directory (e.g., functions/src/generatedModels)"
+    required: false
+    default: "functions/src/generatedModels"
+  generation_script_path:
+    description: "Path to the generation script (e.g., scripts/generate-ts-from-freezed.sh)"
+    required: false
+    default: "scripts/generate-ts-from-freezed.sh"
+  flutter_version:
+    description: "Flutter version to use"
+    required: false
+    default: "3.38.4"
+  flutter_channel:
+    description: "Flutter channel to use"
+    required: false
+    default: "stable"
+  node_version:
+    description: "Node.js version to use"
+    required: false
+    default: "22"
+  java_version:
+    description: "Java version to use"
+    required: false
+    default: "21"
+  java_distribution:
+    description: "Java distribution to use"
+    required: false
+    default: "temurin"
+  check_for_changes:
+    description: "Whether to check for changes in source/generated directories before running (skip if no changes)"
+    required: false
+    default: "true"
+  exclude_patterns:
+    description: "Space-separated patterns to exclude when checking for changes (e.g., '*.freezed.dart *.g.dart')"
+    required: false
+    default: "*.freezed.dart *.g.dart"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Check for relevant changes
+      if: inputs.check_for_changes == 'true'
+      shell: bash
+      id: check-relevant-changes
+      run: |
+        echo "🔍 Checking if there are any changes in source or generated models..."
+
+        # Determine the base commit to compare against
+        if [ "${{ github.event_name }}" == "pull_request" ]; then
+          BASE_REF="${{ github.event.pull_request.base.sha }}"
+          echo "Comparing against PR base: $BASE_REF"
+          git fetch origin "$BASE_REF" 2>/dev/null || echo "Base ref already available"
+        else
+          # For pushes, compare against the previous commit
+          BASE_REF="HEAD~1"
+          echo "Comparing against previous commit"
+        fi
+
+        # Build exclude pattern for git diff
+        EXCLUDE_PATTERNS="${{ inputs.exclude_patterns }}"
+        EXCLUDE_ARGS=""
+        for pattern in $EXCLUDE_PATTERNS; do
+          EXCLUDE_ARGS="$EXCLUDE_ARGS ':!$pattern'"
+        done
+
+        # Check for changes in source models (excluding generated files)
+        SOURCE_CHANGES=$(git diff --name-only "$BASE_REF" HEAD -- "${{ inputs.source_models_path }}/" $EXCLUDE_ARGS 2>/dev/null || echo "")
+
+        # Check for changes in generated models
+        GENERATED_CHANGES=$(git diff --name-only "$BASE_REF" HEAD -- "${{ inputs.generated_models_path }}/" 2>/dev/null || echo "")
+
+        HAS_CHANGES=false
+
+        if [ -n "$SOURCE_CHANGES" ]; then
+          echo "📝 Found changes in source models:"
+          echo "$SOURCE_CHANGES" | sed 's/^/  - /'
+          HAS_CHANGES=true
+        fi
+
+        if [ -n "$GENERATED_CHANGES" ]; then
+          echo "📝 Found changes in generated models:"
+          echo "$GENERATED_CHANGES" | sed 's/^/  - /'
+          HAS_CHANGES=true
+        fi
+
+        if [ "$HAS_CHANGES" = "false" ]; then
+          echo "✅ No changes detected in source or generated models"
+          echo "   Skipping TypeScript generation verification"
+          echo "has_changes=false" >> $GITHUB_OUTPUT
+        else
+          echo "has_changes=true" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Set up Flutter
+      if: inputs.check_for_changes != 'true' || steps.check-relevant-changes.outputs.has_changes != 'false'
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: ${{ inputs.flutter_version }}
+        channel: ${{ inputs.flutter_channel }}
+
+    - name: Set up Node.js
+      if: inputs.check_for_changes != 'true' || steps.check-relevant-changes.outputs.has_changes != 'false'
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node_version }}
+
+    - name: Set up JDK
+      if: inputs.check_for_changes != 'true' || steps.check-relevant-changes.outputs.has_changes != 'false'
+      uses: actions/setup-java@v4
+      with:
+        java-version: ${{ inputs.java_version }}
+        distribution: ${{ inputs.java_distribution }}
+
+    - name: Get Flutter dependencies
+      if: inputs.check_for_changes != 'true' || steps.check-relevant-changes.outputs.has_changes != 'false'
+      shell: bash
+      run: |
+        flutter pub get
+
+    - name: Generate TypeScript code from freezed models
+      if: inputs.check_for_changes != 'true' || steps.check-relevant-changes.outputs.has_changes != 'false'
+      shell: bash
+      run: |
+        if [ -f "${{ inputs.generation_script_path }}" ]; then
+          chmod +x "${{ inputs.generation_script_path }}"
+          "${{ inputs.generation_script_path }}"
+        else
+          echo "❌ Error: Generation script not found at ${{ inputs.generation_script_path }}"
+          exit 1
+        fi
+
+    - name: Check for uncommitted changes in generated files
+      if: inputs.check_for_changes != 'true' || steps.check-relevant-changes.outputs.has_changes != 'false'
+      shell: bash
+      id: check-changes
+      run: |
+        echo "🔍 Checking if generated TypeScript files are up to date..."
+        echo ""
+        echo "This step compares the generated files with what's committed in git."
+        echo "If files differ, it means the generated files need to be regenerated and committed."
+        echo ""
+
+        # Show git status for context
+        echo "📋 Git status of generated directory:"
+        echo "--- TypeScript generated files ---"
+        git status --short "${{ inputs.generated_models_path }}/" 2>/dev/null || echo "  (no changes or directory doesn't exist)"
+        echo ""
+
+        # Check TypeScript generated files
+        echo "🔍 Checking TypeScript generated files..."
+        TS_CHANGES=$(git diff --name-only "${{ inputs.generated_models_path }}/" 2>/dev/null || echo "")
+        if [ -n "$TS_CHANGES" ]; then
+          echo "  Found changes in TypeScript files:"
+          echo "$TS_CHANGES" | sed 's/^/    - /'
+          echo ""
+          echo "  Diff summary:"
+          git diff --stat "${{ inputs.generated_models_path }}/" 2>/dev/null || echo "    (unable to show diff)"
+          echo ""
+          echo "  Actual differences:"
+          echo "  ──────────────────────────────────────────────────────────"
+          git diff "${{ inputs.generated_models_path }}/" 2>/dev/null | head -200 || echo "    (unable to show diff)"
+          echo "  ──────────────────────────────────────────────────────────"
+        else
+          echo "  ✅ No TypeScript changes detected"
+        fi
+        echo ""
+
+        if [ -n "$TS_CHANGES" ]; then
+          echo "❌ Generated files are out of date!"
+          echo ""
+          echo "The following files differ from what's committed:"
+          echo "  TypeScript files:"
+          echo "$TS_CHANGES" | sed 's/^/    - /'
+          echo ""
+          echo "To fix this:"
+          echo "  1. Run '${{ inputs.generation_script_path }}' locally"
+          echo "  2. Review the generated files"
+          echo "  3. Commit the generated files:"
+          echo "     git add ${{ inputs.generated_models_path }}/"
+          echo "     git commit -m 'Update generated TypeScript files from freezed models'"
+          exit 1
+        else
+          echo "✅ All generated files are up to date!"
+          echo "   Generated files match what's committed in git."
+        fi
+
+    - name: Verify generated files exist
+      if: inputs.check_for_changes != 'true' || steps.check-relevant-changes.outputs.has_changes != 'false'
+      shell: bash
+      run: |
+        echo "🔍 Verifying generated TypeScript files exist..."
+
+        # Check if source models directory exists
+        if [ ! -d "${{ inputs.source_models_path }}" ]; then
+          echo "⚠️  ${{ inputs.source_models_path }}/ directory not found, skipping verification"
+          exit 0
+        fi
+
+        # Find all Dart model files (excluding generated files)
+        EXCLUDE_PATTERNS="${{ inputs.exclude_patterns }}"
+        FIND_EXCLUDE=""
+        for pattern in $EXCLUDE_PATTERNS; do
+          FIND_EXCLUDE="$FIND_EXCLUDE ! -name '$pattern'"
+        done
+
+        DART_FILES=$(eval "find ${{ inputs.source_models_path }} -name '*.dart' -type f $FIND_EXCLUDE" 2>/dev/null || echo "")
+
+        if [ -z "$DART_FILES" ]; then
+          echo "⚠️  No Dart model files found in ${{ inputs.source_models_path }}/"
+          exit 0
+        fi
+
+        FAILED=0
+
+        for dart_file in $DART_FILES; do
+          # Get the base name without extension
+          model_name=$(basename "$dart_file" .dart)
+          ts_file="${{ inputs.generated_models_path }}/${model_name}.ts"
+          
+          echo "Checking generated file for $model_name..."
+          
+          if [ ! -f "$ts_file" ]; then
+            echo "  ❌ Missing: $ts_file"
+            FAILED=1
+          else
+            echo "  ✅ Found: $ts_file"
+          fi
+        done
+
+        if [ $FAILED -eq 1 ]; then
+          echo ""
+          echo "❌ Some generated files are missing. Please run '${{ inputs.generation_script_path }}'"
+          exit 1
+        fi
+
+        echo ""
+        echo "✅ All generated files exist!"
+
+    - name: Show diff if files are out of sync
+      if: failure()
+      shell: bash
+      run: |
+        echo "📋 Detailed differences in generated files:"
+        echo ""
+        echo "This shows what differs between the committed files and the newly generated files."
+        echo ""
+
+        # Check if there are any changes
+        TS_CHANGES=$(git diff --name-only "${{ inputs.generated_models_path }}/" 2>/dev/null || echo "")
+
+        if [ -n "$TS_CHANGES" ]; then
+          echo "=== TypeScript generated files differences ==="
+          echo ""
+          echo "Files with changes:"
+          echo "$TS_CHANGES" | sed 's/^/  - /'
+          echo ""
+          echo "Full diff:"
+          echo "──────────────────────────────────────────────────────────"
+          git diff "${{ inputs.generated_models_path }}/" || echo "  (unable to show diff)"
+          echo "──────────────────────────────────────────────────────────"
+          echo ""
+        fi
+
+        if [ -z "$TS_CHANGES" ]; then
+          echo "No differences detected (this shouldn't happen if the previous step failed)"
+        fi

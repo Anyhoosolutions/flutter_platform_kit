@@ -1,0 +1,157 @@
+name: "Build and Deploy Flutter Web"
+description: "Build Flutter web application and deploy to Firebase Hosting"
+
+inputs:
+  # Build inputs
+  target_file:
+    description: "Target Dart file to build (e.g., lib/main.dart)"
+    required: true
+  build_mode:
+    description: "Build mode (release, debug, profile)"
+    required: false
+    default: "release"
+  build_args:
+    description: "Additional arguments for flutter build web"
+    required: false
+    default: ""
+  output_dir:
+    description: "Output directory name (e.g., web_app, web_restaurant). If not set, uses default build/web"
+    required: false
+    default: ""
+  copy_to_output:
+    description: "Whether to copy build/web to a custom output directory"
+    required: false
+    default: "false"
+
+  # Widgetbook-specific inputs
+  is_widgetbook:
+    description: "Whether this is a Widgetbook build (runs build_runner first)"
+    required: false
+    default: "false"
+  widgetbook_dir:
+    description: "Path to widgetbook directory (if is_widgetbook is true)"
+    required: false
+    default: "widgetbook"
+  build_runner_args:
+    description: "Additional arguments for build_runner"
+    required: false
+    default: "--delete-conflicting-outputs"
+
+  # Deployment inputs
+  deploy:
+    description: "Whether to deploy to Firebase Hosting"
+    required: false
+    default: "true"
+  firebase_project_id:
+    description: "Firebase project ID"
+    required: true
+  firebase_hosting_target:
+    description: "Firebase hosting target (e.g., app, restaurant, admin, widgetbook)"
+    required: false
+    default: ""
+  firebase_deploy_only:
+    description: "Firebase deploy --only flag (e.g., 'hosting:app,functions,firestore,storage' or 'hosting:restaurant')"
+    required: false
+    default: ""
+  firebase_deploy_args:
+    description: "Additional arguments for firebase deploy (e.g., --non-interactive)"
+    required: false
+    default: ""
+  service_account_path:
+    description: "Path to Firebase service account JSON file"
+    required: false
+    default: "firebase_service_account.json"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Build Flutter Web
+      shell: bash
+      run: |
+        TARGET_FILE="${{ inputs.target_file }}"
+        BUILD_MODE="${{ inputs.build_mode }}"
+        BUILD_ARGS="${{ inputs.build_args }}"
+        OUTPUT_DIR="${{ inputs.output_dir }}"
+        COPY_TO_OUTPUT="${{ inputs.copy_to_output }}"
+        IS_WIDGETBOOK="${{ inputs.is_widgetbook }}"
+        WIDGETBOOK_DIR="${{ inputs.widgetbook_dir }}"
+
+        if [ "$IS_WIDGETBOOK" = "true" ]; then
+          echo "🔍 Building Widgetbook..."
+          
+          # Check if widgetbook directory exists
+          if [ ! -d "$WIDGETBOOK_DIR" ]; then
+            echo "❌ Widgetbook directory not found: $WIDGETBOOK_DIR"
+            exit 1
+          fi
+          
+          cd "$WIDGETBOOK_DIR"
+          
+          # Run build_runner
+          echo "📦 Running build_runner..."
+          dart run build_runner build ${{ inputs.build_runner_args }}
+          
+          # Build web
+          echo "🌐 Building web..."
+          flutter build web $BUILD_ARGS
+          
+          echo "✅ Build Widgetbook completed and is in $WIDGETBOOK_DIR/build/web"
+          
+          cd ..
+        else
+          echo "🔍 Building Flutter Web..."
+          echo "📋 Target: $TARGET_FILE"
+          echo "📋 Mode: $BUILD_MODE"
+          
+          # Build Flutter web
+          flutter build web --$BUILD_MODE -t "$TARGET_FILE" $BUILD_ARGS
+          
+          # Copy to custom output directory if requested
+          if [ "$COPY_TO_OUTPUT" = "true" ] && [ -n "$OUTPUT_DIR" ]; then
+            echo "📁 Copying build/web to build/$OUTPUT_DIR..."
+            mkdir -p "build/$OUTPUT_DIR"
+            cp -r build/web/* "build/$OUTPUT_DIR"
+            echo "✅ Build completed and copied to build/$OUTPUT_DIR"
+          else
+            echo "✅ Build Flutter Web completed in build/web"
+          fi
+        fi
+
+    - name: Deploy to Firebase Hosting
+      shell: bash
+      if: inputs.deploy == 'true'
+      env:
+        GOOGLE_APPLICATION_CREDENTIALS: ${{ github.workspace }}/${{ inputs.service_account_path }}
+      run: |
+        FIREBASE_PROJECT_ID="${{ inputs.firebase_project_id }}"
+        FIREBASE_HOSTING_TARGET="${{ inputs.firebase_hosting_target }}"
+        FIREBASE_DEPLOY_ONLY="${{ inputs.firebase_deploy_only }}"
+        FIREBASE_DEPLOY_ARGS="${{ inputs.firebase_deploy_args }}"
+        IS_WIDGETBOOK="${{ inputs.is_widgetbook }}"
+        WIDGETBOOK_DIR="${{ inputs.widgetbook_dir }}"
+
+        echo "🔍 Using service account authentication"
+        echo "📋 Service account file: $GOOGLE_APPLICATION_CREDENTIALS"
+
+        # Determine deploy command
+        if [ -n "$FIREBASE_DEPLOY_ONLY" ]; then
+          # Use explicit --only flag
+          DEPLOY_CMD="firebase deploy --only $FIREBASE_DEPLOY_ONLY --project $FIREBASE_PROJECT_ID"
+        elif [ -n "$FIREBASE_HOSTING_TARGET" ]; then
+          # Use hosting target
+          DEPLOY_CMD="firebase deploy --only hosting:$FIREBASE_HOSTING_TARGET --project $FIREBASE_PROJECT_ID"
+        else
+          # Default to hosting only
+          DEPLOY_CMD="firebase deploy --only hosting --project $FIREBASE_PROJECT_ID"
+        fi
+
+        # Add additional arguments if provided
+        if [ -n "$FIREBASE_DEPLOY_ARGS" ]; then
+          DEPLOY_CMD="$DEPLOY_CMD $FIREBASE_DEPLOY_ARGS"
+        fi
+
+        echo "🚀 Deploying to Firebase..."
+        echo "📋 Command: $DEPLOY_CMD"
+        $DEPLOY_CMD
+
+        echo "✅ Deployment completed"

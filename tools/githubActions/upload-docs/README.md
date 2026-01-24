@@ -4,7 +4,7 @@ A simple, reusable GitHub Actions composite action for uploading documentation t
 
 ## Location
 
-This action is located in `tools/upload-docs-action/` to make it easy to share across repositories.
+This action is located in `tools/githubActions/upload-docs/` to make it easy to share across repositories.
 
 ## Features
 
@@ -13,6 +13,17 @@ This action is located in `tools/upload-docs-action/` to make it easy to share a
 - ✅ Runs documentation upload
 - ✅ Posts PR comment with documentation link (if on PR branch)
 
+## Installation in Other Repositories
+
+To use this action in another repository:
+
+1. Copy the `tools/githubActions/upload-docs/` directory to your repository:
+   ```bash
+   # From your repository root
+   mkdir -p .github/actions
+   cp -r path/to/flutter_platform_kit/tools/githubActions/upload-docs .github/actions/upload-docs
+   ```
+
 ## Usage
 
 ### Recommended: Reference Directly from Repository
@@ -20,7 +31,7 @@ This action is located in `tools/upload-docs-action/` to make it easy to share a
 You can reference this action directly from the repository without copying any files:
 
 ```yaml
-- uses: Anyhoosolutions/flutter_platform_kit/tools/upload-docs-action@main
+- uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/upload-docs@main
   with:
     upload_url: ${{ vars.UPLOAD_URL }}
     dart_sdk: '3.5'
@@ -30,25 +41,6 @@ You can also pin to a specific version, branch, or commit:
 - `@main` - Latest from main branch
 - `@v1.0.0` - Specific tag/version
 - `@abc1234` - Specific commit SHA
-
-### Alternative: Copy to Your Repository
-
-If you need to customize the action or want a local copy:
-
-1. Copy the `tools/upload-docs-action/` directory to your repository:
-   ```bash
-   # From your repository root
-   mkdir -p .github/actions
-   cp -r path/to/flutter_platform_kit/tools/upload-docs-action .github/actions/upload-docs
-   ```
-
-2. Then reference it locally:
-   ```yaml
-   - uses: ./.github/actions/upload-docs
-     with:
-       upload_url: ${{ vars.UPLOAD_URL }}
-       dart_sdk: '3.5'
-   ```
 
 ### Full Example
 
@@ -72,12 +64,11 @@ jobs:
       
       # Your pre-processing steps here (generate TOC, copy files, etc.)
       
-      - uses: Anyhoosolutions/flutter_platform_kit/tools/upload-docs-action@main
+      - uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/upload-docs@main
         with:
           upload_url: ${{ vars.UPLOAD_URL }}
           dart_sdk: '3.5'
           project_root: ${{ github.workspace }}
-          upload_tool_path: 'tools/upload_documentation'
           commit_hash: ${{ github.sha }}  # For branch-based deployments
           pr_docs_base_url: 'https://example.com/documentation'  # For PR comments
 ```
@@ -89,7 +80,6 @@ jobs:
 | `upload_url` | The URL endpoint for uploading documentation | Yes | - |
 | `dart_sdk` | Dart SDK version to use | No | `3.5` |
 | `project_root` | Root directory of the project | No | `${{ github.workspace }}` |
-| `upload_tool_path` | Path to the upload_documentation tool | No | `tools/upload_documentation` |
 | `commit_hash` | Optional commit hash for branch-based deployments | No | `''` |
 | `pr_docs_base_url` | Base URL for PR documentation links | No | `''` |
 
@@ -105,7 +95,7 @@ jobs:
 For PRs or branch-based deployments, provide a `commit_hash`:
 
 ```yaml
-- uses: Anyhoosolutions/flutter_platform_kit/tools/upload-docs-action@main
+- uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/upload-docs@main
   with:
     upload_url: ${{ vars.UPLOAD_URL }}
     commit_hash: ${{ github.sha }}

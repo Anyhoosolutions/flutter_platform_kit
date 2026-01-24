@@ -1,0 +1,60 @@
+name: "Firebase Functions Quality Check"
+description: "Run linting and tests for Firebase Functions"
+
+inputs:
+  functions_path:
+    description: "Path to the functions directory"
+    required: false
+    default: "functions"
+  run_lint:
+    description: "Whether to run linting"
+    required: false
+    default: "true"
+  lint_command:
+    description: "Command to run for linting (e.g., 'npx @biomejs/biome ci .')"
+    required: false
+    default: "npx @biomejs/biome ci ."
+  run_tests:
+    description: "Whether to run tests"
+    required: false
+    default: "false"
+  test_command:
+    description: "Command to run for tests (e.g., 'npm test')"
+    required: false
+    default: "npm test"
+  install_command:
+    description: "Command to install dependencies (e.g., 'npm install')"
+    required: false
+    default: "npm install"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Install Dependencies
+      shell: bash
+      run: |
+        cd "${{ inputs.functions_path }}"
+        ${{ inputs.install_command }}
+
+    - name: Fix Biome permissions (if needed)
+      if: inputs.run_lint == 'true' && contains(inputs.lint_command, 'biome')
+      shell: bash
+      run: |
+        cd "${{ inputs.functions_path }}"
+        if [ -f "node_modules/@biomejs/cli-linux-x64/biome" ]; then
+          chmod +x node_modules/@biomejs/cli-linux-x64/biome
+        fi
+
+    - name: Run Lint
+      if: inputs.run_lint == 'true'
+      shell: bash
+      run: |
+        cd "${{ inputs.functions_path }}"
+        ${{ inputs.lint_command }}
+
+    - name: Run Tests
+      if: inputs.run_tests == 'true'
+      shell: bash
+      run: |
+        cd "${{ inputs.functions_path }}"
+        ${{ inputs.test_command }}
