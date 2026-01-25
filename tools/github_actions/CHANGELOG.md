@@ -1,3 +1,7 @@
+## 1.0.5
+
+- Skip deploying if label exist
+
 ## 1.0.4
 
 - Conditional deployments
