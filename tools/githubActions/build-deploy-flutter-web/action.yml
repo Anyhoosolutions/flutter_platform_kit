@@ -42,6 +42,10 @@ inputs:
     description: "Whether to deploy to Firebase Hosting"
     required: false
     default: "true"
+  deploy_trigger_paths:
+    description: "Newline-separated list of paths/patterns that should trigger deployment. If provided, deployment only occurs if files matching these paths have changed. If empty, deployment happens based on 'deploy' input only."
+    required: false
+    default: ""
   firebase_project_id:
     description: "Firebase project ID"
     required: true
@@ -117,9 +121,91 @@ runs:
           fi
         fi
 
+    - name: Check if deployment should be triggered
+      shell: bash
+      id: check-deploy
+      if: inputs.deploy == 'true' && inputs.deploy_trigger_paths != ''
+      run: |
+        set -e
+
+        DEPLOY_TRIGGER_PATHS="${{ inputs.deploy_trigger_paths }}"
+
+        echo "🔍 Checking if files in trigger paths have changed..."
+        echo "📋 Watching paths:"
+        echo "$DEPLOY_TRIGGER_PATHS" | sed 's/^/  - /'
+        echo ""
+
+        # Determine the base commit to compare against
+        if [ "${{ github.event_name }}" == "pull_request" ]; then
+          BASE_BRANCH="${{ github.event.pull_request.base.ref }}"
+          BASE_REF="${{ github.event.pull_request.base.sha }}"
+          echo "📋 Comparing PR branch against base: $BASE_BRANCH"
+          git fetch origin "$BASE_BRANCH:$BASE_BRANCH" 2>/dev/null || echo "Could not fetch base branch"
+        else
+          # For pushes, compare against the previous commit
+          BASE_REF="HEAD~1"
+          echo "📋 Comparing against previous commit (HEAD~1)"
+        fi
+
+        # Check for changes in each trigger path
+        HAS_CHANGES=false
+        CHANGED_FILES=""
+
+        # Process each path (split by newline)
+        while IFS= read -r path; do
+          # Skip empty lines
+          [ -z "$path" ] && continue
+
+          # Trim whitespace
+          path=$(echo "$path" | xargs)
+
+          # Check if path exists (as file or directory)
+          if [ ! -e "$path" ] && [ ! -d "$path" ]; then
+            echo "⚠️  Path does not exist: $path (will still check git diff)"
+          fi
+
+          # Check for changes using git diff (with fallbacks)
+          CHANGED=""
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            # Try multiple fallback strategies for PRs
+            CHANGED=$(git diff --name-only "$BASE_REF" HEAD -- "$path" 2>/dev/null || \
+                     git diff --name-only "$BASE_BRANCH" HEAD -- "$path" 2>/dev/null || \
+                     git diff --name-only HEAD~1 HEAD -- "$path" 2>/dev/null || \
+                     echo "")
+          else
+            # For pushes, compare against previous commit
+            CHANGED=$(git diff --name-only "$BASE_REF" HEAD -- "$path" 2>/dev/null || echo "")
+          fi
+
+          if [ -n "$CHANGED" ]; then
+            echo "✅ Found changes in: $path"
+            echo "$CHANGED" | sed 's/^/    - /'
+            HAS_CHANGES=true
+            if [ -n "$CHANGED_FILES" ]; then
+              CHANGED_FILES="$CHANGED_FILES"$'\n'"$CHANGED"
+            else
+              CHANGED_FILES="$CHANGED"
+            fi
+          else
+            echo "⏭️  No changes in: $path"
+          fi
+        done <<< "$DEPLOY_TRIGGER_PATHS"
+
+        if [ "$HAS_CHANGES" = "true" ]; then
+          echo ""
+          echo "✅ Deployment will be triggered (files changed in watched paths)"
+          echo "should_deploy=true" >> $GITHUB_OUTPUT
+        else
+          echo ""
+          echo "⏭️  Deployment will be skipped (no changes in watched paths)"
+          echo "should_deploy=false" >> $GITHUB_OUTPUT
+        fi
+
     - name: Deploy to Firebase Hosting
       shell: bash
-      if: inputs.deploy == 'true'
+      if: |
+        inputs.deploy == 'true' && 
+        (inputs.deploy_trigger_paths == '' || steps.check-deploy.outputs.should_deploy == 'true')
       env:
         GOOGLE_APPLICATION_CREDENTIALS: ${{ github.workspace }}/${{ inputs.service_account_path }}
       run: |
