@@ -113,6 +113,7 @@ runs:
             echo "⚠️  No README.md found for $action_name"
           fi
         done
+        ls -r docs
 
     - name: Copy package docs directories
       if: inputs.copy_docs_directories == 'true'
