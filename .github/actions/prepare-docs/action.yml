@@ -42,14 +42,6 @@ inputs:
     description: "Whether to copy additional .md files from package root"
     required: false
     default: "true"
-  copy_github_actions_readmes:
-    description: "Whether to copy README.md files from tools/github_actions subdirectories"
-    required: false
-    default: "true"
-  github_actions_directory:
-    description: "Directory containing GitHub Actions (e.g. tools/github_actions)"
-    required: false
-    default: "tools/github_actions"
 
 runs:
   using: "composite"
@@ -106,11 +98,10 @@ runs:
         done
 
     - name: Copy GitHub Actions READMEs to docs
-      if: inputs.copy_github_actions_readmes == 'true'
       shell: bash
       run: |
         # Copy each tools/github_actions subdir's README.md to docs/{action_name}/README.md
-        for action_dir in ${{ inputs.github_actions_directory }}/*/; do
+        for action_dir in tools/github_actions/*/; do
           [ -d "$action_dir" ] || continue
           action_name=$(basename "$action_dir")
           readme_path="${action_dir}README.md"
