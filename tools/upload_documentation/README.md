@@ -80,6 +80,9 @@ When `--commitHash` is provided:
 
 - `UPLOAD_URL` (required): The HTTP endpoint URL where documentation will be uploaded
   - Can also be set via `-DUPLOAD_URL=...` when running Dart
+- `VERBOSE`: When set to `true` or `1`, prints the JSON payload before uploading (useful for debugging)
+  - Example: `VERBOSE=1 dart bin/upload_documentation.dart --projectRoot=.`
+  - Omit or leave unset for normal runs (e.g. in CI) to avoid noisy logs
 
 ## Project Structure
 
@@ -319,6 +322,16 @@ Check:
 - The endpoint accepts POST requests with `Content-Type: application/json`
 - The service is running and healthy
 - Check the response body in the error message for details
+
+### Inspecting the JSON payload
+
+To see the exact JSON sent to the upload endpoint (e.g. when debugging or verifying structure):
+
+```bash
+VERBOSE=1 dart bin/upload_documentation.dart --projectRoot=/path/to/your/repo
+```
+
+or `VERBOSE=true`. Leave `VERBOSE` unset in CI so logs stay clean.
 
 ## Development
 
