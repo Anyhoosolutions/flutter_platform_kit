@@ -1,3 +1,8 @@
+## 1.0.4
+
+- Conditional deployments
+- Renaming directory. Breaking change!
+
 ## 1.0.3
 
 - Try to fix APK deployment. Try 2

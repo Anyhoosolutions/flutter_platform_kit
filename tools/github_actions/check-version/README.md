@@ -4,7 +4,7 @@ A reusable GitHub Actions composite action for checking if a version has been up
 
 ## Location
 
-This action is located in `tools/githubActions/check-version/` to make it easy to share across repositories.
+This action is located in `tools/github_actions/check-version/` to make it easy to share across repositories.
 
 ## Features
 
@@ -20,7 +20,7 @@ This action is located in `tools/githubActions/check-version/` to make it easy t
 You can reference this action directly from the repository without copying any files:
 
 ```yaml
-- uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/check-version@main
+- uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/check-version@main
 ```
 
 You can also pin to a specific version, branch, or commit:
@@ -43,7 +43,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      - uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/check-version@main
+      - uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/check-version@main
 ```
 
 ### Full Example with Custom Options
@@ -63,7 +63,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      - uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/check-version@main
+      - uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/check-version@main
         with:
           base_branch: "main"  # Optional: defaults to PR base branch
           version_file: "pubspec.yaml"
@@ -74,7 +74,7 @@ jobs:
 ### Usage with package.json (Node.js)
 
 ```yaml
-- uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/check-version@main
+- uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/check-version@main
   with:
     version_file: "package.json"
     version_pattern: '"version":'

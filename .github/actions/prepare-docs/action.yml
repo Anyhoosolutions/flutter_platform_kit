@@ -1,5 +1,5 @@
 name: "Prepare Documentation"
-description: "Prepare documentation by generating TOC and copying package files to docs directory"
+description: "Prepare documentation by generating TOC and copying package files and GitHub Actions READMEs to docs directory"
 
 inputs:
   dart_sdk:
@@ -96,6 +96,24 @@ runs:
             echo "⚠️  No README.md found for $package_name"
           fi
         done
+
+    - name: Copy GitHub Actions READMEs to docs
+      shell: bash
+      run: |
+        # Copy each tools/github_actions subdir's README.md to docs/{action_name}/README.md
+        for action_dir in tools/github_actions/*/; do
+          [ -d "$action_dir" ] || continue
+          action_name=$(basename "$action_dir")
+          readme_path="${action_dir}README.md"
+          if [ -f "$readme_path" ]; then
+            mkdir -p "${{ inputs.docs_directory }}/$action_name"
+            cp "$readme_path" "${{ inputs.docs_directory }}/$action_name/README.md"
+            echo "✅ Copied $action_name/README.md from github_actions to ${{ inputs.docs_directory }}/$action_name/README.md"
+          else
+            echo "⚠️  No README.md found for $action_name"
+          fi
+        done
+        ls -r docs
 
     - name: Copy package docs directories
       if: inputs.copy_docs_directories == 'true'

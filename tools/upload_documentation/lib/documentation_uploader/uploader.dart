@@ -15,9 +15,13 @@ class Uploader {
     return url;
   }
 
+  static bool get _verbose =>
+      Platform.environment['VERBOSE'] == 'true' ||
+      Platform.environment['VERBOSE'] == '1';
+
   Future<int> upload() async {
     final jsonString = jsonEncode(uploadData.toJson());
-    // print(jsonString);
+    if (_verbose) print('Uploading JSON: $jsonString');
 
     final url = Uri.parse(getUploadUrl());
 

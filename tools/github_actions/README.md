@@ -9,7 +9,7 @@ Uploads documentation to a documentation service. Handles Dart SDK setup, packag
 
 **Usage:**
 ```yaml
-- uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/upload-docs@main
+- uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/upload-docs@main
   with:
     upload_url: ${{ vars.UPLOAD_URL }}
 ```
@@ -19,7 +19,7 @@ Checks if a version has been updated in a pull request compared to the base bran
 
 **Usage:**
 ```yaml
-- uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/check-version@main
+- uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/check-version@main
 ```
 
 ### [firebase-functions-quality](./firebase-functions-quality/)
@@ -27,7 +27,7 @@ Runs linting and tests for Firebase Functions. Supports configurable linters and
 
 **Usage:**
 ```yaml
-- uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/firebase-functions-quality@main
+- uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/firebase-functions-quality@main
 ```
 
 ### [firebase-functions-test](./firebase-functions-test/)
@@ -35,7 +35,7 @@ Runs tests for Firebase Functions using Firebase Emulators. Handles Node.js, Jav
 
 **Usage:**
 ```yaml
-- uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/firebase-functions-test@main
+- uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/firebase-functions-test@main
   with:
     firebase_project_id: "your-project-id"
 ```
@@ -45,7 +45,7 @@ Verifies that TypeScript files generated from Dart freezed models are up to date
 
 **Usage:**
 ```yaml
-- uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/verify-ts-generation@main
+- uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/verify-ts-generation@main
 ```
 
 ### [prepare-deployment](./prepare-deployment/)
@@ -53,7 +53,7 @@ Verifies that TypeScript files generated from Dart freezed models are up to date
 
 **Usage:**
 ```yaml
-- uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/prepare-deployment@main
+- uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/prepare-deployment@main
   with:
     app_name: "My App"
     verify_files: "lib/firebase_options.dart,firebase_service_account.json"
@@ -66,7 +66,7 @@ Builds Flutter web applications and deploys them to Firebase Hosting. Supports m
 
 **Usage:**
 ```yaml
-- uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/build-deploy-flutter-web@main
+- uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/build-deploy-flutter-web@main
   with:
     target_file: "lib/main.dart"
     firebase_project_id: "my-project-id"
@@ -78,7 +78,7 @@ Builds Flutter APK files and deploys them to Firebase App Distribution. Supports
 
 **Usage:**
 ```yaml
-- uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/build-deploy-flutter-apk@main
+- uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/build-deploy-flutter-apk@main
   with:
     target_file: "lib/main.dart"
     flavor: "shucked"
@@ -99,7 +99,7 @@ Each action is in its own subdirectory with:
 Reference actions directly from the repository without copying files:
 
 ```yaml
-- uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/{action-name}@main
+- uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/{action-name}@main
 ```
 
 You can pin to specific versions:
@@ -113,7 +113,7 @@ If you need to customize an action, copy it to your repository:
 
 ```bash
 mkdir -p .github/actions
-cp -r path/to/flutter_platform_kit/tools/githubActions/{action-name} .github/actions/{action-name}
+cp -r path/to/flutter_platform_kit/tools/github_actions/{action-name} .github/actions/{action-name}
 ```
 
 Then reference it locally:
@@ -125,7 +125,7 @@ Then reference it locally:
 
 When adding a new action:
 
-1. Create a new subdirectory in `tools/githubActions/`
+1. Create a new subdirectory in `tools/github_actions/`
 2. Add `action.yml` with the action definition
 3. Add `README.md` with documentation
 4. Add `example-workflow.yml` if helpful

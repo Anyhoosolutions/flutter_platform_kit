@@ -23,7 +23,9 @@ jobs:
         uses: ./.github/actions/prepare-docs
 
       - name: Upload documentation
-        uses: ./tools/githubActions/upload-docs
+        uses: ./tools/github_actions/upload-docs
+        env:
+          VERBOSE: "1"
         with:
           upload_url: ${{ vars.UPLOAD_URL }}
           dart_sdk: "3.5"
@@ -142,7 +144,9 @@ jobs:
         uses: ./.github/actions/prepare-docs
 
       - name: Upload documentation
-        uses: ./tools/githubActions/upload-docs
+        uses: ./tools/github_actions/upload-docs
+        env:
+          VERBOSE: "1"
         with:
           upload_url: ${{ vars.UPLOAD_URL }}
           dart_sdk: "3.5"

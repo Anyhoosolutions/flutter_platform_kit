@@ -22,7 +22,7 @@ class TableOfContent with _$TableOfContent {
 
   static TableOfContent fromTocJsonContent(TocJsonContent toc, List<String>? allowedUsers) {
     return TableOfContent(
-      id: Utils.hash(toc.filepath),
+      id: Utils.sanitizeFilepathForId(toc.filepath),
       tocTitle: toc.name,
       pageTitle: toc.title,
       filepath: toc.filepath,

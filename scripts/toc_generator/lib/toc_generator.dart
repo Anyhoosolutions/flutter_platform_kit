@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'dart:convert';
 
-/// Generates toc.json by scanning packages and tools directories
+/// Generates toc.json by scanning packages, tools, and GitHub Actions directories
 class TocGenerator {
   final String projectRoot;
   final String tocPath;
@@ -29,11 +29,16 @@ class TocGenerator {
     final toolsSection = await _generatePackagesSection('tools');
     print('✅ Found ${toolsSection.length} tools');
 
-    // Find the flutter_packages and tools sections in existing toc
+    print('\n⚙️  Generating GitHub Actions section...');
+    final githubActionsSection = await _generateGitHubActionsSection();
+    print('✅ Found ${githubActionsSection.length} GitHub Actions');
+
+    // Find the flutter_packages, tools, and github_actions sections in existing toc
     final updatedSubpages = _updateSubpages(
       existingToc['subpages'] as List<dynamic>,
       flutterPackagesSection,
       toolsSection,
+      githubActionsSection,
     );
 
     // Create updated toc
@@ -90,6 +95,39 @@ class TocGenerator {
     packages.sort((a, b) => (a['name'] as String).compareTo(b['name'] as String));
 
     return packages;
+  }
+
+  /// Generate TOC entries for GitHub Actions (tools/github_actions subdirs with README.md)
+  Future<List<Map<String, dynamic>>> _generateGitHubActionsSection() async {
+    const githubActionsDir = 'tools/github_actions';
+    final dir = Directory('$projectRoot/$githubActionsDir');
+    if (!await dir.exists()) {
+      print('⚠️  Directory does not exist: ${dir.path}');
+      return [];
+    }
+
+    final actions = <Map<String, dynamic>>[];
+
+    await for (final entity in dir.list()) {
+      if (entity is! Directory) continue;
+      final actionName = entity.path.split('/').last;
+      final readmePath = File('${entity.path}/README.md');
+      if (!await readmePath.exists()) {
+        print('  ⚠️  Skipped $actionName (no README.md)');
+        continue;
+      }
+      final displayName = _getDocName('$actionName.md');
+      actions.add({
+        'filepath': '$actionName/README.md',
+        'name': displayName,
+        'title': displayName,
+        'subpages': [],
+      });
+      print('  ✅ Added GitHub Action: $actionName');
+    }
+
+    actions.sort((a, b) => (a['name'] as String).compareTo(b['name'] as String));
+    return actions;
   }
 
   /// Generate documentation structure for a single package
@@ -189,20 +227,23 @@ class TocGenerator {
     }).join(' ');
   }
 
-  /// Update subpages in existing toc, replacing flutter_packages and tools sections
+  /// Update subpages in existing toc, replacing flutter_packages, tools, and github_actions sections
   List<dynamic> _updateSubpages(
     List<dynamic> existingSubpages,
     List<Map<String, dynamic>> flutterPackages,
     List<Map<String, dynamic>> tools,
+    List<Map<String, dynamic>> githubActions,
   ) {
     print('\n🔄 Updating subpages...');
     print('  📦 Flutter packages to add: ${flutterPackages.length}');
     print('  🔧 Tools to add: ${tools.length}');
+    print('  ⚙️  GitHub Actions to add: ${githubActions.length}');
 
     bool hasFlutterPackages = false;
     bool hasTools = false;
+    bool hasGitHubActions = false;
 
-    // Update existing subpages and check if flutter_packages and tools exist
+    // Update existing subpages and check if flutter_packages, tools, and github_actions exist
     final updatedSubpages = existingSubpages.map((subpage) {
       final subpageMap = subpage as Map<String, dynamic>;
       final filepath = subpageMap['filepath'] as String;
@@ -224,6 +265,16 @@ class TocGenerator {
         return {
           ...subpageMap,
           'subpages': tools,
+        };
+      }
+
+      // Replace github_actions.md section
+      if (filepath == 'github_actions.md') {
+        hasGitHubActions = true;
+        print('  ✅ Found github_actions.md, updating with ${githubActions.length} actions');
+        return {
+          ...subpageMap,
+          'subpages': githubActions,
         };
       }
 
@@ -253,6 +304,17 @@ class TocGenerator {
         'name': 'Tools',
         'title': 'Tools',
         'subpages': tools,
+      });
+    }
+
+    // Add github_actions.md if it doesn't exist
+    if (!hasGitHubActions && githubActions.isNotEmpty) {
+      print('  ➕ Adding github_actions.md section with ${githubActions.length} actions');
+      result.add({
+        'filepath': 'github_actions.md',
+        'name': 'GitHub Actions',
+        'title': 'GitHub Actions',
+        'subpages': githubActions,
       });
     }
 

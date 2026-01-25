@@ -13,7 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/firebase-functions-test@main
+      - uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/firebase-functions-test@main
         with:
           firebase_project_id: "your-project-id"
           firebase_auth_emulator_host: "127.0.0.1:9099"
