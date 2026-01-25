@@ -23,7 +23,7 @@ jobs:
         uses: ./.github/actions/prepare-docs
 
       - name: Upload documentation
-        uses: ./tools/githubActions/upload-docs
+        uses: ./tools/github_actions/upload-docs
         with:
           upload_url: ${{ vars.UPLOAD_URL }}
           dart_sdk: "3.5"
@@ -142,7 +142,7 @@ jobs:
         uses: ./.github/actions/prepare-docs
 
       - name: Upload documentation
-        uses: ./tools/githubActions/upload-docs
+        uses: ./tools/github_actions/upload-docs
         with:
           upload_url: ${{ vars.UPLOAD_URL }}
           dart_sdk: "3.5"

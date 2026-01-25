@@ -4,7 +4,7 @@ A reusable GitHub Actions composite action for verifying that TypeScript files g
 
 ## Location
 
-This action is located in `tools/githubActions/verify-ts-generation/` to make it easy to share across repositories.
+This action is located in `tools/github_actions/verify-ts-generation/` to make it easy to share across repositories.
 
 ## Features
 
@@ -23,7 +23,7 @@ This action is located in `tools/githubActions/verify-ts-generation/` to make it
 You can reference this action directly from the repository without copying any files:
 
 ```yaml
-- uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/verify-ts-generation@main
+- uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/verify-ts-generation@main
 ```
 
 You can also pin to a specific version, branch, or commit:
@@ -52,7 +52,7 @@ jobs:
         with:
           fetch-depth: 0  # Full history for git diff
       
-      - uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/verify-ts-generation@main
+      - uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/verify-ts-generation@main
 ```
 
 ### Quick Check Mode (for WIP PRs)
@@ -77,7 +77,7 @@ jobs:
         with:
           fetch-depth: 0
       
-      - uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/verify-ts-generation@main
+      - uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/verify-ts-generation@main
         with:
           quick_check: "true"
 ```
@@ -99,7 +99,7 @@ jobs:
         with:
           fetch-depth: 0
       
-      - uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/verify-ts-generation@main
+      - uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/verify-ts-generation@main
         with:
           source_models_path: "lib/sharedModels"
           generated_models_path: "functions/src/generatedModels"

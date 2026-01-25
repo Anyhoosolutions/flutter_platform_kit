@@ -20,7 +20,7 @@ jobs:
 
       # Example 1: Basic build and deploy
       - name: Build and deploy APK
-        uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/build-deploy-flutter-apk@main
+        uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/build-deploy-flutter-apk@main
         with:
           target_file: "lib/main.dart"
           flavor: "shucked"
@@ -28,7 +28,7 @@ jobs:
 
       # Example 2: With release notes file
       - name: Build and deploy with release notes
-        uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/build-deploy-flutter-apk@main
+        uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/build-deploy-flutter-apk@main
         with:
           target_file: "lib/shucked/main/main.dart"
           flavor: "shucked"
@@ -37,7 +37,7 @@ jobs:
 
       # Example 3: With custom app ID
       - name: Build and deploy with custom app ID
-        uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/build-deploy-flutter-apk@main
+        uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/build-deploy-flutter-apk@main
         with:
           target_file: "lib/main.dart"
           firebase_app_id: "1:123456789:android:abcdef123456"
@@ -45,14 +45,14 @@ jobs:
 
       # Example 4: Build only (no deployment)
       - name: Build APK only
-        uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/build-deploy-flutter-apk@main
+        uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/build-deploy-flutter-apk@main
         with:
           target_file: "lib/main.dart"
           deploy: "false"
 
       # Example 5: Multiple flavors
       - name: Build and deploy production
-        uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/build-deploy-flutter-apk@main
+        uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/build-deploy-flutter-apk@main
         with:
           target_file: "lib/main.dart"
           flavor: "production"
@@ -60,7 +60,7 @@ jobs:
           release_notes_file: "deploy/release_notes.txt"
 
       - name: Build and deploy staging
-        uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/build-deploy-flutter-apk@main
+        uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/build-deploy-flutter-apk@main
         with:
           target_file: "lib/main.dart"
           flavor: "staging"
@@ -69,7 +69,7 @@ jobs:
 
       # Example 6: Conditional deployment based on changed files
       - name: Build and deploy production (only if production files changed)
-        uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/build-deploy-flutter-apk@main
+        uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/build-deploy-flutter-apk@main
         with:
           target_file: "lib/main.dart"
           flavor: "production"
@@ -80,7 +80,7 @@ jobs:
             pubspec.yaml
 
       - name: Build and deploy staging (only if staging files changed)
-        uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/build-deploy-flutter-apk@main
+        uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/build-deploy-flutter-apk@main
         with:
           target_file: "lib/main.dart"
           flavor: "staging"

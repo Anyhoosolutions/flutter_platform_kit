@@ -17,4 +17,4 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Run quality checks
-        uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/firebase-functions-quality@main
+        uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/firebase-functions-quality@main

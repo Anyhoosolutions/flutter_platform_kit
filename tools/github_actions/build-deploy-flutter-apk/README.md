@@ -4,7 +4,7 @@ A reusable GitHub Actions composite action for building Flutter APK files and de
 
 ## Location
 
-This action is located in `tools/githubActions/build-deploy-flutter-apk/` to make it easy to share across repositories.
+This action is located in `tools/github_actions/build-deploy-flutter-apk/` to make it easy to share across repositories.
 
 ## Features
 
@@ -23,7 +23,7 @@ This action is located in `tools/githubActions/build-deploy-flutter-apk/` to mak
 You can reference this action directly from the repository without copying any files:
 
 ```yaml
-- uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/build-deploy-flutter-apk@main
+- uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/build-deploy-flutter-apk@main
   with:
     target_file: "lib/main.dart"
     flavor: "shucked"
@@ -46,7 +46,7 @@ You can also pin to a specific version, branch, or commit:
     flutter-version: "3.38.4"
 
 - name: Build and deploy APK
-  uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/build-deploy-flutter-apk@main
+  uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/build-deploy-flutter-apk@main
   with:
     target_file: "lib/main.dart"
     flavor: "shucked"
@@ -56,7 +56,7 @@ You can also pin to a specific version, branch, or commit:
 ### With Release Notes File
 
 ```yaml
-- uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/build-deploy-flutter-apk@main
+- uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/build-deploy-flutter-apk@main
   with:
     target_file: "lib/shucked/main/main.dart"
     flavor: "shucked"
@@ -67,7 +67,7 @@ You can also pin to a specific version, branch, or commit:
 ### With Custom App ID
 
 ```yaml
-- uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/build-deploy-flutter-apk@main
+- uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/build-deploy-flutter-apk@main
   with:
     target_file: "lib/main.dart"
     firebase_app_id: "1:123456789:android:abcdef123456"
@@ -77,7 +77,7 @@ You can also pin to a specific version, branch, or commit:
 ### Build Only (No Deployment)
 
 ```yaml
-- uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/build-deploy-flutter-apk@main
+- uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/build-deploy-flutter-apk@main
   with:
     target_file: "lib/main.dart"
     deploy: "false"
@@ -87,14 +87,14 @@ You can also pin to a specific version, branch, or commit:
 
 ```yaml
 # Build and deploy production flavor
-- uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/build-deploy-flutter-apk@main
+- uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/build-deploy-flutter-apk@main
   with:
     target_file: "lib/main.dart"
     flavor: "production"
     groups: "production-testers"
 
 # Build and deploy staging flavor
-- uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/build-deploy-flutter-apk@main
+- uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/build-deploy-flutter-apk@main
   with:
     target_file: "lib/main.dart"
     flavor: "staging"
@@ -107,7 +107,7 @@ Deploy only when specific files or directories have changed. This is especially 
 
 ```yaml
 # Deploy production flavor only if production-specific files changed
-- uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/build-deploy-flutter-apk@main
+- uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/build-deploy-flutter-apk@main
   with:
     target_file: "lib/main.dart"
     flavor: "production"
@@ -118,7 +118,7 @@ Deploy only when specific files or directories have changed. This is especially 
       pubspec.yaml
 
 # Deploy staging flavor only if staging-specific files changed
-- uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/build-deploy-flutter-apk@main
+- uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/build-deploy-flutter-apk@main
   with:
     target_file: "lib/main.dart"
     flavor: "staging"

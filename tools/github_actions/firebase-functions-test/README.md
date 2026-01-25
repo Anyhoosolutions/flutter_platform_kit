@@ -4,7 +4,7 @@ A reusable GitHub Actions composite action for running tests on Firebase Functio
 
 ## Location
 
-This action is located in `tools/githubActions/firebase-functions-test/` to make it easy to share across repositories.
+This action is located in `tools/github_actions/firebase-functions-test/` to make it easy to share across repositories.
 
 ## Features
 
@@ -23,7 +23,7 @@ This action is located in `tools/githubActions/firebase-functions-test/` to make
 You can reference this action directly from the repository without copying any files:
 
 ```yaml
-- uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/firebase-functions-test@main
+- uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/firebase-functions-test@main
   with:
     firebase_project_id: "your-project-id"
 ```
@@ -50,7 +50,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      - uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/firebase-functions-test@main
+      - uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/firebase-functions-test@main
         with:
           firebase_project_id: "your-project-id"
 ```
@@ -70,7 +70,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      - uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/firebase-functions-test@main
+      - uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/firebase-functions-test@main
         with:
           firebase_project_id: "your-project-id"
           functions_path: "functions"

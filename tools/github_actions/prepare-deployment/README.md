@@ -4,7 +4,7 @@ A reusable GitHub Actions composite action that combines version verification, S
 
 ## Location
 
-This action is located in `tools/githubActions/prepare-deployment/` to make it easy to share across repositories.
+This action is located in `tools/github_actions/prepare-deployment/` to make it easy to share across repositories.
 
 ## Features
 
@@ -22,7 +22,7 @@ This action is located in `tools/githubActions/prepare-deployment/` to make it e
 You can reference this action directly from the repository without copying any files:
 
 ```yaml
-- uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/prepare-deployment@main
+- uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/prepare-deployment@main
   env:
     SOPS_AGE_KEY: ${{ secrets.SOPS_AGE_KEY }}
 ```
@@ -39,7 +39,7 @@ You can also pin to a specific version, branch, or commit:
   with:
     fetch-depth: 0
 
-- uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/prepare-deployment@main
+- uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/prepare-deployment@main
   with:
     app_name: "My App"
     verify_files: "lib/firebase_options.dart,firebase_service_account.json"
@@ -50,7 +50,7 @@ You can also pin to a specific version, branch, or commit:
 ### Disable Individual Steps
 
 ```yaml
-- uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/prepare-deployment@main
+- uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/prepare-deployment@main
   with:
     verify_version: "false"  # Skip version verification
     decrypt_secrets: "true"

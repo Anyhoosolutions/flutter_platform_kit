@@ -4,7 +4,7 @@ A reusable GitHub Actions composite action for building Flutter web applications
 
 ## Location
 
-This action is located in `tools/githubActions/build-deploy-flutter-web/` to make it easy to share across repositories.
+This action is located in `tools/github_actions/build-deploy-flutter-web/` to make it easy to share across repositories.
 
 ## Features
 
@@ -23,7 +23,7 @@ This action is located in `tools/githubActions/build-deploy-flutter-web/` to mak
 You can reference this action directly from the repository without copying any files:
 
 ```yaml
-- uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/build-deploy-flutter-web@main
+- uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/build-deploy-flutter-web@main
   with:
     target_file: "lib/main.dart"
     firebase_project_id: "my-project-id"
@@ -46,7 +46,7 @@ You can also pin to a specific version, branch, or commit:
     flutter-version: "3.38.4"
 
 - name: Build and deploy Flutter web
-  uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/build-deploy-flutter-web@main
+  uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/build-deploy-flutter-web@main
   with:
     target_file: "lib/main.dart"
     firebase_project_id: "my-project-id"
@@ -56,7 +56,7 @@ You can also pin to a specific version, branch, or commit:
 ### Widgetbook Build
 
 ```yaml
-- uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/build-deploy-flutter-web@main
+- uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/build-deploy-flutter-web@main
   with:
     is_widgetbook: "true"
     widgetbook_dir: "widgetbook"
@@ -68,7 +68,7 @@ You can also pin to a specific version, branch, or commit:
 
 ```yaml
 # Build and deploy main app
-- uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/build-deploy-flutter-web@main
+- uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/build-deploy-flutter-web@main
   with:
     target_file: "lib/shucked/main/main.dart"
     copy_to_output: "true"
@@ -78,7 +78,7 @@ You can also pin to a specific version, branch, or commit:
     firebase_deploy_args: "--non-interactive"
 
 # Build and deploy restaurant app
-- uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/build-deploy-flutter-web@main
+- uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/build-deploy-flutter-web@main
   with:
     target_file: "lib/restaurant/restaurant_main.dart"
     copy_to_output: "true"
@@ -87,7 +87,7 @@ You can also pin to a specific version, branch, or commit:
     firebase_hosting_target: "restaurant"
 
 # Build and deploy admin app
-- uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/build-deploy-flutter-web@main
+- uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/build-deploy-flutter-web@main
   with:
     target_file: "lib/admin/admin_main.dart"
     copy_to_output: "true"
@@ -99,7 +99,7 @@ You can also pin to a specific version, branch, or commit:
 ### Build Only (No Deployment)
 
 ```yaml
-- uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/build-deploy-flutter-web@main
+- uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/build-deploy-flutter-web@main
   with:
     target_file: "lib/main.dart"
     deploy: "false"
@@ -111,7 +111,7 @@ Deploy only when specific files or directories have changed. This is especially 
 
 ```yaml
 # Deploy main app only if main app files changed
-- uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/build-deploy-flutter-web@main
+- uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/build-deploy-flutter-web@main
   with:
     target_file: "lib/shucked/main/main.dart"
     copy_to_output: "true"
@@ -124,7 +124,7 @@ Deploy only when specific files or directories have changed. This is especially 
       pubspec.yaml
 
 # Deploy restaurant app only if restaurant files changed
-- uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/build-deploy-flutter-web@main
+- uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/build-deploy-flutter-web@main
   with:
     target_file: "lib/restaurant/restaurant_main.dart"
     copy_to_output: "true"
@@ -137,7 +137,7 @@ Deploy only when specific files or directories have changed. This is especially 
       pubspec.yaml
 
 # Deploy admin app only if admin files changed
-- uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/build-deploy-flutter-web@main
+- uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/build-deploy-flutter-web@main
   with:
     target_file: "lib/admin/admin_main.dart"
     copy_to_output: "true"

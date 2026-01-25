@@ -4,7 +4,7 @@ A reusable GitHub Actions composite action for running linting and tests on Fire
 
 ## Location
 
-This action is located in `tools/githubActions/firebase-functions-quality/` to make it easy to share across repositories.
+This action is located in `tools/github_actions/firebase-functions-quality/` to make it easy to share across repositories.
 
 ## Features
 
@@ -21,7 +21,7 @@ This action is located in `tools/githubActions/firebase-functions-quality/` to m
 You can reference this action directly from the repository without copying any files:
 
 ```yaml
-- uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/firebase-functions-quality@main
+- uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/firebase-functions-quality@main
 ```
 
 You can also pin to a specific version, branch, or commit:
@@ -48,7 +48,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      - uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/firebase-functions-quality@main
+      - uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/firebase-functions-quality@main
 ```
 
 ### Full Example with Linting and Tests
@@ -68,7 +68,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      - uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/firebase-functions-quality@main
+      - uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/firebase-functions-quality@main
         with:
           functions_path: "functions"
           run_lint: "true"
@@ -80,7 +80,7 @@ jobs:
 ### Custom Linter
 
 ```yaml
-- uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/firebase-functions-quality@main
+- uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/firebase-functions-quality@main
   with:
     lint_command: "npm run lint"
 ```
@@ -88,7 +88,7 @@ jobs:
 ### Different Functions Path
 
 ```yaml
-- uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/firebase-functions-quality@main
+- uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/firebase-functions-quality@main
   with:
     functions_path: "firebase/functions"
 ```

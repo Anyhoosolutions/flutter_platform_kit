@@ -4,7 +4,7 @@ A simple, reusable GitHub Actions composite action for uploading documentation t
 
 ## Location
 
-This action is located in `tools/githubActions/upload-docs/` to make it easy to share across repositories.
+This action is located in `tools/github_actions/upload-docs/` to make it easy to share across repositories.
 
 ## Features
 
@@ -17,11 +17,11 @@ This action is located in `tools/githubActions/upload-docs/` to make it easy to 
 
 To use this action in another repository:
 
-1. Copy the `tools/githubActions/upload-docs/` directory to your repository:
+1. Copy the `tools/github_actions/upload-docs/` directory to your repository:
    ```bash
    # From your repository root
    mkdir -p .github/actions
-   cp -r path/to/flutter_platform_kit/tools/githubActions/upload-docs .github/actions/upload-docs
+   cp -r path/to/flutter_platform_kit/tools/github_actions/upload-docs .github/actions/upload-docs
    ```
 
 ## Usage
@@ -31,7 +31,7 @@ To use this action in another repository:
 You can reference this action directly from the repository without copying any files:
 
 ```yaml
-- uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/upload-docs@main
+- uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/upload-docs@main
   with:
     upload_url: ${{ vars.UPLOAD_URL }}
     dart_sdk: '3.5'
@@ -64,7 +64,7 @@ jobs:
       
       # Your pre-processing steps here (generate TOC, copy files, etc.)
       
-      - uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/upload-docs@main
+      - uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/upload-docs@main
         with:
           upload_url: ${{ vars.UPLOAD_URL }}
           dart_sdk: '3.5'
@@ -95,7 +95,7 @@ jobs:
 For PRs or branch-based deployments, provide a `commit_hash`:
 
 ```yaml
-- uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/upload-docs@main
+- uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/upload-docs@main
   with:
     upload_url: ${{ vars.UPLOAD_URL }}
     commit_hash: ${{ github.sha }}

@@ -14,7 +14,7 @@ jobs:
           fetch-depth: 0 # Full history for version comparison
 
       - name: Prepare deployment
-        uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/prepare-deployment@main
+        uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/prepare-deployment@main
         with:
           app_name: "My App"
           verify_files: "lib/firebase_options.dart,firebase_service_account.json"
