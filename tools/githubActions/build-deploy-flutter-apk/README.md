@@ -12,6 +12,7 @@ This action is located in `tools/githubActions/build-deploy-flutter-apk/` to mak
 - ✅ Caches Gradle dependencies for faster builds
 - ✅ Extracts Firebase Android App ID from firebase.json
 - ✅ Deploys to Firebase App Distribution
+- ✅ Conditional deployment based on changed files (perfect for multiple flavors)
 - ✅ Supports release notes from file or text
 - ✅ Distributes to groups and/or individual testers
 
@@ -100,6 +101,39 @@ You can also pin to a specific version, branch, or commit:
     groups: "staging-testers"
 ```
 
+### Conditional Deployment Based on Changed Files
+
+Deploy only when specific files or directories have changed. This is especially useful when you have multiple flavors and want to deploy each flavor only when its relevant files change:
+
+```yaml
+# Deploy production flavor only if production-specific files changed
+- uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/build-deploy-flutter-apk@main
+  with:
+    target_file: "lib/main.dart"
+    flavor: "production"
+    groups: "production-testers"
+    deploy_trigger_paths: |
+      lib/flavors/production/
+      android/app/src/production/
+      pubspec.yaml
+
+# Deploy staging flavor only if staging-specific files changed
+- uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/build-deploy-flutter-apk@main
+  with:
+    target_file: "lib/main.dart"
+    flavor: "staging"
+    groups: "staging-testers"
+    deploy_trigger_paths: |
+      lib/flavors/staging/
+      android/app/src/staging/
+      pubspec.yaml
+```
+
+When `deploy_trigger_paths` is provided:
+- The action checks if any files matching the specified paths have changed (compared to the base branch for PRs, or previous commit for pushes)
+- Deployment only occurs if changes are detected in the watched paths
+- If `deploy_trigger_paths` is empty or not provided, deployment behavior is unchanged (controlled by the `deploy` input)
+
 ## Inputs
 
 ### Build Configuration
@@ -126,6 +160,7 @@ You can also pin to a specific version, branch, or commit:
 | Input | Description | Required | Default |
 |-------|-------------|----------|---------|
 | `deploy` | Whether to deploy to Firebase App Distribution | No | `true` |
+| `deploy_trigger_paths` | Newline-separated list of paths/patterns that should trigger deployment. If provided, deployment only occurs if files matching these paths have changed. If empty, deployment happens based on `deploy` input only. | No | `""` |
 | `firebase_project_id` | Firebase project ID (optional, for logging) | No | `""` |
 | `release_notes_file` | Path to release notes file | No | `deploy/release_notes.txt` |
 | `release_notes` | Release notes text (alternative to file) | No | `""` |
@@ -151,15 +186,20 @@ You can also pin to a specific version, branch, or commit:
    - Caches Gradle caches, wrapper, and project Gradle files
    - Speeds up subsequent builds
 
-2. **Builds Flutter APK**
+2. **Checks for File Changes** (if `deploy_trigger_paths` is provided)
+   - Compares changed files against base branch (PRs) or previous commit (pushes)
+   - Determines if deployment should be triggered based on watched paths
+   - Skips deployment if no relevant changes detected
+
+3. **Builds Flutter APK**
    - Builds APK with specified target file, flavor, and mode
    - Supports additional build arguments
 
-3. **Extracts Firebase App ID** (if not provided)
+4. **Extracts Firebase App ID** (if not provided)
    - Reads firebase.json and extracts Android App ID
    - Uses configurable path in JSON structure
 
-4. **Deploys to Firebase App Distribution** (if enabled)
+5. **Deploys to Firebase App Distribution** (if enabled and conditions met)
    - Uses service account authentication
    - Distributes APK to specified groups and/or testers
    - Includes release notes from file or text
@@ -180,6 +220,11 @@ You can also pin to a specific version, branch, or commit:
 - Both groups and testers can be specified (comma-separated)
 - Gradle caching significantly speeds up builds in CI/CD
 - App ID is extracted using Python's json module
+- **Conditional Deployment**: When `deploy_trigger_paths` is provided, the action uses `git diff` to check for changes:
+  - For pull requests: compares against the base branch
+  - For pushes: compares against the previous commit (HEAD~1)
+  - Deployment only occurs if at least one file in the watched paths has changed
+  - This is ideal for multi-flavor setups where you want to deploy each flavor independently
 
 ## APK Output Paths
 

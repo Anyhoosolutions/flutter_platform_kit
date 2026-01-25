@@ -66,3 +66,26 @@ jobs:
           flavor: "staging"
           groups: "staging-testers"
           release_notes_file: "deploy/release_notes.txt"
+
+      # Example 6: Conditional deployment based on changed files
+      - name: Build and deploy production (only if production files changed)
+        uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/build-deploy-flutter-apk@main
+        with:
+          target_file: "lib/main.dart"
+          flavor: "production"
+          groups: "production-testers"
+          deploy_trigger_paths: |
+            lib/flavors/production/
+            android/app/src/production/
+            pubspec.yaml
+
+      - name: Build and deploy staging (only if staging files changed)
+        uses: Anyhoosolutions/flutter_platform_kit/tools/githubActions/build-deploy-flutter-apk@main
+        with:
+          target_file: "lib/main.dart"
+          flavor: "staging"
+          groups: "staging-testers"
+          deploy_trigger_paths: |
+            lib/flavors/staging/
+            android/app/src/staging/
+            pubspec.yaml
