@@ -89,3 +89,17 @@ jobs:
             lib/flavors/staging/
             android/app/src/staging/
             pubspec.yaml
+
+      # Example 7: Skip build and deployment using PR labels
+      # To skip the entire action (build + deploy), add one of these labels to your PR:
+      # - "no-deploy" (skips all builds and deployments)
+      # - "no-deploy:shucked" (skips only shucked flavor)
+      # - "no-deploy:production" (skips only production flavor)
+      # When a skip label is found, the entire action is skipped (no build, no deployment)
+      - name: Build and deploy (can be skipped with labels)
+        uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/build-deploy-flutter-apk@main
+        with:
+          target_file: "lib/main.dart"
+          flavor: "shucked"
+          groups: "testers"
+          release_notes_file: "deploy/release_notes.txt"

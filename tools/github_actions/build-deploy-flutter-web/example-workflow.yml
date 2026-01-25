@@ -93,3 +93,17 @@ jobs:
             lib/admin/
             lib/shared/
             pubspec.yaml
+
+      # Example 6: Skip build and deployment using PR labels
+      # To skip the entire action (build + deploy), add one of these labels to your PR:
+      # - "no-deploy" (skips all builds and deployments)
+      # - "no-deploy:app" (skips only app hosting target)
+      # - "no-deploy:restaurant" (skips only restaurant hosting target)
+      # - "no-deploy:web_app" (skips by output directory, if hosting target is not set)
+      # When a skip label is found, the entire action is skipped (no build, no deployment)
+      - name: Build and deploy (can be skipped with labels)
+        uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/build-deploy-flutter-web@main
+        with:
+          target_file: "lib/main.dart"
+          firebase_project_id: "my-project-id"
+          firebase_hosting_target: "app"
