@@ -13,6 +13,7 @@ This action is located in `tools/github_actions/build-deploy-flutter-apk/` to ma
 - ✅ Extracts Firebase Android App ID from firebase.json
 - ✅ Deploys to Firebase App Distribution
 - ✅ Conditional deployment based on changed files (perfect for multiple flavors)
+- ✅ Skip deployment using PR labels (e.g., `no-deploy:shucked`)
 - ✅ Supports release notes from file or text
 - ✅ Distributes to groups and/or individual testers
 
@@ -134,6 +135,56 @@ When `deploy_trigger_paths` is provided:
 - Deployment only occurs if changes are detected in the watched paths
 - If `deploy_trigger_paths` is empty or not provided, deployment behavior is unchanged (controlled by the `deploy` input)
 
+### Skip Build and Deployment Using PR Labels
+
+You can skip the entire action (both build and deployment) by adding specific labels to your pull request. This is useful when you want to merge code without triggering a build or deployment.
+
+**Supported Label Formats:**
+
+1. **Generic skip** (skips all builds and deployments):
+   - `no-deploy`
+   - `No Deploy`
+   - `NO-DEPLOY`
+   - Any case variation
+
+2. **Flavor-specific skip** (skips build and deployment for a specific flavor):
+   - `no-deploy:shucked` - Skips build and deployment for the `shucked` flavor
+   - `no-deploy:production` - Skips build and deployment for the `production` flavor
+   - `No Deploy: staging` - Case and spacing variations are supported
+   - Format: `no-deploy:<flavor>` where `<flavor>` matches your build flavor
+
+**How It Works:**
+
+- **For PR events**: Labels are checked directly from the pull request
+- **For push events** (after merge): The action extracts the PR number from the commit message and fetches labels via GitHub API
+- Label matching is **case-insensitive** and handles variations (spaces, hyphens, etc.)
+- When a matching label is found, the **entire action is skipped** (no build, no deployment, no Gradle caching)
+- This saves CI/CD resources and time when you know a build isn't needed
+
+**Examples:**
+
+```yaml
+# This will skip the entire action (build + deploy) if PR has "no-deploy:shucked" label
+- uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/build-deploy-flutter-apk@main
+  with:
+    target_file: "lib/main.dart"
+    flavor: "shucked"
+    groups: "testers"
+```
+
+To skip build and deployment:
+1. Add label `no-deploy:shucked` to your PR
+2. Merge the PR
+3. The entire action will be skipped (no build, no deployment)
+
+**Use Cases:**
+
+- Merge documentation-only changes without building
+- Merge configuration changes that don't require a new build
+- Skip build for specific flavors while building others
+- Temporary skip during maintenance or testing
+- Save CI/CD resources when builds aren't needed
+
 ## Inputs
 
 ### Build Configuration
@@ -186,20 +237,27 @@ When `deploy_trigger_paths` is provided:
    - Caches Gradle caches, wrapper, and project Gradle files
    - Speeds up subsequent builds
 
-2. **Checks for File Changes** (if `deploy_trigger_paths` is provided)
+2. **Checks for Skip Labels** (always runs first)
+   - For PR events: Checks labels directly from the pull request
+   - For push events: Extracts PR number from commit message and fetches labels via GitHub API
+   - Skips the entire action (build and deployment) if a matching `no-deploy` or `no-deploy:<flavor>` label is found
+   - Label matching is case-insensitive and handles variations
+   - If a skip label is found, all subsequent steps are skipped
+
+3. **Checks for File Changes** (if `deploy_trigger_paths` is provided)
    - Compares changed files against base branch (PRs) or previous commit (pushes)
    - Determines if deployment should be triggered based on watched paths
    - Skips deployment if no relevant changes detected
 
-3. **Builds Flutter APK**
+4. **Builds Flutter APK**
    - Builds APK with specified target file, flavor, and mode
    - Supports additional build arguments
 
-4. **Extracts Firebase App ID** (if not provided)
+5. **Extracts Firebase App ID** (if not provided)
    - Reads firebase.json and extracts Android App ID
    - Uses configurable path in JSON structure
 
-5. **Deploys to Firebase App Distribution** (if enabled and conditions met)
+6. **Deploys to Firebase App Distribution** (if enabled and conditions met)
    - Uses service account authentication
    - Distributes APK to specified groups and/or testers
    - Includes release notes from file or text
@@ -225,6 +283,12 @@ When `deploy_trigger_paths` is provided:
   - For pushes: compares against the previous commit (HEAD~1)
   - Deployment only occurs if at least one file in the watched paths has changed
   - This is ideal for multi-flavor setups where you want to deploy each flavor independently
+- **Skip Build and Deployment Labels**: You can skip the entire action by adding labels to your PR:
+  - Generic `no-deploy` label skips all builds and deployments
+  - Flavor-specific `no-deploy:<flavor>` label skips build and deployment for that specific flavor
+  - Works for both PR events and push events (after merge)
+  - When a skip label is found, the entire action is skipped (no build, no deployment, no Gradle caching)
+  - This saves CI/CD resources when builds aren't needed
 
 ## APK Output Paths
 
