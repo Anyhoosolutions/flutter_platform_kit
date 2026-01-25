@@ -69,8 +69,160 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - name: Check for skip deployment labels
+      shell: bash
+      id: check-skip-labels
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+        PR_LABELS_JSON: ${{ toJSON(github.event.pull_request.labels) }}
+      run: |
+        set -e
+        
+        HOSTING_TARGET="${{ inputs.firebase_hosting_target }}"
+        OUTPUT_DIR="${{ inputs.output_dir }}"
+        EVENT_NAME="${{ github.event_name }}"
+        SKIP_DEPLOY=false
+        SKIP_REASON=""
+        
+        echo "🔍 Checking for skip deployment labels..."
+        echo "📋 Event: $EVENT_NAME"
+        echo "📋 Hosting target: ${HOSTING_TARGET:-'(none)'}"
+        echo "📋 Output directory: ${OUTPUT_DIR:-'(none)'}"
+        echo ""
+        
+        # Function to normalize label name (lowercase, handle variations)
+        normalize_label() {
+          echo "$1" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9:]//g'
+        }
+        
+        # Function to check if a label should skip deployment
+        should_skip() {
+          local label="$1"
+          local normalized_label=$(normalize_label "$label")
+          
+          # Check for generic "no-deploy" label (case-insensitive)
+          if [ "$normalized_label" = "nodeploy" ] || [ "$normalized_label" = "no-deploy" ]; then
+            return 0
+          fi
+          
+          # Check for hosting target-specific label (e.g., "no-deploy:app", "no deploy: app")
+          if [ -n "$HOSTING_TARGET" ]; then
+            local normalized_target=$(normalize_label "$HOSTING_TARGET")
+            if echo "$normalized_label" | grep -qE "^nodeploy:${normalized_target}$|^no-deploy:${normalized_target}$"; then
+              return 0
+            fi
+          fi
+          
+          # Check for output directory-specific label (e.g., "no-deploy:web_app", "no deploy: web_app")
+          # Only if hosting target is not set
+          if [ -z "$HOSTING_TARGET" ] && [ -n "$OUTPUT_DIR" ]; then
+            local normalized_output=$(normalize_label "$OUTPUT_DIR")
+            if echo "$normalized_label" | grep -qE "^nodeploy:${normalized_output}$|^no-deploy:${normalized_output}$"; then
+              return 0
+            fi
+          fi
+          
+          return 1
+        }
+        
+        # Get labels based on event type
+        if [ "$EVENT_NAME" = "pull_request" ]; then
+          # For PR events, check labels directly from event
+          echo "📋 Checking PR labels..."
+          
+          # Extract label names from JSON (set as environment variable)
+          if [ -n "$PR_LABELS_JSON" ] && [ "$PR_LABELS_JSON" != "null" ] && [ "$PR_LABELS_JSON" != "[]" ]; then
+            # Try using jq if available
+            if command -v jq >/dev/null 2>&1; then
+              PR_LABELS=$(echo "$PR_LABELS_JSON" | jq -r '.[].name' 2>/dev/null | tr '\n' ' ' || echo "")
+            else
+              # Fallback: extract using sed/grep
+              PR_LABELS=$(echo "$PR_LABELS_JSON" | grep -oE '"name"\s*:\s*"[^"]+"' | sed 's/"name"\s*:\s*"//g' | sed 's/"//g' | tr '\n' ' ' || echo "")
+            fi
+            
+            # Trim whitespace
+            PR_LABELS=$(echo "$PR_LABELS" | xargs)
+            
+            if [ -z "$PR_LABELS" ]; then
+              echo "ℹ️  No labels found on PR"
+            else
+              echo "📋 Found labels: $PR_LABELS"
+              for label in $PR_LABELS; do
+                if should_skip "$label"; then
+                  SKIP_DEPLOY=true
+                  SKIP_REASON="PR has skip label: $label"
+                  echo "⏭️  Found skip label: $label"
+                  break
+                fi
+              done
+            fi
+          else
+            echo "ℹ️  No labels found on PR"
+          fi
+        else
+          # For push events (e.g., after PR merge), try to get PR labels from commit message
+          echo "📋 Checking merged PR labels from commit message..."
+          
+          # Extract PR number from commit message (GitHub merge commits typically include "Merge pull request #123")
+          PR_NUMBER=$(git log -1 --pretty=%B | grep -oE 'Merge pull request #([0-9]+)|#([0-9]+)' | grep -oE '[0-9]+' | head -n 1 || echo "")
+          
+          if [ -n "$PR_NUMBER" ]; then
+            echo "📋 Found PR number in commit: #$PR_NUMBER"
+            
+            # Use GitHub API to get PR labels
+            API_URL="https://api.github.com/repos/${{ github.repository }}/pulls/$PR_NUMBER"
+            echo "🔍 Fetching PR info from: $API_URL"
+            
+            # Fetch PR data (labels are in the response)
+            PR_DATA=$(curl -s -H "Authorization: token $GITHUB_TOKEN" -H "Accept: application/vnd.github.v3+json" "$API_URL" || echo "")
+            
+            if [ -n "$PR_DATA" ] && echo "$PR_DATA" | grep -q '"labels"'; then
+              # Extract label names from JSON response
+              # Try using jq if available, otherwise use sed/awk
+              if command -v jq >/dev/null 2>&1; then
+                LABELS=$(echo "$PR_DATA" | jq -r '.labels[].name' 2>/dev/null | tr '\n' ' ' || echo "")
+              else
+                # Fallback: extract labels using sed (handles JSON arrays)
+                LABELS=$(echo "$PR_DATA" | sed -n '/"labels":\s*\[/,/\]/p' | grep -oE '"name"\s*:\s*"[^"]+"' | sed 's/"name"\s*:\s*"//g' | sed 's/"//g' | tr '\n' ' ' || echo "")
+              fi
+              
+              # Trim whitespace
+              LABELS=$(echo "$LABELS" | xargs)
+              
+              if [ -n "$LABELS" ]; then
+                echo "📋 Found labels on merged PR: $LABELS"
+                for label in $LABELS; do
+                  if should_skip "$label"; then
+                    SKIP_DEPLOY=true
+                    SKIP_REASON="Merged PR #$PR_NUMBER has skip label: $label"
+                    echo "⏭️  Found skip label: $label"
+                    break
+                  fi
+                done
+              else
+                echo "ℹ️  No labels found on merged PR"
+              fi
+            else
+              echo "⚠️  Could not fetch PR data or PR not found (might be a direct push)"
+            fi
+          else
+            echo "ℹ️  No PR number found in commit message (might be a direct push)"
+          fi
+        fi
+        
+        if [ "$SKIP_DEPLOY" = "true" ]; then
+          echo ""
+          echo "⏭️  Build and deployment will be skipped: $SKIP_REASON"
+          echo "skip_deploy=true" >> $GITHUB_OUTPUT
+        else
+          echo ""
+          echo "✅ No skip labels found, build and deployment will proceed"
+          echo "skip_deploy=false" >> $GITHUB_OUTPUT
+        fi
+
     - name: Build Flutter Web
       shell: bash
+      if: steps.check-skip-labels.outputs.skip_deploy != 'true'
       run: |
         TARGET_FILE="${{ inputs.target_file }}"
         BUILD_MODE="${{ inputs.build_mode }}"
@@ -124,7 +276,10 @@ runs:
     - name: Check if deployment should be triggered
       shell: bash
       id: check-deploy
-      if: inputs.deploy == 'true' && inputs.deploy_trigger_paths != ''
+      if: |
+        inputs.deploy == 'true' && 
+        inputs.deploy_trigger_paths != '' && 
+        steps.check-skip-labels.outputs.skip_deploy != 'true'
       run: |
         set -e
 
@@ -205,6 +360,7 @@ runs:
       shell: bash
       if: |
         inputs.deploy == 'true' && 
+        steps.check-skip-labels.outputs.skip_deploy != 'true' &&
         (inputs.deploy_trigger_paths == '' || steps.check-deploy.outputs.should_deploy == 'true')
       env:
         GOOGLE_APPLICATION_CREDENTIALS: ${{ github.workspace }}/${{ inputs.service_account_path }}
