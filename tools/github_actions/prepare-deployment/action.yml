@@ -41,6 +41,10 @@ inputs:
     description: "Comma-separated list of files to verify exist after decryption"
     required: false
     default: ""
+  sops_age_key:
+    description: "SOPS AGE key for decrypting secrets"
+    required: false
+    default: ""
 
   # Environment loading inputs
   load_env:
@@ -303,7 +307,7 @@ runs:
       shell: bash
       if: inputs.decrypt_secrets == 'true'
       env:
-        SOPS_AGE_KEY: ${{ secrets.SOPS_AGE_KEY }}
+        SOPS_AGE_KEY: ${{ inputs.sops_age_key }}
       run: |
         echo "🔓 Decrypting secrets with SOPS..."
         curl -sSL "${{ inputs.decrypt_script_url }}" | bash
