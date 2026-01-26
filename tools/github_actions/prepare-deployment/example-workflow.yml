@@ -18,6 +18,8 @@ jobs:
         with:
           app_name: "My App"
           verify_files: "lib/firebase_options.dart,firebase_service_account.json"
+          # SOPS decryption
+          sops_age_key: ${{ secrets.SOPS_AGE_KEY }}
           # Analysis options
           update_analysis_options: "true"
           analysis_options_ci_file: "analysis_options.yaml-ci"
@@ -34,8 +36,6 @@ jobs:
           flutter_version: "3.38.4"
           flutter_channel: "stable"
           flutter_analyze: "true"
-        env:
-          SOPS_AGE_KEY: ${{ secrets.SOPS_AGE_KEY }}
 
       # Your deployment steps here...
       # - Version is available in CURRENT_VERSION env var

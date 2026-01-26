@@ -23,8 +23,8 @@ You can reference this action directly from the repository without copying any f
 
 ```yaml
 - uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/prepare-deployment@main
-  env:
-    SOPS_AGE_KEY: ${{ secrets.SOPS_AGE_KEY }}
+  with:
+    sops_age_key: ${{ secrets.SOPS_AGE_KEY }}
 ```
 
 You can also pin to a specific version, branch, or commit:
@@ -43,8 +43,7 @@ You can also pin to a specific version, branch, or commit:
   with:
     app_name: "My App"
     verify_files: "lib/firebase_options.dart,firebase_service_account.json"
-  env:
-    SOPS_AGE_KEY: ${{ secrets.SOPS_AGE_KEY }}
+    sops_age_key: ${{ secrets.SOPS_AGE_KEY }}
 ```
 
 ### Disable Individual Steps
@@ -56,8 +55,7 @@ You can also pin to a specific version, branch, or commit:
     decrypt_secrets: "true"
     load_env: "true"
     generate_release_notes: "true"
-  env:
-    SOPS_AGE_KEY: ${{ secrets.SOPS_AGE_KEY }}
+    sops_age_key: ${{ secrets.SOPS_AGE_KEY }}
 ```
 
 ## Inputs
@@ -79,6 +77,7 @@ You can also pin to a specific version, branch, or commit:
 | `decrypt_secrets` | Whether to decrypt SOPS secrets | No | `true` |
 | `sops_version` | SOPS version to install | No | `v3.7.3` |
 | `decrypt_script_url` | URL to decrypt-secrets.sh script | No | `https://raw.githubusercontent.com/Anyhoosolutions/flutter_platform_kit/main/tools/sops_secrets/decrypt-secrets.sh` |
+| `sops_age_key` | SOPS AGE key for decrypting secrets | No | `""` |
 | `verify_files` | Comma-separated list of files to verify | No | `""` |
 
 ### Environment Loading
@@ -123,7 +122,7 @@ You can also pin to a specific version, branch, or commit:
 
 | Secret | Description |
 |--------|-------------|
-| `SOPS_AGE_KEY` | The AGE key for decrypting SOPS-encrypted files (required if `decrypt_secrets: true`) |
+| `SOPS_AGE_KEY` | The AGE key for decrypting SOPS-encrypted files (required if `decrypt_secrets: true`). Must be passed as the `sops_age_key` input: `sops_age_key: ${{ secrets.SOPS_AGE_KEY }}` |
 
 ## What This Action Does
 

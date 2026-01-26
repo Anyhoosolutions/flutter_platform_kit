@@ -1,3 +1,7 @@
+## 1.0.7
+
+- Add SOPS_AGE_KEY as an input
+
 ## 1.0.6
 
 - Fix release_info.dart

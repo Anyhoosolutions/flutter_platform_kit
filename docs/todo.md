@@ -19,3 +19,4 @@
 - [x] Move upload documentation script here
 - [ ] Update AnyhooUser when enhance user data sees new value
 - [ ] Add line at bottom of AppBar
+- [ ] Obfuscate builds (https://docs.flutter.dev/deployment/obfuscate)
