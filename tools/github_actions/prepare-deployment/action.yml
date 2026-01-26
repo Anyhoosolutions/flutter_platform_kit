@@ -480,11 +480,11 @@ runs:
         BUILD_DATE=$(date '+%Y-%m-%d %H:%M:%S')
 
         # Update release_info.dart file
-        sed -i "s/static final String version = '.*';/static final String version = '$VERSION';/" "$RELEASE_INFO_PATH"
-        sed -i "s/static final String buildDate = '.*';/static final String buildDate = '${BUILD_DATE}';/" "$RELEASE_INFO_PATH"
-        sed -i "s/static final String commitHash = '.*';/static final String commitHash = '${COMMIT_HASH}';/" "$RELEASE_INFO_PATH"
-        sed -i "s/static final String branch = '.*';/static final String branch = '${CURRENT_BRANCH}';/" "$RELEASE_INFO_PATH"
-        sed -i "s/static final String commitHashShort = '.*';/static final String commitHashShort = '${COMMIT_HASH_SHORT}';/" "$RELEASE_INFO_PATH"
+        sed -i "s/final String version = '.*';/final String version = '$VERSION';/" "$RELEASE_INFO_PATH"
+        sed -i "s/final String buildDate = '.*';/final String buildDate = '${BUILD_DATE}';/" "$RELEASE_INFO_PATH"
+        sed -i "s/final String commitHash = '.*';/final String commitHash = '${COMMIT_HASH}';/" "$RELEASE_INFO_PATH"
+        sed -i "s/final String branch = '.*';/final String branch = '${CURRENT_BRANCH}';/" "$RELEASE_INFO_PATH"
+        sed -i "s/final String commitHashShort = '.*';/final String commitHashShort = '${COMMIT_HASH_SHORT}';/" "$RELEASE_INFO_PATH"
 
         echo "✅ Updated $RELEASE_INFO_PATH:"
         cat "$RELEASE_INFO_PATH"

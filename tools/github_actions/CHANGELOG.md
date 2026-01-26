@@ -1,3 +1,7 @@
+## 1.0.6
+
+- Fix release_info.dart
+
 ## 1.0.5
 
 - Skip deploying if label exist
