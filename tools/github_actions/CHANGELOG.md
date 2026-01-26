@@ -1,3 +1,7 @@
+## 1.0.8
+
+- Showing APK info
+
 ## 1.0.7
 
 - Add SOPS_AGE_KEY as an input

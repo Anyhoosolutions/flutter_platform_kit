@@ -88,22 +88,22 @@ runs:
         PR_LABELS_JSON: ${{ toJSON(github.event.pull_request.labels) }}
       run: |
         set -e
-        
+
         FLAVOR="${{ inputs.flavor }}"
         EVENT_NAME="${{ github.event_name }}"
         SKIP_DEPLOY=false
         SKIP_REASON=""
-        
+
         echo "🔍 Checking for skip deployment labels..."
         echo "📋 Event: $EVENT_NAME"
         echo "📋 Flavor: ${FLAVOR:-'(none)'}"
         echo ""
-        
+
         # Function to normalize label name (lowercase, handle variations)
         normalize_label() {
           echo "$1" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9:]//g'
         }
-        
+
         # Function to check if a label should skip deployment
         should_skip() {
           local label="$1"
@@ -124,7 +124,7 @@ runs:
           
           return 1
         }
-        
+
         # Get labels based on event type
         if [ "$EVENT_NAME" = "pull_request" ]; then
           # For PR events, check labels directly from event
@@ -209,7 +209,7 @@ runs:
             echo "ℹ️  No PR number found in commit message (might be a direct push)"
           fi
         fi
-        
+
         if [ "$SKIP_DEPLOY" = "true" ]; then
           echo ""
           echo "⏭️  Build and deployment will be skipped: $SKIP_REASON"
@@ -281,6 +281,25 @@ runs:
             fi
           fi
         fi
+
+    - name: Show APK info and size
+      shell: bash
+      if: steps.check-skip-labels.outputs.skip_deploy != 'true'
+      run: |
+        echo "🔍 Showing APK info and size..."
+        echo "📋 APK info:"
+        file "$APK_OUTPUT_PATH"
+        echo "📋 APK size:"
+        du -h "$APK_OUTPUT_PATH"
+        echo "📋 APK details:"
+        ls -l "$APK_OUTPUT_PATH"
+
+    - name: Artifact for APK
+      uses: actions/upload-artifact@v4
+      if: steps.check-skip-labels.outputs.skip_deploy != 'true'
+      with:
+        name: apk
+        path: $APK_OUTPUT_PATH
 
     - name: Check if deployment should be triggered
       shell: bash
