@@ -246,6 +246,7 @@ runs:
         echo "🔍 Building Flutter APK..."
         echo "📋 Target: $TARGET_FILE"
         echo "📋 Mode: $BUILD_MODE"
+        echo "📋 APK output path: ${{ inputs.apk_output_path }}"
 
         # Build command
         BUILD_CMD="flutter build apk --$BUILD_MODE"
@@ -268,6 +269,9 @@ runs:
         $BUILD_CMD
 
         echo "✅ APK build completed"
+
+        echo "Showing apk files in build directory..."
+        find build -iname '*.apk' 
 
         # Determine APK path if not explicitly set
         if [ "${{ inputs.apk_output_path }}" = "build/app/outputs/apk/release/app-release.apk" ]; then
