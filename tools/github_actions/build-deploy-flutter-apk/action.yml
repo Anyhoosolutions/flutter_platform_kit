@@ -286,6 +286,12 @@ runs:
           fi
         fi
 
+        # Always set APK_OUTPUT_PATH to input value if not already set by auto-detection
+        if [ -z "$APK_OUTPUT_PATH" ]; then
+          echo "APK_OUTPUT_PATH=${{ inputs.apk_output_path }}" >> $GITHUB_ENV
+          echo "📦 Using APK path: ${{ inputs.apk_output_path }}"
+        fi
+
     - name: Show APK info and size
       shell: bash
       if: steps.check-skip-labels.outputs.skip_deploy != 'true'
