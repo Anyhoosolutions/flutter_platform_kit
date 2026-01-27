@@ -114,10 +114,23 @@ runs:
             return 0
           fi
           
+          # Check for generic "no-deploy-apk" label (case-insensitive)
+          if [ "$normalized_label" = "nodeployapk" ] || [ "$normalized_label" = "no-deploy-apk" ]; then
+            return 0
+          fi
+          
           # Check for flavor-specific label (e.g., "no-deploy:shucked", "no deploy: shucked")
           if [ -n "$FLAVOR" ]; then
             local normalized_flavor=$(normalize_label "$FLAVOR")
             if echo "$normalized_label" | grep -qE "^nodeploy:${normalized_flavor}$|^no-deploy:${normalized_flavor}$"; then
+              return 0
+            fi
+          fi
+          
+          # Check for APK flavor-specific label (e.g., "no-deploy-apk:shucked", "no deploy-apk: shucked")
+          if [ -n "$FLAVOR" ]; then
+            local normalized_flavor=$(normalize_label "$FLAVOR")
+            if echo "$normalized_label" | grep -qE "^nodeployapk:${normalized_flavor}$|^no-deploy-apk:${normalized_flavor}$"; then
               return 0
             fi
           fi

@@ -105,10 +105,23 @@ runs:
             return 0
           fi
           
+          # Check for generic "no-deploy-web" label (case-insensitive)
+          if [ "$normalized_label" = "nodeployweb" ] || [ "$normalized_label" = "no-deploy-web" ]; then
+            return 0
+          fi
+          
           # Check for hosting target-specific label (e.g., "no-deploy:app", "no deploy: app")
           if [ -n "$HOSTING_TARGET" ]; then
             local normalized_target=$(normalize_label "$HOSTING_TARGET")
             if echo "$normalized_label" | grep -qE "^nodeploy:${normalized_target}$|^no-deploy:${normalized_target}$"; then
+              return 0
+            fi
+          fi
+          
+          # Check for web hosting target-specific label (e.g., "no-deploy-web:app", "no deploy-web: app")
+          if [ -n "$HOSTING_TARGET" ]; then
+            local normalized_target=$(normalize_label "$HOSTING_TARGET")
+            if echo "$normalized_label" | grep -qE "^nodeployweb:${normalized_target}$|^no-deploy-web:${normalized_target}$"; then
               return 0
             fi
           fi
