@@ -270,8 +270,10 @@ runs:
 
         echo "✅ APK build completed"
 
+        echo "\n================================================"
         echo "Showing apk files in build directory..."
         find build -iname '*.apk' 
+        echo "================================================\n"
 
         # Determine APK path if not explicitly set
         if [ "${{ inputs.apk_output_path }}" = "build/app/outputs/apk/release/app-release.apk" ]; then
@@ -296,13 +298,16 @@ runs:
       shell: bash
       if: steps.check-skip-labels.outputs.skip_deploy != 'true'
       run: |
+        echo "\n================================================"
         echo "🔍 Showing APK info and size..."
+        echo "APK_OUTPUT_PATH: $APK_OUTPUT_PATH"
         echo "📋 APK info:"
         file "$APK_OUTPUT_PATH"
         echo "📋 APK size:"
         du -h "$APK_OUTPUT_PATH"
         echo "📋 APK details:"
         ls -l "$APK_OUTPUT_PATH"
+        echo "================================================\n"
 
     - name: Artifact for APK
       uses: actions/upload-artifact@v4

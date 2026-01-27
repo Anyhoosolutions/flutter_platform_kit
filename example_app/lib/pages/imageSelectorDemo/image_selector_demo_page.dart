@@ -1,5 +1,6 @@
 import 'package:anyhoo_image_selector/layout_type.dart';
 import 'package:anyhoo_image_selector/widgets/anyhoo_image_selector_widget.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:anyhoo_image_selector/selected_image.dart';
 
@@ -76,6 +77,8 @@ class _ImageSelectorDemoPageState extends State<ImageSelectorDemoPage> {
             if (image.selectedFile != null) _InfoRow(label: 'File Path', value: image.selectedFile!.path),
             if (image.selectedImage != null) _InfoRow(label: 'Type', value: 'Web Image'),
             if (image.selectedImage != null) _InfoRow(label: 'Bytes', value: '${image.selectedImage!.length} bytes'),
+            _InfoRow(label: 'Mime Type', value: image.mimeType ?? 'null'),
+            _InfoRow(label: 'kIsWeb', value: kIsWeb.toString()),
           ],
         ),
       ),

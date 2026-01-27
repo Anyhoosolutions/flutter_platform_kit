@@ -28,23 +28,28 @@ class ImageSelectorCubit extends Cubit<ImageSelectorState> {
 
     try {
       final XFile? xFile = await _picker.pickImage(source: source);
+      _log.info('Mime type: ${xFile?.mimeType}');
+      final sourceType = source == ImageSource.camera ? ImageSourceType.camera : ImageSourceType.gallery;
+      _log.info('Source type: $sourceType');
+      _log.info('kIsWeb: $kIsWeb');
 
       if (xFile != null) {
         if (kIsWeb) {
           // On web, read bytes from XFile
           final Uint8List imageBytes = await xFile.readAsBytes();
           emit(ImageSelectorState(
-            mimeType: xFile.mimeType,
             selectedImage: imageBytes,
-            sourceType: source == ImageSource.camera ? ImageSourceType.camera : ImageSourceType.gallery,
+            sourceType: sourceType,
             isLoading: false,
+            mimeType: xFile.mimeType,
           ));
         } else {
           // On mobile, store the File object
           final File file = File(xFile.path);
+
           emit(ImageSelectorState(
             selectedFile: file,
-            sourceType: source == ImageSource.camera ? ImageSourceType.camera : ImageSourceType.gallery,
+            sourceType: sourceType,
             isLoading: false,
           ));
         }
