@@ -1,3 +1,7 @@
+## 0.0.12
+
+- Add support for copying shared models to docs
+
 ## 0.0.11
 
 - Handle maps and enums
