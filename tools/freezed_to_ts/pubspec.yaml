@@ -8,6 +8,7 @@ environment:
 
 executables:
   freezed_to_ts: freezed_to_ts
+  copy_shared_models_to_docs: copy_shared_models_to_docs
 
 dependencies:
   analyzer: ^6.4.1
