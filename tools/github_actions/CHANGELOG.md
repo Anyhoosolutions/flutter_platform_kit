@@ -1,3 +1,7 @@
+## 1.0.11
+
+- Add **copy-shared-models-to-docs** action: generates `docs/shared_models.md` from Dart freezed shared models (clean Dart, no freezed boilerplate). Integrated into the upload_docs workflow.
+
 ## 1.0.10 
 
 - Fix for setting variable

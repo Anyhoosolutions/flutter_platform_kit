@@ -1,0 +1,32 @@
+name: Copy Shared Models to Docs (example)
+
+# Example workflow that runs the copy-shared-models-to-docs action.
+# Use this as a step before prepare-docs so shared_models.md is generated and included in uploaded docs.
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  copy-shared-models:
+    name: Copy shared models to docs
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Copy shared models to docs
+        uses: ./tools/github_actions/copy-shared-models-to-docs
+        with:
+          source_models_path: "tools/freezed_to_ts/test_data"
+          output_path: "docs/shared_models.md"
+
+  # Optional: run prepare-docs and upload-docs afterwards
+  # prepare-and-upload:
+  #   needs: copy-shared-models
+  #   ...
+  #     - uses: ./.github/actions/prepare-docs
+  #     - uses: ./tools/github_actions/upload-docs
+  #       with: ...

@@ -48,6 +48,17 @@ Verifies that TypeScript files generated from Dart freezed models are up to date
 - uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/verify-ts-generation@main
 ```
 
+### [copy-shared-models-to-docs](./copy-shared-models-to-docs/)
+Generates a Markdown documentation file from Dart freezed shared models (clean Dart, no freezed boilerplate). Use as a step before prepare-docs so the file is included in uploaded docs.
+
+**Usage:**
+```yaml
+- uses: ./tools/github_actions/copy-shared-models-to-docs
+  with:
+    source_models_path: "tools/freezed_to_ts/test_data"
+    output_path: "docs/shared_models.md"
+```
+
 ### [prepare-deployment](./prepare-deployment/)
 **Combined action** that verifies version bump, decrypts SOPS secrets, loads environment variables, generates release notes, and updates release_info.dart. All steps are configurable and can be enabled/disabled individually.
 

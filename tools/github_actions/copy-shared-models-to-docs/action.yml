@@ -1,0 +1,62 @@
+name: "Copy Shared Models to Docs"
+description: "Generate a Markdown documentation file from Dart freezed shared models (clean Dart, no @freezed/part/with/fromJson) using the copy_shared_models_to_docs script"
+
+inputs:
+  source_models_path:
+    description: "Path to Dart shared models (file or directory), relative to project root (e.g. tools/freezed_to_ts/test_data or lib/sharedModels)"
+    required: false
+    default: "tools/freezed_to_ts/test_data"
+  output_path:
+    description: "Path to the output Markdown file, relative to project root (e.g. docs/shared_models.md)"
+    required: false
+    default: "docs/shared_models.md"
+  freezed_to_ts_path:
+    description: "Path to the freezed_to_ts package, relative to project root"
+    required: false
+    default: "tools/freezed_to_ts"
+  project_root:
+    description: "Project root directory (defaults to workspace)"
+    required: false
+    default: ${{ github.workspace }}
+  dart_sdk:
+    description: "Dart SDK version"
+    required: false
+    default: "3.5"
+  enabled:
+    description: "Whether to run the step (skip if source path does not exist or no Dart model files)"
+    required: false
+    default: "true"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Set up Dart
+      uses: dart-lang/setup-dart@v1
+      with:
+        sdk: ${{ inputs.dart_sdk }}
+
+    - name: Copy shared models to docs
+      if: inputs.enabled == 'true'
+      shell: bash
+      run: |
+        set -e
+        ROOT="${{ inputs.project_root }}"
+        SRC="$ROOT/${{ inputs.source_models_path }}"
+        OUT="$ROOT/${{ inputs.output_path }}"
+        PKG="$ROOT/${{ inputs.freezed_to_ts_path }}"
+
+        if [ ! -d "$PKG" ]; then
+          echo "❌ freezed_to_ts package not found at $PKG"
+          exit 1
+        fi
+
+        if [ ! -f "$SRC" ] && [ ! -d "$SRC" ]; then
+          echo "⚠️  Source path not found: $SRC — skipping copy-shared-models-to-docs"
+          exit 0
+        fi
+
+        echo "📄 Generating shared models doc from $SRC -> $OUT"
+        cd "$PKG"
+        dart pub get --no-precompile
+        dart run freezed_to_ts:copy_shared_models_to_docs -i "$SRC" -o "$OUT"
+        echo "✅ Wrote $OUT"
