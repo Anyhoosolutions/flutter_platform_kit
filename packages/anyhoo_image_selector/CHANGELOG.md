@@ -1,3 +1,7 @@
+## 0.0.11
+
+* Debugging
+
 ## 0.0.10
 
 * Allow uploading to Storage with mime type
