@@ -3,15 +3,16 @@ import 'dart:io';
 import 'package:freezed_to_ts/freezed_to_ts.dart';
 import 'package:path/path.dart' as p;
 
-/// Copies shared model information (as TypeScript) from Dart freezed files
-/// into a Markdown documentation file.
+/// Copies shared model information (as Dart code, without freezed parts) from
+/// Dart freezed files into a Markdown documentation file.
 class CopySharedModelsToDocs {
   static const _excludeSuffixes = ['.freezed.dart', '.g.dart'];
 
   final FreezedToTsConverter _converter = FreezedToTsConverter();
 
-  /// Generates a Markdown document containing TypeScript definitions for all
+  /// Generates a Markdown document containing clean Dart definitions for all
   /// freezed models and enums found under [inputPath] (file or directory).
+  /// No @freezed, part, with, or fromJson—just classes and enums.
   ///
   /// Returns the generated Markdown content.
   String generate(String inputPath) {
@@ -29,11 +30,11 @@ class CopySharedModelsToDocs {
       final content = File(file).readAsStringSync();
       if (!_hasModels(content)) continue;
 
-      final ts = _converter.convert(content);
-      if (ts.trim().isEmpty) continue;
+      final dart = _converter.convertToDartDoc(content);
+      if (dart.trim().isEmpty) continue;
 
       final basename = p.basename(file);
-      entries.add(_DocEntry(sourceFile: basename, tsContent: ts));
+      entries.add(_DocEntry(sourceFile: basename, codeContent: dart));
     }
 
     return _wrapMarkdown(entries);
@@ -71,15 +72,15 @@ class CopySharedModelsToDocs {
     buf.writeln('# Shared Models');
     buf.writeln();
     buf.writeln(
-        'TypeScript definitions generated from Dart freezed shared models. ');
+        'Dart model definitions extracted from freezed shared models (no @freezed, part, with, or fromJson). ');
     buf.writeln('Use these as a reference for backend and frontend contracts.');
     buf.writeln();
 
     for (final e in entries) {
       buf.writeln('## ${e.sourceFile}');
       buf.writeln();
-      buf.writeln('```typescript');
-      buf.write(e.tsContent.trim());
+      buf.writeln('```dart');
+      buf.write(e.codeContent.trim());
       buf.writeln();
       buf.writeln('```');
       buf.writeln();
@@ -91,7 +92,7 @@ class CopySharedModelsToDocs {
 
 class _DocEntry {
   final String sourceFile;
-  final String tsContent;
+  final String codeContent;
 
-  _DocEntry({required this.sourceFile, required this.tsContent});
+  _DocEntry({required this.sourceFile, required this.codeContent});
 }

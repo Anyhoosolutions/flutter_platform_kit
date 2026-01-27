@@ -23,7 +23,7 @@ The script can be run from a local clone (ideal for development) or activated gl
 ### Executables
 
 *   **`freezed_to_ts`**: Converts Dart freezed models to TypeScript and writes `.ts` files (or prints to console).
-*   **`copy_shared_models_to_docs`**: Same conversion, but writes a single Markdown documentation file (e.g. for docs). Use `-i` for the shared-models path (e.g. `lib/sharedModels`) and `-o` for the output file (e.g. `docs/shared_models.md`). Suitable for GitHub Actions:
+*   **`copy_shared_models_to_docs`**: Writes a single Markdown documentation file with **Dart** model definitions (no `@freezed`, `part`, `with`, or `fromJson`—just classes and enums). Use `-i` for the shared-models path (e.g. `lib/sharedModels`) and `-o` for the output file (e.g. `docs/shared_models.md`). Suitable for GitHub Actions:
 
     ```sh
     dart run freezed_to_ts:copy_shared_models_to_docs -i lib/sharedModels -o docs/shared_models.md

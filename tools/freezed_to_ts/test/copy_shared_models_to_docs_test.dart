@@ -24,7 +24,7 @@ void main() {
       expect(result, startsWith('# Shared Models'));
       expect(
         result,
-        contains('TypeScript definitions generated from Dart freezed shared models.'),
+        contains('Dart model definitions extracted from freezed shared models'),
       );
       expect(
         result,
@@ -32,7 +32,7 @@ void main() {
       );
     });
 
-    test('output has ## sections per source file with ```typescript code blocks', () {
+    test('output has ## sections per source file with ```dart code blocks', () {
       final result = copier.generate(testDataPath);
 
       expect(result, contains('## address.dart'));
@@ -41,51 +41,61 @@ void main() {
       expect(result, contains('## user.dart'));
       expect(result, contains('## user_group.dart'));
 
-      final tsBlocks = RegExp(r'```typescript\n').allMatches(result);
-      // Match ``` only when not part of ```typescript (closing fences); last may have no trailing \n (trimRight)
-      final closingFences = RegExp(r'\n```(?!typescript)(?:\n|$)').allMatches(result);
-      expect(tsBlocks.length, greaterThanOrEqualTo(4), reason: 'test_data has 5 model files');
-      expect(tsBlocks.length, equals(closingFences.length), reason: 'Each ```typescript block must have a closing ```');
+      final dartBlocks = RegExp(r'```dart\n').allMatches(result);
+      final closingFences = RegExp(r'\n```(?!dart)(?:\n|$)').allMatches(result);
+      expect(dartBlocks.length, greaterThanOrEqualTo(4), reason: 'test_data has 5 model files');
+      expect(dartBlocks.length, equals(closingFences.length), reason: 'Each ```dart block must have a closing ```');
     });
 
-    test('output contains expected TypeScript for AddressType enum', () {
+    test('output contains expected Dart for AddressType enum', () {
       final result = copier.generate(testDataPath);
 
-      expect(result, contains('export enum AddressType {'));
-      expect(result, contains('home = "home",'));
-      expect(result, contains('work = "work",'));
-      expect(result, contains('other = "other",'));
+      expect(result, contains('enum AddressType {'));
+      expect(result, contains('home, work, other'));
     });
 
-    test('output contains expected TypeScript for Address', () {
+    test('output contains expected Dart for Address', () {
       final result = copier.generate(testDataPath);
 
-      expect(result, contains('export interface Address {'));
-      expect(result, contains('id: string;'));
-      expect(result, contains('street: string;'));
-      expect(result, contains('city: string;'));
-      expect(result, contains('addressType: AddressType;'));
+      expect(result, contains('class Address {'));
+      expect(result, contains('final String id;'));
+      expect(result, contains('final String street;'));
+      expect(result, contains('final String city;'));
+      expect(result, contains('final AddressType addressType;'));
+      expect(result, contains('const Address({'));
     });
 
-    test('output contains expected TypeScript for RecipeShort', () {
+    test('output contains expected Dart for RecipeShort', () {
       final result = copier.generate(testDataPath);
 
-      expect(result, contains('export interface RecipeShort {'));
-      expect(result, contains('description: string | null;'));
-      expect(result, contains('imageUrls: string[];'));
-      expect(result, contains('categories: string[];'));
+      expect(result, contains('class RecipeShort {'));
+      expect(result, contains('final String? description;'));
+      expect(result, contains('final List<String> imageUrls;'));
+      expect(result, contains('final List<String> categories;'));
     });
 
     test('output contains User and UserGroup with imports', () {
       final result = copier.generate(testDataPath);
 
-      expect(result, contains('export interface User {'));
-      expect(result, contains('import type { Address } from "./address";'));
-      expect(result, contains('address: Address;'));
+      expect(result, contains('class User {'));
+      expect(result, contains("import 'address.dart';"));
+      expect(result, contains('final Address address;'));
 
-      expect(result, contains('export interface UserGroup {'));
-      expect(result, contains('import type { RecipeShort } from "./recipe_short";'));
-      expect(result, contains('recipes: RecipeShort[];'));
+      expect(result, contains('class UserGroup {'));
+      expect(result, contains("import 'recipe_short.dart';"));
+      expect(result, contains('final List<RecipeShort> recipes;'));
+    });
+
+    test('output has no freezed parts in code blocks', () {
+      final result = copier.generate(testDataPath);
+      final codeBlocks = RegExp(r'```dart\n([\s\S]*?)```').allMatches(result);
+      for (final m in codeBlocks) {
+        final code = m.group(1)!;
+        expect(code, isNot(contains('@freezed')), reason: 'code block should not contain @freezed');
+        expect(code, isNot(contains('part ')), reason: 'code block should not contain part ');
+        expect(code, isNot(contains('with _\$')), reason: 'code block should not contain with _\$');
+        expect(code, isNot(contains('fromJson')), reason: 'code block should not contain fromJson');
+      }
     });
 
     test('empty directory produces title and intro only', () {
@@ -94,9 +104,9 @@ void main() {
         final result = copier.generate(tmp.path);
 
         expect(result, startsWith('# Shared Models'));
-        expect(result, contains('TypeScript definitions generated from'));
-        expect(result, isNot(contains('## ')));
-        expect(result, isNot(contains('```typescript')));
+        expect(result, contains('Dart model definitions'));
+        expect(result, isNot(contains('## address')));
+        expect(result, isNot(contains('```dart')));
       } finally {
         tmp.deleteSync(recursive: true);
       }
@@ -106,14 +116,12 @@ void main() {
       final tmp = Directory.systemTemp.createTempSync('copy_shared_models_test_no_models');
       try {
         final noModels = File(p.join(tmp.path, 'helper.dart'));
-        noModels.writeAsStringSync('''
-void main() => print("no freezed");
-''');
+        noModels.writeAsStringSync('void main() => print("no freezed");');
         final result = copier.generate(tmp.path);
 
         expect(result, startsWith('# Shared Models'));
         expect(result, isNot(contains('## helper.dart')));
-        expect(result, isNot(contains('```typescript')));
+        expect(result, isNot(contains('```dart')));
       } finally {
         tmp.deleteSync(recursive: true);
       }
@@ -126,16 +134,16 @@ void main() => print("no freezed");
 
       expect(result, startsWith('# Shared Models'));
       expect(result, contains('## address_type.dart'));
-      expect(result, contains('export enum AddressType {'));
-      expect(result, contains('```typescript'));
+      expect(result, contains('enum AddressType {'));
+      expect(result, contains('```dart'));
     });
 
     test('output has balanced markdown code fences', () {
       final result = copier.generate(testDataPath);
 
-      final openFences = RegExp(r'```typescript\n').allMatches(result);
-      final closeFences = RegExp(r'\n```(?!typescript)(?:\n|$)').allMatches(result);
-      expect(openFences.length, equals(closeFences.length), reason: 'Each ```typescript block must have a closing ```');
+      final openFences = RegExp(r'```dart\n').allMatches(result);
+      final closeFences = RegExp(r'\n```(?!dart)(?:\n|$)').allMatches(result);
+      expect(openFences.length, equals(closeFences.length), reason: 'Each ```dart block must have a closing ```');
       expect(result, contains('}\n```'));
     });
   });
