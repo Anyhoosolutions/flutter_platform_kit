@@ -292,19 +292,57 @@ runs:
         if [ "${{ inputs.apk_output_path }}" = "build/app/outputs/apk/release/app-release.apk" ]; then
           # Auto-detect APK path based on flavor
           if [ -n "$FLAVOR" ]; then
-            # Try flavor-specific path
+            # Try flavor-specific path in apk directory
             FLAVOR_APK_PATH="build/app/outputs/apk/$FLAVOR/release/app-$FLAVOR-release.apk"
             if [ -f "$FLAVOR_APK_PATH" ]; then
               echo "APK_OUTPUT_PATH=$FLAVOR_APK_PATH" >> $GITHUB_ENV
               echo "📦 Detected APK at: $FLAVOR_APK_PATH"
+            else
+              # Try flavor-specific path in flutter-apk directory
+              FLAVOR_APK_PATH="build/app/outputs/flutter-apk/app-$FLAVOR-release.apk"
+              if [ -f "$FLAVOR_APK_PATH" ]; then
+                echo "APK_OUTPUT_PATH=$FLAVOR_APK_PATH" >> $GITHUB_ENV
+                echo "📦 Detected APK at: $FLAVOR_APK_PATH"
+              fi
+            fi
+          else
+            # No flavor - try default paths
+            # Try flutter-apk directory first (common Flutter output location)
+            DEFAULT_FLUTTER_APK="build/app/outputs/flutter-apk/app-release.apk"
+            if [ -f "$DEFAULT_FLUTTER_APK" ]; then
+              echo "APK_OUTPUT_PATH=$DEFAULT_FLUTTER_APK" >> $GITHUB_ENV
+              echo "📦 Detected APK at: $DEFAULT_FLUTTER_APK"
             fi
           fi
         fi
 
         # Always set APK_OUTPUT_PATH to input value if not already set by auto-detection
         if [ -z "$APK_OUTPUT_PATH" ]; then
-          echo "APK_OUTPUT_PATH=${{ inputs.apk_output_path }}" >> $GITHUB_ENV
-          echo "📦 Using APK path: ${{ inputs.apk_output_path }}"
+          # Check if the input path exists, if not try to find the APK
+          if [ -f "${{ inputs.apk_output_path }}" ]; then
+            echo "APK_OUTPUT_PATH=${{ inputs.apk_output_path }}" >> $GITHUB_ENV
+            echo "📦 Using APK path: ${{ inputs.apk_output_path }}"
+          else
+            # Try to find APK in common locations
+            FOUND_APK=""
+            for APK_PATH in \
+              "build/app/outputs/flutter-apk/app-release.apk" \
+              "build/app/outputs/apk/release/app-release.apk" \
+              "${{ inputs.apk_output_path }}"; do
+              if [ -f "$APK_PATH" ]; then
+                FOUND_APK="$APK_PATH"
+                break
+              fi
+            done
+            
+            if [ -n "$FOUND_APK" ]; then
+              echo "APK_OUTPUT_PATH=$FOUND_APK" >> $GITHUB_ENV
+              echo "📦 Found APK at: $FOUND_APK"
+            else
+              echo "APK_OUTPUT_PATH=${{ inputs.apk_output_path }}" >> $GITHUB_ENV
+              echo "⚠️  Using specified path (may not exist): ${{ inputs.apk_output_path }}"
+            fi
+          fi
         fi
 
     - name: Show APK info and size
@@ -327,7 +365,7 @@ runs:
       if: steps.check-skip-labels.outputs.skip_deploy != 'true'
       with:
         name: apk
-        path: $APK_OUTPUT_PATH
+        path: ${{ env.APK_OUTPUT_PATH }}
 
     - name: Check if deployment should be triggered
       shell: bash
@@ -470,12 +508,21 @@ runs:
       env:
         GOOGLE_APPLICATION_CREDENTIALS: ${{ github.workspace }}/${{ inputs.service_account_path }}
       run: |
+        set -e
+        
         # Use environment variable if set (auto-detected), otherwise use input
         if [ -n "$APK_OUTPUT_PATH" ]; then
           APK_PATH="$APK_OUTPUT_PATH"
         else
           APK_PATH="${{ inputs.apk_output_path }}"
         fi
+        
+        # Resolve to absolute path to avoid any path issues
+        # Normalize the path (resolve . and ..) - this handles both absolute and relative paths
+        if [ -f "$APK_PATH" ]; then
+          APK_PATH=$(cd "$(dirname "$APK_PATH")" && pwd)/$(basename "$APK_PATH")
+        fi
+        
         RELEASE_NOTES_FILE="${{ inputs.release_notes_file }}"
         RELEASE_NOTES="${{ inputs.release_notes }}"
         GROUPS="${{ inputs.groups }}"
@@ -488,37 +535,54 @@ runs:
         # Check if APK exists
         if [ ! -f "$APK_PATH" ]; then
           echo "❌ APK file not found: $APK_PATH"
+          echo "📋 Current directory: $(pwd)"
+          echo "📋 Looking for APK files:"
+          find build -iname '*.apk' 2>/dev/null || echo "No APK files found in build directory"
+          exit 1
+        fi
+
+        # Verify it's actually an APK file
+        if ! file "$APK_PATH" | grep -qiE "(android|apk|zip)"; then
+          echo "❌ File does not appear to be a valid APK: $APK_PATH"
+          echo "📋 File type: $(file "$APK_PATH")"
           exit 1
         fi
 
         echo "📦 APK file: $APK_PATH ($(du -h "$APK_PATH" | cut -f1))"
+        echo "📋 APK file type: $(file "$APK_PATH")"
+        echo "📋 APK absolute path: $APK_PATH"
 
-        # Build deploy command
-        DEPLOY_CMD="firebase appdistribution:distribute \"$APK_PATH\" --app \"$FIREBASE_APP_ID_ANDROID\""
+        # Build deploy command arguments array to avoid quoting issues
+        DEPLOY_ARGS=(
+          "appdistribution:distribute"
+          "$APK_PATH"
+          "--app"
+          "$FIREBASE_APP_ID_ANDROID"
+        )
 
         # Add release notes
         if [ -n "$RELEASE_NOTES_FILE" ] && [ -f "$RELEASE_NOTES_FILE" ]; then
-          DEPLOY_CMD="$DEPLOY_CMD --release-notes-file \"$RELEASE_NOTES_FILE\""
+          DEPLOY_ARGS+=("--release-notes-file" "$RELEASE_NOTES_FILE")
           echo "📝 Using release notes from: $RELEASE_NOTES_FILE"
         elif [ -n "$RELEASE_NOTES" ]; then
-          DEPLOY_CMD="$DEPLOY_CMD --release-notes \"$RELEASE_NOTES\""
+          DEPLOY_ARGS+=("--release-notes" "$RELEASE_NOTES")
           echo "📝 Using provided release notes text"
         fi
 
         # Add groups
         if [ -n "$GROUPS" ]; then
-          DEPLOY_CMD="$DEPLOY_CMD --groups \"$GROUPS\""
+          DEPLOY_ARGS+=("--groups" "$GROUPS")
           echo "👥 Distributing to groups: $GROUPS"
         fi
 
         # Add testers
         if [ -n "$TESTERS" ]; then
-          DEPLOY_CMD="$DEPLOY_CMD --testers \"$TESTERS\""
+          DEPLOY_ARGS+=("--testers" "$TESTERS")
           echo "👥 Distributing to testers: $TESTERS"
         fi
 
         echo "🚀 Deploying to Firebase App Distribution..."
-        echo "📋 Command: $DEPLOY_CMD"
-        $DEPLOY_CMD
+        echo "📋 Command: firebase ${DEPLOY_ARGS[*]}"
+        firebase "${DEPLOY_ARGS[@]}"
 
         echo "✅ Deployment completed"
