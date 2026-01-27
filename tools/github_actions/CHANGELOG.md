@@ -1,3 +1,7 @@
+## 1.0.12
+
+- Fix for firebase app distribution groups
+
 ## 1.0.11
 
 - Add **copy-shared-models-to-docs** action: generates `docs/shared_models.md` from Dart freezed shared models (clean Dart, no freezed boilerplate). Integrated into the upload_docs workflow.

@@ -525,12 +525,15 @@ runs:
         
         RELEASE_NOTES_FILE="${{ inputs.release_notes_file }}"
         RELEASE_NOTES="${{ inputs.release_notes }}"
-        GROUPS="${{ inputs.groups }}"
-        TESTERS="${{ inputs.testers }}"
+        # Use a different variable name to avoid conflict with system GROUPS env var
+        FIREBASE_GROUPS="${{ inputs.groups }}"
+        FIREBASE_TESTERS="${{ inputs.testers }}"
 
         echo "🔍 Using service account authentication"
         echo "📋 Service account file: $GOOGLE_APPLICATION_CREDENTIALS"
         echo "🔍 Using Firebase Android App ID: $FIREBASE_APP_ID_ANDROID"
+        echo "🔍 Input groups value: '${{ inputs.groups }}'"
+        echo "🔍 Resolved groups value: '$FIREBASE_GROUPS'"
 
         # Check if APK exists
         if [ ! -f "$APK_PATH" ]; then
@@ -570,15 +573,15 @@ runs:
         fi
 
         # Add groups
-        if [ -n "$GROUPS" ]; then
-          DEPLOY_ARGS+=("--groups" "$GROUPS")
-          echo "👥 Distributing to groups: $GROUPS"
+        if [ -n "$FIREBASE_GROUPS" ]; then
+          DEPLOY_ARGS+=("--groups" "$FIREBASE_GROUPS")
+          echo "👥 Distributing to groups: $FIREBASE_GROUPS"
         fi
 
         # Add testers
-        if [ -n "$TESTERS" ]; then
-          DEPLOY_ARGS+=("--testers" "$TESTERS")
-          echo "👥 Distributing to testers: $TESTERS"
+        if [ -n "$FIREBASE_TESTERS" ]; then
+          DEPLOY_ARGS+=("--testers" "$FIREBASE_TESTERS")
+          echo "👥 Distributing to testers: $FIREBASE_TESTERS"
         fi
 
         echo "🚀 Deploying to Firebase App Distribution..."
