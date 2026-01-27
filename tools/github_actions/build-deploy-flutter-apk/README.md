@@ -147,11 +147,23 @@ You can skip the entire action (both build and deployment) by adding specific la
    - `NO-DEPLOY`
    - Any case variation
 
-2. **Flavor-specific skip** (skips build and deployment for a specific flavor):
+2. **APK-specific skip** (skips all APK builds and deployments):
+   - `no-deploy-apk`
+   - `No Deploy APK`
+   - `NO-DEPLOY-APK`
+   - Any case variation
+
+3. **Flavor-specific skip** (skips build and deployment for a specific flavor):
    - `no-deploy:shucked` - Skips build and deployment for the `shucked` flavor
    - `no-deploy:production` - Skips build and deployment for the `production` flavor
    - `No Deploy: staging` - Case and spacing variations are supported
    - Format: `no-deploy:<flavor>` where `<flavor>` matches your build flavor
+
+4. **APK flavor-specific skip** (skips APK build and deployment for a specific flavor):
+   - `no-deploy-apk:shucked` - Skips APK build and deployment for the `shucked` flavor
+   - `no-deploy-apk:production` - Skips APK build and deployment for the `production` flavor
+   - `No Deploy APK: staging` - Case and spacing variations are supported
+   - Format: `no-deploy-apk:<flavor>` where `<flavor>` matches your build flavor
 
 **How It Works:**
 
@@ -240,7 +252,7 @@ To skip build and deployment:
 2. **Checks for Skip Labels** (always runs first)
    - For PR events: Checks labels directly from the pull request
    - For push events: Extracts PR number from commit message and fetches labels via GitHub API
-   - Skips the entire action (build and deployment) if a matching `no-deploy` or `no-deploy:<flavor>` label is found
+   - Skips the entire action (build and deployment) if a matching `no-deploy`, `no-deploy-apk`, `no-deploy:<flavor>`, or `no-deploy-apk:<flavor>` label is found
    - Label matching is case-insensitive and handles variations
    - If a skip label is found, all subsequent steps are skipped
 
@@ -285,7 +297,9 @@ To skip build and deployment:
   - This is ideal for multi-flavor setups where you want to deploy each flavor independently
 - **Skip Build and Deployment Labels**: You can skip the entire action by adding labels to your PR:
   - Generic `no-deploy` label skips all builds and deployments
+  - APK-specific `no-deploy-apk` label skips all APK builds and deployments
   - Flavor-specific `no-deploy:<flavor>` label skips build and deployment for that specific flavor
+  - APK flavor-specific `no-deploy-apk:<flavor>` label skips APK build and deployment for that specific flavor
   - Works for both PR events and push events (after merge)
   - When a skip label is found, the entire action is skipped (no build, no deployment, no Gradle caching)
   - This saves CI/CD resources when builds aren't needed

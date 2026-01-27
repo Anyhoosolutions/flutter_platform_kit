@@ -389,6 +389,180 @@ class FreezedToTsConverter {
     return '${output.toString().trim()}\n';
   }
 
+  /// Generates clean Dart documentation (no freezed parts: no @freezed, part,
+  /// with, fromJson) for shared models. Output is suitable for ```dart blocks.
+  String convertToDartDoc(String dartCode) {
+    final parseResult = parseString(
+      content: dartCode,
+      featureSet: FeatureSet.latestLanguageVersion(),
+      throwIfDiagnostics: false,
+    );
+    final compilationUnit = parseResult.unit;
+    final output = StringBuffer();
+    final Set<String> referencedFreezedClasses = {};
+    final Set<String> referencedEnums = {};
+    final List<String> dartImports = [];
+
+    final List<EnumDeclaration> enumDeclarations = [];
+    for (final declaration in compilationUnit.declarations) {
+      if (declaration is EnumDeclaration) {
+        enumDeclarations.add(declaration);
+      }
+    }
+
+    final List<Map<String, dynamic>> freezedClasses = [];
+    for (final declaration in compilationUnit.declarations) {
+      if (declaration is! ClassDeclaration) continue;
+      final isFreezed = declaration.metadata.any((m) => m.name.name == 'freezed');
+      if (!isFreezed) continue;
+
+      final className = declaration.name.lexeme;
+      final factoryConstructors = declaration.members
+          .whereType<ConstructorDeclaration>()
+          .where((m) => m.factoryKeyword != null);
+
+      if (factoryConstructors.isEmpty) continue;
+
+      final allFields = <String, Map<String, dynamic>>{};
+
+      for (final constructor in factoryConstructors) {
+        if (constructor.name?.lexeme == 'fromJson') continue;
+        for (final param in constructor.parameters.parameters) {
+          String? name;
+          TypeAnnotation? typeAnnotation;
+          bool isRequired = false;
+
+          if (param is DefaultFormalParameter) {
+            final inner = param.parameter;
+            if (inner is SimpleFormalParameter) {
+              name = inner.name?.lexeme;
+              typeAnnotation = inner.type;
+            } else if (inner is FieldFormalParameter) {
+              name = inner.name.lexeme;
+              typeAnnotation = inner.type;
+            }
+            isRequired = false;
+          } else if (param is FieldFormalParameter) {
+            name = param.name.lexeme;
+            typeAnnotation = param.type;
+            isRequired = param.requiredKeyword != null;
+          } else if (param is SimpleFormalParameter) {
+            name = param.name?.lexeme;
+            typeAnnotation = param.type;
+            isRequired = param.requiredKeyword != null;
+          }
+          if (name == null || typeAnnotation == null) continue;
+
+          bool shouldIgnore = false;
+          for (final annotation in param.metadata) {
+            if (annotation.name.name == 'JsonKey' && annotation.arguments != null) {
+              for (final arg in annotation.arguments!.arguments) {
+                if (arg is NamedExpression && arg.name.label.name == 'ignore') {
+                  if (arg.expression is BooleanLiteral) {
+                    shouldIgnore = (arg.expression as BooleanLiteral).value;
+                  }
+                  break;
+                }
+              }
+            }
+          }
+          if (shouldIgnore) continue;
+
+          final dartType = typeAnnotation.toSource();
+          _extractReferencedFreezedClasses(dartType, className, referencedFreezedClasses);
+          _extractReferencedEnums(dartType, referencedEnums);
+
+          if (allFields.containsKey(name)) continue;
+          allFields[name] = {'name': name, 'dartType': dartType, 'required': isRequired};
+        }
+      }
+
+      freezedClasses.add({'className': className, 'fields': allFields.values.toList()});
+    }
+
+    final localClassNames = freezedClasses.map((c) => c['className'] as String).toSet();
+    final localEnumNames = enumDeclarations.map((e) => e.name.lexeme).toSet();
+
+    void addDartImport(String dartPath) {
+      if (dartPath.isEmpty || dartPath.startsWith('package:')) return;
+      final p = dartPath.endsWith('.dart') ? dartPath : '$dartPath.dart';
+      if (!dartImports.contains(p)) dartImports.add(p);
+    }
+
+    for (final ref in referencedFreezedClasses) {
+      if (localClassNames.contains(ref)) continue;
+      final path = _resolveDartImportPath(compilationUnit, ref, true);
+      if (path != null) addDartImport(path);
+    }
+    for (final ref in referencedEnums) {
+      if (localEnumNames.contains(ref)) continue;
+      final path = _resolveDartImportPath(compilationUnit, ref, false);
+      if (path != null) addDartImport(path);
+    }
+    dartImports.sort();
+
+    for (final p in dartImports) {
+      output.writeln("import '$p';");
+    }
+    if (dartImports.isNotEmpty && (enumDeclarations.isNotEmpty || freezedClasses.isNotEmpty)) {
+      output.writeln('');
+    }
+
+    final sortedEnums = List<EnumDeclaration>.from(enumDeclarations)
+      ..sort((a, b) => a.name.lexeme.compareTo(b.name.lexeme));
+    for (var i = 0; i < sortedEnums.length; i++) {
+      if (i > 0) output.writeln('');
+      final e = sortedEnums[i];
+      final names = e.constants.map((c) => c.name.lexeme).join(', ');
+      output.writeln('enum ${e.name.lexeme} { $names }');
+    }
+
+    if (sortedEnums.isNotEmpty && freezedClasses.isNotEmpty) output.writeln('');
+
+    final sortedClasses = List<Map<String, dynamic>>.from(freezedClasses)
+      ..sort((a, b) => (a['className'] as String).compareTo(b['className'] as String));
+    for (var i = 0; i < sortedClasses.length; i++) {
+      if (i > 0) output.writeln('');
+      final info = sortedClasses[i];
+      final className = info['className'] as String;
+      final fields = info['fields'] as List<Map<String, dynamic>>;
+      output.writeln('class $className {');
+      for (final f in fields) {
+        output.writeln('  final ${f['dartType']} ${f['name']};');
+      }
+      output.writeln('');
+      final params = fields.map((f) {
+        final req = f['required'] as bool;
+        return req ? 'required this.${f['name']}' : 'this.${f['name']}';
+      }).join(', ');
+      output.writeln('  const $className({ $params });');
+      output.writeln('}');
+    }
+
+    return '${output.toString().trim()}\n';
+  }
+
+  String? _resolveDartImportPath(CompilationUnit compilationUnit, String symbolName, bool _) {
+    final expectedFile = _classNameToFileName(symbolName);
+    for (final d in compilationUnit.directives) {
+      if (d is! ImportDirective) continue;
+      final uri = d.uri.stringValue;
+      if (uri == null) continue;
+      if (!uri.startsWith('package:')) {
+        if (uri == expectedFile || uri.endsWith('/$expectedFile')) return expectedFile;
+        if (uri.endsWith('.dart')) return uri;
+        return '$uri.dart';
+      }
+      if (_ignoredPackages.any((p) => uri.startsWith('package:$p/'))) continue;
+      final fn = _extractFileNameFromPackageImport(uri);
+      if (fn != null && fn == expectedFile) return fn;
+    }
+    if (_knownFreezedClasses.contains(symbolName) || _knownEnums.contains(symbolName)) {
+      return expectedFile;
+    }
+    return null;
+  }
+
   void _extractReferencedFreezedClasses(String type, String currentClassName, Set<String> referencedClasses) {
     // Remove nullable marker
     final baseType = type.endsWith('?') ? type.substring(0, type.length - 1) : type;

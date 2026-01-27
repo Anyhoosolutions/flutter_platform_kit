@@ -168,13 +168,25 @@ You can skip the entire action (both build and deployment) by adding specific la
    - `NO-DEPLOY`
    - Any case variation
 
-2. **Hosting target-specific skip** (skips build and deployment for a specific hosting target):
+2. **Web-specific skip** (skips all web builds and deployments):
+   - `no-deploy-web`
+   - `No Deploy Web`
+   - `NO-DEPLOY-WEB`
+   - Any case variation
+
+3. **Hosting target-specific skip** (skips build and deployment for a specific hosting target):
    - `no-deploy:app` - Skips build and deployment for the `app` hosting target
    - `no-deploy:restaurant` - Skips build and deployment for the `restaurant` hosting target
    - `No Deploy: widgetbook` - Case and spacing variations are supported
    - Format: `no-deploy:<hosting_target>` where `<hosting_target>` matches your `firebase_hosting_target` input
 
-3. **Output directory-specific skip** (if hosting target is not set):
+4. **Web hosting target-specific skip** (skips web build and deployment for a specific hosting target):
+   - `no-deploy-web:app` - Skips web build and deployment for the `app` hosting target
+   - `no-deploy-web:restaurant` - Skips web build and deployment for the `restaurant` hosting target
+   - `No Deploy Web: widgetbook` - Case and spacing variations are supported
+   - Format: `no-deploy-web:<hosting_target>` where `<hosting_target>` matches your `firebase_hosting_target` input
+
+5. **Output directory-specific skip** (if hosting target is not set):
    - `no-deploy:web_app` - Skips build and deployment for the `web_app` output directory
    - `no-deploy:web_restaurant` - Skips build and deployment for the `web_restaurant` output directory
    - Format: `no-deploy:<output_dir>` where `<output_dir>` matches your `output_dir` input
@@ -256,7 +268,7 @@ This action does not produce outputs, but builds are available in:
 1. **Checks for Skip Labels** (always runs first)
    - For PR events: Checks labels directly from the pull request
    - For push events: Extracts PR number from commit message and fetches labels via GitHub API
-   - Skips the entire action (build and deployment) if a matching `no-deploy` or `no-deploy:<target>` label is found
+   - Skips the entire action (build and deployment) if a matching `no-deploy`, `no-deploy-web`, `no-deploy:<target>`, or `no-deploy-web:<target>` label is found
    - Label matching is case-insensitive and handles variations
    - If a skip label is found, all subsequent steps are skipped
 
@@ -296,7 +308,9 @@ This action does not produce outputs, but builds are available in:
   - This is ideal for multi-app setups where you want to deploy each app independently
 - **Skip Build and Deployment Labels**: You can skip the entire action by adding labels to your PR:
   - Generic `no-deploy` label skips all builds and deployments
+  - Web-specific `no-deploy-web` label skips all web builds and deployments
   - Hosting target-specific `no-deploy:<hosting_target>` label skips build and deployment for that specific target
+  - Web hosting target-specific `no-deploy-web:<hosting_target>` label skips web build and deployment for that specific target
   - Output directory-specific `no-deploy:<output_dir>` label skips build and deployment for that specific output directory (when hosting target is not set)
   - Works for both PR events and push events (after merge)
   - When a skip label is found, the entire action is skipped (no build, no deployment)
