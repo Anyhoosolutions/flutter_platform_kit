@@ -19,9 +19,9 @@ class MapPage extends StatelessWidget {
             height: 400,
             width: 600,
             child: AnyhooMap(
+              settings: AnyhooMapSettings(initialZoom: 15),
               mapType: AnyhooMapType.flutter,
               location: AnyhooLatLong(latitude: 51.5074, longitude: -0.1278),
-              initialZoom: 15,
               markers: [
                 AnyhooMarker(
                   location: AnyhooLatLong(latitude: 51.5094, longitude: -0.1278),

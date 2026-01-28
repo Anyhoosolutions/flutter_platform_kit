@@ -1,5 +1,4 @@
 import 'package:anyhoo_map/anyhoo_map.dart';
-import 'package:anyhoo_map/src/anyhoo_map_settings.dart';
 import 'package:anyhoo_map/src/open_street_map_tile_layer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';

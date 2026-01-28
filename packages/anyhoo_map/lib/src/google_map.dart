@@ -1,5 +1,4 @@
 import 'package:anyhoo_map/anyhoo_map.dart';
-import 'package:anyhoo_map/src/anyhoo_map_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 

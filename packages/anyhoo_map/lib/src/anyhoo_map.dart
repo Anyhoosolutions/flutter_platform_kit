@@ -4,23 +4,23 @@ import 'package:flutter/material.dart';
 class AnyhooMap extends StatelessWidget {
   final AnyhooMapType mapType;
   final AnyhooLatLong location;
-  final double initialZoom;
   final List<AnyhooMarker> markers;
+  final AnyhooMapSettings settings;
 
   const AnyhooMap({
     super.key,
     required this.mapType,
     required this.location,
-    required this.initialZoom,
     required this.markers,
+    required this.settings,
   });
 
   @override
   Widget build(BuildContext context) {
     if (mapType == AnyhooMapType.google) {
-      return GoogleMapView(location: location, initialZoom: initialZoom, markers: markers);
+      return GoogleMapView(location: location, markers: markers, settings: settings);
     } else if (mapType == AnyhooMapType.flutter) {
-      return FlutterMapView(location: location, initialZoom: initialZoom, markers: markers);
+      return FlutterMapView(location: location, markers: markers, settings: settings);
     } else {
       throw Exception('Invalid map type: $mapType');
     }
