@@ -24,14 +24,14 @@ class MapPage extends StatelessWidget {
               initialZoom: 15,
               markers: [
                 AnyhooMarker(
-                  location: AnyhooLatLong(latitude: 51.5074, longitude: -0.1278),
+                  location: AnyhooLatLong(latitude: 51.5094, longitude: -0.1278),
                   title: 'London',
-                  description: 'London is the capital of England',
+                  description: 'This is a marker in London',
                 ),
                 AnyhooMarker(
                   location: AnyhooLatLong(latitude: 51.5070, longitude: -0.1260),
                   title: 'London',
-                  description: 'London is the capital of England',
+                  description: 'Here is another marker',
                 ),
               ],
             ),

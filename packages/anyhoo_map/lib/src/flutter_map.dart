@@ -1,4 +1,5 @@
 import 'package:anyhoo_map/anyhoo_map.dart';
+import 'package:anyhoo_map/src/anyhoo_map_settings.dart';
 import 'package:anyhoo_map/src/open_street_map_tile_layer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -6,10 +7,10 @@ import 'package:latlong2/latlong.dart';
 
 class FlutterMapView extends StatelessWidget {
   final AnyhooLatLong location;
-  final double initialZoom;
   final List<AnyhooMarker> markers;
+  final AnyhooMapSettings settings;
 
-  const FlutterMapView({super.key, required this.location, this.initialZoom = 15, this.markers = const []});
+  const FlutterMapView({super.key, required this.location, this.markers = const [], required this.settings});
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +26,7 @@ class FlutterMapView extends StatelessWidget {
           child: FlutterMap(
             options: MapOptions(
               initialCenter: LatLng(location.latitude, location.longitude),
-              initialZoom: initialZoom,
+              initialZoom: settings.initialZoom,
               // onTap: (_, p) => setState(() => customMarkers.add(buildPin(p))),
               interactionOptions: const InteractionOptions(flags: ~InteractiveFlag.doubleTapZoom),
             ),

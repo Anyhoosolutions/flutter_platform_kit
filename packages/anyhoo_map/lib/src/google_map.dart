@@ -1,18 +1,22 @@
 import 'package:anyhoo_map/anyhoo_map.dart';
+import 'package:anyhoo_map/src/anyhoo_map_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class GoogleMapView extends StatelessWidget {
   final AnyhooLatLong location;
-  final double initialZoom;
   final List<AnyhooMarker> markers;
+  final AnyhooMapSettings settings;
 
-  const GoogleMapView({super.key, required this.location, this.initialZoom = 15, this.markers = const []});
+  const GoogleMapView({super.key, required this.location, this.markers = const [], required this.settings});
 
   @override
   Widget build(BuildContext context) {
     return GoogleMap(
-      initialCameraPosition: CameraPosition(target: LatLng(location.latitude, location.longitude), zoom: initialZoom),
+      initialCameraPosition: CameraPosition(
+        target: LatLng(location.latitude, location.longitude),
+        zoom: settings.initialZoom,
+      ),
       markers: markers
           .map(
             (marker) => Marker(
@@ -23,10 +27,10 @@ class GoogleMapView extends StatelessWidget {
           )
           .toSet(),
 
-      myLocationEnabled: false,
-      myLocationButtonEnabled: false,
-      zoomControlsEnabled: false,
-      mapToolbarEnabled: false,
+      myLocationEnabled: settings.showUserLocation,
+      myLocationButtonEnabled: settings.showUserLocationButton,
+      zoomControlsEnabled: settings.showZoomControls,
+      mapToolbarEnabled: settings.showMapToolbar,
     );
   }
 }
