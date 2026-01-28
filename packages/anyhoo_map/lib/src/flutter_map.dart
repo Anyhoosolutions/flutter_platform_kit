@@ -13,35 +13,43 @@ class FlutterMapView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FlutterMap(
-      options: MapOptions(
-        initialCenter: LatLng(location.latitude, location.longitude),
-        initialZoom: initialZoom,
-        // onTap: (_, p) => setState(() => customMarkers.add(buildPin(p))),
-        interactionOptions: const InteractionOptions(flags: ~InteractiveFlag.doubleTapZoom),
-      ),
-      children: [
-        openStreetMapTileLayer,
-        MarkerLayer(
-          markers: markers
-              .map(
-                (marker) => Marker(
-                  point: LatLng(marker.location.latitude, marker.location.longitude),
-                  width: 80,
-                  height: 80,
-                  child: Tooltip(
-                    message: '${marker.title}\n${marker.description}',
-                    child: Icon(
-                      Icons.location_on,
-                      color: Colors.red,
-                      size: 40,
-                    ),
-                  ),
-                ),
-              )
-              .toList(),
-        ),
-      ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // If constraints are unbounded (e.g., in SingleChildScrollView), use a reasonable default height
+        final height = constraints.maxHeight.isInfinite
+            ? MediaQuery.of(context).size.height * 0.7
+            : constraints.maxHeight;
+
+        return SizedBox(
+          height: height,
+          child: FlutterMap(
+            options: MapOptions(
+              initialCenter: LatLng(location.latitude, location.longitude),
+              initialZoom: initialZoom,
+              // onTap: (_, p) => setState(() => customMarkers.add(buildPin(p))),
+              interactionOptions: const InteractionOptions(flags: ~InteractiveFlag.doubleTapZoom),
+            ),
+            children: [
+              openStreetMapTileLayer,
+              MarkerLayer(
+                markers: markers
+                    .map(
+                      (marker) => Marker(
+                        point: LatLng(marker.location.latitude, marker.location.longitude),
+                        width: 80,
+                        height: 80,
+                        child: Tooltip(
+                          message: '${marker.title}\n${marker.description}',
+                          child: Icon(Icons.location_on, color: Colors.red, size: 40),
+                        ),
+                      ),
+                    )
+                    .toList(),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

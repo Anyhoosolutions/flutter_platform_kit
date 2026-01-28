@@ -18,7 +18,18 @@ class MapPage extends StatelessWidget {
           mapType: AnyhooMapType.flutter,
           location: AnyhooLatLong(latitude: 51.5074, longitude: -0.1278),
           initialZoom: 15,
-          markers: [],
+          markers: [
+            AnyhooMarker(
+              location: AnyhooLatLong(latitude: 51.5074, longitude: -0.1278),
+              title: 'London',
+              description: 'London is the capital of England',
+            ),
+            AnyhooMarker(
+              location: AnyhooLatLong(latitude: 51.5070, longitude: -0.1260),
+              title: 'London',
+              description: 'London is the capital of England',
+            ),
+          ],
         ),
       ),
     );
