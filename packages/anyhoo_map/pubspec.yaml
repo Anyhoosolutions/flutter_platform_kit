@@ -1,0 +1,28 @@
+name: anyhoo_map
+description: "A new Flutter package project."
+version: 0.0.1
+homepage: https://anyhoosolutions.web.app/documentation/flutter_platform_kit
+publish_to: none
+
+environment:
+  sdk: ^3.10.7
+  flutter: ">=1.17.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  google_maps_flutter: ^2.14.0
+  latlong2: ^0.9.1
+  anyhoo_core:
+    path: ../anyhoo_core
+  flutter_map: ^8.2.2
+  http: ^1.6.0
+  retry: ^3.1.2
+  freezed_annotation: ^3.1.0
+
+dev_dependencies:
+  build_runner: ^2.10.5
+  freezed: ^3.2.4
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0

@@ -1,0 +1,1 @@
+enum AnyhooMapType { google, flutter }

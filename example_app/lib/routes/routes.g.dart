@@ -29,6 +29,7 @@ RouteBase get $homeScreenRoute => GoRouteData.$route(
       path: 'remote-config',
       factory: $RemoteConfigRoute._fromState,
     ),
+    GoRouteData.$route(path: 'map', factory: $MapRoute._fromState),
     GoRouteData.$route(path: 'logging', factory: $LoggingRoute._fromState),
     GoRouteData.$route(
       path: 'route-demo',
@@ -211,6 +212,26 @@ mixin $RemoteConfigRoute on GoRouteData {
 
   @override
   String get location => GoRouteData.$location('/remote-config');
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+mixin $MapRoute on GoRouteData {
+  static MapRoute _fromState(GoRouterState state) => MapRoute();
+
+  @override
+  String get location => GoRouteData.$location('/map');
 
   @override
   void go(BuildContext context) => context.go(location);

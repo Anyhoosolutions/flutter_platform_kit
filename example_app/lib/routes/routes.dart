@@ -12,6 +12,7 @@ import 'package:example_app/pages/firestoreDemo/firestore_demo_page.dart';
 import 'package:example_app/pages/homePage/home_page.dart';
 import 'package:example_app/pages/imageSelectorDemo/image_selector_demo_page.dart';
 import 'package:example_app/pages/loggingPage/logging_page.dart';
+import 'package:example_app/pages/mapPage/map_page.dart';
 import 'package:example_app/pages/remoteConfigDemo/remote_config_demo_page.dart';
 import 'package:example_app/pages/routeDemo/route_first_demo_page.dart';
 import 'package:example_app/pages/routeDemo/route_nested_demo_page.dart';
@@ -36,6 +37,7 @@ final _log = Logger('Routes');
     TypedGoRoute<FirestoreRoute>(path: 'firestore'),
     TypedGoRoute<ImageSelectorRoute>(path: 'image-selector'),
     TypedGoRoute<RemoteConfigRoute>(path: 'remote-config'),
+    TypedGoRoute<MapRoute>(path: 'map'),
     TypedGoRoute<LoggingRoute>(path: 'logging'),
     TypedGoRoute<RouteDemoRoute>(
       path: 'route-demo',
@@ -136,6 +138,14 @@ class RemoteConfigRoute extends GoRouteData with $RemoteConfigRoute {
   @override
   Widget build(BuildContext context, GoRouterState state) {
     return RemoteConfigDemoPage();
+  }
+}
+
+@immutable
+class MapRoute extends GoRouteData with $MapRoute {
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    return MapPage();
   }
 }
 

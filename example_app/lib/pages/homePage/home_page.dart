@@ -76,6 +76,8 @@ class HomePage extends StatelessWidget {
           const SizedBox(height: 16),
           _analyticsDemoButton(context),
           const SizedBox(height: 16),
+          _mapDemoButton(context),
+          const SizedBox(height: 16),
           _imageSelectorDemoButton(context),
           const SizedBox(height: 16),
           _remoteConfigDemoButton(context),
@@ -148,6 +150,17 @@ class HomePage extends StatelessWidget {
       icon: Icons.analytics,
       onTap: () {
         GoRouter.of(context).push('/analytics');
+      },
+    );
+  }
+
+  _DemoCard _mapDemoButton(BuildContext context) {
+    return _DemoCard(
+      title: 'Map Demo',
+      description: 'Demonstrates map',
+      icon: Icons.map,
+      onTap: () {
+        GoRouter.of(context).push('/map');
       },
     );
   }
