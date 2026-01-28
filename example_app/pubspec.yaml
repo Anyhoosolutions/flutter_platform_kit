@@ -32,6 +32,8 @@ dependencies:
     path: ../packages/anyhoo_shimmer
   anyhoo_logging:
     path: ../packages/anyhoo_logging
+  anyhoo_map:
+    path: ../packages/anyhoo_map
 
   # Required dependencies
   flutter_bloc: ^9.1.0
