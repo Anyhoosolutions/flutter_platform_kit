@@ -73,7 +73,7 @@ class MyApp extends StatelessWidget {
     final appRouter = AnyhooRouter(
       routes: $appRoutes,
       authCubit: authCubit,
-      initialPath: '/map',
+      initialPath: '/',
       debugLogDiagnostics: true,
     ).getGoRouter();
 
