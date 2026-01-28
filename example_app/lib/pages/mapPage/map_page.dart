@@ -14,28 +14,33 @@ class MapPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Map Page'), backgroundColor: Theme.of(context).colorScheme.inversePrimary),
       body: SingleChildScrollView(
-        child: Center(
-          child: SizedBox(
-            height: 400,
-            width: 600,
-            child: AnyhooMap(
-              settings: AnyhooMapSettings(initialZoom: 15),
-              mapType: AnyhooMapType.flutter,
-              location: AnyhooLatLong(latitude: 51.5074, longitude: -0.1278),
-              markers: [
-                AnyhooMarker(
-                  location: AnyhooLatLong(latitude: 51.5094, longitude: -0.1278),
-                  title: 'London',
-                  description: 'This is a marker in London',
+        child: Column(
+          children: [
+            Text("TODO: Should have a switch between GoogleMap and FlutterMap"),
+            Center(
+              child: SizedBox(
+                height: 400,
+                width: 600,
+                child: AnyhooMap(
+                  settings: AnyhooMapSettings(initialZoom: 15),
+                  mapType: AnyhooMapType.flutter,
+                  location: AnyhooLatLong(latitude: 51.5074, longitude: -0.1278),
+                  markers: [
+                    AnyhooMarker(
+                      location: AnyhooLatLong(latitude: 51.5094, longitude: -0.1278),
+                      title: 'London',
+                      description: 'This is a marker in London',
+                    ),
+                    AnyhooMarker(
+                      location: AnyhooLatLong(latitude: 51.5070, longitude: -0.1260),
+                      title: 'London',
+                      description: 'Here is another marker',
+                    ),
+                  ],
                 ),
-                AnyhooMarker(
-                  location: AnyhooLatLong(latitude: 51.5070, longitude: -0.1260),
-                  title: 'London',
-                  description: 'Here is another marker',
-                ),
-              ],
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );
