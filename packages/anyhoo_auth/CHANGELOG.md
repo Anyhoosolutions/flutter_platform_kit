@@ -1,4 +1,8 @@
-## 0.0.30 
+## 0.0.31
+
+* Replace svg files by coding svg in dart file
+
+## 0.0.30
 
 * Change colors for Login widget
 
