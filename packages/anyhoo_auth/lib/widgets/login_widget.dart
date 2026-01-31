@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:anyhoo_auth/cubit/anyhoo_auth_cubit.dart';
 import 'package:anyhoo_auth/cubit/anyhoo_auth_state.dart';
+import 'package:anyhoo_auth/icons/apple_icon_svg.dart';
+import 'package:anyhoo_auth/icons/google_icon_svg.dart';
 import 'package:anyhoo_auth/widgets/login_widget_settings.dart';
 import 'package:anyhoo_core/anyhoo_core.dart';
 import 'package:flutter/material.dart';
@@ -158,7 +160,7 @@ class _LoginWidgetState<T extends AnyhooUser> extends State<LoginWidget<T>> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SvgPicture.asset(icon, width: 24, height: 24),
+            SvgPicture.string(icon),
             const SizedBox(width: 12),
             Text(
               text,
@@ -416,7 +418,7 @@ class _LoginWidgetState<T extends AnyhooUser> extends State<LoginWidget<T>> {
     return [
       _buildSocialSignInButton(
         onPressed: _isLoading ? null : _handleGoogleSignIn,
-        icon: 'images/google_icon.svg',
+        icon: GoogleIconSvg.svg,
         text: 'Continue with Google',
         backgroundColor: Colors.white,
         textColor: Colors.black87,
@@ -432,7 +434,7 @@ class _LoginWidgetState<T extends AnyhooUser> extends State<LoginWidget<T>> {
     return [
       _buildSocialSignInButton(
         onPressed: _isLoading ? null : _handleAppleSignIn,
-        icon: 'assets/images/apple_icon.svg',
+        icon: AppleIconSvg.svg,
         text: 'Continue with Apple',
         backgroundColor: Colors.black,
         textColor: Colors.white,
