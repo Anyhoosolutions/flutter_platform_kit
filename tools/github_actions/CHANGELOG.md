@@ -1,3 +1,7 @@
+## 1.0.13
+
+- Add headers
+
 ## 1.0.12 
 
 - Fix for firebase app distribution groups
