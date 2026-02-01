@@ -1,3 +1,7 @@
+## 1.0.18
+
+- Print inputs
+
 ## 1.0.17
 
 - Fix: Allow for version override
