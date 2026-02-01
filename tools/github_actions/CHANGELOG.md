@@ -1,3 +1,7 @@
+## 1.0.17
+
+- Fix: Allow for version override
+
 ## 1.0.16
 
 - Allow for version override

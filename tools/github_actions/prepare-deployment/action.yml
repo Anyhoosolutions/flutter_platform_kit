@@ -159,6 +159,14 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - name: Set version from override
+      shell: bash
+      if: inputs.version_override != ''
+      run: |
+        echo "🔧 Setting version from override: ${{ inputs.version_override }}"
+        echo "CURRENT_VERSION=${{ inputs.version_override }}" >> $GITHUB_ENV
+        echo "current_version=${{ inputs.version_override }}" >> $GITHUB_OUTPUT
+
     - name: Verify version was bumped
       shell: bash
       id: version-check
@@ -191,7 +199,7 @@ runs:
 
           current_version=$(grep "$VERSION_PATTERN" "$VERSION_FILE" | sed "s/$VERSION_PATTERN//" | tr -d ' ' | head -n 1)
         fi
-
+        
         echo "Current version: $current_version"
         echo "CURRENT_VERSION=$current_version" >> $GITHUB_ENV
         echo "current_version=$current_version" >> $GITHUB_OUTPUT
