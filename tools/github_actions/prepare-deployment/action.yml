@@ -15,6 +15,10 @@ inputs:
     description: "Pattern to extract version (e.g., 'version:')"
     required: false
     default: "version:"
+  version_override:
+    description: "Optional version to override what's in pubspec.yaml (e.g., '1.2.3+456'). If provided, this version will be used instead of reading from the version file."
+    required: false
+    default: ""
   require_build_number_increase:
     description: "Whether to require build number (after +) to increase"
     required: false
@@ -172,14 +176,22 @@ runs:
 
         VERSION_FILE="${{ inputs.version_file }}"
         VERSION_PATTERN="${{ inputs.version_pattern }}"
+        VERSION_OVERRIDE="${{ inputs.version_override }}"
 
-        # Get current version from version file
-        if [ ! -f "$VERSION_FILE" ]; then
-          echo "❌ Error: Version file '$VERSION_FILE' not found"
-          exit 1
+        # Get current version - use override if provided, otherwise read from file
+        if [ -n "$VERSION_OVERRIDE" ]; then
+          echo "🔧 Using version override: $VERSION_OVERRIDE"
+          current_version="$VERSION_OVERRIDE"
+        else
+          # Get current version from version file
+          if [ ! -f "$VERSION_FILE" ]; then
+            echo "❌ Error: Version file '$VERSION_FILE' not found"
+            exit 1
+          fi
+
+          current_version=$(grep "$VERSION_PATTERN" "$VERSION_FILE" | sed "s/$VERSION_PATTERN//" | tr -d ' ' | head -n 1)
         fi
 
-        current_version=$(grep "$VERSION_PATTERN" "$VERSION_FILE" | sed "s/$VERSION_PATTERN//" | tr -d ' ' | head -n 1)
         echo "Current version: $current_version"
         echo "CURRENT_VERSION=$current_version" >> $GITHUB_ENV
         echo "current_version=$current_version" >> $GITHUB_OUTPUT
