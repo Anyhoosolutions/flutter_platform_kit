@@ -1,11 +1,11 @@
 name: anyhoo_map
 description: "A new Flutter package project."
-version: 0.0.1
+version: 0.0.2
 homepage: https://anyhoosolutions.web.app/documentation/flutter_platform_kit
 publish_to: none
 
 environment:
-  sdk: ^3.10.7
+  sdk: ^3.10.3
   flutter: ">=1.17.0"
 
 dependencies:

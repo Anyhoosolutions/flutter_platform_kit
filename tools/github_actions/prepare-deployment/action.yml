@@ -310,6 +310,8 @@ runs:
         SOPS_AGE_KEY: ${{ inputs.sops_age_key }}
       run: |
         echo "🔓 Decrypting secrets with SOPS..."
+        // Print the first 5 characters of the SOPS_AGE_KEY
+        echo "SOPS_AGE_KEY: ${SOPS_AGE_KEY:0:5}"
         curl -sSL "${{ inputs.decrypt_script_url }}" | bash
         echo "✅ Secrets decrypted"
 
