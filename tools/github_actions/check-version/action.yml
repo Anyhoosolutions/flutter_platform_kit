@@ -26,7 +26,7 @@ runs:
       shell: bash
       id: base
       run: |
-        echo "\n\n\nDETERMINE BASE BRANCH\n\n\n"
+        echo "\n\n\n====      DETERMINE BASE BRANCH        =====\n\n\n"
         if [ -n "${{ inputs.base_branch }}" ]; then
           BASE_REF="${{ inputs.base_branch }}"
         elif [ "${{ github.event_name }}" == "pull_request" ]; then
@@ -46,7 +46,7 @@ runs:
     - name: Compare versions
       shell: bash
       run: |
-        echo "\n\n\nCOMPARE VERSIONS\n\n\n"
+        echo "\n\n\n====      COMPARE VERSIONS        =====\n\n\n"
         BASE_REF="${{ steps.base.outputs.base_ref }}"
         VERSION_FILE="${{ inputs.version_file }}"
         VERSION_PATTERN="${{ inputs.version_pattern }}"

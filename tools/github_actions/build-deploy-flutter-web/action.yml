@@ -76,7 +76,7 @@ runs:
         GITHUB_TOKEN: ${{ github.token }}
         PR_LABELS_JSON: ${{ toJSON(github.event.pull_request.labels) }}
       run: |
-        echo "\n\n\nCHECK FOR SKIP DEPLOYMENT LABELS\n\n\n"
+        echo "\n\n\n====      CHECK FOR SKIP DEPLOYMENT LABELS        =====\n\n\n"
         set -e
 
         HOSTING_TARGET="${{ inputs.firebase_hosting_target }}"
@@ -238,7 +238,7 @@ runs:
       shell: bash
       if: steps.check-skip-labels.outputs.skip_deploy != 'true'
       run: |
-        echo "\n\n\nBUILD FLUTTER WEB\n\n\n"
+        echo "\n\n\n====      BUILD FLUTTER WEB        =====\n\n\n"
         TARGET_FILE="${{ inputs.target_file }}"
         BUILD_MODE="${{ inputs.build_mode }}"
         BUILD_ARGS="${{ inputs.build_args }}"
@@ -296,7 +296,7 @@ runs:
         inputs.deploy_trigger_paths != '' && 
         steps.check-skip-labels.outputs.skip_deploy != 'true'
       run: |
-        echo "\n\n\nCHECK IF DEPLOYMENT SHOULD BE TRIGGERED\n\n\n"
+        echo "\n\n\n====      CHECK IF DEPLOYMENT SHOULD BE TRIGGERED        =====\n\n\n"
         set -e
 
         DEPLOY_TRIGGER_PATHS="${{ inputs.deploy_trigger_paths }}"
@@ -381,7 +381,7 @@ runs:
       env:
         GOOGLE_APPLICATION_CREDENTIALS: ${{ github.workspace }}/${{ inputs.service_account_path }}
       run: |
-        echo "\n\n\nDEPLOY TO FIREBASE HOSTING\n\n\n"
+        echo "\n\n\n====      DEPLOY TO FIREBASE HOSTING        =====\n\n\n"
         FIREBASE_PROJECT_ID="${{ inputs.firebase_project_id }}"
         FIREBASE_HOSTING_TARGET="${{ inputs.firebase_hosting_target }}"
         FIREBASE_DEPLOY_ONLY="${{ inputs.firebase_deploy_only }}"
