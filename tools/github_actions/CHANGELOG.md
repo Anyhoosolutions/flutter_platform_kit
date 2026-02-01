@@ -1,3 +1,7 @@
+## 1.0.15
+
+- Bug fix for debugging SOPS_AGE_KEY
+
 ## 1.0.14
 
 - Better headers
