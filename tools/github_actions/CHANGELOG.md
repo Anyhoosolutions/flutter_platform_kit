@@ -1,3 +1,7 @@
+## 1.0.16
+
+- Allow for version override
+
 ## 1.0.15
 
 - Bug fix for debugging SOPS_AGE_KEY
