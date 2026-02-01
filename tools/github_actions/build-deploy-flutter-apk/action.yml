@@ -87,7 +87,14 @@ runs:
         GITHUB_TOKEN: ${{ github.token }}
         PR_LABELS_JSON: ${{ toJSON(github.event.pull_request.labels) }}
       run: |
-        echo "\n\n\n====      CHECK FOR SKIP DEPLOYMENT LABELS        =====\n\n\n"
+        echo ".."
+        echo ".."
+        echo ".."
+        echo "===================================================="
+        echo "====      CHECK FOR SKIP DEPLOYMENT LABELS    ======"
+        echo "===================================================="
+        echo ".."
+        echo ".."
         set -e
 
         FLAVOR="${{ inputs.flavor }}"
@@ -252,7 +259,15 @@ runs:
       shell: bash
       if: steps.check-skip-labels.outputs.skip_deploy != 'true'
       run: |
-        echo "\n\n\n====      BUILD FLUTTER APK        =====\n\n\n"
+
+        echo ".."
+        echo ".."
+        echo ".."
+        echo "============================================"
+        echo "====         BUILD FLUTTER APK        ======"
+        echo "============================================"
+        echo ".."
+        echo ".."
         TARGET_FILE="${{ inputs.target_file }}"
         FLAVOR="${{ inputs.flavor }}"
         BUILD_MODE="${{ inputs.build_mode }}"
@@ -351,7 +366,14 @@ runs:
       shell: bash
       if: steps.check-skip-labels.outputs.skip_deploy != 'true'
       run: |
-        echo "\n\n\n====      SHOW APK INFO AND SIZE        =====\n\n\n"
+        echo ".."
+        echo ".."
+        echo ".."
+        echo "============================================"
+        echo "====         SHOW APK INFO AND SIZE   ======"
+        echo "============================================"
+        echo ".."
+        echo ".."
         echo "\n================================================"
         echo "🔍 Showing APK info and size..."
         echo "APK_OUTPUT_PATH: $APK_OUTPUT_PATH"
@@ -378,7 +400,14 @@ runs:
         inputs.deploy_trigger_paths != '' && 
         steps.check-skip-labels.outputs.skip_deploy != 'true'
       run: |
-        echo "\n\n\n====      CHECK IF DEPLOYMENT SHOULD BE TRIGGERED        =====\n\n\n"
+        echo ".."
+        echo ".."
+        echo ".."
+        echo "=================================================================="
+        echo "====         CHECK IF DEPLOYMENT SHOULD BE TRIGGERED        ======"
+        echo "=================================================================="
+        echo ".."
+        echo ".."
         set -e
 
         DEPLOY_TRIGGER_PATHS="${{ inputs.deploy_trigger_paths }}"
@@ -463,7 +492,14 @@ runs:
         inputs.firebase_app_id == '' && 
         (inputs.deploy_trigger_paths == '' || steps.check-deploy.outputs.should_deploy == 'true')
       run: |
-        echo "\n\n\n====      EXTRACT FIREBASE ANDROID APP ID        =====\n\n\n"
+        echo ".."
+        echo ".."
+        echo ".."
+        echo "====================================================="
+        echo "====         EXTRACT FIREBASE ANDROID APP ID   ======"
+        echo "====================================================="
+        echo ".."
+        echo ".."
         set -e
         FIREBASE_JSON="${{ inputs.firebase_json_path }}"
         APP_ID_PATH="${{ inputs.app_id_path }}"
@@ -501,7 +537,14 @@ runs:
         inputs.firebase_app_id != '' && 
         (inputs.deploy_trigger_paths == '' || steps.check-deploy.outputs.should_deploy == 'true')
       run: |
-        echo "\n\n\n====      SET FIREBASE APP ID        =====\n\n\n"
+        echo ".."
+        echo ".."
+        echo ".."
+        echo "=============================================="
+        echo "====         SET FIREBASE APP ID        ======"
+        echo "=============================================="
+        echo ".."
+        echo ".."
         echo "✅ Using provided Firebase Android App ID: ${{ inputs.firebase_app_id }}"
         echo "FIREBASE_APP_ID_ANDROID=${{ inputs.firebase_app_id }}" >> $GITHUB_ENV
 
@@ -514,7 +557,14 @@ runs:
       env:
         GOOGLE_APPLICATION_CREDENTIALS: ${{ github.workspace }}/${{ inputs.service_account_path }}
       run: |
-        echo "\n\n\n====      DEPLOY TO FIREBASE APP DISTRIBUTION        =====\n\n\n"
+        echo ".."
+        echo ".."
+        echo ".."
+        echo "========================================================"
+        echo "====       DEPLOY TO FIREBASE APP DISTRIBUTION    ======"
+        echo "========================================================"
+        echo ".."
+        echo ".."
         set -e
 
         # Use environment variable if set (auto-detected), otherwise use input

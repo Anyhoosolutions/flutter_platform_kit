@@ -1,3 +1,7 @@
+## 1.0.14
+
+- Better headers
+
 ## 1.0.13
 
 - Add headers

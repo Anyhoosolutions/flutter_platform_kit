@@ -54,7 +54,14 @@ runs:
       if: inputs.quick_check == 'true'
       shell: bash
       run: |
-        echo "\n\n\n====      QUICK CHECK - CHANGED DART MODELS HAVE MATCHING GENERATED TYPESCRIPT FILES        =====\n\n\n"
+        echo ".."
+        echo ".."
+        echo ".."
+        echo "===================================================="
+        echo "====               QUICK CHECK                ======"
+        echo "===================================================="
+        echo ".."
+        echo ".."
         echo "🔍 Quick check: Verifying changed Dart freezed models have matching generated TypeScript files..."
 
         # Check if source models directory exists
@@ -138,7 +145,14 @@ runs:
       shell: bash
       id: check-relevant-changes
       run: |
-        echo "\n\n\n====      CHECK FOR RELEVANT CHANGES        =====\n\n\n"
+        echo ".."
+        echo ".."
+        echo ".."
+        echo "===================================================="
+        echo "====      CHECK FOR RELEVANT CHANGESLABELS    ======"
+        echo "===================================================="
+        echo ".."
+        echo ".."
         echo "🔍 Checking if there are any changes in source or generated models..."
 
         # Determine the base commit to compare against
@@ -211,14 +225,28 @@ runs:
       if: inputs.quick_check != 'true' && (inputs.check_for_changes != 'true' || steps.check-relevant-changes.outputs.has_changes != 'false')
       shell: bash
       run: |
-        echo "\n\n\n====      GET FLUTTER DEPENDENCIES        =====\n\n\n"
+        echo ".."
+        echo ".."
+        echo ".."
+        echo "===================================================="
+        echo "====         GET FLUTTER DEPENDENCIES         ======"
+        echo "===================================================="
+        echo ".."
+        echo ".."
         flutter pub get
 
     - name: Generate TypeScript code from freezed models
       if: inputs.quick_check != 'true' && (inputs.check_for_changes != 'true' || steps.check-relevant-changes.outputs.has_changes != 'false')
       shell: bash
       run: |
-        echo "\n\n\n====      GENERATE TYPECRIPT CODE FROM FREEZED MODELS        =====\n\n\n"
+        echo ".."
+        echo ".."
+        echo ".."
+        echo "============================================================"
+        echo "====    GENERATE TYPECRIPT CODE FROM FREEZED MODELS   ======"
+        echo "============================================================"
+        echo ".."
+        echo ".."
         if [ -f "${{ inputs.generation_script_path }}" ]; then
           chmod +x "${{ inputs.generation_script_path }}"
           "${{ inputs.generation_script_path }}"
@@ -232,7 +260,14 @@ runs:
       shell: bash
       id: check-changes
       run: |
-        echo "\n\n\n====      CHECK FOR UNCOMMITTED CHANGES IN GENERATED FILES        =====\n\n\n"
+        echo ".."
+        echo ".."
+        echo ".."
+        echo "================================================================="
+        echo "====    CHECK FOR UNCOMMITTED CHANGES IN GENERATED FILES   ======"
+        echo "================================================================="
+        echo ".."
+        echo ".."
         echo "🔍 Checking if generated TypeScript files are up to date..."
         echo ""
         echo "This step compares the generated files with what's committed in git."
@@ -287,7 +322,14 @@ runs:
       if: inputs.quick_check != 'true' && (inputs.check_for_changes != 'true' || steps.check-relevant-changes.outputs.has_changes != 'false')
       shell: bash
       run: |
-        echo "\n\n\n====      VERIFY GENERATED FILES EXIST        =====\n\n\n"
+        echo ".."
+        echo ".."
+        echo ".."
+        echo "===================================================="
+        echo "====        VERIFY GENERATED FILES EXIST      ======"
+        echo "===================================================="
+        echo ".."
+        echo ".."
         echo "🔍 Verifying generated TypeScript files exist..."
 
         # Check if source models directory exists
@@ -340,7 +382,14 @@ runs:
       if: failure() && inputs.quick_check != 'true'
       shell: bash
       run: |
-        echo "\n\n\n====      SHOW DIFF IF FILES ARE OUT OF SYNC        =====\n\n\n"
+        echo ".."
+        echo ".."
+        echo ".."
+        echo "===================================================="
+        echo "====     SHOW DIFF IF FILES ARE OUT OF SYNC   ======"
+        echo "===================================================="
+        echo ".."
+        echo ".."
         echo "📋 Detailed differences in generated files:"
         echo ""
         echo "This shows what differs between the committed files and the newly generated files."

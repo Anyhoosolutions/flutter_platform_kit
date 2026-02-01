@@ -160,7 +160,14 @@ runs:
       id: version-check
       if: inputs.verify_version == 'true'
       run: |
-        echo "\n\n\n====      VERIFY VERSION WAS BUMPED        =====\n\n\n"
+        echo ".."
+        echo ".."
+        echo ".."
+        echo "===================================================="
+        echo "====           VERIFY VERSION WAS BUMPED      ======"
+        echo "===================================================="
+        echo ".."
+        echo ".."
         set -e  # Exit on any error
 
         VERSION_FILE="${{ inputs.version_file }}"
@@ -297,7 +304,14 @@ runs:
       shell: bash
       if: inputs.decrypt_secrets == 'true'
       run: |
-        echo "\n\n\n====      INSTALL SOPS        =====\n\n\n"
+        echo ".."
+        echo ".."
+        echo ".."
+        echo "===================================================="
+        echo "====             INSTALL SOPS                 ======"
+        echo "===================================================="
+        echo ".."
+        echo ".."
         echo "📦 Installing SOPS ${{ inputs.sops_version }}..."
         wget -O sops https://github.com/mozilla/sops/releases/download/${{ inputs.sops_version }}/sops-${{ inputs.sops_version }}.linux
         chmod +x sops
@@ -311,7 +325,14 @@ runs:
       env:
         SOPS_AGE_KEY: ${{ inputs.sops_age_key }}
       run: |
-        echo "\n\n\n====      DECRYPT SECRETS WITH SOPS        =====\n\n\n"
+        echo ".."
+        echo ".."
+        echo ".."
+        echo "===================================================="
+        echo "====          DECRYPT SECRETS WITH SOPS       ======"
+        echo "===================================================="
+        echo ".."
+        echo ".."
         echo "🔓 Decrypting secrets with SOPS..."
         // Print the first 5 characters of the SOPS_AGE_KEY
         echo "SOPS_AGE_KEY: ${SOPS_AGE_KEY:0:5}"
@@ -322,7 +343,14 @@ runs:
       shell: bash
       if: inputs.decrypt_secrets == 'true' && inputs.verify_files != ''
       run: |
-        echo "\n\n\n====      VERIFY DECRYPTED FILES        =====\n\n\n"
+        echo ".."
+        echo ".."
+        echo ".."
+        echo "===================================================="
+        echo "====         VERIFY DECRYPTED FILES           ======"
+        echo "===================================================="
+        echo ".."
+        echo ".."
         echo "🔍 Verifying decrypted files..."
         IFS=',' read -ra FILES <<< "${{ inputs.verify_files }}"
         FAILED=0
@@ -358,7 +386,14 @@ runs:
       shell: bash
       if: inputs.load_env == 'true'
       run: |
-        echo "\n\n\n====      LOAD ENVIRONMENT VARIABLES FROM .ENV        =====\n\n\n"
+        echo ".."
+        echo ".."
+        echo ".."
+        echo "====================================================="
+        echo "====    LOAD ENVIRONMENT VARIABLES FROM .ENV   ======"
+        echo "====================================================="
+        echo ".."
+        echo ".."
         ENV_FILE="${{ inputs.env_file }}"
 
         echo "🔍 Loading environment variables from $ENV_FILE file..."
@@ -395,7 +430,14 @@ runs:
       shell: bash
       if: inputs.generate_release_notes == 'true'
       run: |
-        echo "\n\n\n====      GENERATE RELEASE NOTES        =====\n\n\n"
+        echo ".."
+        echo ".."
+        echo ".."
+        echo "===================================================="
+        echo "====          GENERATE RELEASE NOTES          ======"
+        echo "===================================================="
+        echo ".."
+        echo ".."
         OUTPUT_FILE="${{ inputs.release_notes_output }}"
         APP_NAME="${{ inputs.app_name }}"
         VERSION="${{ inputs.version }}"
@@ -459,7 +501,14 @@ runs:
       shell: bash
       if: inputs.update_release_info == 'true'
       run: |
-        echo "\n\n\n====      UPDATE RELEASE_INFO.DART        =====\n\n\n"
+        echo ".."
+        echo ".."
+        echo ".."
+        echo "===================================================="
+        echo "====          UPDATE RELEASE_INFO.DART        ======"
+        echo "===================================================="
+        echo ".."
+        echo ".."
         RELEASE_INFO_PATH="${{ inputs.release_info_path }}"
         VERSION=""
 
@@ -507,7 +556,14 @@ runs:
       shell: bash
       if: inputs.update_analysis_options == 'true'
       run: |
-        echo "\n\n\n====      UPDATE ANALYSIS_OPTIONS.YAML        =====\n\n\n"
+        echo ".."
+        echo ".."
+        echo ".."
+        echo "===================================================="
+        echo "====         UPDATE ANALYSIS_OPTIONS.YAML     ======"
+        echo "===================================================="
+        echo ".."
+        echo ".."
         set -e
         CI_FILE="${{ inputs.analysis_options_ci_file }}"
         TARGET_FILE="analysis_options.yaml"
@@ -525,7 +581,14 @@ runs:
       shell: bash
       if: inputs.setup_firebase == 'true'
       run: |
-        echo "\n\n\n====      INSTALL FIREBASE CLI        =====\n\n\n"
+        echo ".."
+        echo ".."
+        echo ".."
+        echo "===================================================="
+        echo "====         INSTALL FIREBASE CLI             ======"
+        echo "===================================================="
+        echo ".."
+        echo ".."
         set -e
         echo "📦 Installing Firebase CLI..."
         npm install -g firebase-tools
@@ -537,7 +600,14 @@ runs:
       env:
         GOOGLE_APPLICATION_CREDENTIALS: ${{ github.workspace }}/${{ inputs.firebase_service_account_path }}
       run: |
-        echo "\n\n\n====      TEST FIREBASE SERVICE ACCOUNT AUTHENTICATION        =====\n\n\n"
+        echo ".."
+        echo ".."
+        echo ".."
+        echo "=============================================================="
+        echo "====     TEST FIREBASE SERVICE ACCOUNT AUTHENTICATION   ======"
+        echo "=============================================================="
+        echo ".."
+        echo ".."
         set -e
         echo "🔍 Testing Firebase service account authentication..."
         echo "📋 Service account file: $GOOGLE_APPLICATION_CREDENTIALS"
@@ -560,7 +630,14 @@ runs:
       shell: bash
       if: inputs.build_functions == 'true'
       run: |
-        echo "\n\n\n====      INSTALL NPM DEPENDENCIES AND BUILD FUNCTIONS        =====\n\n\n"
+        echo ".."
+        echo ".."
+        echo ".."
+        echo "============================================================"
+        echo "====    INSTALL NPM DEPENDENCIES AND BUILD FUNCTIONS  ======"
+        echo "============================================================"
+        echo ".."
+        echo ".."
         set -e
         FUNCTIONS_PATH="${{ inputs.functions_path }}"
         echo "📦 Installing npm dependencies and building functions in $FUNCTIONS_PATH..."
@@ -599,7 +676,14 @@ runs:
       shell: bash
       if: inputs.setup_flutter == 'true'
       run: |
-        echo "\n\n\n====      SHOW FLUTTER VERSION        =====\n\n\n"
+        echo ".."
+        echo ".."
+        echo ".."
+        echo "===================================================="
+        echo "====              SHOW FLUTTER VERSION        ======"
+        echo "===================================================="
+        echo ".."
+        echo ".."
         set -e
         echo "📱 Flutter version:"
         flutter --version
@@ -620,7 +704,14 @@ runs:
       shell: bash
       if: inputs.setup_flutter == 'true'
       run: |
-        echo "\n\n\n====      GET FLUTTER DEPENDENCIES        =====\n\n\n"
+        echo ".."
+        echo ".."
+        echo ".."
+        echo "===================================================="
+        echo "====            GET FLUTTER DEPENDENCIES      ======"
+        echo "===================================================="
+        echo ".."
+        echo ".."
         set -e
         echo "📦 Getting Flutter dependencies..."
         flutter pub get
@@ -630,7 +721,14 @@ runs:
       shell: bash
       if: inputs.setup_flutter == 'true' && inputs.flutter_analyze == 'true'
       run: |
-        echo "\n\n\n====      RUN FLUTTER ANALYZE        =====\n\n\n"
+        echo ".."
+        echo ".."
+        echo ".."
+        echo "===================================================="
+        echo "====             RUN FLUTTER ANALYZE          ======"
+        echo "===================================================="
+        echo ".."
+        echo ".."
         set -e
         echo "🔍 Running Flutter analyze..."
         flutter analyze
