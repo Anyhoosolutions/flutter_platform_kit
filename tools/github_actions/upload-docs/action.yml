@@ -41,7 +41,14 @@ runs:
     - name: Checkout upload tool
       shell: bash
       run: |
-        echo "\n\n\n====      CHECKOUT UPLOAD TOOL        =====\n\n\n"
+        echo ".."
+        echo ".."
+        echo ".."
+        echo "===================================================="
+        echo "====            CHECKOUT UPLOAD TOOL          ======"
+        echo "===================================================="
+        echo ".."
+        echo ".."
         echo "Checking out upload tool from repository..."
         UPLOAD_TOOL_PATH="tools/upload_documentation"
         TOOL_DIR=$(dirname "$UPLOAD_TOOL_PATH")
@@ -61,7 +68,14 @@ runs:
       env:
         UPLOAD_URL: ${{ inputs.upload_url }}
       run: |
-        echo "\n\n\n====      RUN DOCUMENTATION UPLOAD        =====\n\n\n"
+        echo ".."
+        echo ".."
+        echo ".."
+        echo "===================================================="
+        echo "====           RUN DOCUMENTATION UPLOAD       ======"
+        echo "===================================================="
+        echo ".."
+        echo ".."
         UPLOAD_TOOL_PATH="tools/upload_documentation"
         if [ ! -d "$UPLOAD_TOOL_PATH" ]; then
           echo "❌ Error: Upload tool directory not found at $UPLOAD_TOOL_PATH"
