@@ -39,6 +39,7 @@ runs:
       if: inputs.enabled == 'true'
       shell: bash
       run: |
+        echo "\n\n\n====      COPY SHARED MODELS TO DOCS        =====\n\n\n"
         set -e
         ROOT="${{ inputs.project_root }}"
         SRC="$ROOT/${{ inputs.source_models_path }}"

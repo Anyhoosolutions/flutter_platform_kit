@@ -33,6 +33,7 @@ runs:
     - name: Install Dependencies
       shell: bash
       run: |
+        echo "\n\n\n====      INSTALL DEPENDENCIES        =====\n\n\n"
         cd "${{ inputs.functions_path }}"
         ${{ inputs.install_command }}
 
@@ -40,6 +41,7 @@ runs:
       if: inputs.run_lint == 'true' && contains(inputs.lint_command, 'biome')
       shell: bash
       run: |
+        echo "\n\n\n====      FIX BIOME PERMISSIONS        =====\n\n\n"
         cd "${{ inputs.functions_path }}"
         if [ -f "node_modules/@biomejs/cli-linux-x64/biome" ]; then
           chmod +x node_modules/@biomejs/cli-linux-x64/biome
@@ -49,6 +51,7 @@ runs:
       if: inputs.run_lint == 'true'
       shell: bash
       run: |
+        echo "\n\n\n====      RUN LINTING        =====\n\n\n"
         cd "${{ inputs.functions_path }}"
         ${{ inputs.lint_command }}
 
@@ -56,5 +59,6 @@ runs:
       if: inputs.run_tests == 'true'
       shell: bash
       run: |
+        echo "\n\n\n====      RUN TESTS        =====\n\n\n"
         cd "${{ inputs.functions_path }}"
         ${{ inputs.test_command }}

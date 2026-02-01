@@ -67,6 +67,7 @@ runs:
     - name: Install Firebase Emulator
       shell: bash
       run: |
+        echo "\n\n\n====      INSTALL FIREBASE CLI        =====\n\n\n"
         set -e
         echo "Installing Firebase CLI..."
         npm install -g firebase-tools
@@ -75,6 +76,7 @@ runs:
     - name: Install Dependencies
       shell: bash
       run: |
+        echo "\n\n\n====      INSTALL DEPENDENCIES        =====\n\n\n"
         set -e
         cd "${{ inputs.functions_path }}"
         echo "Running install command: ${{ inputs.install_command }}"
@@ -84,6 +86,7 @@ runs:
       if: inputs.build_command != ''
       shell: bash
       run: |
+        echo "\n\n\n====      BUILD TYPESCRIPT        =====\n\n\n"
         set -e
         cd "${{ inputs.functions_path }}"
         echo "Running build command: ${{ inputs.build_command }}"
@@ -93,6 +96,7 @@ runs:
     - name: Verify Functions Directory
       shell: bash
       run: |
+        echo "\n\n\n====      VERIFY FUNCTIONS DIRECTORY        =====\n\n\n"
         set -e
         cd "${{ inputs.functions_path }}"
         echo "Verifying functions directory structure..."
@@ -126,6 +130,7 @@ runs:
         GCLOUD_PROJECT: ${{ inputs.firebase_project_id }}
         NODE_ENV: "test"
       run: |
+        echo "\n\n\n====      RUN FUNCTIONS TESTS        =====\n\n\n"
         set -e
         cd "${{ inputs.functions_path }}"
         echo "Running tests with Firebase emulators..."
