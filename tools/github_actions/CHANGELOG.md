@@ -1,3 +1,7 @@
+## 1.0.19
+
+- Better printing of input files
+
 ## 1.0.18
 
 - Print inputs
