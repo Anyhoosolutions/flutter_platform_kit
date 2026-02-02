@@ -1,3 +1,7 @@
+## 1.0.20
+
+- Print permissions
+
 ## 1.0.19
 
 - Better printing of input files
