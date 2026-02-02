@@ -1,3 +1,7 @@
+## 1.0.21
+
+- Fix release info variables
+
 ## 1.0.20
 
 - Print permissions
