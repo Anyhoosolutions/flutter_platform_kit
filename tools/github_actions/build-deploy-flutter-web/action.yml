@@ -241,6 +241,68 @@ runs:
           echo "skip_deploy=false" >> $GITHUB_OUTPUT
         fi
 
+    - name: Check Firebase/GCP permissions
+      shell: bash
+      id: check-firebase-permissions
+      if: |
+        inputs.deploy == 'true' && 
+        steps.check-skip-labels.outputs.skip_deploy != 'true'
+      env:
+        GOOGLE_APPLICATION_CREDENTIALS: ${{ github.workspace }}/${{ inputs.service_account_path }}
+      run: |
+        echo ".."
+        echo ".."
+        echo "===================================================="
+        echo "====    CHECK FIREBASE/GCP PERMISSIONS          ======"
+        echo "===================================================="
+        echo ".."
+        set -e
+
+        FIREBASE_PROJECT_ID="${{ inputs.firebase_project_id }}"
+        SA_FILE="${GOOGLE_APPLICATION_CREDENTIALS}"
+
+        echo "🔍 Checking permissions for project: $FIREBASE_PROJECT_ID"
+        echo "📋 Service account file: $SA_FILE"
+        echo ""
+
+        if [ ! -f "$SA_FILE" ]; then
+          echo "❌ Service account file not found: $SA_FILE"
+          exit 1
+        fi
+
+        # Use gcloud to verify Service Usage API access (required for Firebase deploy)
+        if command -v gcloud >/dev/null 2>&1; then
+          echo "📋 Activating service account..."
+          gcloud auth activate-service-account --key-file="$SA_FILE" --project="$FIREBASE_PROJECT_ID" 2>/dev/null || true
+
+          echo "📋 Checking Service Usage API access (required for deployment)..."
+          GCLOUD_EXIT=0
+          GCLOUD_OUTPUT=$(gcloud services list --project="$FIREBASE_PROJECT_ID" --limit=1 2>&1) || GCLOUD_EXIT=$?
+          echo "$GCLOUD_OUTPUT"
+          if [ "$GCLOUD_EXIT" -ne 0 ]; then
+            if echo "$GCLOUD_OUTPUT" | grep -qE "403|Permission denied|does not have required permission|serviceusage.serviceUsageConsumer|serviceusage.services.use"; then
+              echo ""
+              echo "❌ Permission check failed: the service account does not have access to use project $FIREBASE_PROJECT_ID."
+              echo ""
+              echo "Grant the caller the roles/serviceusage.serviceUsageConsumer role, or a custom role with"
+              echo "the serviceusage.services.use permission:"
+              echo "  https://console.developers.google.com/iam-admin/iam?project=$FIREBASE_PROJECT_ID"
+              echo ""
+              echo "Propagation of the new permission may take a few minutes."
+              exit 1
+            fi
+            echo "❌ Failed to list services for project $FIREBASE_PROJECT_ID"
+            exit 1
+          fi
+          echo ""
+          echo "✅ Permission check passed: service account can use project $FIREBASE_PROJECT_ID"
+        else
+          echo "⚠️  gcloud CLI not found — skipping permission check."
+          echo "   Ensure the service account has roles/serviceusage.serviceUsageConsumer (or serviceusage.services.use)"
+          echo "   on project $FIREBASE_PROJECT_ID to avoid 403 errors during deploy:"
+          echo "   https://console.developers.google.com/iam-admin/iam?project=$FIREBASE_PROJECT_ID"
+        fi
+
     - name: Build Flutter Web
       shell: bash
       if: steps.check-skip-labels.outputs.skip_deploy != 'true'
