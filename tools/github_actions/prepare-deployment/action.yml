@@ -169,6 +169,11 @@ runs:
         echo "Version verification:"
         echo "  verify_version: ${{ inputs.verify_version }}"
         echo "  version_file: ${{ inputs.version_file }}"
+        if [ -f "${{ inputs.version_file }}" ]; then
+          echo "    → file exists, first 5 chars: $(head -c 5 "${{ inputs.version_file }}")"
+        else
+          echo "    → file does not exist"
+        fi
         echo "  version_pattern: ${{ inputs.version_pattern }}"
         echo "  version_override: ${{ inputs.version_override }}"
         echo "  require_build_number_increase: ${{ inputs.require_build_number_increase }}"
@@ -189,6 +194,11 @@ runs:
         echo "Environment loading:"
         echo "  load_env: ${{ inputs.load_env }}"
         echo "  env_file: ${{ inputs.env_file }}"
+        if [ -f "${{ inputs.env_file }}" ]; then
+          echo "    → file exists, first 5 chars: $(head -c 5 "${{ inputs.env_file }}")"
+        else
+          echo "    → file does not exist"
+        fi
         echo "  env_fail_if_missing: ${{ inputs.env_fail_if_missing }}"
         echo ""
         echo "Release notes:"
@@ -200,15 +210,30 @@ runs:
         echo "Release info:"
         echo "  update_release_info: ${{ inputs.update_release_info }}"
         echo "  release_info_path: ${{ inputs.release_info_path }}"
+        if [ -f "${{ inputs.release_info_path }}" ]; then
+          echo "    → file exists, first 5 chars: $(head -c 5 "${{ inputs.release_info_path }}")"
+        else
+          echo "    → file does not exist"
+        fi
         echo ""
         echo "Analysis options:"
         echo "  update_analysis_options: ${{ inputs.update_analysis_options }}"
         echo "  analysis_options_ci_file: ${{ inputs.analysis_options_ci_file }}"
+        if [ -f "${{ inputs.analysis_options_ci_file }}" ]; then
+          echo "    → file exists, first 5 chars: $(head -c 5 "${{ inputs.analysis_options_ci_file }}")"
+        else
+          echo "    → file does not exist"
+        fi
         echo ""
         echo "Firebase:"
         echo "  setup_firebase: ${{ inputs.setup_firebase }}"
         echo "  firebase_project_id: ${{ inputs.firebase_project_id }}"
         echo "  firebase_service_account_path: ${{ inputs.firebase_service_account_path }}"
+        if [ -f "${{ inputs.firebase_service_account_path }}" ]; then
+          echo "    → file exists (secret file, first 5 chars: $(head -c 5 "${{ inputs.firebase_service_account_path }}"))"
+        else
+          echo "    → file does not exist"
+        fi
         echo ""
         echo "Functions:"
         echo "  build_functions: ${{ inputs.build_functions }}"
@@ -264,7 +289,7 @@ runs:
 
           current_version=$(grep "$VERSION_PATTERN" "$VERSION_FILE" | sed "s/$VERSION_PATTERN//" | tr -d ' ' | head -n 1)
         fi
-        
+
         echo "Current version: $current_version"
         echo "CURRENT_VERSION=$current_version" >> $GITHUB_ENV
         echo "current_version=$current_version" >> $GITHUB_OUTPUT
