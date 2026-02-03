@@ -1,3 +1,7 @@
+## 0.0.15
+
+* Allow _shouldSetupErrorHandling
+
 ## 0.0.14
 
 * Allow uploading to Storage with mime type
