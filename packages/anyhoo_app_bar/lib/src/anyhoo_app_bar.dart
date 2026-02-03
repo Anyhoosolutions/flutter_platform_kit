@@ -39,75 +39,37 @@ class _AnyhooAppBarState extends State<AnyhooAppBar> {
   bool showTitleText = false;
   final collapsedPosition = 245;
   bool _listenerAdded = false;
-  bool _retryScheduled = false;
-  ScrollController? _currentController;
 
   @override
   void initState() {
     super.initState();
+    // When there's no image, the title is always visible (no collapse behavior)
     showTitleText = widget.imageUrl == null;
-
-    // Try to attach listener after the first frame
-    if (widget.scrollController != null) {
-      _currentController = widget.scrollController;
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _tryAttachListener();
-      });
-    }
+    _tryAttachListener();
   }
 
+  /// Attaches the scroll listener if needed (only when imageUrl != null).
+  /// Does NOT retry if the controller doesn't have clients yet - this avoids
+  /// infinite frame scheduling that breaks pumpAndSettle in tests.
   void _tryAttachListener() {
-    if (!mounted || widget.scrollController == null) {
+    // Scroll listener is only needed when there's an image to collapse
+    if (widget.imageUrl == null) {
       return;
     }
-
-    // Only add listener if not already added to this controller
-    if (_listenerAdded && _currentController == widget.scrollController) {
+    if (_listenerAdded) {
       return;
     }
-
-    if (widget.scrollController!.hasClients) {
-      // Remove listener from previous controller if it changed
-      if (_listenerAdded && _currentController != null && _currentController != widget.scrollController) {
-        try {
-          _currentController!.removeListener(_onScroll);
-        } catch (e) {
-          // Ignore errors when removing from disposed controller
-        }
-      }
-
-      // Add listener to current controller
-      if (!_listenerAdded || _currentController != widget.scrollController) {
-        try {
-          widget.scrollController!.addListener(_onScroll);
-          _listenerAdded = true;
-          _currentController = widget.scrollController;
-          _retryScheduled = false;
-        } catch (e) {
-          // Ignore errors
-        }
-      }
-    } else {
-      // Retry after the next frame, but only if we haven't already scheduled a retry
-      if (!_retryScheduled) {
-        _retryScheduled = true;
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          _retryScheduled = false;
-          if (mounted) {
-            _tryAttachListener();
-          }
-        });
-      }
+    final controller = widget.scrollController;
+    if (controller != null && controller.hasClients) {
+      controller.addListener(_onScroll);
+      _listenerAdded = true;
     }
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // Also try here in case the controller gets attached during build
-    if (widget.scrollController != null && !_listenerAdded) {
-      _tryAttachListener();
-    }
+    _tryAttachListener();
   }
 
   @override
@@ -117,20 +79,11 @@ class _AnyhooAppBarState extends State<AnyhooAppBar> {
     if (oldWidget.scrollController != widget.scrollController) {
       // Remove listener from old controller
       if (_listenerAdded && oldWidget.scrollController != null) {
-        try {
-          oldWidget.scrollController!.removeListener(_onScroll);
-        } catch (e) {
-          // Ignore errors when removing from disposed controller
-        }
+        oldWidget.scrollController!.removeListener(_onScroll);
         _listenerAdded = false;
       }
-      _currentController = widget.scrollController;
-      _retryScheduled = false;
-      // Add listener to new controller
-      if (widget.scrollController != null) {
-        _tryAttachListener();
-      }
-    } else if (widget.scrollController != null && !_listenerAdded) {
+      _tryAttachListener();
+    } else if (!_listenerAdded) {
       // Controller is the same but listener wasn't added, try again
       _tryAttachListener();
     }
@@ -145,9 +98,6 @@ class _AnyhooAppBarState extends State<AnyhooAppBar> {
   }
 
   void _onScroll() {
-    if (widget.imageUrl == null) {
-      return;
-    }
     if (widget.scrollController!.position.pixels > collapsedPosition) {
       if (!showTitleText) {
         setState(() {
@@ -165,7 +115,8 @@ class _AnyhooAppBarState extends State<AnyhooAppBar> {
 
   @override
   Widget build(BuildContext context) {
-    final backgroundColor = widget.backgroundColor ?? Theme.of(context).colorScheme.primary;
+    final backgroundColor =
+        widget.backgroundColor ?? Theme.of(context).colorScheme.primary;
     return SliverAppBar(
       expandedHeight: _getExpandedHeight(),
       pinned: true,
@@ -175,7 +126,12 @@ class _AnyhooAppBarState extends State<AnyhooAppBar> {
       leading: _getBackButton(context),
       actions: _getActionButtons(),
       flexibleSpace: AnyhooShimmer(
-        child: FlexibleSpaceBar(centerTitle: true, title: _getTitle(), background: _getBackgroundImage()),
+        enabled: widget.isLoading,
+        child: FlexibleSpaceBar(
+          centerTitle: true,
+          title: _getTitle(),
+          background: _getBackgroundImage(),
+        ),
       ),
 
       // TODO: Add a line at the bottom?
@@ -197,15 +153,24 @@ class _AnyhooAppBarState extends State<AnyhooAppBar> {
     return IconButton(
       icon: Container(
         padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(color: Colors.black.withValues(alpha: 0.3), shape: BoxShape.circle),
-        child: Icon(widget.backButtonIcon ?? Icons.arrow_back, color: Colors.white),
+        decoration: BoxDecoration(
+          color: Colors.black.withValues(alpha: 0.3),
+          shape: BoxShape.circle,
+        ),
+        child: Icon(
+          widget.backButtonIcon ?? Icons.arrow_back,
+          color: Colors.white,
+        ),
       ),
       onPressed: () => GoRouter.of(context).pop(),
     );
   }
 
   List<Widget> _getActionButtons() {
-    return [..._getNonOverflowActionButtons(), if (_getOverflowActionButtons() != null) _getOverflowActionButtons()!];
+    return [
+      ..._getNonOverflowActionButtons(),
+      if (_getOverflowActionButtons() != null) _getOverflowActionButtons()!,
+    ];
   }
 
   List<Widget> _getNonOverflowActionButtons() {
@@ -217,7 +182,12 @@ class _AnyhooAppBarState extends State<AnyhooAppBar> {
             child: IconButton(
               icon: Container(
                 padding: const EdgeInsets.all(8),
-                child: Icon(ab.icon, color: widget.iconColor ?? Theme.of(context).colorScheme.onPrimaryContainer),
+                child: Icon(
+                  ab.icon,
+                  color:
+                      widget.iconColor ??
+                      Theme.of(context).colorScheme.onPrimaryContainer,
+                ),
               ),
               onPressed: ab.onTap,
             ),
@@ -232,16 +202,22 @@ class _AnyhooAppBarState extends State<AnyhooAppBar> {
     }
 
     final entries = widget.actionButtons
-        .where((ab) => ab is OverflowActionButtonInfo || ab is DividerActionButtonInfo)
+        .where(
+          (ab) =>
+              ab is OverflowActionButtonInfo || ab is DividerActionButtonInfo,
+        )
         .map((ab) => createPopupMenuEntry(ab))
         .toList();
 
     return PopupMenuButton<String>(
-      icon: const Icon(Icons.more_vert, color: Colors.black), // TDOO: Should pick the color from the theme
+      icon: const Icon(
+        Icons.more_vert,
+        color: Colors.black,
+      ), // TDOO: Should pick the color from the theme
       onSelected: (String result) {
-        final actionButton = widget.actionButtons.whereType<OverflowActionButtonInfo>().firstWhere(
-          (ab) => ab.title == result,
-        );
+        final actionButton = widget.actionButtons
+            .whereType<OverflowActionButtonInfo>()
+            .firstWhere((ab) => ab.title == result);
         actionButton.onTap();
         return;
       },
@@ -255,7 +231,9 @@ class _AnyhooAppBarState extends State<AnyhooAppBar> {
         value: ab.title,
         child: Semantics(
           label: ab.title,
-          child: Row(children: [Icon(ab.icon), SizedBox(width: 8), Text(ab.title)]),
+          child: Row(
+            children: [Icon(ab.icon), SizedBox(width: 8), Text(ab.title)],
+          ),
         ),
       );
     }
@@ -272,7 +250,10 @@ class _AnyhooAppBarState extends State<AnyhooAppBar> {
     if (widget.title == null || !showTitleText) {
       return null;
     }
-    return Text(widget.title!, style: TextStyle(color: Theme.of(context).colorScheme.onSurface));
+    return Text(
+      widget.title!,
+      style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+    );
   }
 
   Widget? _getBackgroundImage() {
@@ -283,7 +264,10 @@ class _AnyhooAppBarState extends State<AnyhooAppBar> {
       // TODO: What height should this be?
       return ShimmerShapes.image(
         height: 40,
-        borderRadius: BorderRadius.only(bottomLeft: Radius.circular(16), bottomRight: Radius.circular(16)),
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(16),
+          bottomRight: Radius.circular(16),
+        ),
       );
     }
     if (widget.imageUrl != null) {
