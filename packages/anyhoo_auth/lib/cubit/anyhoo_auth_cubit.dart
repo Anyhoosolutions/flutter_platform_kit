@@ -67,6 +67,7 @@ class AnyhooAuthCubit<T extends AnyhooUser> extends Cubit<AnyhooAuthState<T>> {
           }
         } catch (e, stackTrace) {
           _log.severe('Error in auth state stream', e);
+          _log.warning('user: ${user?.toString()}');
           SentryHelper.captureException(e, stackTrace: stackTrace, fatal: false);
           emit(state.copyWith(errorMessage: e.toString(), isLoading: false));
         }

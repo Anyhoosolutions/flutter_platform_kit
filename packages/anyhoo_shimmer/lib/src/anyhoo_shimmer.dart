@@ -44,10 +44,6 @@ class AnyhooShimmer extends StatelessWidget {
     //   }
     // }
 
-    return Shimmer(
-      linearGradient: linearGradient,
-      child: child,
-      enabled: enabled,
-    );
+    return Shimmer(linearGradient: linearGradient, enabled: enabled, child: child);
   }
 }
