@@ -1,4 +1,8 @@
-## 0.0.6 
+## 0.0.7
+ 
+* Simplify AnyhooAppBar
+
+## 0.0.6
  
 * Change color for app bar icon
 
