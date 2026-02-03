@@ -271,7 +271,9 @@ class _LoginWidgetState<T extends AnyhooUser> extends State<LoginWidget<T>> {
   }
 
   Widget? _getLogo() {
-    if (widget.assetLogoPath != null) return Image.asset(widget.assetLogoPath!, width: 80, height: 80);
+    if (widget.assetLogoPath != null) {
+      return Image.asset(widget.assetLogoPath!, width: 80, height: 80);
+    }
     return null;
   }
 
@@ -307,6 +309,7 @@ class _LoginWidgetState<T extends AnyhooUser> extends State<LoginWidget<T>> {
         child: Column(
           children: [
             FormBuilderTextField(
+              key: const Key('login_widget_email_input'),
               name: 'email',
               decoration: const InputDecoration(
                 labelText: 'Email',
@@ -320,6 +323,7 @@ class _LoginWidgetState<T extends AnyhooUser> extends State<LoginWidget<T>> {
             ),
             const SizedBox(height: 16),
             FormBuilderTextField(
+              key: const Key('login_widget_password_input'),
               name: 'password',
               decoration: InputDecoration(
                 labelText: 'Password',
@@ -347,6 +351,7 @@ class _LoginWidgetState<T extends AnyhooUser> extends State<LoginWidget<T>> {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
+                key: const Key('login_widget_sign_in_up_button'),
                 onPressed: _isLoading ? null : _handleEmailAuth,
                 child: _isLoading
                     ? const SizedBox(
