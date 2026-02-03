@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 class AnyhooShimmer extends StatelessWidget {
   final Widget? child;
+  final bool enabled;
 
   final lightModeLinearGradient = LinearGradient(
     colors: [Colors.grey[300]!, Colors.grey[100]!, Colors.grey[300]!],
@@ -19,7 +20,8 @@ class AnyhooShimmer extends StatelessWidget {
     end: const Alignment(1.0, 0.3),
     tileMode: TileMode.clamp,
   );
-  AnyhooShimmer({super.key, this.child});
+
+  AnyhooShimmer({super.key, this.child, this.enabled = true});
 
   @override
   Widget build(BuildContext context) {
@@ -42,6 +44,6 @@ class AnyhooShimmer extends StatelessWidget {
     //   }
     // }
 
-    return Shimmer(linearGradient: linearGradient, child: child);
+    return Shimmer(linearGradient: linearGradient, enabled: enabled, child: child);
   }
 }

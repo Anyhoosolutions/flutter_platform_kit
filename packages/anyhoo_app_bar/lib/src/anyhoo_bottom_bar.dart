@@ -4,7 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 
 class AnyhooBottomBar extends StatefulWidget {
-  const AnyhooBottomBar({super.key, this.backgroundColor, required this.items, required this.selectedItemKey});
+  const AnyhooBottomBar({
+    super.key,
+    this.backgroundColor,
+    required this.items,
+    required this.selectedItemKey,
+  });
 
   final Color? backgroundColor;
   final List<AnyhooBottomBarItem> items;
@@ -19,14 +24,20 @@ class _AnyhooBottomBarState extends State<AnyhooBottomBar> {
 
   @override
   Widget build(BuildContext context) {
-    final backgroundColor = widget.backgroundColor ?? Theme.of(context).colorScheme.primary;
+    final backgroundColor =
+        widget.backgroundColor ?? Theme.of(context).colorScheme.primary;
     final selectedColor = Theme.of(context).colorScheme.primary;
     final iconColor = Theme.of(context).colorScheme.onSurface;
 
     return Container(
       height: 80,
       decoration: BoxDecoration(
-        border: Border(top: BorderSide(color: backgroundColor.withValues(alpha: 0.4), width: 1)),
+        border: Border(
+          top: BorderSide(
+            color: backgroundColor.withValues(alpha: 0.4),
+            width: 1,
+          ),
+        ),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -40,6 +51,7 @@ class _AnyhooBottomBarState extends State<AnyhooBottomBar> {
                 item.route,
                 iconColor,
                 selectedColor,
+                item.key,
               ),
             )
             .toList(),
@@ -55,8 +67,10 @@ class _AnyhooBottomBarState extends State<AnyhooBottomBar> {
     String url,
     Color color,
     Color selectedColor,
+    String key,
   ) {
     return GestureDetector(
+      key: Key(key),
       onTap: () {
         _log.info('Tapping on $label to go to $url');
         GoRouterWrapper().push(context, url);
@@ -66,7 +80,13 @@ class _AnyhooBottomBarState extends State<AnyhooBottomBar> {
         children: [
           Icon(icon, color: isSelected ? selectedColor : color, size: 24),
           const SizedBox(height: 4),
-          Text(label, style: TextStyle(color: isSelected ? selectedColor : color, fontSize: 12)),
+          Text(
+            label,
+            style: TextStyle(
+              color: isSelected ? selectedColor : color,
+              fontSize: 12,
+            ),
+          ),
         ],
       ),
     );

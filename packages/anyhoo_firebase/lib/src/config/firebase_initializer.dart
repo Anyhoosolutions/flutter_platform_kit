@@ -22,8 +22,10 @@ class FirebaseInitializer {
   FirebaseAuth? _auth;
   FirebaseFirestore? _firestore;
   FirebaseStorage? _storage;
+  final bool _shouldSetupErrorHandling;
 
-  FirebaseInitializer({required this.arguments, required this.emulatorConfig});
+  FirebaseInitializer({required this.arguments, required this.emulatorConfig, bool shouldSetupErrorHandling = true})
+    : _shouldSetupErrorHandling = shouldSetupErrorHandling;
 
   Future<void> initialize(FirebaseOptions firebaseOptions) async {
     _log.info('!! Initializing Firebase');
@@ -270,6 +272,9 @@ class FirebaseInitializer {
   void _setupErrorHandling() async {
     // Set up custom error widget builder to show detailed error information on screen
     // This replaces the red error screen with a custom error display
+    if (!_shouldSetupErrorHandling) {
+      return;
+    }
     ErrorWidget.builder = (FlutterErrorDetails errorDetails) {
       _log.severe(
         'ErrorWidget.builder caught error: ${errorDetails.exception}',
