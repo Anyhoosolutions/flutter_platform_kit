@@ -31,7 +31,7 @@ on:
       
       # Customize these descriptions!
       android_flavor1:
-        description: 'Android - Snap & Savor'  # Your actual app name
+        description: 'Android - My Example App'  # Your actual app name
         type: boolean
         default: false
       android_flavor2:
@@ -71,7 +71,7 @@ Copy `deploy-config-template.json` to `.github/deploy-config.json` and configure
     "snapandsavor": {
       "target_file": "lib/main.dart",
       "android": {
-        "firebase_app_id": "1:662631605767:android:5f42abaa1d0bb2b2972ca2",
+        "firebase_app_id": "1:123:android:456",
         "distribution_groups": ["testers"]
       },
       "web": {
@@ -82,7 +82,7 @@ Copy `deploy-config-template.json` to `.github/deploy-config.json` and configure
     "admin": {
       "target_file": "lib/admin/main.dart",
       "android": {
-        "firebase_app_id": "1:662631605767:android:admin123",
+        "firebase_app_id": "1:123:android:admin123",
         "flavor": "admin"
       }
     }
@@ -263,6 +263,132 @@ This is useful for:
    - Change the description for the corresponding checkbox (e.g., `'Android - Restaurant'`)
 
 No changes needed to flutter_platform_kit!
+
+## Deploying Widgetbook
+
+Widgetbook deployment is different from flavor deployments - it's a single shared build that showcases all your widgets, not flavor-specific.
+
+### Project Structure
+
+Your Widgetbook should be in a subdirectory of your main app:
+
+```
+my_app/
+├── lib/
+│   └── ...
+├── widgetbook/              # Widgetbook project
+│   ├── lib/
+│   │   └── main.dart
+│   ├── pubspec.yaml
+│   └── ...
+├── firebase.json
+└── .github/
+    └── deploy-config.json
+```
+
+### Step 1: Configure Firebase Hosting Target
+
+In your app's `firebase.json`, add a hosting target for Widgetbook:
+
+```json
+{
+  "hosting": [
+    {
+      "target": "app",
+      "public": "build/web",
+      "ignore": ["firebase.json", "**/.*", "**/node_modules/**"]
+    },
+    {
+      "target": "widgetbook",
+      "public": "widgetbook/build/web",
+      "ignore": ["firebase.json", "**/.*", "**/node_modules/**"]
+    }
+  ]
+}
+```
+
+Then link the target to your site:
+
+```bash
+firebase target:apply hosting widgetbook your-project-widgetbook
+```
+
+(Replace `your-project-widgetbook` with your actual Firebase Hosting site name)
+
+### Step 2: Configure deploy-config.json
+
+Add the `widgetbook` section to your `.github/deploy-config.json`:
+
+```json
+{
+  "firebase": {
+    "project_id": "your-project-id",
+    "service_account_path": "firebase_service_account.json"
+  },
+  
+  "widgetbook": {
+    "directory": "widgetbook",
+    "hosting_target": "widgetbook"
+  }
+}
+```
+
+| Field | Description |
+|-------|-------------|
+| `directory` | Path to your Widgetbook project (relative to repo root) |
+| `hosting_target` | Firebase Hosting target name (must match `firebase.json`) |
+
+### Step 3: Deploy
+
+1. Go to **Actions** > **Deploy**
+2. Check the **Widgetbook** checkbox
+3. Click **Run workflow**
+
+### What the Workflow Does
+
+When you deploy Widgetbook, the workflow:
+
+1. Checks out the code (at the selected branch/commit)
+2. Decrypts SOPS secrets
+3. Sets up Flutter
+4. Runs `flutter pub get` in the main app directory
+5. Runs `flutter pub get` in the Widgetbook directory
+6. Runs `dart run build_runner build --delete-conflicting-outputs` to generate Widgetbook code
+7. Runs `flutter build web` to build Widgetbook
+8. Deploys to Firebase Hosting at the configured target
+
+### Widgetbook with Multiple Hosting Sites
+
+If you have multiple apps/flavors each with their own Widgetbook, you can configure separate hosting targets:
+
+```json
+{
+  "hosting": [
+    { "target": "widgetbook-main", "public": "widgetbook/build/web" },
+    { "target": "widgetbook-admin", "public": "widgetbook-admin/build/web" }
+  ]
+}
+```
+
+However, note that the current workflow only supports a single Widgetbook deployment. For multiple Widgetbooks, you'd need to extend the workflow or deploy them as part of your web flavor deployments.
+
+### Troubleshooting Widgetbook
+
+**build_runner fails:**
+- Ensure your Widgetbook's `pubspec.yaml` has `build_runner` as a dev dependency
+- Check that the main app's packages are compatible with Widgetbook's version
+
+**Hosting target not found:**
+- Run `firebase target:apply hosting widgetbook <site-name>` locally
+- Commit the updated `.firebaserc` file
+
+**Widgetbook can't find main app's widgets:**
+- Ensure Widgetbook's `pubspec.yaml` has a path dependency to the main app:
+  ```yaml
+  dependencies:
+    my_app:
+      path: ../
+  ```
 
 ## Future Enhancements
 
