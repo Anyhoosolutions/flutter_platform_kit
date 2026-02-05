@@ -84,18 +84,30 @@ runs:
         # Try to fetch the base branch for comparison
         git fetch origin "$BASE_BRANCH:$BASE_BRANCH" 2>/dev/null || echo "Could not fetch base branch, comparing against HEAD"
 
-        # Build exclude pattern for git diff
-        EXCLUDE_PATTERNS="${{ inputs.exclude_patterns }}"
-        EXCLUDE_ARGS=""
-        for pattern in $EXCLUDE_PATTERNS; do
-          EXCLUDE_ARGS="$EXCLUDE_ARGS ':!$pattern'"
-        done
-
-        # Find changed Dart model files (excluding generated files)
-        CHANGED_DART=$(git diff --name-only "$BASE_REF" HEAD -- "${{ inputs.source_models_path }}"/*.dart $EXCLUDE_ARGS 2>/dev/null || \
-                      git diff --name-only "$BASE_BRANCH" HEAD -- "${{ inputs.source_models_path }}"/*.dart $EXCLUDE_ARGS 2>/dev/null || \
-                      git diff --name-only HEAD~1 HEAD -- "${{ inputs.source_models_path }}"/*.dart $EXCLUDE_ARGS 2>/dev/null || \
+        # Find changed Dart model files
+        CHANGED_DART=$(git diff --name-only "$BASE_REF" HEAD -- "${{ inputs.source_models_path }}"/*.dart 2>/dev/null || \
+                      git diff --name-only "$BASE_BRANCH" HEAD -- "${{ inputs.source_models_path }}"/*.dart 2>/dev/null || \
+                      git diff --name-only HEAD~1 HEAD -- "${{ inputs.source_models_path }}"/*.dart 2>/dev/null || \
                       echo "")
+
+        # Filter out generated files (*.freezed.dart, *.g.dart, etc.)
+        EXCLUDE_PATTERNS="${{ inputs.exclude_patterns }}"
+        FILTERED_DART=""
+        for dart_file in $CHANGED_DART; do
+          EXCLUDE_THIS=false
+          for pattern in $EXCLUDE_PATTERNS; do
+            # Convert glob pattern to regex for matching
+            regex_pattern=$(echo "$pattern" | sed 's/\./\\./g' | sed 's/\*/.*/g')
+            if echo "$dart_file" | grep -qE "$regex_pattern$"; then
+              EXCLUDE_THIS=true
+              break
+            fi
+          done
+          if [ "$EXCLUDE_THIS" = "false" ]; then
+            FILTERED_DART="$FILTERED_DART $dart_file"
+          fi
+        done
+        CHANGED_DART=$(echo "$FILTERED_DART" | xargs)
 
         if [ -z "$CHANGED_DART" ]; then
           echo "✅ No Dart model files changed in this PR"
@@ -166,15 +178,26 @@ runs:
           echo "Comparing against previous commit"
         fi
 
-        # Build exclude pattern for git diff
-        EXCLUDE_PATTERNS="${{ inputs.exclude_patterns }}"
-        EXCLUDE_ARGS=""
-        for pattern in $EXCLUDE_PATTERNS; do
-          EXCLUDE_ARGS="$EXCLUDE_ARGS ':!$pattern'"
-        done
+        # Check for changes in source models
+        SOURCE_CHANGES=$(git diff --name-only "$BASE_REF" HEAD -- "${{ inputs.source_models_path }}/" 2>/dev/null || echo "")
 
-        # Check for changes in source models (excluding generated files)
-        SOURCE_CHANGES=$(git diff --name-only "$BASE_REF" HEAD -- "${{ inputs.source_models_path }}/" $EXCLUDE_ARGS 2>/dev/null || echo "")
+        # Filter out generated files (*.freezed.dart, *.g.dart, etc.)
+        EXCLUDE_PATTERNS="${{ inputs.exclude_patterns }}"
+        FILTERED_CHANGES=""
+        for src_file in $SOURCE_CHANGES; do
+          EXCLUDE_THIS=false
+          for pattern in $EXCLUDE_PATTERNS; do
+            regex_pattern=$(echo "$pattern" | sed 's/\./\\./g' | sed 's/\*/.*/g')
+            if echo "$src_file" | grep -qE "$regex_pattern$"; then
+              EXCLUDE_THIS=true
+              break
+            fi
+          done
+          if [ "$EXCLUDE_THIS" = "false" ]; then
+            FILTERED_CHANGES="$FILTERED_CHANGES $src_file"
+          fi
+        done
+        SOURCE_CHANGES=$(echo "$FILTERED_CHANGES" | xargs)
 
         # Check for changes in generated models
         GENERATED_CHANGES=$(git diff --name-only "$BASE_REF" HEAD -- "${{ inputs.generated_models_path }}/" 2>/dev/null || echo "")
@@ -338,14 +361,26 @@ runs:
           exit 0
         fi
 
-        # Find all Dart model files (excluding generated files)
-        EXCLUDE_PATTERNS="${{ inputs.exclude_patterns }}"
-        FIND_EXCLUDE=""
-        for pattern in $EXCLUDE_PATTERNS; do
-          FIND_EXCLUDE="$FIND_EXCLUDE ! -name '$pattern'"
-        done
+        # Find all Dart model files
+        ALL_DART_FILES=$(find "${{ inputs.source_models_path }}" -name '*.dart' -type f 2>/dev/null || echo "")
 
-        DART_FILES=$(eval "find ${{ inputs.source_models_path }} -name '*.dart' -type f $FIND_EXCLUDE" 2>/dev/null || echo "")
+        # Filter out generated files (*.freezed.dart, *.g.dart, etc.)
+        EXCLUDE_PATTERNS="${{ inputs.exclude_patterns }}"
+        DART_FILES=""
+        for dart_file in $ALL_DART_FILES; do
+          EXCLUDE_THIS=false
+          for pattern in $EXCLUDE_PATTERNS; do
+            regex_pattern=$(echo "$pattern" | sed 's/\./\\./g' | sed 's/\*/.*/g')
+            if echo "$dart_file" | grep -qE "$regex_pattern$"; then
+              EXCLUDE_THIS=true
+              break
+            fi
+          done
+          if [ "$EXCLUDE_THIS" = "false" ]; then
+            DART_FILES="$DART_FILES $dart_file"
+          fi
+        done
+        DART_FILES=$(echo "$DART_FILES" | xargs)
 
         if [ -z "$DART_FILES" ]; then
           echo "⚠️  No Dart model files found in ${{ inputs.source_models_path }}/"
