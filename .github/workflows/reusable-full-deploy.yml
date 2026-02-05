@@ -1,0 +1,1043 @@
+name: Reusable Full Deploy
+
+on:
+  workflow_call:
+    inputs:
+      # ==================== CHECKOUT OPTIONS ====================
+      commit_sha:
+        description: "Specific commit SHA to deploy (leave empty for branch HEAD)"
+        required: false
+        type: string
+        default: ""
+
+      # ==================== BUILD CONFIGURATION ====================
+      version:
+        description: "Version Name (e.g., 1.0.2+123)"
+        required: true
+        type: string
+      release_notes:
+        description: "Release Notes"
+        required: false
+        type: string
+        default: "Manual build from GitHub Actions"
+
+      # ==================== ANDROID DEPLOYMENTS ====================
+      android_flavor1:
+        description: "Deploy Android - Flavor 1"
+        required: false
+        type: boolean
+        default: false
+      android_flavor2:
+        description: "Deploy Android - Flavor 2"
+        required: false
+        type: boolean
+        default: false
+      android_flavor3:
+        description: "Deploy Android - Flavor 3"
+        required: false
+        type: boolean
+        default: false
+      android_flavor4:
+        description: "Deploy Android - Flavor 4"
+        required: false
+        type: boolean
+        default: false
+      android_flavor5:
+        description: "Deploy Android - Flavor 5"
+        required: false
+        type: boolean
+        default: false
+
+      # ==================== iOS DEPLOYMENTS ====================
+      ios_flavor1:
+        description: "Deploy iOS - Flavor 1"
+        required: false
+        type: boolean
+        default: false
+      ios_flavor2:
+        description: "Deploy iOS - Flavor 2"
+        required: false
+        type: boolean
+        default: false
+      ios_flavor3:
+        description: "Deploy iOS - Flavor 3"
+        required: false
+        type: boolean
+        default: false
+      ios_flavor4:
+        description: "Deploy iOS - Flavor 4"
+        required: false
+        type: boolean
+        default: false
+      ios_flavor5:
+        description: "Deploy iOS - Flavor 5"
+        required: false
+        type: boolean
+        default: false
+
+      # ==================== WEB DEPLOYMENTS ====================
+      web_flavor1:
+        description: "Deploy Web - Flavor 1"
+        required: false
+        type: boolean
+        default: false
+      web_flavor2:
+        description: "Deploy Web - Flavor 2"
+        required: false
+        type: boolean
+        default: false
+      web_flavor3:
+        description: "Deploy Web - Flavor 3"
+        required: false
+        type: boolean
+        default: false
+      web_flavor4:
+        description: "Deploy Web - Flavor 4"
+        required: false
+        type: boolean
+        default: false
+      web_flavor5:
+        description: "Deploy Web - Flavor 5"
+        required: false
+        type: boolean
+        default: false
+
+      # ==================== OTHER DEPLOYMENTS ====================
+      functions:
+        description: "Deploy Firebase Functions"
+        required: false
+        type: boolean
+        default: false
+      widgetbook:
+        description: "Deploy Widgetbook"
+        required: false
+        type: boolean
+        default: false
+
+    secrets:
+      SOPS_AGE_KEY:
+        required: true
+
+# Ensure only one deployment runs at a time per repo
+concurrency:
+  group: deploy-${{ github.repository }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  # ============================================================================
+  # PREPARE JOB - Runs once, validates inputs, computes matrices
+  # ============================================================================
+  prepare:
+    name: Prepare Deployment
+    runs-on: ubuntu-latest
+    outputs:
+      # Flavor arrays for matrix strategies
+      android_flavors: ${{ steps.compute-matrices.outputs.android_flavors }}
+      ios_flavors: ${{ steps.compute-matrices.outputs.ios_flavors }}
+      web_flavors: ${{ steps.compute-matrices.outputs.web_flavors }}
+      # Boolean flags for job conditions
+      has_android: ${{ steps.compute-matrices.outputs.has_android }}
+      has_ios: ${{ steps.compute-matrices.outputs.has_ios }}
+      has_web: ${{ steps.compute-matrices.outputs.has_web }}
+      has_functions: ${{ steps.compute-matrices.outputs.has_functions }}
+      has_widgetbook: ${{ steps.compute-matrices.outputs.has_widgetbook }}
+      # Checkout ref
+      checkout_ref: ${{ steps.determine-ref.outputs.checkout_ref }}
+      # Config
+      config_json: ${{ steps.load-config.outputs.config_json }}
+
+    steps:
+      - name: Determine checkout ref
+        id: determine-ref
+        run: |
+          if [ -n "${{ inputs.commit_sha }}" ]; then
+            echo "checkout_ref=${{ inputs.commit_sha }}" >> $GITHUB_OUTPUT
+            echo "📌 Will checkout specific commit: ${{ inputs.commit_sha }}"
+          else
+            echo "checkout_ref=${{ github.ref }}" >> $GITHUB_OUTPUT
+            echo "📌 Will checkout branch: ${{ github.ref }}"
+          fi
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.determine-ref.outputs.checkout_ref }}
+          fetch-depth: 0
+
+      - name: Debug - Print workflow inputs
+        run: |
+          echo "===================================================="
+          echo "====           WORKFLOW INPUTS                 ======"
+          echo "===================================================="
+          echo ""
+          echo "Checkout:"
+          echo "  commit_sha: ${{ inputs.commit_sha }}"
+          echo "  resolved ref: ${{ steps.determine-ref.outputs.checkout_ref }}"
+          echo ""
+          echo "Build Configuration:"
+          echo "  version: ${{ inputs.version }}"
+          echo "  release_notes: ${{ inputs.release_notes }}"
+          echo ""
+          echo "Android Deployments:"
+          echo "  flavor1: ${{ inputs.android_flavor1 }}"
+          echo "  flavor2: ${{ inputs.android_flavor2 }}"
+          echo "  flavor3: ${{ inputs.android_flavor3 }}"
+          echo "  flavor4: ${{ inputs.android_flavor4 }}"
+          echo "  flavor5: ${{ inputs.android_flavor5 }}"
+          echo ""
+          echo "iOS Deployments:"
+          echo "  flavor1: ${{ inputs.ios_flavor1 }}"
+          echo "  flavor2: ${{ inputs.ios_flavor2 }}"
+          echo "  flavor3: ${{ inputs.ios_flavor3 }}"
+          echo "  flavor4: ${{ inputs.ios_flavor4 }}"
+          echo "  flavor5: ${{ inputs.ios_flavor5 }}"
+          echo ""
+          echo "Web Deployments:"
+          echo "  flavor1: ${{ inputs.web_flavor1 }}"
+          echo "  flavor2: ${{ inputs.web_flavor2 }}"
+          echo "  flavor3: ${{ inputs.web_flavor3 }}"
+          echo "  flavor4: ${{ inputs.web_flavor4 }}"
+          echo "  flavor5: ${{ inputs.web_flavor5 }}"
+          echo ""
+          echo "Other Deployments:"
+          echo "  functions: ${{ inputs.functions }}"
+          echo "  widgetbook: ${{ inputs.widgetbook }}"
+          echo "===================================================="
+
+      - name: Load deploy configuration
+        id: load-config
+        run: |
+          CONFIG_FILE=".github/deploy-config.json"
+
+          if [ -f "$CONFIG_FILE" ]; then
+            echo "✅ Found $CONFIG_FILE"
+            # Minify JSON and set as output
+            CONFIG_JSON=$(cat "$CONFIG_FILE" | jq -c '.')
+            echo "config_json=$CONFIG_JSON" >> $GITHUB_OUTPUT
+            
+            # Display flavor mapping
+            echo ""
+            echo "📋 Flavor mapping:"
+            jq -r '.flavor_mapping | to_entries[] | "  \(.key): \(.value // "not configured")"' "$CONFIG_FILE"
+          else
+            echo "❌ $CONFIG_FILE not found!"
+            echo "   Please create this file based on deploy-config-template.json"
+            exit 1
+          fi
+
+      - name: Compute deployment matrices
+        id: compute-matrices
+        run: |
+          echo "🔍 Computing deployment matrices..."
+
+          CONFIG_FILE=".github/deploy-config.json"
+
+          # Helper function to get actual flavor name from mapping
+          get_flavor_name() {
+            local slot=$1
+            if [ -f "$CONFIG_FILE" ]; then
+              jq -r ".flavor_mapping.$slot // empty" "$CONFIG_FILE"
+            fi
+          }
+
+          # Build Android flavors array
+          ANDROID_FLAVORS="["
+          ANDROID_COUNT=0
+          for i in 1 2 3 4 5; do
+            INPUT_VAR="inputs.android_flavor$i"
+            if [ "${{ inputs.android_flavor1 }}" = "true" ] && [ "$i" = "1" ]; then
+              FLAVOR_NAME=$(get_flavor_name "flavor$i")
+              if [ -n "$FLAVOR_NAME" ]; then
+                [ $ANDROID_COUNT -gt 0 ] && ANDROID_FLAVORS="${ANDROID_FLAVORS},"
+                ANDROID_FLAVORS="${ANDROID_FLAVORS}{\"slot\":\"flavor$i\",\"name\":\"$FLAVOR_NAME\"}"
+                ANDROID_COUNT=$((ANDROID_COUNT + 1))
+              fi
+            fi
+          done
+
+          # Check each flavor input explicitly
+          if [ "${{ inputs.android_flavor1 }}" = "true" ]; then
+            FLAVOR_NAME=$(get_flavor_name "flavor1")
+            if [ -n "$FLAVOR_NAME" ]; then
+              [ $ANDROID_COUNT -gt 0 ] && ANDROID_FLAVORS="${ANDROID_FLAVORS},"
+              ANDROID_FLAVORS="${ANDROID_FLAVORS}{\"slot\":\"flavor1\",\"name\":\"$FLAVOR_NAME\"}"
+              ANDROID_COUNT=$((ANDROID_COUNT + 1))
+            fi
+          fi
+
+          # Reset and rebuild properly
+          ANDROID_FLAVORS="["
+          ANDROID_COUNT=0
+
+          check_and_add_flavor() {
+            local platform=$1
+            local slot=$2
+            local input_value=$3
+            local current_array=$4
+            local current_count=$5
+            
+            if [ "$input_value" = "true" ]; then
+              FLAVOR_NAME=$(get_flavor_name "$slot")
+              if [ -n "$FLAVOR_NAME" ]; then
+                if [ $current_count -gt 0 ]; then
+                  echo "${current_array},{\"slot\":\"$slot\",\"name\":\"$FLAVOR_NAME\"}"
+                else
+                  echo "${current_array}{\"slot\":\"$slot\",\"name\":\"$FLAVOR_NAME\"}"
+                fi
+                return 0
+              fi
+            fi
+            echo "$current_array"
+            return 1
+          }
+
+          # Build Android matrix
+          ANDROID_FLAVORS="["
+          ANDROID_COUNT=0
+
+          if [ "${{ inputs.android_flavor1 }}" = "true" ]; then
+            FLAVOR_NAME=$(jq -r '.flavor_mapping.flavor1 // empty' "$CONFIG_FILE")
+            if [ -n "$FLAVOR_NAME" ]; then
+              [ $ANDROID_COUNT -gt 0 ] && ANDROID_FLAVORS="${ANDROID_FLAVORS},"
+              ANDROID_FLAVORS="${ANDROID_FLAVORS}{\"slot\":\"flavor1\",\"name\":\"$FLAVOR_NAME\"}"
+              ANDROID_COUNT=$((ANDROID_COUNT + 1))
+            fi
+          fi
+          if [ "${{ inputs.android_flavor2 }}" = "true" ]; then
+            FLAVOR_NAME=$(jq -r '.flavor_mapping.flavor2 // empty' "$CONFIG_FILE")
+            if [ -n "$FLAVOR_NAME" ]; then
+              [ $ANDROID_COUNT -gt 0 ] && ANDROID_FLAVORS="${ANDROID_FLAVORS},"
+              ANDROID_FLAVORS="${ANDROID_FLAVORS}{\"slot\":\"flavor2\",\"name\":\"$FLAVOR_NAME\"}"
+              ANDROID_COUNT=$((ANDROID_COUNT + 1))
+            fi
+          fi
+          if [ "${{ inputs.android_flavor3 }}" = "true" ]; then
+            FLAVOR_NAME=$(jq -r '.flavor_mapping.flavor3 // empty' "$CONFIG_FILE")
+            if [ -n "$FLAVOR_NAME" ]; then
+              [ $ANDROID_COUNT -gt 0 ] && ANDROID_FLAVORS="${ANDROID_FLAVORS},"
+              ANDROID_FLAVORS="${ANDROID_FLAVORS}{\"slot\":\"flavor3\",\"name\":\"$FLAVOR_NAME\"}"
+              ANDROID_COUNT=$((ANDROID_COUNT + 1))
+            fi
+          fi
+          if [ "${{ inputs.android_flavor4 }}" = "true" ]; then
+            FLAVOR_NAME=$(jq -r '.flavor_mapping.flavor4 // empty' "$CONFIG_FILE")
+            if [ -n "$FLAVOR_NAME" ]; then
+              [ $ANDROID_COUNT -gt 0 ] && ANDROID_FLAVORS="${ANDROID_FLAVORS},"
+              ANDROID_FLAVORS="${ANDROID_FLAVORS}{\"slot\":\"flavor4\",\"name\":\"$FLAVOR_NAME\"}"
+              ANDROID_COUNT=$((ANDROID_COUNT + 1))
+            fi
+          fi
+          if [ "${{ inputs.android_flavor5 }}" = "true" ]; then
+            FLAVOR_NAME=$(jq -r '.flavor_mapping.flavor5 // empty' "$CONFIG_FILE")
+            if [ -n "$FLAVOR_NAME" ]; then
+              [ $ANDROID_COUNT -gt 0 ] && ANDROID_FLAVORS="${ANDROID_FLAVORS},"
+              ANDROID_FLAVORS="${ANDROID_FLAVORS}{\"slot\":\"flavor5\",\"name\":\"$FLAVOR_NAME\"}"
+              ANDROID_COUNT=$((ANDROID_COUNT + 1))
+            fi
+          fi
+          ANDROID_FLAVORS="${ANDROID_FLAVORS}]"
+
+          # Build iOS matrix
+          IOS_FLAVORS="["
+          IOS_COUNT=0
+
+          if [ "${{ inputs.ios_flavor1 }}" = "true" ]; then
+            FLAVOR_NAME=$(jq -r '.flavor_mapping.flavor1 // empty' "$CONFIG_FILE")
+            if [ -n "$FLAVOR_NAME" ]; then
+              [ $IOS_COUNT -gt 0 ] && IOS_FLAVORS="${IOS_FLAVORS},"
+              IOS_FLAVORS="${IOS_FLAVORS}{\"slot\":\"flavor1\",\"name\":\"$FLAVOR_NAME\"}"
+              IOS_COUNT=$((IOS_COUNT + 1))
+            fi
+          fi
+          if [ "${{ inputs.ios_flavor2 }}" = "true" ]; then
+            FLAVOR_NAME=$(jq -r '.flavor_mapping.flavor2 // empty' "$CONFIG_FILE")
+            if [ -n "$FLAVOR_NAME" ]; then
+              [ $IOS_COUNT -gt 0 ] && IOS_FLAVORS="${IOS_FLAVORS},"
+              IOS_FLAVORS="${IOS_FLAVORS}{\"slot\":\"flavor2\",\"name\":\"$FLAVOR_NAME\"}"
+              IOS_COUNT=$((IOS_COUNT + 1))
+            fi
+          fi
+          if [ "${{ inputs.ios_flavor3 }}" = "true" ]; then
+            FLAVOR_NAME=$(jq -r '.flavor_mapping.flavor3 // empty' "$CONFIG_FILE")
+            if [ -n "$FLAVOR_NAME" ]; then
+              [ $IOS_COUNT -gt 0 ] && IOS_FLAVORS="${IOS_FLAVORS},"
+              IOS_FLAVORS="${IOS_FLAVORS}{\"slot\":\"flavor3\",\"name\":\"$FLAVOR_NAME\"}"
+              IOS_COUNT=$((IOS_COUNT + 1))
+            fi
+          fi
+          if [ "${{ inputs.ios_flavor4 }}" = "true" ]; then
+            FLAVOR_NAME=$(jq -r '.flavor_mapping.flavor4 // empty' "$CONFIG_FILE")
+            if [ -n "$FLAVOR_NAME" ]; then
+              [ $IOS_COUNT -gt 0 ] && IOS_FLAVORS="${IOS_FLAVORS},"
+              IOS_FLAVORS="${IOS_FLAVORS}{\"slot\":\"flavor4\",\"name\":\"$FLAVOR_NAME\"}"
+              IOS_COUNT=$((IOS_COUNT + 1))
+            fi
+          fi
+          if [ "${{ inputs.ios_flavor5 }}" = "true" ]; then
+            FLAVOR_NAME=$(jq -r '.flavor_mapping.flavor5 // empty' "$CONFIG_FILE")
+            if [ -n "$FLAVOR_NAME" ]; then
+              [ $IOS_COUNT -gt 0 ] && IOS_FLAVORS="${IOS_FLAVORS},"
+              IOS_FLAVORS="${IOS_FLAVORS}{\"slot\":\"flavor5\",\"name\":\"$FLAVOR_NAME\"}"
+              IOS_COUNT=$((IOS_COUNT + 1))
+            fi
+          fi
+          IOS_FLAVORS="${IOS_FLAVORS}]"
+
+          # Build Web matrix
+          WEB_FLAVORS="["
+          WEB_COUNT=0
+
+          if [ "${{ inputs.web_flavor1 }}" = "true" ]; then
+            FLAVOR_NAME=$(jq -r '.flavor_mapping.flavor1 // empty' "$CONFIG_FILE")
+            if [ -n "$FLAVOR_NAME" ]; then
+              [ $WEB_COUNT -gt 0 ] && WEB_FLAVORS="${WEB_FLAVORS},"
+              WEB_FLAVORS="${WEB_FLAVORS}{\"slot\":\"flavor1\",\"name\":\"$FLAVOR_NAME\"}"
+              WEB_COUNT=$((WEB_COUNT + 1))
+            fi
+          fi
+          if [ "${{ inputs.web_flavor2 }}" = "true" ]; then
+            FLAVOR_NAME=$(jq -r '.flavor_mapping.flavor2 // empty' "$CONFIG_FILE")
+            if [ -n "$FLAVOR_NAME" ]; then
+              [ $WEB_COUNT -gt 0 ] && WEB_FLAVORS="${WEB_FLAVORS},"
+              WEB_FLAVORS="${WEB_FLAVORS}{\"slot\":\"flavor2\",\"name\":\"$FLAVOR_NAME\"}"
+              WEB_COUNT=$((WEB_COUNT + 1))
+            fi
+          fi
+          if [ "${{ inputs.web_flavor3 }}" = "true" ]; then
+            FLAVOR_NAME=$(jq -r '.flavor_mapping.flavor3 // empty' "$CONFIG_FILE")
+            if [ -n "$FLAVOR_NAME" ]; then
+              [ $WEB_COUNT -gt 0 ] && WEB_FLAVORS="${WEB_FLAVORS},"
+              WEB_FLAVORS="${WEB_FLAVORS}{\"slot\":\"flavor3\",\"name\":\"$FLAVOR_NAME\"}"
+              WEB_COUNT=$((WEB_COUNT + 1))
+            fi
+          fi
+          if [ "${{ inputs.web_flavor4 }}" = "true" ]; then
+            FLAVOR_NAME=$(jq -r '.flavor_mapping.flavor4 // empty' "$CONFIG_FILE")
+            if [ -n "$FLAVOR_NAME" ]; then
+              [ $WEB_COUNT -gt 0 ] && WEB_FLAVORS="${WEB_FLAVORS},"
+              WEB_FLAVORS="${WEB_FLAVORS}{\"slot\":\"flavor4\",\"name\":\"$FLAVOR_NAME\"}"
+              WEB_COUNT=$((WEB_COUNT + 1))
+            fi
+          fi
+          if [ "${{ inputs.web_flavor5 }}" = "true" ]; then
+            FLAVOR_NAME=$(jq -r '.flavor_mapping.flavor5 // empty' "$CONFIG_FILE")
+            if [ -n "$FLAVOR_NAME" ]; then
+              [ $WEB_COUNT -gt 0 ] && WEB_FLAVORS="${WEB_FLAVORS},"
+              WEB_FLAVORS="${WEB_FLAVORS}{\"slot\":\"flavor5\",\"name\":\"$FLAVOR_NAME\"}"
+              WEB_COUNT=$((WEB_COUNT + 1))
+            fi
+          fi
+          WEB_FLAVORS="${WEB_FLAVORS}]"
+
+          # Set outputs
+          echo "android_flavors=$ANDROID_FLAVORS" >> $GITHUB_OUTPUT
+          echo "ios_flavors=$IOS_FLAVORS" >> $GITHUB_OUTPUT
+          echo "web_flavors=$WEB_FLAVORS" >> $GITHUB_OUTPUT
+
+          echo "has_android=$( [ $ANDROID_COUNT -gt 0 ] && echo 'true' || echo 'false' )" >> $GITHUB_OUTPUT
+          echo "has_ios=$( [ $IOS_COUNT -gt 0 ] && echo 'true' || echo 'false' )" >> $GITHUB_OUTPUT
+          echo "has_web=$( [ $WEB_COUNT -gt 0 ] && echo 'true' || echo 'false' )" >> $GITHUB_OUTPUT
+          echo "has_functions=${{ inputs.functions }}" >> $GITHUB_OUTPUT
+          echo "has_widgetbook=${{ inputs.widgetbook }}" >> $GITHUB_OUTPUT
+
+          echo ""
+          echo "📋 Computed matrices:"
+          echo "  Android: $ANDROID_FLAVORS (count: $ANDROID_COUNT)"
+          echo "  iOS: $IOS_FLAVORS (count: $IOS_COUNT)"
+          echo "  Web: $WEB_FLAVORS (count: $WEB_COUNT)"
+          echo "  Functions: ${{ inputs.functions }}"
+          echo "  Widgetbook: ${{ inputs.widgetbook }}"
+
+      - name: Check SOPS key availability
+        env:
+          SOPS_AGE_KEY: ${{ secrets.SOPS_AGE_KEY }}
+        run: |
+          echo "🔐 Checking SOPS_AGE_KEY..."
+          if [ -z "$SOPS_AGE_KEY" ]; then
+            echo "❌ SOPS_AGE_KEY is empty or not set"
+            exit 1
+          else
+            echo "✅ SOPS_AGE_KEY is set (length: ${#SOPS_AGE_KEY} chars)"
+          fi
+
+      - name: Verify at least one deployment is selected
+        run: |
+          if [ "${{ inputs.android_flavor1 }}" != "true" ] && \
+             [ "${{ inputs.android_flavor2 }}" != "true" ] && \
+             [ "${{ inputs.android_flavor3 }}" != "true" ] && \
+             [ "${{ inputs.android_flavor4 }}" != "true" ] && \
+             [ "${{ inputs.android_flavor5 }}" != "true" ] && \
+             [ "${{ inputs.ios_flavor1 }}" != "true" ] && \
+             [ "${{ inputs.ios_flavor2 }}" != "true" ] && \
+             [ "${{ inputs.ios_flavor3 }}" != "true" ] && \
+             [ "${{ inputs.ios_flavor4 }}" != "true" ] && \
+             [ "${{ inputs.ios_flavor5 }}" != "true" ] && \
+             [ "${{ inputs.web_flavor1 }}" != "true" ] && \
+             [ "${{ inputs.web_flavor2 }}" != "true" ] && \
+             [ "${{ inputs.web_flavor3 }}" != "true" ] && \
+             [ "${{ inputs.web_flavor4 }}" != "true" ] && \
+             [ "${{ inputs.web_flavor5 }}" != "true" ] && \
+             [ "${{ inputs.functions }}" != "true" ] && \
+             [ "${{ inputs.widgetbook }}" != "true" ]; then
+            echo "❌ No deployments selected! Please select at least one deployment option."
+            exit 1
+          fi
+          echo "✅ At least one deployment is selected"
+
+  # ============================================================================
+  # ANDROID DEPLOYMENT JOB
+  # ============================================================================
+  build-deploy-android:
+    name: Android - ${{ matrix.include.name }}
+    needs: prepare
+    if: needs.prepare.outputs.has_android == 'true'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJson(needs.prepare.outputs.android_flavors) }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
+          fetch-depth: 0
+
+      - name: Load flavor configuration
+        id: flavor-config
+        run: |
+          CONFIG_FILE=".github/deploy-config.json"
+          FLAVOR_NAME="${{ matrix.include.name }}"
+
+          echo "🔍 Loading configuration for flavor: $FLAVOR_NAME"
+
+          # Extract flavor-specific config
+          TARGET_FILE=$(jq -r ".flavors[\"$FLAVOR_NAME\"].target_file // \"lib/main.dart\"" "$CONFIG_FILE")
+          FIREBASE_APP_ID=$(jq -r ".flavors[\"$FLAVOR_NAME\"].android.firebase_app_id // empty" "$CONFIG_FILE")
+          BUILD_ARGS=$(jq -r ".flavors[\"$FLAVOR_NAME\"].android.build_args // \"\"" "$CONFIG_FILE")
+          FLAVOR_ARG=$(jq -r ".flavors[\"$FLAVOR_NAME\"].android.flavor // \"\"" "$CONFIG_FILE")
+          GROUPS=$(jq -r ".flavors[\"$FLAVOR_NAME\"].android.distribution_groups // [\"testers\"] | join(\",\")" "$CONFIG_FILE")
+
+          # Firebase project
+          FIREBASE_PROJECT=$(jq -r ".firebase.project_id // empty" "$CONFIG_FILE")
+          SERVICE_ACCOUNT=$(jq -r ".firebase.service_account_path // \"firebase_service_account.json\"" "$CONFIG_FILE")
+
+          # Flutter version
+          FLUTTER_VERSION=$(jq -r ".flutter_version // \"3.38.4\"" "$CONFIG_FILE")
+          FLUTTER_CHANNEL=$(jq -r ".flutter_channel // \"stable\"" "$CONFIG_FILE")
+
+          echo "target_file=$TARGET_FILE" >> $GITHUB_OUTPUT
+          echo "firebase_app_id=$FIREBASE_APP_ID" >> $GITHUB_OUTPUT
+          echo "build_args=$BUILD_ARGS" >> $GITHUB_OUTPUT
+          echo "flavor_arg=$FLAVOR_ARG" >> $GITHUB_OUTPUT
+          echo "groups=$GROUPS" >> $GITHUB_OUTPUT
+          echo "firebase_project=$FIREBASE_PROJECT" >> $GITHUB_OUTPUT
+          echo "service_account=$SERVICE_ACCOUNT" >> $GITHUB_OUTPUT
+          echo "flutter_version=$FLUTTER_VERSION" >> $GITHUB_OUTPUT
+          echo "flutter_channel=$FLUTTER_CHANNEL" >> $GITHUB_OUTPUT
+
+          echo ""
+          echo "📋 Configuration:"
+          echo "  Target: $TARGET_FILE"
+          echo "  Flavor arg: $FLAVOR_ARG"
+          echo "  Firebase App ID: $FIREBASE_APP_ID"
+          echo "  Groups: $GROUPS"
+
+      - name: Prepare deployment
+        uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/prepare-deployment@main
+        with:
+          app_name: "${{ matrix.include.name }}"
+          verify_version: "false"
+          verify_files: "lib/firebase_options.dart,firebase_service_account.json"
+          update_analysis_options: "true"
+          analysis_options_ci_file: "analysis_options.yaml-ci"
+          setup_firebase: "true"
+          firebase_project_id: ${{ steps.flavor-config.outputs.firebase_project }}
+          firebase_service_account_path: ${{ steps.flavor-config.outputs.service_account }}
+          build_functions: "false"
+          setup_flutter: "true"
+          flutter_version: ${{ steps.flavor-config.outputs.flutter_version }}
+          flutter_channel: ${{ steps.flavor-config.outputs.flutter_channel }}
+          flutter_analyze: "true"
+          update_release_info: "true"
+          release_info_path: "lib/features/about/release_info.dart"
+          generate_release_notes: "true"
+          version_override: ${{ inputs.version }}
+          sops_age_key: ${{ secrets.SOPS_AGE_KEY }}
+        env:
+          SOPS_AGE_KEY: ${{ secrets.SOPS_AGE_KEY }}
+
+      - name: Build and deploy APK to Firebase App Distribution
+        uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/build-deploy-flutter-apk@main
+        with:
+          target_file: ${{ steps.flavor-config.outputs.target_file }}
+          flavor: ${{ steps.flavor-config.outputs.flavor_arg }}
+          build_args: --build-name=${{ inputs.version }} ${{ steps.flavor-config.outputs.build_args }}
+          firebase_app_id: ${{ steps.flavor-config.outputs.firebase_app_id }}
+          release_notes: ${{ inputs.release_notes }}
+          groups: ${{ steps.flavor-config.outputs.groups }}
+          service_account_path: ${{ steps.flavor-config.outputs.service_account }}
+          deploy_trigger_paths: ""
+
+  # ============================================================================
+  # iOS DEPLOYMENT JOB
+  # ============================================================================
+  build-deploy-ios:
+    name: iOS - ${{ matrix.include.name }}
+    needs: prepare
+    if: needs.prepare.outputs.has_ios == 'true'
+    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJson(needs.prepare.outputs.ios_flavors) }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
+          fetch-depth: 0
+
+      - name: Load flavor configuration
+        id: flavor-config
+        run: |
+          CONFIG_FILE=".github/deploy-config.json"
+          FLAVOR_NAME="${{ matrix.include.name }}"
+
+          echo "🔍 Loading configuration for flavor: $FLAVOR_NAME"
+
+          TARGET_FILE=$(jq -r ".flavors[\"$FLAVOR_NAME\"].target_file // \"lib/main.dart\"" "$CONFIG_FILE")
+          FIREBASE_APP_ID=$(jq -r ".flavors[\"$FLAVOR_NAME\"].ios.firebase_app_id // empty" "$CONFIG_FILE")
+          BUILD_ARGS=$(jq -r ".flavors[\"$FLAVOR_NAME\"].ios.build_args // \"\"" "$CONFIG_FILE")
+          FLAVOR_ARG=$(jq -r ".flavors[\"$FLAVOR_NAME\"].ios.flavor // \"\"" "$CONFIG_FILE")
+          GROUPS=$(jq -r ".flavors[\"$FLAVOR_NAME\"].ios.distribution_groups // [\"testers\"] | join(\",\")" "$CONFIG_FILE")
+
+          FIREBASE_PROJECT=$(jq -r ".firebase.project_id // empty" "$CONFIG_FILE")
+          SERVICE_ACCOUNT=$(jq -r ".firebase.service_account_path // \"firebase_service_account.json\"" "$CONFIG_FILE")
+          FLUTTER_VERSION=$(jq -r ".flutter_version // \"3.38.4\"" "$CONFIG_FILE")
+          FLUTTER_CHANNEL=$(jq -r ".flutter_channel // \"stable\"" "$CONFIG_FILE")
+
+          echo "target_file=$TARGET_FILE" >> $GITHUB_OUTPUT
+          echo "firebase_app_id=$FIREBASE_APP_ID" >> $GITHUB_OUTPUT
+          echo "build_args=$BUILD_ARGS" >> $GITHUB_OUTPUT
+          echo "flavor_arg=$FLAVOR_ARG" >> $GITHUB_OUTPUT
+          echo "groups=$GROUPS" >> $GITHUB_OUTPUT
+          echo "firebase_project=$FIREBASE_PROJECT" >> $GITHUB_OUTPUT
+          echo "service_account=$SERVICE_ACCOUNT" >> $GITHUB_OUTPUT
+          echo "flutter_version=$FLUTTER_VERSION" >> $GITHUB_OUTPUT
+          echo "flutter_channel=$FLUTTER_CHANNEL" >> $GITHUB_OUTPUT
+
+      - name: Install SOPS for macOS
+        run: |
+          echo "📦 Installing SOPS for macOS..."
+          ARCH=$(uname -m)
+          if [ "$ARCH" = "arm64" ]; then
+            SOPS_URL="https://github.com/mozilla/sops/releases/download/v3.7.3/sops-v3.7.3.darwin.arm64"
+          else
+            SOPS_URL="https://github.com/mozilla/sops/releases/download/v3.7.3/sops-v3.7.3.darwin"
+          fi
+          curl -sSL -o sops "$SOPS_URL"
+          chmod +x sops
+          sudo mv sops /usr/local/bin/
+          sops --version
+
+      - name: Decrypt secrets
+        env:
+          SOPS_AGE_KEY: ${{ secrets.SOPS_AGE_KEY }}
+        run: |
+          echo "🔓 Decrypting secrets..."
+          curl -sSL "https://raw.githubusercontent.com/Anyhoosolutions/flutter_platform_kit/main/tools/sops_secrets/decrypt-secrets.sh" | bash
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: ${{ steps.flavor-config.outputs.flutter_channel }}
+          flutter-version: ${{ steps.flavor-config.outputs.flutter_version }}
+
+      - name: Cache CocoaPods
+        uses: actions/cache@v3
+        with:
+          path: |
+            ios/Pods
+            ios/.symlinks
+            ~/.cocoapods
+          key: ${{ runner.os }}-pods-${{ hashFiles('ios/Podfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pods-
+
+      - name: Get Flutter dependencies
+        run: flutter pub get
+
+      - name: Flutter analyze
+        run: flutter analyze
+
+      - name: Install CocoaPods dependencies
+        working-directory: ios
+        run: pod install --repo-update
+
+      - name: Build iOS
+        run: |
+          TARGET="${{ steps.flavor-config.outputs.target_file }}"
+          FLAVOR="${{ steps.flavor-config.outputs.flavor_arg }}"
+          BUILD_ARGS="${{ steps.flavor-config.outputs.build_args }}"
+
+          BUILD_CMD="flutter build ios --release --no-codesign --target $TARGET"
+          [ -n "$FLAVOR" ] && BUILD_CMD="$BUILD_CMD --flavor $FLAVOR"
+          BUILD_CMD="$BUILD_CMD --build-name=${{ inputs.version }} $BUILD_ARGS"
+
+          echo "🚀 Running: $BUILD_CMD"
+          $BUILD_CMD
+
+      - name: Install Firebase CLI
+        run: npm install -g firebase-tools
+
+      - name: Deploy to Firebase App Distribution
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ github.workspace }}/${{ steps.flavor-config.outputs.service_account }}
+        run: |
+          echo "🚀 Deploying iOS to Firebase App Distribution..."
+
+          APP_PATH=$(find build/ios/iphoneos -name "*.app" -type d | head -1)
+          if [ -z "$APP_PATH" ]; then
+            echo "❌ Could not find .app bundle"
+            exit 1
+          fi
+
+          echo "📦 Found app: $APP_PATH"
+
+          firebase appdistribution:distribute "$APP_PATH" \
+            --app "${{ steps.flavor-config.outputs.firebase_app_id }}" \
+            --groups "${{ steps.flavor-config.outputs.groups }}" \
+            --release-notes "${{ inputs.release_notes }}"
+
+          echo "✅ iOS deployment completed"
+
+  # ============================================================================
+  # WEB DEPLOYMENT JOB
+  # ============================================================================
+  build-deploy-web:
+    name: Web - ${{ matrix.include.name }}
+    needs: prepare
+    if: needs.prepare.outputs.has_web == 'true'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJson(needs.prepare.outputs.web_flavors) }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
+          fetch-depth: 0
+
+      - name: Load flavor configuration
+        id: flavor-config
+        run: |
+          CONFIG_FILE=".github/deploy-config.json"
+          FLAVOR_NAME="${{ matrix.include.name }}"
+
+          echo "🔍 Loading configuration for flavor: $FLAVOR_NAME"
+
+          TARGET_FILE=$(jq -r ".flavors[\"$FLAVOR_NAME\"].target_file // \"lib/main.dart\"" "$CONFIG_FILE")
+          HOSTING_TARGET=$(jq -r ".flavors[\"$FLAVOR_NAME\"].web.hosting_target // \"\"" "$CONFIG_FILE")
+          DEPLOY_ONLY=$(jq -r ".flavors[\"$FLAVOR_NAME\"].web.deploy_only // \"hosting\"" "$CONFIG_FILE")
+          BUILD_ARGS=$(jq -r ".flavors[\"$FLAVOR_NAME\"].web.build_args // \"\"" "$CONFIG_FILE")
+          BUILD_FUNCTIONS=$(jq -r ".flavors[\"$FLAVOR_NAME\"].web.build_functions // false" "$CONFIG_FILE")
+
+          FIREBASE_PROJECT=$(jq -r ".firebase.project_id // empty" "$CONFIG_FILE")
+          SERVICE_ACCOUNT=$(jq -r ".firebase.service_account_path // \"firebase_service_account.json\"" "$CONFIG_FILE")
+          FLUTTER_VERSION=$(jq -r ".flutter_version // \"3.38.4\"" "$CONFIG_FILE")
+          FLUTTER_CHANNEL=$(jq -r ".flutter_channel // \"stable\"" "$CONFIG_FILE")
+          FUNCTIONS_PATH=$(jq -r ".functions.path // \"functions\"" "$CONFIG_FILE")
+
+          echo "target_file=$TARGET_FILE" >> $GITHUB_OUTPUT
+          echo "hosting_target=$HOSTING_TARGET" >> $GITHUB_OUTPUT
+          echo "deploy_only=$DEPLOY_ONLY" >> $GITHUB_OUTPUT
+          echo "build_args=$BUILD_ARGS" >> $GITHUB_OUTPUT
+          echo "build_functions=$BUILD_FUNCTIONS" >> $GITHUB_OUTPUT
+          echo "firebase_project=$FIREBASE_PROJECT" >> $GITHUB_OUTPUT
+          echo "service_account=$SERVICE_ACCOUNT" >> $GITHUB_OUTPUT
+          echo "flutter_version=$FLUTTER_VERSION" >> $GITHUB_OUTPUT
+          echo "flutter_channel=$FLUTTER_CHANNEL" >> $GITHUB_OUTPUT
+          echo "functions_path=$FUNCTIONS_PATH" >> $GITHUB_OUTPUT
+
+      - name: Prepare deployment
+        uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/prepare-deployment@main
+        with:
+          app_name: "${{ matrix.include.name }}"
+          verify_version: "false"
+          verify_files: "lib/firebase_options.dart,firebase_service_account.json"
+          update_analysis_options: "true"
+          analysis_options_ci_file: "analysis_options.yaml-ci"
+          setup_firebase: "true"
+          firebase_project_id: ${{ steps.flavor-config.outputs.firebase_project }}
+          firebase_service_account_path: ${{ steps.flavor-config.outputs.service_account }}
+          build_functions: ${{ steps.flavor-config.outputs.build_functions }}
+          functions_path: ${{ steps.flavor-config.outputs.functions_path }}
+          functions_chmod_biome: "true"
+          setup_flutter: "true"
+          flutter_version: ${{ steps.flavor-config.outputs.flutter_version }}
+          flutter_channel: ${{ steps.flavor-config.outputs.flutter_channel }}
+          flutter_analyze: "true"
+          update_release_info: "true"
+          release_info_path: "lib/features/about/release_info.dart"
+          generate_release_notes: "false"
+          sops_age_key: ${{ secrets.SOPS_AGE_KEY }}
+          version_override: ${{ inputs.version }}
+        env:
+          SOPS_AGE_KEY: ${{ secrets.SOPS_AGE_KEY }}
+
+      - name: Build and deploy Web to Firebase Hosting
+        uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/build-deploy-flutter-web@main
+        with:
+          target_file: ${{ steps.flavor-config.outputs.target_file }}
+          build_args: ${{ steps.flavor-config.outputs.build_args }}
+          firebase_project_id: ${{ steps.flavor-config.outputs.firebase_project }}
+          firebase_hosting_target: ${{ steps.flavor-config.outputs.hosting_target }}
+          firebase_deploy_only: ${{ steps.flavor-config.outputs.deploy_only }}
+          firebase_deploy_args: "--non-interactive"
+          service_account_path: ${{ steps.flavor-config.outputs.service_account }}
+          deploy_trigger_paths: ""
+
+  # ============================================================================
+  # FUNCTIONS DEPLOYMENT JOB
+  # ============================================================================
+  deploy-functions:
+    name: Deploy Functions
+    needs: prepare
+    if: needs.prepare.outputs.has_functions == 'true'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
+          fetch-depth: 0
+
+      - name: Load configuration
+        id: config
+        run: |
+          CONFIG_FILE=".github/deploy-config.json"
+
+          FIREBASE_PROJECT=$(jq -r ".firebase.project_id // empty" "$CONFIG_FILE")
+          SERVICE_ACCOUNT=$(jq -r ".firebase.service_account_path // \"firebase_service_account.json\"" "$CONFIG_FILE")
+          FUNCTIONS_PATH=$(jq -r ".functions.path // \"functions\"" "$CONFIG_FILE")
+          INSTALL_CMD=$(jq -r ".functions.install_command // \"npm install\"" "$CONFIG_FILE")
+          BUILD_CMD=$(jq -r ".functions.build_command // \"npm run build\"" "$CONFIG_FILE")
+          CHMOD_BIOME=$(jq -r ".functions.chmod_biome // false" "$CONFIG_FILE")
+
+          echo "firebase_project=$FIREBASE_PROJECT" >> $GITHUB_OUTPUT
+          echo "service_account=$SERVICE_ACCOUNT" >> $GITHUB_OUTPUT
+          echo "functions_path=$FUNCTIONS_PATH" >> $GITHUB_OUTPUT
+          echo "install_cmd=$INSTALL_CMD" >> $GITHUB_OUTPUT
+          echo "build_cmd=$BUILD_CMD" >> $GITHUB_OUTPUT
+          echo "chmod_biome=$CHMOD_BIOME" >> $GITHUB_OUTPUT
+
+      - name: Install SOPS
+        run: |
+          wget -O sops https://github.com/mozilla/sops/releases/download/v3.7.3/sops-v3.7.3.linux
+          chmod +x sops
+          sudo mv sops /usr/local/bin/
+
+      - name: Decrypt secrets
+        env:
+          SOPS_AGE_KEY: ${{ secrets.SOPS_AGE_KEY }}
+        run: |
+          curl -sSL "https://raw.githubusercontent.com/Anyhoosolutions/flutter_platform_kit/main/tools/sops_secrets/decrypt-secrets.sh" | bash
+
+      - name: Install Firebase CLI
+        run: npm install -g firebase-tools
+
+      - name: Install and build functions
+        working-directory: ${{ steps.config.outputs.functions_path }}
+        run: |
+          echo "📦 Installing dependencies..."
+          ${{ steps.config.outputs.install_cmd }}
+
+          if [ "${{ steps.config.outputs.chmod_biome }}" = "true" ]; then
+            if [ -f "node_modules/@biomejs/cli-linux-x64/biome" ]; then
+              chmod +x node_modules/@biomejs/cli-linux-x64/biome
+            fi
+          fi
+
+          echo "🔨 Building functions..."
+          ${{ steps.config.outputs.build_cmd }}
+
+      - name: Deploy functions to Firebase
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ github.workspace }}/${{ steps.config.outputs.service_account }}
+        run: |
+          echo "🚀 Deploying functions..."
+          firebase deploy --only functions --project ${{ steps.config.outputs.firebase_project }} --non-interactive
+          echo "✅ Functions deployment completed"
+
+  # ============================================================================
+  # WIDGETBOOK DEPLOYMENT JOB
+  # ============================================================================
+  deploy-widgetbook:
+    name: Deploy Widgetbook
+    needs: prepare
+    if: needs.prepare.outputs.has_widgetbook == 'true'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
+          fetch-depth: 0
+
+      - name: Load configuration
+        id: config
+        run: |
+          CONFIG_FILE=".github/deploy-config.json"
+
+          FIREBASE_PROJECT=$(jq -r ".firebase.project_id // empty" "$CONFIG_FILE")
+          SERVICE_ACCOUNT=$(jq -r ".firebase.service_account_path // \"firebase_service_account.json\"" "$CONFIG_FILE")
+          WIDGETBOOK_DIR=$(jq -r ".widgetbook.directory // \"widgetbook\"" "$CONFIG_FILE")
+          HOSTING_TARGET=$(jq -r ".widgetbook.hosting_target // \"widgetbook\"" "$CONFIG_FILE")
+          FLUTTER_VERSION=$(jq -r ".flutter_version // \"3.38.4\"" "$CONFIG_FILE")
+          FLUTTER_CHANNEL=$(jq -r ".flutter_channel // \"stable\"" "$CONFIG_FILE")
+
+          echo "firebase_project=$FIREBASE_PROJECT" >> $GITHUB_OUTPUT
+          echo "service_account=$SERVICE_ACCOUNT" >> $GITHUB_OUTPUT
+          echo "widgetbook_dir=$WIDGETBOOK_DIR" >> $GITHUB_OUTPUT
+          echo "hosting_target=$HOSTING_TARGET" >> $GITHUB_OUTPUT
+          echo "flutter_version=$FLUTTER_VERSION" >> $GITHUB_OUTPUT
+          echo "flutter_channel=$FLUTTER_CHANNEL" >> $GITHUB_OUTPUT
+
+      - name: Install SOPS
+        run: |
+          wget -O sops https://github.com/mozilla/sops/releases/download/v3.7.3/sops-v3.7.3.linux
+          chmod +x sops
+          sudo mv sops /usr/local/bin/
+
+      - name: Decrypt secrets
+        env:
+          SOPS_AGE_KEY: ${{ secrets.SOPS_AGE_KEY }}
+        run: |
+          curl -sSL "https://raw.githubusercontent.com/Anyhoosolutions/flutter_platform_kit/main/tools/sops_secrets/decrypt-secrets.sh" | bash
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: ${{ steps.config.outputs.flutter_channel }}
+          flutter-version: ${{ steps.config.outputs.flutter_version }}
+
+      - name: Get main app dependencies
+        run: flutter pub get
+
+      - name: Get Widgetbook dependencies
+        working-directory: ${{ steps.config.outputs.widgetbook_dir }}
+        run: flutter pub get
+
+      - name: Run build_runner
+        working-directory: ${{ steps.config.outputs.widgetbook_dir }}
+        run: dart run build_runner build --delete-conflicting-outputs
+
+      - name: Build Widgetbook
+        working-directory: ${{ steps.config.outputs.widgetbook_dir }}
+        run: flutter build web
+
+      - name: Install Firebase CLI
+        run: npm install -g firebase-tools
+
+      - name: Deploy Widgetbook
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ github.workspace }}/${{ steps.config.outputs.service_account }}
+        run: |
+          echo "🚀 Deploying Widgetbook..."
+          firebase deploy --only "hosting:${{ steps.config.outputs.hosting_target }}" \
+            --project ${{ steps.config.outputs.firebase_project }} --non-interactive
+          echo "✅ Widgetbook deployment completed"
+
+  # ============================================================================
+  # SUMMARY JOB
+  # ============================================================================
+  summary:
+    name: Deployment Summary
+    needs:
+      [
+        prepare,
+        build-deploy-android,
+        build-deploy-ios,
+        build-deploy-web,
+        deploy-functions,
+        deploy-widgetbook,
+      ]
+    if: always()
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Generate deployment summary
+        run: |
+          echo "# Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Version:** ${{ inputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Triggered by:** @${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Ref:** ${{ needs.prepare.outputs.checkout_ref }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Deployment | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|------------|--------|" >> $GITHUB_STEP_SUMMARY
+
+          # Check each job result
+          if [ "${{ needs.prepare.outputs.has_android }}" = "true" ]; then
+            if [ "${{ needs.build-deploy-android.result }}" = "success" ]; then
+              echo "| Android | ✅ Success |" >> $GITHUB_STEP_SUMMARY
+            elif [ "${{ needs.build-deploy-android.result }}" = "failure" ]; then
+              echo "| Android | ❌ Failed |" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "| Android | ⏭️ Skipped |" >> $GITHUB_STEP_SUMMARY
+            fi
+          fi
+
+          if [ "${{ needs.prepare.outputs.has_ios }}" = "true" ]; then
+            if [ "${{ needs.build-deploy-ios.result }}" = "success" ]; then
+              echo "| iOS | ✅ Success |" >> $GITHUB_STEP_SUMMARY
+            elif [ "${{ needs.build-deploy-ios.result }}" = "failure" ]; then
+              echo "| iOS | ❌ Failed |" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "| iOS | ⏭️ Skipped |" >> $GITHUB_STEP_SUMMARY
+            fi
+          fi
+
+          if [ "${{ needs.prepare.outputs.has_web }}" = "true" ]; then
+            if [ "${{ needs.build-deploy-web.result }}" = "success" ]; then
+              echo "| Web | ✅ Success |" >> $GITHUB_STEP_SUMMARY
+            elif [ "${{ needs.build-deploy-web.result }}" = "failure" ]; then
+              echo "| Web | ❌ Failed |" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "| Web | ⏭️ Skipped |" >> $GITHUB_STEP_SUMMARY
+            fi
+          fi
+
+          if [ "${{ needs.prepare.outputs.has_functions }}" = "true" ]; then
+            if [ "${{ needs.deploy-functions.result }}" = "success" ]; then
+              echo "| Functions | ✅ Success |" >> $GITHUB_STEP_SUMMARY
+            elif [ "${{ needs.deploy-functions.result }}" = "failure" ]; then
+              echo "| Functions | ❌ Failed |" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "| Functions | ⏭️ Skipped |" >> $GITHUB_STEP_SUMMARY
+            fi
+          fi
+
+          if [ "${{ needs.prepare.outputs.has_widgetbook }}" = "true" ]; then
+            if [ "${{ needs.deploy-widgetbook.result }}" = "success" ]; then
+              echo "| Widgetbook | ✅ Success |" >> $GITHUB_STEP_SUMMARY
+            elif [ "${{ needs.deploy-widgetbook.result }}" = "failure" ]; then
+              echo "| Widgetbook | ❌ Failed |" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "| Widgetbook | ⏭️ Skipped |" >> $GITHUB_STEP_SUMMARY
+            fi
+          fi
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "---" >> $GITHUB_STEP_SUMMARY
+          echo "*Run: [#${{ github.run_number }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})*" >> $GITHUB_STEP_SUMMARY

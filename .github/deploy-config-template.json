@@ -1,0 +1,90 @@
+{
+	"$comment": "Copy this file to .github/deploy-config.json in your app repository and customize",
+
+	"flutter_version": "3.38.4",
+	"flutter_channel": "stable",
+
+	"flavor_mapping": {
+		"flavor1": "main",
+		"flavor2": "admin",
+		"flavor3": null,
+		"flavor4": null,
+		"flavor5": null
+	},
+
+	"flavors": {
+		"main": {
+			"description": "Main production app",
+			"target_file": "lib/main.dart",
+			"android": {
+				"firebase_app_id": "1:123456789:android:abcdef123456",
+				"flavor": "",
+				"build_args": "--no-tree-shake-icons",
+				"distribution_groups": ["testers"]
+			},
+			"ios": {
+				"firebase_app_id": "1:123456789:ios:abcdef123456",
+				"flavor": "",
+				"build_args": "--no-tree-shake-icons",
+				"distribution_groups": ["testers"]
+			},
+			"web": {
+				"hosting_target": "app",
+				"deploy_only": "hosting,functions,firestore,storage",
+				"build_args": "",
+				"build_functions": true
+			}
+		},
+		"admin": {
+			"description": "Admin dashboard",
+			"target_file": "lib/admin/main.dart",
+			"android": {
+				"firebase_app_id": "1:123456789:android:admin123456",
+				"flavor": "admin",
+				"build_args": "--no-tree-shake-icons",
+				"distribution_groups": ["admin-testers"]
+			},
+			"ios": {
+				"firebase_app_id": "1:123456789:ios:admin123456",
+				"flavor": "admin",
+				"build_args": "--no-tree-shake-icons",
+				"distribution_groups": ["admin-testers"]
+			},
+			"web": {
+				"hosting_target": "admin",
+				"deploy_only": "hosting:admin",
+				"build_args": "",
+				"build_functions": false
+			}
+		}
+	},
+
+	"firebase": {
+		"project_id": "your-firebase-project-id",
+		"service_account_path": "firebase_service_account.json"
+	},
+
+	"functions": {
+		"path": "functions",
+		"install_command": "npm install",
+		"build_command": "npm run build",
+		"chmod_biome": true
+	},
+
+	"widgetbook": {
+		"directory": "widgetbook",
+		"hosting_target": "widgetbook"
+	},
+
+	"sops": {
+		"decrypt_script_url": "https://raw.githubusercontent.com/Anyhoosolutions/flutter_platform_kit/main/tools/sops_secrets/decrypt-secrets.sh",
+		"verify_files": [
+			"lib/firebase_options.dart",
+			"firebase_service_account.json"
+		]
+	},
+
+	"release_info": {
+		"path": "lib/features/about/release_info.dart"
+	}
+}

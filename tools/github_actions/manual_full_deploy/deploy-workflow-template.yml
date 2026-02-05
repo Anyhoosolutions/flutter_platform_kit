@@ -1,0 +1,151 @@
+# =============================================================================
+# DEPLOY WORKFLOW TEMPLATE
+# =============================================================================
+# Copy this file to your app repository as .github/workflows/deploy.yml
+# Then customize the descriptions to match your flavor names.
+#
+# Also create .github/deploy-config.json based on deploy-config-template.json
+# =============================================================================
+
+name: Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      # ==================== CHECKOUT OPTIONS ====================
+      commit_sha:
+        description: "Commit SHA (leave empty for branch HEAD)"
+        required: false
+        type: string
+
+      # ==================== BUILD CONFIGURATION ====================
+      version:
+        description: "Version (e.g., 1.0.2+123)"
+        required: true
+        type: string
+        default: "0.0.0+XXX"
+      release_notes:
+        description: "Release Notes"
+        required: false
+        type: string
+        default: "Manual build from GitHub Actions"
+
+      # ==================== ANDROID DEPLOYMENTS ====================
+      # Customize these descriptions to match your actual flavor names!
+      android_flavor1:
+        description: "Android - Main App" # <-- Customize this
+        required: false
+        type: boolean
+        default: false
+      android_flavor2:
+        description: "Android - Admin" # <-- Customize this
+        required: false
+        type: boolean
+        default: false
+      android_flavor3:
+        description: "Android - Flavor 3" # <-- Customize or remove
+        required: false
+        type: boolean
+        default: false
+      android_flavor4:
+        description: "Android - Flavor 4" # <-- Customize or remove
+        required: false
+        type: boolean
+        default: false
+      android_flavor5:
+        description: "Android - Flavor 5" # <-- Customize or remove
+        required: false
+        type: boolean
+        default: false
+
+      # ==================== iOS DEPLOYMENTS ====================
+      ios_flavor1:
+        description: "iOS - Main App" # <-- Customize this
+        required: false
+        type: boolean
+        default: false
+      ios_flavor2:
+        description: "iOS - Admin" # <-- Customize this
+        required: false
+        type: boolean
+        default: false
+      ios_flavor3:
+        description: "iOS - Flavor 3" # <-- Customize or remove
+        required: false
+        type: boolean
+        default: false
+      ios_flavor4:
+        description: "iOS - Flavor 4" # <-- Customize or remove
+        required: false
+        type: boolean
+        default: false
+      ios_flavor5:
+        description: "iOS - Flavor 5" # <-- Customize or remove
+        required: false
+        type: boolean
+        default: false
+
+      # ==================== WEB DEPLOYMENTS ====================
+      web_flavor1:
+        description: "Web - Main App" # <-- Customize this
+        required: false
+        type: boolean
+        default: false
+      web_flavor2:
+        description: "Web - Admin" # <-- Customize this
+        required: false
+        type: boolean
+        default: false
+      web_flavor3:
+        description: "Web - Flavor 3" # <-- Customize or remove
+        required: false
+        type: boolean
+        default: false
+      web_flavor4:
+        description: "Web - Flavor 4" # <-- Customize or remove
+        required: false
+        type: boolean
+        default: false
+      web_flavor5:
+        description: "Web - Flavor 5" # <-- Customize or remove
+        required: false
+        type: boolean
+        default: false
+
+      # ==================== OTHER DEPLOYMENTS ====================
+      functions:
+        description: "Firebase Functions"
+        required: false
+        type: boolean
+        default: false
+      widgetbook:
+        description: "Widgetbook"
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  deploy:
+    uses: Anyhoosolutions/flutter_platform_kit/.github/workflows/reusable-full-deploy.yml@main
+    with:
+      commit_sha: ${{ inputs.commit_sha }}
+      version: ${{ inputs.version }}
+      release_notes: ${{ inputs.release_notes }}
+      android_flavor1: ${{ inputs.android_flavor1 }}
+      android_flavor2: ${{ inputs.android_flavor2 }}
+      android_flavor3: ${{ inputs.android_flavor3 }}
+      android_flavor4: ${{ inputs.android_flavor4 }}
+      android_flavor5: ${{ inputs.android_flavor5 }}
+      ios_flavor1: ${{ inputs.ios_flavor1 }}
+      ios_flavor2: ${{ inputs.ios_flavor2 }}
+      ios_flavor3: ${{ inputs.ios_flavor3 }}
+      ios_flavor4: ${{ inputs.ios_flavor4 }}
+      ios_flavor5: ${{ inputs.ios_flavor5 }}
+      web_flavor1: ${{ inputs.web_flavor1 }}
+      web_flavor2: ${{ inputs.web_flavor2 }}
+      web_flavor3: ${{ inputs.web_flavor3 }}
+      web_flavor4: ${{ inputs.web_flavor4 }}
+      web_flavor5: ${{ inputs.web_flavor5 }}
+      functions: ${{ inputs.functions }}
+      widgetbook: ${{ inputs.widgetbook }}
+    secrets: inherit
