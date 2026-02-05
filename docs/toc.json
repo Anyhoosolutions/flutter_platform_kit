@@ -193,6 +193,12 @@
 					"subpages": []
 				},
 				{
+					"filepath": "manual_full_deploy/README.md",
+					"name": "Manual Full Deploy",
+					"title": "Manual Full Deploy",
+					"subpages": []
+				},
+				{
 					"filepath": "prepare-deployment/README.md",
 					"name": "Prepare Deployment",
 					"title": "Prepare Deployment",
