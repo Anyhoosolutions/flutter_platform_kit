@@ -1,3 +1,7 @@
+## 0.0.5
+
+- Fix homepage URL
+
 ## 0.0.4
 
  - Fix documentation
