@@ -2,8 +2,6 @@ name: Verify documentation
 
 on:
   pull_request:
-    branches:
-      - main
 
 jobs:
   verify-docs:
@@ -11,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
 
     # Skip if PR title contains "WIP"
-    if: ${{ !contains(github.event.pull_request.title, 'WIP') }}
+    # if: ${{ !contains(github.event.pull_request.title, 'WIP') }}
 
     steps:
       - name: Checkout code
