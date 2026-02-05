@@ -1,5 +1,51 @@
 # Documentation Uploader Tool
 
+
+## Deprecation warning
+
+!!!!
+
+
+This tool is deprecated and should no longer be used. There is a [Github App](https://anyhoosolutions.web.app/documentation/anyhoo_solutions/page/documentation_project%7Cdocumentation_project) that should be used instead
+
+!!!!
+
+
+
+
+
+### Warning
+### Warning
+### Warning
+### Warning
+### Warning
+### Warning
+### Warning
+### Warning
+### Warning
+### Warning
+### Warning
+### Warning
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 A command-line tool for uploading documentation to a documentation service. Reads documentation files from a `docs/` directory and uploads them via HTTP POST to a configurable endpoint.
 
 ## Features

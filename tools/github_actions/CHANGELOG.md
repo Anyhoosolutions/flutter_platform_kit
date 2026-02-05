@@ -1,3 +1,7 @@
+## 1.0.22
+
+- Fix Ts generation verification
+
 ## 1.0.21
 
 - Fix release info variables

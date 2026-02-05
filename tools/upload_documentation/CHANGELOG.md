@@ -1,3 +1,7 @@
+## 1.0.4
+
+- Fix homepage URL
+
 ## 1.0.3
 
 - Conditional debug printing

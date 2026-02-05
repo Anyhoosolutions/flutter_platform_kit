@@ -1,8 +1,8 @@
 name: freezed_to_ts
 description: A script to convert Dart freezed classes to TypeScript interfaces.
-version: 0.0.12
-homepage: https://github.com/lidholm/flutter_platform_kit/tree/main/tools/freezed_to_ts
-repository: https://github.com/lidholm/flutter_platform_kit
+version: 0.0.13
+homepage: https://github.com/anyhoosolutions/flutter_platform_kit/tree/main/tools/freezed_to_ts
+repository: https://github.com/anyhoosolutions/flutter_platform_kit
 environment:
   sdk: ">=3.0.0 <4.0.0"
 

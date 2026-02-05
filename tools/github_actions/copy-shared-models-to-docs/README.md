@@ -17,7 +17,7 @@ A reusable GitHub Actions composite action that runs the `copy_shared_models_to_
 
 ### As a step before prepare-docs (recommended)
 
-Run this action before [prepare-docs](https://github.com/lidholm/flutter_platform_kit/tree/main/.github/actions/prepare-docs) so the generated `shared_models.md` is included when you upload documentation:
+Run this action before [prepare-docs](https://github.com/anyhoosolutions/flutter_platform_kit/tree/main/.github/actions/prepare-docs) so the generated `shared_models.md` is included when you upload documentation:
 
 ```yaml
 steps:
