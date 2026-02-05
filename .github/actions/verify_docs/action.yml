@@ -1,0 +1,40 @@
+name: "Verify Documentation"
+description: "Verify that documentation is up-to-date by running sync script and checking for uncommitted changes"
+
+inputs:
+  dart_sdk:
+    description: "Dart SDK version to use"
+    required: false
+    default: "3.5"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Set up Dart
+      uses: dart-lang/setup-dart@v1
+      with:
+        sdk: ${{ inputs.dart_sdk }}
+
+    - name: Run documentation sync script
+      shell: bash
+      run: |
+        echo "🔄 Running documentation sync script..."
+        ./scripts/sync_docs.sh
+
+    - name: Verify no changes
+      shell: bash
+      run: |
+        if [ -n "$(git status --porcelain docs/)" ]; then
+          echo "❌ Documentation is out of sync!"
+          echo ""
+          echo "The following files have changed:"
+          git status --porcelain docs/
+          echo ""
+          echo "Diff:"
+          git diff docs/
+          echo ""
+          echo "Please run './scripts/sync_docs.sh' locally and commit the changes."
+          exit 1
+        else
+          echo "✅ Documentation is up-to-date!"
+        fi

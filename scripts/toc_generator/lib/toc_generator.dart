@@ -146,19 +146,8 @@ class TocGenerator {
     // Get package display name (convert snake_case to Title Case)
     final displayName = _toTitleCase(packageName);
 
-    // Find all documentation files
+    // Find all documentation files (changelogs are appended to READMEs, not separate pages)
     final subpages = <Map<String, dynamic>>[];
-
-    // Always add CHANGELOG.md if it exists
-    final changelogPath = File('${packageDir.path}/CHANGELOG.md');
-    if (await changelogPath.exists()) {
-      subpages.add({
-        'filepath': '$packageName/CHANGELOG.md',
-        'name': 'Changelog',
-        'title': 'Changelog',
-        'subpages': [],
-      });
-    }
 
     // Find files in docs/ directory
     final docsDir = Directory('${packageDir.path}/docs');
@@ -194,12 +183,8 @@ class TocGenerator {
       }
     }
 
-    // Sort subpages: Changelog first, then alphabetically
-    subpages.sort((a, b) {
-      if (a['name'] == 'Changelog') return -1;
-      if (b['name'] == 'Changelog') return 1;
-      return (a['name'] as String).compareTo(b['name'] as String);
-    });
+    // Sort subpages alphabetically
+    subpages.sort((a, b) => (a['name'] as String).compareTo(b['name'] as String));
 
     return {
       'filepath': '$packageName/README.md',
