@@ -1,247 +1,309 @@
-# Manual Full Deploy Workflow
+# Reusable Full Deploy Workflow
 
-A comprehensive GitHub Actions workflow for deploying Flutter applications to multiple platforms and flavors in a single run.
+A reusable GitHub Actions workflow for deploying Flutter applications to multiple platforms and flavors. Designed to be called from app repositories with zero code changes required for deployment.
 
 ## Features
 
-- **Multi-platform support**: Deploy to Android, iOS, and Web simultaneously
-- **Flavor support**: Deploy multiple flavors (e.g., main app, admin) in parallel
-- **Shared preparation**: Common steps run once, saving time and resources
-- **Firebase integration**: Deploy to Firebase App Distribution (Android/iOS) and Firebase Hosting (Web)
-- **Functions deployment**: Optionally deploy Firebase Functions
-- **Widgetbook deployment**: Optionally deploy Widgetbook for component documentation
-- **Deployment summary**: Get a clear overview of all deployment results
+- **Reusable template**: Lives in `flutter_platform_kit`, called from app repos
+- **Multi-platform**: Deploy Android, iOS, and Web simultaneously
+- **Multi-flavor**: Support up to 5 flavors per platform
+- **Branch/commit selection**: Deploy any branch or specific commit
+- **Firebase integration**: Firebase App Distribution (Android/iOS) and Hosting (Web)
+- **Automatic updates**: Future improvements (e.g., Play Store support) work automatically
 
 ## Quick Start
 
-### 1. Copy the workflow to your repository
+### 1. Create the wrapper workflow in your app repo
 
-Copy `.github/workflows/manual_full_deploy.yml` to your app repository.
+Copy `deploy-workflow-template.yml` to `.github/workflows/deploy.yml` and customize the flavor descriptions:
 
-### 2. Create your configuration file
+```yaml
+# .github/workflows/deploy.yml
+name: Deploy
 
-Copy `.github/deploy-config-template.json` to `.github/deploy-config.json` in your app repository and customize it:
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version (e.g., 1.0.2+123)'
+        required: true
+        type: string
+      
+      # Customize these descriptions!
+      android_flavor1:
+        description: 'Android - Snap & Savor'  # Your actual app name
+        type: boolean
+        default: false
+      android_flavor2:
+        description: 'Android - Admin Panel'   # Your second flavor
+        type: boolean
+        default: false
+      # ... etc
+
+jobs:
+  deploy:
+    uses: Anyhoosolutions/flutter_platform_kit/.github/workflows/reusable-full-deploy.yml@main
+    with:
+      version: ${{ inputs.version }}
+      android_flavor1: ${{ inputs.android_flavor1 }}
+      android_flavor2: ${{ inputs.android_flavor2 }}
+      # ... pass through all inputs
+    secrets: inherit
+```
+
+### 2. Create the configuration file
+
+Copy `deploy-config-template.json` to `.github/deploy-config.json` and configure:
 
 ```json
 {
-  "app_name": "Your App Name",
   "flutter_version": "3.38.4",
+  
+  "flavor_mapping": {
+    "flavor1": "snapandsavor",
+    "flavor2": "admin",
+    "flavor3": null,
+    "flavor4": null,
+    "flavor5": null
+  },
+  
   "flavors": {
-    "main": {
+    "snapandsavor": {
       "target_file": "lib/main.dart",
       "android": {
-        "firebase_app_id": "1:123456789:android:abcdef",
-        "distribution_groups": ["testers"]
-      },
-      "ios": {
-        "firebase_app_id": "1:123456789:ios:abcdef",
+        "firebase_app_id": "1:662631605767:android:5f42abaa1d0bb2b2972ca2",
         "distribution_groups": ["testers"]
       },
       "web": {
         "hosting_target": "app",
         "deploy_only": "hosting,functions"
       }
+    },
+    "admin": {
+      "target_file": "lib/admin/main.dart",
+      "android": {
+        "firebase_app_id": "1:662631605767:android:admin123",
+        "flavor": "admin"
+      }
     }
   },
+  
   "firebase": {
-    "project_id": "your-project-id"
+    "project_id": "snapandsavor-ef356"
   }
 }
 ```
 
-### 3. Set up secrets and variables
+### 3. Set up secrets
 
 In your repository settings, add:
-
-**Secrets:**
 - `SOPS_AGE_KEY`: Your SOPS age key for decrypting secrets
-
-**Variables:**
-- `FIREBASE_PROJECT_ID`: Your Firebase project ID
 
 ### 4. Run the workflow
 
-Go to **Actions** > **Manual Full Deploy** > **Run workflow** and select the deployments you want.
-
-## Workflow Inputs
-
-| Input | Description | Default |
-|-------|-------------|---------|
-| `deploy_android_main` | Deploy Android - Main App | `false` |
-| `deploy_android_admin` | Deploy Android - Admin | `false` |
-| `deploy_ios_main` | Deploy iOS - Main App | `false` |
-| `deploy_ios_admin` | Deploy iOS - Admin | `false` |
-| `deploy_web_main` | Deploy Web - Main App | `false` |
-| `deploy_web_admin` | Deploy Web - Admin | `false` |
-| `deploy_functions` | Deploy Firebase Functions | `false` |
-| `deploy_widgetbook` | Deploy Widgetbook | `false` |
-| `version` | Version name (e.g., 1.0.2+123) | `0.0.0+XXX` |
-| `release_notes` | Release notes for the deployment | `Manual build...` |
+1. Go to **Actions** > **Deploy**
+2. Click **Run workflow**
+3. Select your branch (or enter a commit SHA)
+4. Check the deployments you want
+5. Enter version and release notes
+6. Click **Run workflow**
 
 ## Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                     Workflow Dispatch                        │
-│  ☑ Android Main  ☐ Android Admin  ☑ Web Main  ☐ Functions  │
+│                     Your App Repository                      │
+├─────────────────────────────────────────────────────────────┤
+│  .github/                                                    │
+│    workflows/                                                │
+│      deploy.yml        ← Thin wrapper (customize here)      │
+│    deploy-config.json  ← Your flavor configs                │
 └─────────────────────────────────────────────────────────────┘
                               │
+                              │ uses: ...reusable-full-deploy.yml@main
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                      Prepare Job                             │
-│  • Checkout code                                             │
-│  • Validate inputs                                           │
-│  • Compute flavor matrices                                   │
-│  • Check SOPS key                                            │
-└─────────────────────────────────────────────────────────────┘
-                              │
-        ┌─────────────────────┼─────────────────────┐
-        │                     │                     │
-        ▼                     ▼                     ▼
-┌───────────────┐   ┌───────────────┐   ┌───────────────┐
-│ Android Job   │   │   iOS Job     │   │   Web Job     │
-│ (ubuntu)      │   │   (macos)     │   │  (ubuntu)     │
-│               │   │               │   │               │
-│ matrix:       │   │ matrix:       │   │ matrix:       │
-│  - main       │   │  - main       │   │  - main       │
-│  - admin      │   │  - admin      │   │  - admin      │
-└───────────────┘   └───────────────┘   └───────────────┘
-        │                     │                     │
-        └─────────────────────┼─────────────────────┘
-                              │
-                              ▼
-┌─────────────────────────────────────────────────────────────┐
-│                      Summary Job                             │
-│  • Generate deployment report                                │
-│  • Show success/failure for each deployment                 │
+│              flutter_platform_kit Repository                 │
+├─────────────────────────────────────────────────────────────┤
+│  .github/workflows/                                          │
+│    reusable-full-deploy.yml  ← All the logic lives here     │
 └─────────────────────────────────────────────────────────────┘
 ```
 
-## Configuration File Schema
+## Workflow Inputs
 
-The `deploy-config.json` file supports the following structure:
+The wrapper workflow passes these inputs to the reusable workflow:
 
-### Root Level
-
-| Field | Type | Description |
+| Input | Type | Description |
 |-------|------|-------------|
-| `app_name` | string | Display name of your application |
-| `flutter_version` | string | Flutter version to use |
-| `flutter_channel` | string | Flutter channel (stable, beta, dev) |
-| `flavors` | object | Flavor configurations |
-| `firebase` | object | Firebase project settings |
-| `functions` | object | Firebase Functions settings |
-| `widgetbook` | object | Widgetbook settings |
-| `sops` | object | SOPS decryption settings |
+| `commit_sha` | string | Specific commit to deploy (empty = branch HEAD) |
+| `version` | string | Version name (e.g., 1.0.2+123) |
+| `release_notes` | string | Release notes text |
+| `android_flavor1..5` | boolean | Deploy Android for each flavor slot |
+| `ios_flavor1..5` | boolean | Deploy iOS for each flavor slot |
+| `web_flavor1..5` | boolean | Deploy Web for each flavor slot |
+| `functions` | boolean | Deploy Firebase Functions |
+| `widgetbook` | boolean | Deploy Widgetbook |
 
-### Flavor Configuration
+## Configuration File Reference
 
-Each flavor supports:
+### `flavor_mapping`
+
+Maps generic flavor slots to your actual flavor names:
+
+```json
+{
+  "flavor_mapping": {
+    "flavor1": "main",      // When user checks "Flavor 1", use config for "main"
+    "flavor2": "admin",     // When user checks "Flavor 2", use config for "admin"
+    "flavor3": null,        // Flavor 3 not configured (checkbox ignored)
+    "flavor4": null,
+    "flavor5": null
+  }
+}
+```
+
+### `flavors.<name>`
+
+Configuration for each flavor:
 
 ```json
 {
   "flavors": {
-    "flavor_name": {
-      "description": "Human-readable description",
+    "main": {
+      "description": "Main production app",
       "target_file": "lib/main.dart",
+      
       "android": {
-        "firebase_app_id": "Firebase Android App ID",
-        "apk_output_path": "Path to built APK",
-        "build_args": "Additional flutter build arguments",
-        "distribution_groups": ["group1", "group2"]
+        "firebase_app_id": "1:xxx:android:xxx",
+        "flavor": "",                           // Flutter --flavor argument
+        "build_args": "--no-tree-shake-icons",
+        "distribution_groups": ["testers"]
       },
+      
       "ios": {
-        "firebase_app_id": "Firebase iOS App ID",
-        "bundle_id": "com.example.app",
-        "distribution_groups": ["group1", "group2"]
+        "firebase_app_id": "1:xxx:ios:xxx",
+        "flavor": "",
+        "build_args": "--no-tree-shake-icons",
+        "distribution_groups": ["testers"]
       },
+      
       "web": {
-        "hosting_target": "Firebase Hosting target name",
+        "hosting_target": "app",
         "deploy_only": "hosting,functions,firestore,storage",
-        "build_args": "Additional flutter build web arguments"
+        "build_args": "",
+        "build_functions": true
       }
     }
   }
 }
 ```
 
-## Adding New Flavors
+### `firebase`
 
-To add a new flavor:
+Firebase project settings:
 
-1. Add the flavor configuration to `deploy-config.json`
-2. Add new workflow inputs in `manual_full_deploy.yml`:
-
-```yaml
-deploy_android_newflavor:
-  description: 'Deploy Android - New Flavor'
-  required: false
-  default: false
-  type: boolean
+```json
+{
+  "firebase": {
+    "project_id": "your-project-id",
+    "service_account_path": "firebase_service_account.json"
+  }
+}
 ```
 
-3. Update the `compute-flavors` step to include the new flavor:
+### `functions`
 
-```bash
-if [ "${{ github.event.inputs.deploy_android_newflavor }}" = "true" ]; then
-  # ... add to ANDROID_FLAVORS
-fi
+Firebase Functions settings:
+
+```json
+{
+  "functions": {
+    "path": "functions",
+    "install_command": "npm install",
+    "build_command": "npm run build",
+    "chmod_biome": true
+  }
+}
 ```
 
-4. Add the flavor case in `Load flavor configuration` steps
+### `widgetbook`
 
-## Job Dependencies
+Widgetbook settings:
 
-| Job | Depends On | Condition |
-|-----|------------|-----------|
-| `prepare` | - | Always runs |
-| `build-deploy-android` | prepare | Any Android checkbox selected |
-| `build-deploy-ios` | prepare | Any iOS checkbox selected |
-| `build-deploy-web` | prepare | Any Web checkbox selected |
-| `deploy-functions` | prepare | Functions checkbox selected |
-| `deploy-widgetbook` | prepare | Widgetbook checkbox selected |
-| `summary` | All jobs | Always runs (reports results) |
+```json
+{
+  "widgetbook": {
+    "directory": "widgetbook",
+    "hosting_target": "widgetbook"
+  }
+}
+```
 
-## Troubleshooting
+## Deploying a Specific Commit
 
-### SOPS decryption fails
+To deploy a specific commit instead of the branch HEAD:
 
-Ensure `SOPS_AGE_KEY` secret is set correctly in your repository settings.
+1. Run the workflow from any branch
+2. Enter the full commit SHA in the "Commit SHA" field
+3. The workflow will checkout and deploy that exact commit
 
-### Firebase deployment fails with permission error
+This is useful for:
+- Deploying a known-good commit after a bad merge
+- Deploying an older version for testing
+- Cherry-picking specific changes for deployment
 
-1. Verify `FIREBASE_PROJECT_ID` variable is correct
-2. Check that `firebase_service_account.json` is properly encrypted and decrypted
-3. Ensure the service account has necessary IAM roles:
-   - Firebase Admin
-   - Service Account Admin
-   - Service Usage Admin
+## Adding a New Flavor
 
-### iOS build fails
+1. **Update `deploy-config.json`** in your app repo:
+   - Add the new flavor to `flavor_mapping` (e.g., `"flavor3": "restaurant"`)
+   - Add the full configuration under `flavors`
 
-1. macOS runners have limited resources; ensure your project builds locally
-2. CocoaPods installation may fail if Podfile.lock is out of date
-3. Unsigned builds are used for Firebase App Distribution
+2. **Update `deploy.yml`** in your app repo:
+   - Change the description for the corresponding checkbox (e.g., `'Android - Restaurant'`)
 
-### Matrix job shows empty
-
-If a platform job doesn't run, check:
-1. The corresponding checkbox was selected
-2. The `compute-flavors` step correctly includes the flavor in the array
+No changes needed to flutter_platform_kit!
 
 ## Future Enhancements
 
-This workflow is designed to support future additions:
+The reusable workflow is designed for future additions:
 
-- **Google Play Store**: AAB builds for production release
-- **TestFlight**: iOS TestFlight deployment
+- **Google Play Store**: AAB builds and Play Store deployment
+- **TestFlight**: iOS TestFlight distribution
 - **App Store**: Direct App Store submission
-- **Promotion workflows**: Promote builds between environments
+- **Build promotion**: Promote builds between environments
 
-## Related Actions
+When these features are added to `reusable-full-deploy.yml`, all app repos using it will automatically have access (may require config updates).
 
-This workflow uses these composite actions from flutter_platform_kit:
+## Troubleshooting
 
-- [`prepare-deployment`](../prepare-deployment/README.md)
-- [`build-deploy-flutter-apk`](../build-deploy-flutter-apk/README.md)
-- [`build-deploy-flutter-web`](../build-deploy-flutter-web/README.md)
+### "Flavor not configured" error
+
+The flavor slot you selected doesn't have a mapping in `deploy-config.json`. Check that:
+1. `flavor_mapping.flavorN` maps to a valid flavor name
+2. That flavor name exists in the `flavors` object
+
+### iOS build fails on CocoaPods
+
+Try updating your `Podfile.lock`:
+```bash
+cd ios && pod install --repo-update && cd ..
+git add ios/Podfile.lock && git commit -m "Update Podfile.lock"
+```
+
+### Firebase permission denied
+
+Ensure your service account has these roles:
+- Firebase Admin SDK Administrator Service Agent
+- Service Usage Consumer
+- Cloud Functions Admin (if deploying functions)
+
+## Files Reference
+
+| File | Location | Purpose |
+|------|----------|---------|
+| `reusable-full-deploy.yml` | flutter_platform_kit | The reusable workflow (don't modify) |
+| `deploy-workflow-template.yml` | flutter_platform_kit | Template for app repos |
+| `deploy-config-template.json` | flutter_platform_kit | Template config file |
+| `deploy.yml` | Your app repo | Your customized wrapper |
+| `deploy-config.json` | Your app repo | Your flavor configurations |
