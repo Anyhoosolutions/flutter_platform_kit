@@ -2,6 +2,8 @@ name: Verify documentation
 
 on:
   pull_request:
+    branches:
+      - main
 
 jobs:
   verify-docs:
