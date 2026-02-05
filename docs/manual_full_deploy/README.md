@@ -31,7 +31,7 @@ on:
       
       # Customize these descriptions!
       android_flavor1:
-        description: 'Android - Snap & Savor'  # Your actual app name
+        description: 'Android - My Example App'  # Your actual app name
         type: boolean
         default: false
       android_flavor2:
@@ -71,7 +71,7 @@ Copy `deploy-config-template.json` to `.github/deploy-config.json` and configure
     "snapandsavor": {
       "target_file": "lib/main.dart",
       "android": {
-        "firebase_app_id": "1:662631605767:android:5f42abaa1d0bb2b2972ca2",
+        "firebase_app_id": "1:123:android:456",
         "distribution_groups": ["testers"]
       },
       "web": {
@@ -82,7 +82,7 @@ Copy `deploy-config-template.json` to `.github/deploy-config.json` and configure
     "admin": {
       "target_file": "lib/admin/main.dart",
       "android": {
-        "firebase_app_id": "1:662631605767:android:admin123",
+        "firebase_app_id": "1:123:android:admin123",
         "flavor": "admin"
       }
     }
