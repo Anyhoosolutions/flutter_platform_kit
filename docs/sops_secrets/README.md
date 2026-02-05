@@ -420,3 +420,15 @@ my-app/
 ## License
 
 These scripts are part of the flutter_platform_kit project and follow the same license.
+
+---
+
+## Changelog
+
+### 0.0.2
+
+Only encrypt changed files
+
+### 0.0.1
+
+Scripts for encrypting and decrypting secrets

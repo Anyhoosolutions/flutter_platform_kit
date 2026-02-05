@@ -15,3 +15,27 @@ Key features:
 - **Easy to use**: Simple `SentryHelper` class for packages to report errors
 
 Packages can use `SentryHelper` to report errors/logs, and it will automatically be a no-op if Sentry is not configured.
+
+---
+
+## Changelog
+
+### 0.0.5
+
+* Remove direct Sentry dependency
+
+### 0.0.4
+
+* Latest Sentry version
+
+### 0.0.3
+
+* Fix Sentry logging
+
+### 0.0.2
+
+* Add Sentry logging
+
+### 0.0.1
+ 
+* Add logging package

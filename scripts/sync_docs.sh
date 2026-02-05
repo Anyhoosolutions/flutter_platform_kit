@@ -2,9 +2,8 @@
 #
 # Syncs documentation files to the docs directory:
 # - Generates toc.json using the Dart toc_generator
-# - Copies CHANGELOGs from packages
-# - Copies READMEs from packages
-# - Copies GitHub Actions READMEs
+# - Copies READMEs from packages (with CHANGELOGs appended at the bottom)
+# - Copies GitHub Actions READMEs (with CHANGELOGs appended if they exist)
 # - Copies package docs/ directories
 # - Copies additional .md files from package roots
 #
@@ -51,47 +50,66 @@ if [ "$SKIP_TOC" = false ]; then
   echo ""
 fi
 
-# Copy CHANGELOGs
-echo "📝 Copying CHANGELOGs..."
-for package_dir in $PACKAGE_DIRS; do
-  [ -d "$package_dir" ] || continue
-  package_name=$(basename "$package_dir")
-  changelog_path="$package_dir/CHANGELOG.md"
-  
-  if [ -f "$changelog_path" ]; then
-    mkdir -p "$DOCS_DIR/$package_name"
-    cp "$changelog_path" "$DOCS_DIR/$package_name/CHANGELOG.md"
-    echo "  ✅ $package_name/CHANGELOG.md"
-  fi
-done
-echo ""
-
-# Copy READMEs
-echo "📖 Copying READMEs..."
+# Copy READMEs with CHANGELOGs appended
+echo "📖 Copying READMEs (with CHANGELOGs appended)..."
 for package_dir in $PACKAGE_DIRS; do
   [ -d "$package_dir" ] || continue
   package_name=$(basename "$package_dir")
   readme_path="$package_dir/README.md"
+  changelog_path="$package_dir/CHANGELOG.md"
   
   if [ -f "$readme_path" ]; then
     mkdir -p "$DOCS_DIR/$package_name"
+    # Start with the README content
     cp "$readme_path" "$DOCS_DIR/$package_name/README.md"
-    echo "  ✅ $package_name/README.md"
+    
+    # Append CHANGELOG if it exists
+    if [ -f "$changelog_path" ]; then
+      {
+        echo ""
+        echo "---"
+        echo ""
+        echo "## Changelog"
+        echo ""
+        # Convert ## headings to ### (add one # to version headings)
+        sed 's/^## /### /' "$changelog_path"
+      } >> "$DOCS_DIR/$package_name/README.md"
+      echo "  ✅ $package_name/README.md (with Changelog)"
+    else
+      echo "  ✅ $package_name/README.md"
+    fi
   fi
 done
 echo ""
 
-# Copy GitHub Actions READMEs
+# Copy GitHub Actions READMEs (with CHANGELOGs appended if they exist)
 echo "🔧 Copying GitHub Actions READMEs..."
 for action_dir in tools/github_actions/*/; do
   [ -d "$action_dir" ] || continue
   action_name=$(basename "$action_dir")
   readme_path="${action_dir}README.md"
+  changelog_path="${action_dir}CHANGELOG.md"
   
   if [ -f "$readme_path" ]; then
     mkdir -p "$DOCS_DIR/$action_name"
+    # Start with the README content
     cp "$readme_path" "$DOCS_DIR/$action_name/README.md"
-    echo "  ✅ $action_name/README.md"
+    
+    # Append CHANGELOG if it exists
+    if [ -f "$changelog_path" ]; then
+      {
+        echo ""
+        echo "---"
+        echo ""
+        echo "## Changelog"
+        echo ""
+        # Convert ## headings to ### (add one # to version headings)
+        sed 's/^## /### /' "$changelog_path"
+      } >> "$DOCS_DIR/$action_name/README.md"
+      echo "  ✅ $action_name/README.md (with Changelog)"
+    else
+      echo "  ✅ $action_name/README.md"
+    fi
   fi
 done
 echo ""

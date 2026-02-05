@@ -86,3 +86,69 @@ This tool is currently a simple prototype. Here are some potential features and 
 - [x] **Directory Processing**: Add functionality to process all `freezed` files within a given directory instead of just a single file. *(In Progress)*
 - [ ] **Improved Error Handling**: Provide more specific error messages if a file can't be parsed or a valid `freezed` class isn't found.
 - [x] **Handle type convertions**: Handle if a type is being converted to/from JSON types, e.g. DateTime to Timestamp
+
+---
+
+## Changelog
+
+### 0.0.13
+
+- Fix homepage URL
+
+### 0.0.12
+
+- Add support for copying shared models to docs
+
+### 0.0.11
+
+- Handle maps and enums
+
+### 0.0.10
+
+- Allow to skip fields when generating
+
+### 0.0.9
+
+- New lines and no .ts suffices
+
+### 0.0.8
+
+- Fix import
+
+### 0.0.7
+
+- Use double quotes
+
+### 0.0.6
+
+- Fix documentation
+
+### 0.0.5
+
+- Handle enums
+
+### 0.0.4
+
+- Fixes for import type
+- Fix for imports of package type
+- A little logging
+
+### 0.0.3
+
+- Fixes for import type
+- Fixes for import of nested classes
+- Updating documentation
+- Sort imports
+
+### 0.0.2
+
+- Fixes for import type
+- Fixes for import of nested classes
+- Updating documentation
+
+### 0.0.1
+
+- Initial version of the script.
+- Converts a single freezed class or a directory of classes to TypeScript interface.
+- Handles basic types, nullability, lists, maps, and DateTime to Firestore Timestamp conversion.
+- Handles nested classes.
