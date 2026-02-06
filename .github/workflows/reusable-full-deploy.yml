@@ -139,7 +139,6 @@ jobs:
       has_android: ${{ steps.compute-matrices.outputs.has_android }}
       has_ios: ${{ steps.compute-matrices.outputs.has_ios }}
       has_web: ${{ steps.compute-matrices.outputs.has_web }}
-      has_functions: ${{ steps.compute-matrices.outputs.has_functions }}
       has_widgetbook: ${{ steps.compute-matrices.outputs.has_widgetbook }}
       # Checkout ref
       checkout_ref: ${{ steps.determine-ref.outputs.checkout_ref }}
@@ -204,7 +203,6 @@ jobs:
           echo "  flavor5: ${{ inputs.web_flavor5 }}"
           echo ""
           echo "Other Deployments:"
-          echo "  functions: ${{ inputs.functions }}"
           echo "  widgetbook: ${{ inputs.widgetbook }}"
           echo "===================================================="
 
@@ -365,7 +363,6 @@ jobs:
           echo "has_android=$( [ $ANDROID_COUNT -gt 0 ] && echo 'true' || echo 'false' )" >> $GITHUB_OUTPUT
           echo "has_ios=$( [ $IOS_COUNT -gt 0 ] && echo 'true' || echo 'false' )" >> $GITHUB_OUTPUT
           echo "has_web=$( [ $WEB_COUNT -gt 0 ] && echo 'true' || echo 'false' )" >> $GITHUB_OUTPUT
-          echo "has_functions=${{ inputs.functions }}" >> $GITHUB_OUTPUT
           echo "has_widgetbook=${{ inputs.widgetbook }}" >> $GITHUB_OUTPUT
 
           echo ""
@@ -373,7 +370,6 @@ jobs:
           echo "  Android: $ANDROID_FLAVORS (count: $ANDROID_COUNT)"
           echo "  iOS: $IOS_FLAVORS (count: $IOS_COUNT)"
           echo "  Web: $WEB_FLAVORS (count: $WEB_COUNT)"
-          echo "  Functions: ${{ inputs.functions }}"
           echo "  Widgetbook: ${{ inputs.widgetbook }}"
 
       - name: Check SOPS key availability
@@ -405,7 +401,6 @@ jobs:
              [ "${{ inputs.web_flavor3 }}" != "true" ] && \
              [ "${{ inputs.web_flavor4 }}" != "true" ] && \
              [ "${{ inputs.web_flavor5 }}" != "true" ] && \
-             [ "${{ inputs.functions }}" != "true" ] && \
              [ "${{ inputs.widgetbook }}" != "true" ]; then
             echo "❌ No deployments selected! Please select at least one deployment option."
             exit 1
@@ -476,6 +471,12 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('android/**/*.gradle*', 'android/**/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
+
+      - name: Update release_info.dart
+        uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/manual_full_deploy/actions/update-release-info@main
+        with:
+          release_info_path: ${{ steps.flavor-config.outputs.release_info_path }}
+          version: ${{ inputs.version }}
 
       - name: Build Flutter APK
         run: |
@@ -618,6 +619,12 @@ jobs:
         working-directory: ios
         run: pod install --repo-update
 
+      - name: Update release_info.dart
+        uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/manual_full_deploy/actions/update-release-info@main
+        with:
+          release_info_path: ${{ steps.flavor-config.outputs.release_info_path }}
+          version: ${{ inputs.version }}
+
       - name: Build iOS
         run: |
           TARGET="${{ steps.flavor-config.outputs.target_file }}"
@@ -749,6 +756,12 @@ jobs:
           cd ..
           echo "✅ Functions built successfully"
 
+      - name: Update release_info.dart
+        uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/manual_full_deploy/actions/update-release-info@main
+        with:
+          release_info_path: ${{ steps.flavor-config.outputs.release_info_path }}
+          version: ${{ inputs.version }}
+
       - name: Build Flutter Web
         run: |
           TARGET_FILE="${{ steps.flavor-config.outputs.target_file }}"
@@ -781,9 +794,22 @@ jobs:
           HOSTING_TARGET="${{ steps.flavor-config.outputs.hosting_target }}"
           DEPLOY_ONLY="${{ steps.flavor-config.outputs.deploy_only }}"
 
-          echo "🚀 Deploying to Firebase Hosting..."
+          echo "🚀 Deploying to Firebase..."
+          echo "📋 Project: $FIREBASE_PROJECT"
+          echo "📋 Hosting target: $HOSTING_TARGET"
+          echo "📋 Deploy only: $DEPLOY_ONLY"
 
+          # If hosting_target is configured, replace "hosting" with "hosting:$HOSTING_TARGET"
+          # This prevents deploying to ALL hosting sites (e.g., widgetbook) when multiple targets exist.
+          # If hosting_target is empty (single-site setup), we leave "hosting" as-is for default firebase.json.
           if [ -n "$DEPLOY_ONLY" ]; then
+            if [ -n "$HOSTING_TARGET" ]; then
+              # Replace "hosting" with "hosting:target" (handles: "hosting", "hosting,functions", etc.)
+              DEPLOY_ONLY=$(echo "$DEPLOY_ONLY" | sed -E "s/(^|,)hosting(,|$)/\1hosting:$HOSTING_TARGET\2/g")
+              echo "📋 Final deploy targets: $DEPLOY_ONLY"
+            else
+              echo "📋 No hosting target configured - using default hosting"
+            fi
             firebase deploy --only "$DEPLOY_ONLY" --project "$FIREBASE_PROJECT" --non-interactive
           elif [ -n "$HOSTING_TARGET" ]; then
             firebase deploy --only "hosting:$HOSTING_TARGET" --project "$FIREBASE_PROJECT" --non-interactive
@@ -792,73 +818,6 @@ jobs:
           fi
 
           echo "✅ Web deployment completed"
-
-  # ============================================================================
-  # FUNCTIONS DEPLOYMENT JOB
-  # ============================================================================
-  deploy-functions:
-    name: Deploy Functions
-    needs: prepare
-    if: needs.prepare.outputs.has_functions == 'true'
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ needs.prepare.outputs.checkout_ref }}
-          fetch-depth: 0
-
-      - name: Load configuration
-        id: config
-        run: |
-          CONFIG_FILE=".github/deploy-config.json"
-
-          FIREBASE_PROJECT=$(jq -r ".firebase.project_id // empty" "$CONFIG_FILE")
-          SERVICE_ACCOUNT=$(jq -r ".firebase.service_account_path // \"firebase_service_account.json\"" "$CONFIG_FILE")
-          FUNCTIONS_PATH=$(jq -r ".functions.path // \"functions\"" "$CONFIG_FILE")
-          INSTALL_CMD=$(jq -r ".functions.install_command // \"npm install\"" "$CONFIG_FILE")
-          BUILD_CMD=$(jq -r ".functions.build_command // \"npm run build\"" "$CONFIG_FILE")
-          CHMOD_BIOME=$(jq -r ".functions.chmod_biome // false" "$CONFIG_FILE")
-
-          echo "firebase_project=$FIREBASE_PROJECT" >> $GITHUB_OUTPUT
-          echo "service_account=$SERVICE_ACCOUNT" >> $GITHUB_OUTPUT
-          echo "functions_path=$FUNCTIONS_PATH" >> $GITHUB_OUTPUT
-          echo "install_cmd=$INSTALL_CMD" >> $GITHUB_OUTPUT
-          echo "build_cmd=$BUILD_CMD" >> $GITHUB_OUTPUT
-          echo "chmod_biome=$CHMOD_BIOME" >> $GITHUB_OUTPUT
-
-      - name: Setup SOPS and decrypt secrets
-        uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/manual_full_deploy/actions/setup-sops@main
-        with:
-          sops_age_key: ${{ secrets.SOPS_AGE_KEY }}
-          verify_files: "${{ steps.config.outputs.service_account }}"
-
-      - name: Setup Firebase CLI
-        uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/manual_full_deploy/actions/setup-firebase-cli@main
-
-      - name: Install and build functions
-        working-directory: ${{ steps.config.outputs.functions_path }}
-        run: |
-          echo "📦 Installing dependencies..."
-          ${{ steps.config.outputs.install_cmd }}
-
-          if [ "${{ steps.config.outputs.chmod_biome }}" = "true" ]; then
-            if [ -f "node_modules/@biomejs/cli-linux-x64/biome" ]; then
-              chmod +x node_modules/@biomejs/cli-linux-x64/biome
-            fi
-          fi
-
-          echo "🔨 Building functions..."
-          ${{ steps.config.outputs.build_cmd }}
-
-      - name: Deploy functions to Firebase
-        env:
-          GOOGLE_APPLICATION_CREDENTIALS: ${{ github.workspace }}/${{ steps.config.outputs.service_account }}
-        run: |
-          echo "🚀 Deploying functions..."
-          firebase deploy --only functions --project ${{ steps.config.outputs.firebase_project }} --non-interactive
-          echo "✅ Functions deployment completed"
 
   # ============================================================================
   # WIDGETBOOK DEPLOYMENT JOB
@@ -887,6 +846,7 @@ jobs:
           HOSTING_TARGET=$(jq -r ".widgetbook.hosting_target // \"widgetbook\"" "$CONFIG_FILE")
           FLUTTER_VERSION=$(jq -r ".flutter_version // \"3.38.4\"" "$CONFIG_FILE")
           FLUTTER_CHANNEL=$(jq -r ".flutter_channel // \"stable\"" "$CONFIG_FILE")
+          RELEASE_INFO_PATH=$(jq -r ".release_info.path // \"\"" "$CONFIG_FILE")
 
           echo "firebase_project=$FIREBASE_PROJECT" >> $GITHUB_OUTPUT
           echo "service_account=$SERVICE_ACCOUNT" >> $GITHUB_OUTPUT
@@ -894,6 +854,7 @@ jobs:
           echo "hosting_target=$HOSTING_TARGET" >> $GITHUB_OUTPUT
           echo "flutter_version=$FLUTTER_VERSION" >> $GITHUB_OUTPUT
           echo "flutter_channel=$FLUTTER_CHANNEL" >> $GITHUB_OUTPUT
+          echo "release_info_path=$RELEASE_INFO_PATH" >> $GITHUB_OUTPUT
 
       - name: Setup SOPS and decrypt secrets
         uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/manual_full_deploy/actions/setup-sops@main
@@ -906,6 +867,12 @@ jobs:
         with:
           flutter_version: ${{ steps.config.outputs.flutter_version }}
           flutter_channel: ${{ steps.config.outputs.flutter_channel }}
+
+      - name: Update release_info.dart
+        uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/manual_full_deploy/actions/update-release-info@main
+        with:
+          release_info_path: ${{ steps.config.outputs.release_info_path }}
+          version: ${{ inputs.version }}
 
       - name: Get Widgetbook dependencies
         working-directory: ${{ steps.config.outputs.widgetbook_dir }}
@@ -942,7 +909,6 @@ jobs:
         build-deploy-android,
         build-deploy-ios,
         build-deploy-web,
-        deploy-functions,
         deploy-widgetbook,
       ]
     if: always()
@@ -990,16 +956,6 @@ jobs:
               echo "| Web | ❌ Failed |" >> $GITHUB_STEP_SUMMARY
             else
               echo "| Web | ⏭️ Skipped |" >> $GITHUB_STEP_SUMMARY
-            fi
-          fi
-
-          if [ "${{ needs.prepare.outputs.has_functions }}" = "true" ]; then
-            if [ "${{ needs.deploy-functions.result }}" = "success" ]; then
-              echo "| Functions | ✅ Success |" >> $GITHUB_STEP_SUMMARY
-            elif [ "${{ needs.deploy-functions.result }}" = "failure" ]; then
-              echo "| Functions | ❌ Failed |" >> $GITHUB_STEP_SUMMARY
-            else
-              echo "| Functions | ⏭️ Skipped |" >> $GITHUB_STEP_SUMMARY
             fi
           fi
 

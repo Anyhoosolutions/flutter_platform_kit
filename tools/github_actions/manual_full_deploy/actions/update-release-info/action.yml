@@ -1,0 +1,83 @@
+name: "Update Release Info"
+description: "Update release_info.dart with version, commit hash, branch, and build date"
+
+inputs:
+  release_info_path:
+    description: "Path to release_info.dart file"
+    required: false
+    default: ""
+  version:
+    description: "Version string (e.g., 1.0.0+123)"
+    required: true
+  commit_hash:
+    description: "Full commit SHA"
+    required: false
+    default: ""
+  branch:
+    description: "Branch name"
+    required: false
+    default: ""
+
+runs:
+  using: "composite"
+  steps:
+    - name: Update release_info.dart
+      shell: bash
+      run: |
+        RELEASE_INFO_PATH="${{ inputs.release_info_path }}"
+        
+        if [ -z "$RELEASE_INFO_PATH" ]; then
+          echo "⏭️ Skipping release_info.dart update - path not configured"
+          exit 0
+        fi
+        
+        if [ ! -f "$RELEASE_INFO_PATH" ]; then
+          echo "⏭️ Skipping release_info.dart update - file not found: $RELEASE_INFO_PATH"
+          exit 0
+        fi
+        
+        echo "📝 Updating $RELEASE_INFO_PATH..."
+        
+        VERSION="${{ inputs.version }}"
+        COMMIT_HASH="${{ inputs.commit_hash }}"
+        if [ -z "$COMMIT_HASH" ]; then
+          COMMIT_HASH="${{ github.sha }}"
+        fi
+        COMMIT_HASH_SHORT="${COMMIT_HASH:0:7}"
+        
+        CURRENT_BRANCH="${{ inputs.branch }}"
+        if [ -z "$CURRENT_BRANCH" ]; then
+          CURRENT_BRANCH="${{ github.ref_name }}"
+        fi
+        
+        BUILD_DATE=$(date '+%Y-%m-%d %H:%M:%S')
+        
+        echo "  Version: $VERSION"
+        echo "  Commit: $COMMIT_HASH_SHORT ($COMMIT_HASH)"
+        echo "  Branch: $CURRENT_BRANCH"
+        echo "  Build Date: $BUILD_DATE"
+        
+        # Define sed in-place function for cross-platform compatibility
+        sed_inplace() {
+          if [[ "$OSTYPE" == "darwin"* ]]; then
+            sed -i '' "$@"
+          else
+            sed -i "$@"
+          fi
+        }
+        
+        # Update release_info.dart file - field format (final String version = '...';)
+        sed_inplace "s/final String version = '.*';/final String version = '$VERSION';/" "$RELEASE_INFO_PATH"
+        sed_inplace "s/final String buildDate = '.*';/final String buildDate = '${BUILD_DATE}';/" "$RELEASE_INFO_PATH"
+        sed_inplace "s/final String commitHash = '.*';/final String commitHash = '${COMMIT_HASH}';/" "$RELEASE_INFO_PATH"
+        sed_inplace "s/final String branch = '.*';/final String branch = '${CURRENT_BRANCH}';/" "$RELEASE_INFO_PATH"
+        sed_inplace "s/final String commitHashShort = '.*';/final String commitHashShort = '${COMMIT_HASH_SHORT}';/" "$RELEASE_INFO_PATH"
+        
+        # Update release_info.dart file - constructor format (this.version = '...')
+        sed_inplace "s/this\.version = '[^']*'/this.version = '$VERSION'/" "$RELEASE_INFO_PATH"
+        sed_inplace "s/this\.buildDate = '[^']*'/this.buildDate = '${BUILD_DATE}'/" "$RELEASE_INFO_PATH"
+        sed_inplace "s/this\.commitHash = '[^']*'/this.commitHash = '${COMMIT_HASH}'/" "$RELEASE_INFO_PATH"
+        sed_inplace "s/this\.branch = '[^']*'/this.branch = '${CURRENT_BRANCH}'/" "$RELEASE_INFO_PATH"
+        sed_inplace "s/this\.commitHashShort = '[^']*'/this.commitHashShort = '${COMMIT_HASH_SHORT}'/" "$RELEASE_INFO_PATH"
+        
+        echo "✅ Updated release_info.dart"
