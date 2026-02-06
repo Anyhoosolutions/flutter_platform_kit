@@ -794,9 +794,22 @@ jobs:
           HOSTING_TARGET="${{ steps.flavor-config.outputs.hosting_target }}"
           DEPLOY_ONLY="${{ steps.flavor-config.outputs.deploy_only }}"
 
-          echo "🚀 Deploying to Firebase Hosting..."
+          echo "🚀 Deploying to Firebase..."
+          echo "📋 Project: $FIREBASE_PROJECT"
+          echo "📋 Hosting target: $HOSTING_TARGET"
+          echo "📋 Deploy only: $DEPLOY_ONLY"
 
+          # If hosting_target is configured, replace "hosting" with "hosting:$HOSTING_TARGET"
+          # This prevents deploying to ALL hosting sites (e.g., widgetbook) when multiple targets exist.
+          # If hosting_target is empty (single-site setup), we leave "hosting" as-is for default firebase.json.
           if [ -n "$DEPLOY_ONLY" ]; then
+            if [ -n "$HOSTING_TARGET" ]; then
+              # Replace "hosting" with "hosting:target" (handles: "hosting", "hosting,functions", etc.)
+              DEPLOY_ONLY=$(echo "$DEPLOY_ONLY" | sed -E "s/(^|,)hosting(,|$)/\1hosting:$HOSTING_TARGET\2/g")
+              echo "📋 Final deploy targets: $DEPLOY_ONLY"
+            else
+              echo "📋 No hosting target configured - using default hosting"
+            fi
             firebase deploy --only "$DEPLOY_ONLY" --project "$FIREBASE_PROJECT" --non-interactive
           elif [ -n "$HOSTING_TARGET" ]; then
             firebase deploy --only "hosting:$HOSTING_TARGET" --project "$FIREBASE_PROJECT" --non-interactive

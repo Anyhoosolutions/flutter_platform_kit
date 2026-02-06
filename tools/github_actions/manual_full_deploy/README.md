@@ -230,7 +230,6 @@ The wrapper workflow passes these inputs to the reusable workflow:
 | `android_flavor1..5` | boolean | Deploy Android for each flavor slot |
 | `ios_flavor1..5` | boolean | Deploy iOS for each flavor slot |
 | `web_flavor1..5` | boolean | Deploy Web for each flavor slot |
-| `functions` | boolean | Deploy Firebase Functions |
 | `widgetbook` | boolean | Deploy Widgetbook |
 
 ## Configuration File Reference
@@ -279,13 +278,28 @@ Configuration for each flavor:
       "web": {
         "hosting_target": "app",
         "deploy_only": "hosting,functions,firestore,storage",
-        "build_args": "",
-        "build_functions": true
+        "build_args": ""
       }
     }
   }
 }
 ```
+
+**Important notes about web deployment:**
+
+| Field | Description |
+|-------|-------------|
+| `hosting_target` | Firebase Hosting target name (only needed for multi-site setups) |
+| `deploy_only` | Comma-separated list of Firebase services to deploy |
+
+**Single hosting site (default firebase.json):**
+- Leave `hosting_target` empty or omit it
+- Use `"deploy_only": "hosting"` or `"deploy_only": "hosting,functions"`
+- Works with default `firebase init` / FlutterFire configuration
+
+**Multiple hosting sites (e.g., app + widgetbook):**
+- Set `hosting_target` to your target name (must match `firebase.json`)
+- The workflow automatically replaces `hosting` with `hosting:<target>` to avoid deploying ALL sites
 
 ### `firebase`
 
