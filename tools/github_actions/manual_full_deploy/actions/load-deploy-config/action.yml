@@ -114,6 +114,9 @@ runs:
       shell: bash
       if: ${{ inputs.flavor_name != '' }}
       run: |
+        # Disable exit on error to handle jq failures gracefully
+        set +e
+        
         CONFIG_FILE="${{ inputs.config_file }}"
         FLAVOR_NAME="${{ inputs.flavor_name }}"
         PLATFORM="${{ inputs.platform }}"
@@ -142,11 +145,18 @@ runs:
         echo "target_file=$TARGET_FILE" >> $GITHUB_OUTPUT
 
         # Platform-specific config
+        echo "📋 Extracting platform-specific config for: $PLATFORM"
+        
         if [ "$PLATFORM" = "android" ]; then
-          FIREBASE_APP_ID=$(jq -r ".flavors[\"$FLAVOR_NAME\"].android.firebase_app_id // \"\"" "$CONFIG_FILE")
-          BUILD_ARGS=$(jq -r ".flavors[\"$FLAVOR_NAME\"].android.build_args // \"\"" "$CONFIG_FILE")
-          FLAVOR_ARG=$(jq -r ".flavors[\"$FLAVOR_NAME\"].android.flavor // \"\"" "$CONFIG_FILE")
-          GROUPS=$(jq -r ".flavors[\"$FLAVOR_NAME\"].android.distribution_groups // [\"testers\"] | join(\",\")" "$CONFIG_FILE")
+          echo "  Extracting android config..."
+          FIREBASE_APP_ID=$(jq -r ".flavors[\"$FLAVOR_NAME\"].android.firebase_app_id // \"\"" "$CONFIG_FILE") || echo "Failed to extract firebase_app_id"
+          echo "  firebase_app_id: $FIREBASE_APP_ID"
+          BUILD_ARGS=$(jq -r ".flavors[\"$FLAVOR_NAME\"].android.build_args // \"\"" "$CONFIG_FILE") || echo "Failed to extract build_args"
+          echo "  build_args: $BUILD_ARGS"
+          FLAVOR_ARG=$(jq -r ".flavors[\"$FLAVOR_NAME\"].android.flavor // \"\"" "$CONFIG_FILE") || echo "Failed to extract flavor"
+          echo "  flavor_arg: $FLAVOR_ARG"
+          GROUPS=$(jq -r ".flavors[\"$FLAVOR_NAME\"].android.distribution_groups // [\"testers\"] | join(\",\")" "$CONFIG_FILE") || echo "Failed to extract groups"
+          echo "  groups: $GROUPS"
 
           echo "firebase_app_id=$FIREBASE_APP_ID" >> $GITHUB_OUTPUT
           echo "build_args=$BUILD_ARGS" >> $GITHUB_OUTPUT
