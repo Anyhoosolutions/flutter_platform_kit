@@ -1,0 +1,152 @@
+name: "Load Deploy Configuration"
+description: "Load and parse deploy-config.json, extracting flavor-specific settings"
+
+inputs:
+  config_file:
+    description: "Path to deploy-config.json"
+    required: false
+    default: ".github/deploy-config.json"
+  flavor_name:
+    description: "The flavor name to extract configuration for"
+    required: false
+    default: ""
+  platform:
+    description: "Platform to extract config for (android, ios, web)"
+    required: false
+    default: ""
+
+outputs:
+  config_json:
+    description: "The full config as minified JSON"
+    value: ${{ steps.load-config.outputs.config_json }}
+  flutter_version:
+    description: "Flutter version from config"
+    value: ${{ steps.load-config.outputs.flutter_version }}
+  flutter_channel:
+    description: "Flutter channel from config"
+    value: ${{ steps.load-config.outputs.flutter_channel }}
+  firebase_project:
+    description: "Firebase project ID"
+    value: ${{ steps.load-config.outputs.firebase_project }}
+  service_account:
+    description: "Path to service account file"
+    value: ${{ steps.load-config.outputs.service_account }}
+  # Flavor-specific outputs (when flavor_name is provided)
+  target_file:
+    description: "Target file for the flavor"
+    value: ${{ steps.load-flavor.outputs.target_file }}
+  firebase_app_id:
+    description: "Firebase App ID for the platform/flavor"
+    value: ${{ steps.load-flavor.outputs.firebase_app_id }}
+  build_args:
+    description: "Build arguments for the platform/flavor"
+    value: ${{ steps.load-flavor.outputs.build_args }}
+  flavor_arg:
+    description: "Flavor argument for build command"
+    value: ${{ steps.load-flavor.outputs.flavor_arg }}
+  groups:
+    description: "Distribution groups (Android/iOS)"
+    value: ${{ steps.load-flavor.outputs.groups }}
+  hosting_target:
+    description: "Firebase hosting target (Web)"
+    value: ${{ steps.load-flavor.outputs.hosting_target }}
+  deploy_only:
+    description: "Firebase deploy --only value (Web)"
+    value: ${{ steps.load-flavor.outputs.deploy_only }}
+  build_functions:
+    description: "Whether to build functions (Web)"
+    value: ${{ steps.load-flavor.outputs.build_functions }}
+  functions_path:
+    description: "Path to functions directory"
+    value: ${{ steps.load-flavor.outputs.functions_path }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Load deploy configuration
+      id: load-config
+      shell: bash
+      run: |
+        CONFIG_FILE="${{ inputs.config_file }}"
+
+        if [ ! -f "$CONFIG_FILE" ]; then
+          echo "❌ $CONFIG_FILE not found!"
+          echo "   Please create this file based on deploy-config-template.json"
+          exit 1
+        fi
+
+        echo "✅ Found $CONFIG_FILE"
+
+        # Extract global settings
+        FLUTTER_VERSION=$(jq -r '.flutter_version // "3.38.4"' "$CONFIG_FILE")
+        FLUTTER_CHANNEL=$(jq -r '.flutter_channel // "stable"' "$CONFIG_FILE")
+        FIREBASE_PROJECT=$(jq -r '.firebase.project_id // ""' "$CONFIG_FILE")
+        SERVICE_ACCOUNT=$(jq -r '.firebase.service_account_path // "firebase_service_account.json"' "$CONFIG_FILE")
+        FUNCTIONS_PATH=$(jq -r '.functions.path // "functions"' "$CONFIG_FILE")
+
+        # Minify and output full config
+        CONFIG_JSON=$(cat "$CONFIG_FILE" | jq -c '.')
+
+        echo "config_json=$CONFIG_JSON" >> $GITHUB_OUTPUT
+        echo "flutter_version=$FLUTTER_VERSION" >> $GITHUB_OUTPUT
+        echo "flutter_channel=$FLUTTER_CHANNEL" >> $GITHUB_OUTPUT
+        echo "firebase_project=$FIREBASE_PROJECT" >> $GITHUB_OUTPUT
+        echo "service_account=$SERVICE_ACCOUNT" >> $GITHUB_OUTPUT
+        echo "functions_path=$FUNCTIONS_PATH" >> $GITHUB_OUTPUT
+
+        echo "📋 Global configuration loaded:"
+        echo "  Flutter: $FLUTTER_VERSION ($FLUTTER_CHANNEL)"
+        echo "  Firebase Project: $FIREBASE_PROJECT"
+
+    - name: Load flavor configuration
+      id: load-flavor
+      shell: bash
+      if: inputs.flavor_name != ''
+      run: |
+        CONFIG_FILE="${{ inputs.config_file }}"
+        FLAVOR_NAME="${{ inputs.flavor_name }}"
+        PLATFORM="${{ inputs.platform }}"
+
+        echo "🔍 Loading configuration for flavor: $FLAVOR_NAME, platform: $PLATFORM"
+
+        # Extract flavor-specific config
+        TARGET_FILE=$(jq -r ".flavors[\"$FLAVOR_NAME\"].target_file // \"lib/main.dart\"" "$CONFIG_FILE")
+
+        echo "target_file=$TARGET_FILE" >> $GITHUB_OUTPUT
+
+        # Platform-specific config
+        if [ "$PLATFORM" = "android" ]; then
+          FIREBASE_APP_ID=$(jq -r ".flavors[\"$FLAVOR_NAME\"].android.firebase_app_id // \"\"" "$CONFIG_FILE")
+          BUILD_ARGS=$(jq -r ".flavors[\"$FLAVOR_NAME\"].android.build_args // \"\"" "$CONFIG_FILE")
+          FLAVOR_ARG=$(jq -r ".flavors[\"$FLAVOR_NAME\"].android.flavor // \"\"" "$CONFIG_FILE")
+          GROUPS=$(jq -r ".flavors[\"$FLAVOR_NAME\"].android.distribution_groups // [\"testers\"] | join(\",\")" "$CONFIG_FILE")
+
+          echo "firebase_app_id=$FIREBASE_APP_ID" >> $GITHUB_OUTPUT
+          echo "build_args=$BUILD_ARGS" >> $GITHUB_OUTPUT
+          echo "flavor_arg=$FLAVOR_ARG" >> $GITHUB_OUTPUT
+          echo "groups=$GROUPS" >> $GITHUB_OUTPUT
+
+        elif [ "$PLATFORM" = "ios" ]; then
+          FIREBASE_APP_ID=$(jq -r ".flavors[\"$FLAVOR_NAME\"].ios.firebase_app_id // \"\"" "$CONFIG_FILE")
+          BUILD_ARGS=$(jq -r ".flavors[\"$FLAVOR_NAME\"].ios.build_args // \"\"" "$CONFIG_FILE")
+          FLAVOR_ARG=$(jq -r ".flavors[\"$FLAVOR_NAME\"].ios.flavor // \"\"" "$CONFIG_FILE")
+          GROUPS=$(jq -r ".flavors[\"$FLAVOR_NAME\"].ios.distribution_groups // [\"testers\"] | join(\",\")" "$CONFIG_FILE")
+
+          echo "firebase_app_id=$FIREBASE_APP_ID" >> $GITHUB_OUTPUT
+          echo "build_args=$BUILD_ARGS" >> $GITHUB_OUTPUT
+          echo "flavor_arg=$FLAVOR_ARG" >> $GITHUB_OUTPUT
+          echo "groups=$GROUPS" >> $GITHUB_OUTPUT
+
+        elif [ "$PLATFORM" = "web" ]; then
+          HOSTING_TARGET=$(jq -r ".flavors[\"$FLAVOR_NAME\"].web.hosting_target // \"\"" "$CONFIG_FILE")
+          DEPLOY_ONLY=$(jq -r ".flavors[\"$FLAVOR_NAME\"].web.deploy_only // \"hosting\"" "$CONFIG_FILE")
+          BUILD_ARGS=$(jq -r ".flavors[\"$FLAVOR_NAME\"].web.build_args // \"\"" "$CONFIG_FILE")
+          BUILD_FUNCTIONS=$(jq -r ".flavors[\"$FLAVOR_NAME\"].web.build_functions // \"false\"" "$CONFIG_FILE")
+
+          echo "hosting_target=$HOSTING_TARGET" >> $GITHUB_OUTPUT
+          echo "deploy_only=$DEPLOY_ONLY" >> $GITHUB_OUTPUT
+          echo "build_args=$BUILD_ARGS" >> $GITHUB_OUTPUT
+          echo "build_functions=$BUILD_FUNCTIONS" >> $GITHUB_OUTPUT
+        fi
+
+        echo "📋 Flavor configuration loaded for $FLAVOR_NAME ($PLATFORM)"

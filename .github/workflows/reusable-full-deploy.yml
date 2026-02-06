@@ -143,8 +143,12 @@ jobs:
       has_widgetbook: ${{ steps.compute-matrices.outputs.has_widgetbook }}
       # Checkout ref
       checkout_ref: ${{ steps.determine-ref.outputs.checkout_ref }}
-      # Config
-      config_json: ${{ steps.load-config.outputs.config_json }}
+      # Config values
+      flutter_version: ${{ steps.load-config.outputs.flutter_version }}
+      flutter_channel: ${{ steps.load-config.outputs.flutter_channel }}
+      firebase_project: ${{ steps.load-config.outputs.firebase_project }}
+      service_account: ${{ steps.load-config.outputs.service_account }}
+      functions_path: ${{ steps.load-config.outputs.functions_path }}
 
     steps:
       - name: Determine checkout ref
@@ -206,24 +210,7 @@ jobs:
 
       - name: Load deploy configuration
         id: load-config
-        run: |
-          CONFIG_FILE=".github/deploy-config.json"
-
-          if [ -f "$CONFIG_FILE" ]; then
-            echo "✅ Found $CONFIG_FILE"
-            # Minify JSON and set as output
-            CONFIG_JSON=$(cat "$CONFIG_FILE" | jq -c '.')
-            echo "config_json=$CONFIG_JSON" >> $GITHUB_OUTPUT
-            
-            # Display flavor mapping
-            echo ""
-            echo "📋 Flavor mapping:"
-            jq -r '.flavor_mapping | to_entries[] | "  \(.key): \(.value // "not configured")"' "$CONFIG_FILE"
-          else
-            echo "❌ $CONFIG_FILE not found!"
-            echo "   Please create this file based on deploy-config-template.json"
-            exit 1
-          fi
+        uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/manual_full_deploy/actions/load-deploy-config@main
 
       - name: Compute deployment matrices
         id: compute-matrices
@@ -231,65 +218,6 @@ jobs:
           echo "🔍 Computing deployment matrices..."
 
           CONFIG_FILE=".github/deploy-config.json"
-
-          # Helper function to get actual flavor name from mapping
-          get_flavor_name() {
-            local slot=$1
-            if [ -f "$CONFIG_FILE" ]; then
-              jq -r ".flavor_mapping.$slot // empty" "$CONFIG_FILE"
-            fi
-          }
-
-          # Build Android flavors array
-          ANDROID_FLAVORS="["
-          ANDROID_COUNT=0
-          for i in 1 2 3 4 5; do
-            INPUT_VAR="inputs.android_flavor$i"
-            if [ "${{ inputs.android_flavor1 }}" = "true" ] && [ "$i" = "1" ]; then
-              FLAVOR_NAME=$(get_flavor_name "flavor$i")
-              if [ -n "$FLAVOR_NAME" ]; then
-                [ $ANDROID_COUNT -gt 0 ] && ANDROID_FLAVORS="${ANDROID_FLAVORS},"
-                ANDROID_FLAVORS="${ANDROID_FLAVORS}{\"slot\":\"flavor$i\",\"name\":\"$FLAVOR_NAME\"}"
-                ANDROID_COUNT=$((ANDROID_COUNT + 1))
-              fi
-            fi
-          done
-
-          # Check each flavor input explicitly
-          if [ "${{ inputs.android_flavor1 }}" = "true" ]; then
-            FLAVOR_NAME=$(get_flavor_name "flavor1")
-            if [ -n "$FLAVOR_NAME" ]; then
-              [ $ANDROID_COUNT -gt 0 ] && ANDROID_FLAVORS="${ANDROID_FLAVORS},"
-              ANDROID_FLAVORS="${ANDROID_FLAVORS}{\"slot\":\"flavor1\",\"name\":\"$FLAVOR_NAME\"}"
-              ANDROID_COUNT=$((ANDROID_COUNT + 1))
-            fi
-          fi
-
-          # Reset and rebuild properly
-          ANDROID_FLAVORS="["
-          ANDROID_COUNT=0
-
-          check_and_add_flavor() {
-            local platform=$1
-            local slot=$2
-            local input_value=$3
-            local current_array=$4
-            local current_count=$5
-            
-            if [ "$input_value" = "true" ]; then
-              FLAVOR_NAME=$(get_flavor_name "$slot")
-              if [ -n "$FLAVOR_NAME" ]; then
-                if [ $current_count -gt 0 ]; then
-                  echo "${current_array},{\"slot\":\"$slot\",\"name\":\"$FLAVOR_NAME\"}"
-                else
-                  echo "${current_array}{\"slot\":\"$slot\",\"name\":\"$FLAVOR_NAME\"}"
-                fi
-                return 0
-              fi
-            fi
-            echo "$current_array"
-            return 1
-          }
 
           # Build Android matrix
           ANDROID_FLAVORS="["
@@ -506,79 +434,91 @@ jobs:
 
       - name: Load flavor configuration
         id: flavor-config
-        run: |
-          CONFIG_FILE=".github/deploy-config.json"
-          FLAVOR_NAME="${{ matrix.include.name }}"
-
-          echo "🔍 Loading configuration for flavor: $FLAVOR_NAME"
-
-          # Extract flavor-specific config
-          TARGET_FILE=$(jq -r ".flavors[\"$FLAVOR_NAME\"].target_file // \"lib/main.dart\"" "$CONFIG_FILE")
-          FIREBASE_APP_ID=$(jq -r ".flavors[\"$FLAVOR_NAME\"].android.firebase_app_id // empty" "$CONFIG_FILE")
-          BUILD_ARGS=$(jq -r ".flavors[\"$FLAVOR_NAME\"].android.build_args // \"\"" "$CONFIG_FILE")
-          FLAVOR_ARG=$(jq -r ".flavors[\"$FLAVOR_NAME\"].android.flavor // \"\"" "$CONFIG_FILE")
-          GROUPS=$(jq -r ".flavors[\"$FLAVOR_NAME\"].android.distribution_groups // [\"testers\"] | join(\",\")" "$CONFIG_FILE")
-
-          # Firebase project
-          FIREBASE_PROJECT=$(jq -r ".firebase.project_id // empty" "$CONFIG_FILE")
-          SERVICE_ACCOUNT=$(jq -r ".firebase.service_account_path // \"firebase_service_account.json\"" "$CONFIG_FILE")
-
-          # Flutter version
-          FLUTTER_VERSION=$(jq -r ".flutter_version // \"3.38.4\"" "$CONFIG_FILE")
-          FLUTTER_CHANNEL=$(jq -r ".flutter_channel // \"stable\"" "$CONFIG_FILE")
-
-          echo "target_file=$TARGET_FILE" >> $GITHUB_OUTPUT
-          echo "firebase_app_id=$FIREBASE_APP_ID" >> $GITHUB_OUTPUT
-          echo "build_args=$BUILD_ARGS" >> $GITHUB_OUTPUT
-          echo "flavor_arg=$FLAVOR_ARG" >> $GITHUB_OUTPUT
-          echo "groups=$GROUPS" >> $GITHUB_OUTPUT
-          echo "firebase_project=$FIREBASE_PROJECT" >> $GITHUB_OUTPUT
-          echo "service_account=$SERVICE_ACCOUNT" >> $GITHUB_OUTPUT
-          echo "flutter_version=$FLUTTER_VERSION" >> $GITHUB_OUTPUT
-          echo "flutter_channel=$FLUTTER_CHANNEL" >> $GITHUB_OUTPUT
-
-          echo ""
-          echo "📋 Configuration:"
-          echo "  Target: $TARGET_FILE"
-          echo "  Flavor arg: $FLAVOR_ARG"
-          echo "  Firebase App ID: $FIREBASE_APP_ID"
-          echo "  Groups: $GROUPS"
-
-      - name: Prepare deployment
-        uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/prepare-deployment@main
+        uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/manual_full_deploy/actions/load-deploy-config@main
         with:
-          app_name: "${{ matrix.include.name }}"
-          verify_version: "false"
-          verify_files: "lib/firebase_options.dart,firebase_service_account.json"
-          update_analysis_options: "true"
-          analysis_options_ci_file: "analysis_options.yaml-ci"
-          setup_firebase: "true"
-          firebase_project_id: ${{ steps.flavor-config.outputs.firebase_project }}
-          firebase_service_account_path: ${{ steps.flavor-config.outputs.service_account }}
-          build_functions: "false"
-          setup_flutter: "true"
+          flavor_name: ${{ matrix.include.name }}
+          platform: android
+
+      - name: Setup SOPS and decrypt secrets
+        uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/manual_full_deploy/actions/setup-sops@main
+        with:
+          sops_age_key: ${{ secrets.SOPS_AGE_KEY }}
+          verify_files: "lib/firebase_options.dart,${{ steps.flavor-config.outputs.service_account }}"
+
+      - name: Setup Flutter environment
+        uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/manual_full_deploy/actions/setup-flutter-env@main
+        with:
           flutter_version: ${{ steps.flavor-config.outputs.flutter_version }}
           flutter_channel: ${{ steps.flavor-config.outputs.flutter_channel }}
-          flutter_analyze: "true"
-          update_release_info: "true"
-          release_info_path: "lib/features/about/release_info.dart"
-          generate_release_notes: "true"
-          version_override: ${{ inputs.version }}
-          sops_age_key: ${{ secrets.SOPS_AGE_KEY }}
-        env:
-          SOPS_AGE_KEY: ${{ secrets.SOPS_AGE_KEY }}
+          run_analyze: "true"
 
-      - name: Build and deploy APK to Firebase App Distribution
-        uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/build-deploy-flutter-apk@main
+      - name: Cache Gradle dependencies
+        uses: actions/cache@v3
         with:
-          target_file: ${{ steps.flavor-config.outputs.target_file }}
-          flavor: ${{ steps.flavor-config.outputs.flavor_arg }}
-          build_args: --build-name=${{ inputs.version }} ${{ steps.flavor-config.outputs.build_args }}
-          firebase_app_id: ${{ steps.flavor-config.outputs.firebase_app_id }}
-          release_notes: ${{ inputs.release_notes }}
-          groups: ${{ steps.flavor-config.outputs.groups }}
-          service_account_path: ${{ steps.flavor-config.outputs.service_account }}
-          deploy_trigger_paths: ""
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+            android/.gradle
+          key: ${{ runner.os }}-gradle-${{ hashFiles('android/**/*.gradle*', 'android/**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Build Flutter APK
+        run: |
+          TARGET_FILE="${{ steps.flavor-config.outputs.target_file }}"
+          FLAVOR="${{ steps.flavor-config.outputs.flavor_arg }}"
+          BUILD_ARGS="${{ steps.flavor-config.outputs.build_args }}"
+
+          echo "🔍 Building Flutter APK..."
+          echo "📋 Target: $TARGET_FILE"
+          echo "📋 Flavor: ${FLAVOR:-'(none)'}"
+
+          BUILD_CMD="flutter build apk --release -t $TARGET_FILE"
+          [ -n "$FLAVOR" ] && BUILD_CMD="$BUILD_CMD --flavor $FLAVOR"
+          BUILD_CMD="$BUILD_CMD --build-name=${{ inputs.version }} $BUILD_ARGS"
+
+          echo "🚀 Running: $BUILD_CMD"
+          $BUILD_CMD
+
+          echo "✅ APK build completed"
+
+          # Find and set APK path
+          if [ -n "$FLAVOR" ]; then
+            APK_PATH="build/app/outputs/apk/$FLAVOR/release/app-$FLAVOR-release.apk"
+            if [ ! -f "$APK_PATH" ]; then
+              APK_PATH="build/app/outputs/flutter-apk/app-$FLAVOR-release.apk"
+            fi
+          else
+            APK_PATH="build/app/outputs/flutter-apk/app-release.apk"
+            if [ ! -f "$APK_PATH" ]; then
+              APK_PATH="build/app/outputs/apk/release/app-release.apk"
+            fi
+          fi
+
+          echo "APK_OUTPUT_PATH=$APK_PATH" >> $GITHUB_ENV
+          echo "📦 APK path: $APK_PATH"
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: apk-${{ matrix.include.name }}
+          path: ${{ env.APK_OUTPUT_PATH }}
+
+      - name: Setup Firebase CLI
+        uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/manual_full_deploy/actions/setup-firebase-cli@main
+
+      - name: Deploy to Firebase App Distribution
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ github.workspace }}/${{ steps.flavor-config.outputs.service_account }}
+        run: |
+          echo "🚀 Deploying to Firebase App Distribution..."
+
+          firebase appdistribution:distribute "$APK_OUTPUT_PATH" \
+            --app "${{ steps.flavor-config.outputs.firebase_app_id }}" \
+            --groups "${{ steps.flavor-config.outputs.groups }}" \
+            --release-notes "${{ inputs.release_notes }}"
+
+          echo "✅ Android deployment completed"
 
   # ============================================================================
   # iOS DEPLOYMENT JOB
@@ -602,59 +542,24 @@ jobs:
 
       - name: Load flavor configuration
         id: flavor-config
-        run: |
-          CONFIG_FILE=".github/deploy-config.json"
-          FLAVOR_NAME="${{ matrix.include.name }}"
-
-          echo "🔍 Loading configuration for flavor: $FLAVOR_NAME"
-
-          TARGET_FILE=$(jq -r ".flavors[\"$FLAVOR_NAME\"].target_file // \"lib/main.dart\"" "$CONFIG_FILE")
-          FIREBASE_APP_ID=$(jq -r ".flavors[\"$FLAVOR_NAME\"].ios.firebase_app_id // empty" "$CONFIG_FILE")
-          BUILD_ARGS=$(jq -r ".flavors[\"$FLAVOR_NAME\"].ios.build_args // \"\"" "$CONFIG_FILE")
-          FLAVOR_ARG=$(jq -r ".flavors[\"$FLAVOR_NAME\"].ios.flavor // \"\"" "$CONFIG_FILE")
-          GROUPS=$(jq -r ".flavors[\"$FLAVOR_NAME\"].ios.distribution_groups // [\"testers\"] | join(\",\")" "$CONFIG_FILE")
-
-          FIREBASE_PROJECT=$(jq -r ".firebase.project_id // empty" "$CONFIG_FILE")
-          SERVICE_ACCOUNT=$(jq -r ".firebase.service_account_path // \"firebase_service_account.json\"" "$CONFIG_FILE")
-          FLUTTER_VERSION=$(jq -r ".flutter_version // \"3.38.4\"" "$CONFIG_FILE")
-          FLUTTER_CHANNEL=$(jq -r ".flutter_channel // \"stable\"" "$CONFIG_FILE")
-
-          echo "target_file=$TARGET_FILE" >> $GITHUB_OUTPUT
-          echo "firebase_app_id=$FIREBASE_APP_ID" >> $GITHUB_OUTPUT
-          echo "build_args=$BUILD_ARGS" >> $GITHUB_OUTPUT
-          echo "flavor_arg=$FLAVOR_ARG" >> $GITHUB_OUTPUT
-          echo "groups=$GROUPS" >> $GITHUB_OUTPUT
-          echo "firebase_project=$FIREBASE_PROJECT" >> $GITHUB_OUTPUT
-          echo "service_account=$SERVICE_ACCOUNT" >> $GITHUB_OUTPUT
-          echo "flutter_version=$FLUTTER_VERSION" >> $GITHUB_OUTPUT
-          echo "flutter_channel=$FLUTTER_CHANNEL" >> $GITHUB_OUTPUT
-
-      - name: Install SOPS for macOS
-        run: |
-          echo "📦 Installing SOPS for macOS..."
-          ARCH=$(uname -m)
-          if [ "$ARCH" = "arm64" ]; then
-            SOPS_URL="https://github.com/mozilla/sops/releases/download/v3.7.3/sops-v3.7.3.darwin.arm64"
-          else
-            SOPS_URL="https://github.com/mozilla/sops/releases/download/v3.7.3/sops-v3.7.3.darwin"
-          fi
-          curl -sSL -o sops "$SOPS_URL"
-          chmod +x sops
-          sudo mv sops /usr/local/bin/
-          sops --version
-
-      - name: Decrypt secrets
-        env:
-          SOPS_AGE_KEY: ${{ secrets.SOPS_AGE_KEY }}
-        run: |
-          echo "🔓 Decrypting secrets..."
-          curl -sSL "https://raw.githubusercontent.com/Anyhoosolutions/flutter_platform_kit/main/tools/sops_secrets/decrypt-secrets.sh" | bash
-
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
+        uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/manual_full_deploy/actions/load-deploy-config@main
         with:
-          channel: ${{ steps.flavor-config.outputs.flutter_channel }}
-          flutter-version: ${{ steps.flavor-config.outputs.flutter_version }}
+          flavor_name: ${{ matrix.include.name }}
+          platform: ios
+
+      - name: Setup SOPS and decrypt secrets (macOS)
+        uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/manual_full_deploy/actions/setup-sops@main
+        with:
+          sops_age_key: ${{ secrets.SOPS_AGE_KEY }}
+          verify_files: "lib/firebase_options.dart,${{ steps.flavor-config.outputs.service_account }}"
+          runner_os: macos
+
+      - name: Setup Flutter environment
+        uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/manual_full_deploy/actions/setup-flutter-env@main
+        with:
+          flutter_version: ${{ steps.flavor-config.outputs.flutter_version }}
+          flutter_channel: ${{ steps.flavor-config.outputs.flutter_channel }}
+          run_analyze: "true"
 
       - name: Cache CocoaPods
         uses: actions/cache@v3
@@ -666,12 +571,6 @@ jobs:
           key: ${{ runner.os }}-pods-${{ hashFiles('ios/Podfile.lock') }}
           restore-keys: |
             ${{ runner.os }}-pods-
-
-      - name: Get Flutter dependencies
-        run: flutter pub get
-
-      - name: Flutter analyze
-        run: flutter analyze
 
       - name: Install CocoaPods dependencies
         working-directory: ios
@@ -690,8 +589,8 @@ jobs:
           echo "🚀 Running: $BUILD_CMD"
           $BUILD_CMD
 
-      - name: Install Firebase CLI
-        run: npm install -g firebase-tools
+      - name: Setup Firebase CLI
+        uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/manual_full_deploy/actions/setup-firebase-cli@main
 
       - name: Deploy to Firebase App Distribution
         env:
@@ -736,72 +635,73 @@ jobs:
 
       - name: Load flavor configuration
         id: flavor-config
-        run: |
-          CONFIG_FILE=".github/deploy-config.json"
-          FLAVOR_NAME="${{ matrix.include.name }}"
-
-          echo "🔍 Loading configuration for flavor: $FLAVOR_NAME"
-
-          TARGET_FILE=$(jq -r ".flavors[\"$FLAVOR_NAME\"].target_file // \"lib/main.dart\"" "$CONFIG_FILE")
-          HOSTING_TARGET=$(jq -r ".flavors[\"$FLAVOR_NAME\"].web.hosting_target // \"\"" "$CONFIG_FILE")
-          DEPLOY_ONLY=$(jq -r ".flavors[\"$FLAVOR_NAME\"].web.deploy_only // \"hosting\"" "$CONFIG_FILE")
-          BUILD_ARGS=$(jq -r ".flavors[\"$FLAVOR_NAME\"].web.build_args // \"\"" "$CONFIG_FILE")
-          BUILD_FUNCTIONS=$(jq -r ".flavors[\"$FLAVOR_NAME\"].web.build_functions // false" "$CONFIG_FILE")
-
-          FIREBASE_PROJECT=$(jq -r ".firebase.project_id // empty" "$CONFIG_FILE")
-          SERVICE_ACCOUNT=$(jq -r ".firebase.service_account_path // \"firebase_service_account.json\"" "$CONFIG_FILE")
-          FLUTTER_VERSION=$(jq -r ".flutter_version // \"3.38.4\"" "$CONFIG_FILE")
-          FLUTTER_CHANNEL=$(jq -r ".flutter_channel // \"stable\"" "$CONFIG_FILE")
-          FUNCTIONS_PATH=$(jq -r ".functions.path // \"functions\"" "$CONFIG_FILE")
-
-          echo "target_file=$TARGET_FILE" >> $GITHUB_OUTPUT
-          echo "hosting_target=$HOSTING_TARGET" >> $GITHUB_OUTPUT
-          echo "deploy_only=$DEPLOY_ONLY" >> $GITHUB_OUTPUT
-          echo "build_args=$BUILD_ARGS" >> $GITHUB_OUTPUT
-          echo "build_functions=$BUILD_FUNCTIONS" >> $GITHUB_OUTPUT
-          echo "firebase_project=$FIREBASE_PROJECT" >> $GITHUB_OUTPUT
-          echo "service_account=$SERVICE_ACCOUNT" >> $GITHUB_OUTPUT
-          echo "flutter_version=$FLUTTER_VERSION" >> $GITHUB_OUTPUT
-          echo "flutter_channel=$FLUTTER_CHANNEL" >> $GITHUB_OUTPUT
-          echo "functions_path=$FUNCTIONS_PATH" >> $GITHUB_OUTPUT
-
-      - name: Prepare deployment
-        uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/prepare-deployment@main
+        uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/manual_full_deploy/actions/load-deploy-config@main
         with:
-          app_name: "${{ matrix.include.name }}"
-          verify_version: "false"
-          verify_files: "lib/firebase_options.dart,firebase_service_account.json"
-          update_analysis_options: "true"
-          analysis_options_ci_file: "analysis_options.yaml-ci"
-          setup_firebase: "true"
-          firebase_project_id: ${{ steps.flavor-config.outputs.firebase_project }}
-          firebase_service_account_path: ${{ steps.flavor-config.outputs.service_account }}
-          build_functions: ${{ steps.flavor-config.outputs.build_functions }}
-          functions_path: ${{ steps.flavor-config.outputs.functions_path }}
-          functions_chmod_biome: "true"
-          setup_flutter: "true"
+          flavor_name: ${{ matrix.include.name }}
+          platform: web
+
+      - name: Setup SOPS and decrypt secrets
+        uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/manual_full_deploy/actions/setup-sops@main
+        with:
+          sops_age_key: ${{ secrets.SOPS_AGE_KEY }}
+          verify_files: "lib/firebase_options.dart,${{ steps.flavor-config.outputs.service_account }}"
+
+      - name: Setup Flutter environment
+        uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/manual_full_deploy/actions/setup-flutter-env@main
+        with:
           flutter_version: ${{ steps.flavor-config.outputs.flutter_version }}
           flutter_channel: ${{ steps.flavor-config.outputs.flutter_channel }}
-          flutter_analyze: "true"
-          update_release_info: "true"
-          release_info_path: "lib/features/about/release_info.dart"
-          generate_release_notes: "false"
-          sops_age_key: ${{ secrets.SOPS_AGE_KEY }}
-          version_override: ${{ inputs.version }}
-        env:
-          SOPS_AGE_KEY: ${{ secrets.SOPS_AGE_KEY }}
+          run_analyze: "true"
 
-      - name: Build and deploy Web to Firebase Hosting
-        uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/build-deploy-flutter-web@main
-        with:
-          target_file: ${{ steps.flavor-config.outputs.target_file }}
-          build_args: ${{ steps.flavor-config.outputs.build_args }}
-          firebase_project_id: ${{ steps.flavor-config.outputs.firebase_project }}
-          firebase_hosting_target: ${{ steps.flavor-config.outputs.hosting_target }}
-          firebase_deploy_only: ${{ steps.flavor-config.outputs.deploy_only }}
-          firebase_deploy_args: "--non-interactive"
-          service_account_path: ${{ steps.flavor-config.outputs.service_account }}
-          deploy_trigger_paths: ""
+      - name: Build and install functions (if needed)
+        if: steps.flavor-config.outputs.build_functions == 'true'
+        run: |
+          FUNCTIONS_PATH="${{ steps.flavor-config.outputs.functions_path }}"
+          echo "📦 Installing and building functions in $FUNCTIONS_PATH..."
+
+          cd "$FUNCTIONS_PATH"
+          npm install
+
+          # Handle biome binary permissions
+          if [ -f "node_modules/@biomejs/cli-linux-x64/biome" ]; then
+            chmod +x node_modules/@biomejs/cli-linux-x64/biome
+          fi
+
+          npm run build
+          cd ..
+          echo "✅ Functions built successfully"
+
+      - name: Build Flutter Web
+        run: |
+          TARGET_FILE="${{ steps.flavor-config.outputs.target_file }}"
+          BUILD_ARGS="${{ steps.flavor-config.outputs.build_args }}"
+
+          echo "🔍 Building Flutter Web..."
+          flutter build web --release -t "$TARGET_FILE" $BUILD_ARGS
+          echo "✅ Web build completed"
+
+      - name: Setup Firebase CLI
+        uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/manual_full_deploy/actions/setup-firebase-cli@main
+
+      - name: Deploy to Firebase Hosting
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ github.workspace }}/${{ steps.flavor-config.outputs.service_account }}
+        run: |
+          FIREBASE_PROJECT="${{ steps.flavor-config.outputs.firebase_project }}"
+          HOSTING_TARGET="${{ steps.flavor-config.outputs.hosting_target }}"
+          DEPLOY_ONLY="${{ steps.flavor-config.outputs.deploy_only }}"
+
+          echo "🚀 Deploying to Firebase Hosting..."
+
+          if [ -n "$DEPLOY_ONLY" ]; then
+            firebase deploy --only "$DEPLOY_ONLY" --project "$FIREBASE_PROJECT" --non-interactive
+          elif [ -n "$HOSTING_TARGET" ]; then
+            firebase deploy --only "hosting:$HOSTING_TARGET" --project "$FIREBASE_PROJECT" --non-interactive
+          else
+            firebase deploy --only hosting --project "$FIREBASE_PROJECT" --non-interactive
+          fi
+
+          echo "✅ Web deployment completed"
 
   # ============================================================================
   # FUNCTIONS DEPLOYMENT JOB
@@ -838,20 +738,14 @@ jobs:
           echo "build_cmd=$BUILD_CMD" >> $GITHUB_OUTPUT
           echo "chmod_biome=$CHMOD_BIOME" >> $GITHUB_OUTPUT
 
-      - name: Install SOPS
-        run: |
-          wget -O sops https://github.com/mozilla/sops/releases/download/v3.7.3/sops-v3.7.3.linux
-          chmod +x sops
-          sudo mv sops /usr/local/bin/
+      - name: Setup SOPS and decrypt secrets
+        uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/manual_full_deploy/actions/setup-sops@main
+        with:
+          sops_age_key: ${{ secrets.SOPS_AGE_KEY }}
+          verify_files: "${{ steps.config.outputs.service_account }}"
 
-      - name: Decrypt secrets
-        env:
-          SOPS_AGE_KEY: ${{ secrets.SOPS_AGE_KEY }}
-        run: |
-          curl -sSL "https://raw.githubusercontent.com/Anyhoosolutions/flutter_platform_kit/main/tools/sops_secrets/decrypt-secrets.sh" | bash
-
-      - name: Install Firebase CLI
-        run: npm install -g firebase-tools
+      - name: Setup Firebase CLI
+        uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/manual_full_deploy/actions/setup-firebase-cli@main
 
       - name: Install and build functions
         working-directory: ${{ steps.config.outputs.functions_path }}
@@ -911,26 +805,17 @@ jobs:
           echo "flutter_version=$FLUTTER_VERSION" >> $GITHUB_OUTPUT
           echo "flutter_channel=$FLUTTER_CHANNEL" >> $GITHUB_OUTPUT
 
-      - name: Install SOPS
-        run: |
-          wget -O sops https://github.com/mozilla/sops/releases/download/v3.7.3/sops-v3.7.3.linux
-          chmod +x sops
-          sudo mv sops /usr/local/bin/
-
-      - name: Decrypt secrets
-        env:
-          SOPS_AGE_KEY: ${{ secrets.SOPS_AGE_KEY }}
-        run: |
-          curl -sSL "https://raw.githubusercontent.com/Anyhoosolutions/flutter_platform_kit/main/tools/sops_secrets/decrypt-secrets.sh" | bash
-
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
+      - name: Setup SOPS and decrypt secrets
+        uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/manual_full_deploy/actions/setup-sops@main
         with:
-          channel: ${{ steps.config.outputs.flutter_channel }}
-          flutter-version: ${{ steps.config.outputs.flutter_version }}
+          sops_age_key: ${{ secrets.SOPS_AGE_KEY }}
+          verify_files: "${{ steps.config.outputs.service_account }}"
 
-      - name: Get main app dependencies
-        run: flutter pub get
+      - name: Setup Flutter environment
+        uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/manual_full_deploy/actions/setup-flutter-env@main
+        with:
+          flutter_version: ${{ steps.config.outputs.flutter_version }}
+          flutter_channel: ${{ steps.config.outputs.flutter_channel }}
 
       - name: Get Widgetbook dependencies
         working-directory: ${{ steps.config.outputs.widgetbook_dir }}
@@ -944,8 +829,8 @@ jobs:
         working-directory: ${{ steps.config.outputs.widgetbook_dir }}
         run: flutter build web
 
-      - name: Install Firebase CLI
-        run: npm install -g firebase-tools
+      - name: Setup Firebase CLI
+        uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/manual_full_deploy/actions/setup-firebase-cli@main
 
       - name: Deploy Widgetbook
         env:

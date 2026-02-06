@@ -1,0 +1,49 @@
+name: "Setup Firebase CLI"
+description: "Install Firebase CLI and optionally test authentication"
+
+inputs:
+  test_auth:
+    description: "Whether to test Firebase authentication"
+    required: false
+    default: "false"
+  firebase_project_id:
+    description: "Firebase project ID for authentication test"
+    required: false
+    default: ""
+  service_account_path:
+    description: "Path to Firebase service account JSON file"
+    required: false
+    default: "firebase_service_account.json"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Install Firebase CLI
+      shell: bash
+      run: |
+        echo "📦 Installing Firebase CLI..."
+        npm install -g firebase-tools
+        echo "✅ Firebase CLI installed: $(firebase --version)"
+
+    - name: Test Firebase service account authentication
+      shell: bash
+      if: inputs.test_auth == 'true' && inputs.firebase_project_id != ''
+      env:
+        GOOGLE_APPLICATION_CREDENTIALS: ${{ github.workspace }}/${{ inputs.service_account_path }}
+      run: |
+        echo "🔍 Testing Firebase service account authentication..."
+        echo "📋 Service account file: $GOOGLE_APPLICATION_CREDENTIALS"
+
+        # Test authentication by listing projects (lightweight operation)
+        if firebase projects:list --project ${{ inputs.firebase_project_id }} > /dev/null 2>&1; then
+          echo "✅ Firebase authentication successful!"
+          echo "✅ Service account has access to project: ${{ inputs.firebase_project_id }}"
+        else
+          echo "❌ Firebase authentication failed!"
+          echo "❌ Service account may not have proper permissions"
+          echo "❌ Please verify the service account has the following roles:"
+          echo "   - Firebase Admin (or Firebase Admin SDK Administrator Service Agent)"
+          echo "   - Service Account Admin"
+          echo "   - Service Usage Admin"
+          exit 1
+        fi

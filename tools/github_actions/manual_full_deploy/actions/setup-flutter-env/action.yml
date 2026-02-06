@@ -1,0 +1,69 @@
+name: "Setup Flutter Environment"
+description: "Setup Flutter, cache dependencies, get packages, and optionally analyze"
+
+inputs:
+  flutter_version:
+    description: "Flutter version to use"
+    required: false
+    default: "3.38.4"
+  flutter_channel:
+    description: "Flutter channel to use"
+    required: false
+    default: "stable"
+  run_analyze:
+    description: "Whether to run flutter analyze"
+    required: false
+    default: "false"
+  working_directory:
+    description: "Working directory for flutter commands"
+    required: false
+    default: "."
+  cache_key_prefix:
+    description: "Prefix for cache key"
+    required: false
+    default: ""
+
+runs:
+  using: "composite"
+  steps:
+    - name: Set up Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: ${{ inputs.flutter_version }}
+        channel: ${{ inputs.flutter_channel }}
+
+    - name: Show Flutter version
+      shell: bash
+      run: |
+        echo "📱 Flutter version:"
+        flutter --version
+
+    - name: Cache Flutter dependencies
+      uses: actions/cache@v3
+      with:
+        path: |
+          .pub-cache/bin
+          .pub-cache/global_packages
+          .pub-cache/hosted
+          .dart_tool
+          .packages
+        key: ${{ runner.os }}-${{ inputs.cache_key_prefix }}flutter-${{ hashFiles('**/pubspec.yaml') }}
+        restore-keys: |
+          ${{ runner.os }}-${{ inputs.cache_key_prefix }}flutter-
+
+    - name: Get Flutter dependencies
+      shell: bash
+      working-directory: ${{ inputs.working_directory }}
+      run: |
+        echo "📦 Getting Flutter dependencies..."
+        flutter pub get
+        echo "✅ Flutter dependencies installed"
+
+    - name: Flutter analyze
+      shell: bash
+      if: inputs.run_analyze == 'true'
+      working-directory: ${{ inputs.working_directory }}
+      run: |
+        echo "🔍 Running Flutter analyze..."
+        flutter analyze
+        echo "✅ Flutter analyze completed"
