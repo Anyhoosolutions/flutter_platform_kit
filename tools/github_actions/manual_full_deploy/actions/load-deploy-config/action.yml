@@ -98,6 +98,17 @@ runs:
         echo "  Flutter: $FLUTTER_VERSION ($FLUTTER_CHANNEL)"
         echo "  Firebase Project: $FIREBASE_PROJECT"
 
+    - name: Debug inputs
+      id: debug-inputs
+      shell: bash
+      run: |
+        echo "🔍 Action inputs:"
+        echo "  config_file: '${{ inputs.config_file }}'"
+        echo "  flavor_name: '${{ inputs.flavor_name }}'"
+        echo "  platform: '${{ inputs.platform }}'"
+        echo "  flavor_name empty check: ${{ inputs.flavor_name == '' }}"
+        echo "  flavor_name not-empty check: ${{ inputs.flavor_name != '' }}"
+
     - name: Load flavor configuration
       id: load-flavor
       shell: bash
@@ -106,6 +117,11 @@ runs:
         CONFIG_FILE="${{ inputs.config_file }}"
         FLAVOR_NAME="${{ inputs.flavor_name }}"
         PLATFORM="${{ inputs.platform }}"
+
+        echo "🔍 load-flavor step is running!"
+        echo "  CONFIG_FILE: $CONFIG_FILE"
+        echo "  FLAVOR_NAME: $FLAVOR_NAME"
+        echo "  PLATFORM: $PLATFORM"
 
         # Safety check - exit gracefully if flavor_name is empty
         if [ -z "$FLAVOR_NAME" ]; then
