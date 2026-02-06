@@ -115,9 +115,14 @@ runs:
 
         echo "🔍 Loading configuration for flavor: $FLAVOR_NAME, platform: $PLATFORM"
 
+        # Debug: show what we're looking for
+        echo "📋 Config file contents for this flavor:"
+        jq ".flavors[\"$FLAVOR_NAME\"]" "$CONFIG_FILE" || echo "Failed to extract flavor config"
+
         # Extract flavor-specific config
         TARGET_FILE=$(jq -r ".flavors[\"$FLAVOR_NAME\"].target_file // \"lib/main.dart\"" "$CONFIG_FILE")
-
+        
+        echo "📋 Extracted target_file: $TARGET_FILE"
         echo "target_file=$TARGET_FILE" >> $GITHUB_OUTPUT
 
         # Platform-specific config

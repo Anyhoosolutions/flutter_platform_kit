@@ -512,6 +512,22 @@ Ensure your service account has these roles:
 - Service Usage Consumer
 - Cloud Functions Admin (if deploying functions)
 
+### Flutter analyze fails on unrelated directories
+
+If `flutter analyze` fails due to errors in directories like `widgetbook/`, `scripts/`, or other subdirectories that aren't part of your main app, update your `analysis_options.yaml` to exclude them:
+
+```yaml
+analyzer:
+  exclude:
+    - build/**
+    - lib/**.freezed.dart
+    - lib/**.g.dart
+    - widgetbook/**       # Add this
+    - scripts/**          # Add this
+```
+
+This is needed because CI runs analyze from the repo root, which may pick up separate packages that have their own analysis settings.
+
 ## Files Reference
 
 | File | Location | Purpose |
