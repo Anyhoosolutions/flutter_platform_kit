@@ -110,6 +110,13 @@ for action_dir in tools/github_actions/*/; do
     else
       echo "  ✅ $action_name/README.md"
     fi
+    
+    # Copy additional .md files (excluding README.md and CHANGELOG.md)
+    find "$action_dir" -maxdepth 1 -type f -name "*.md" ! -name "README.md" ! -name "CHANGELOG.md" 2>/dev/null | while read -r doc_file; do
+      filename=$(basename "$doc_file")
+      cp "$doc_file" "$DOCS_DIR/$action_name/$filename"
+      echo "  ✅ $action_name/$filename"
+    done
   fi
 done
 echo ""

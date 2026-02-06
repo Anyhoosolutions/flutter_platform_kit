@@ -31,8 +31,7 @@
 			"web": {
 				"hosting_target": "app",
 				"deploy_only": "hosting,functions,firestore,storage",
-				"build_args": "",
-				"build_functions": true
+				"build_args": ""
 			}
 		},
 		"admin": {
@@ -52,9 +51,8 @@
 			},
 			"web": {
 				"hosting_target": "admin",
-				"deploy_only": "hosting:admin",
-				"build_args": "",
-				"build_functions": false
+				"deploy_only": "hosting",
+				"build_args": ""
 			}
 		}
 	},
