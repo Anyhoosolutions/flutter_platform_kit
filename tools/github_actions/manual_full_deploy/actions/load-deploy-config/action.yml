@@ -44,9 +44,9 @@ outputs:
   flavor_arg:
     description: "Flavor argument for build command"
     value: ${{ steps.load-flavor.outputs.flavor_arg }}
-  groups:
+  firebase_groups:
     description: "Distribution groups (Android/iOS)"
-    value: ${{ steps.load-flavor.outputs.groups }}
+    value: ${{ steps.load-flavor.outputs.firebase_groups }}
   hosting_target:
     description: "Firebase hosting target (Web)"
     value: ${{ steps.load-flavor.outputs.hosting_target }}
@@ -160,24 +160,24 @@ runs:
           echo "  build_args: $BUILD_ARGS"
           FLAVOR_ARG=$(jq -r ".flavors[\"$FLAVOR_NAME\"].android.flavor // \"\"" "$CONFIG_FILE") || echo "Failed to extract flavor"
           echo "  flavor_arg: $FLAVOR_ARG"
-          GROUPS=$(jq -r ".flavors[\"$FLAVOR_NAME\"].android.distribution_groups // [\"testers\"] | join(\",\")" "$CONFIG_FILE") || echo "Failed to extract groups"
-          echo "  groups: $GROUPS"
+          FIREBASE_GROUPS=$(jq -r ".flavors[\"$FLAVOR_NAME\"].android.distribution_groups // [\"testers\"] | join(\",\")" "$CONFIG_FILE") || echo "Failed to extract groups"
+          echo "  firebase_groups: $FIREBASE_GROUPS"
 
           echo "firebase_app_id=$FIREBASE_APP_ID" >> $GITHUB_OUTPUT
           echo "build_args=$BUILD_ARGS" >> $GITHUB_OUTPUT
           echo "flavor_arg=$FLAVOR_ARG" >> $GITHUB_OUTPUT
-          echo "groups=$GROUPS" >> $GITHUB_OUTPUT
+          echo "firebase_groups=$FIREBASE_GROUPS" >> $GITHUB_OUTPUT
 
         elif [ "$PLATFORM" = "ios" ]; then
           FIREBASE_APP_ID=$(jq -r ".flavors[\"$FLAVOR_NAME\"].ios.firebase_app_id // \"\"" "$CONFIG_FILE")
           BUILD_ARGS=$(jq -r ".flavors[\"$FLAVOR_NAME\"].ios.build_args // \"\"" "$CONFIG_FILE")
           FLAVOR_ARG=$(jq -r ".flavors[\"$FLAVOR_NAME\"].ios.flavor // \"\"" "$CONFIG_FILE")
-          GROUPS=$(jq -r ".flavors[\"$FLAVOR_NAME\"].ios.distribution_groups // [\"testers\"] | join(\",\")" "$CONFIG_FILE")
+          FIREBASE_GROUPS=$(jq -r ".flavors[\"$FLAVOR_NAME\"].ios.distribution_groups // [\"testers\"] | join(\",\")" "$CONFIG_FILE")
 
           echo "firebase_app_id=$FIREBASE_APP_ID" >> $GITHUB_OUTPUT
           echo "build_args=$BUILD_ARGS" >> $GITHUB_OUTPUT
           echo "flavor_arg=$FLAVOR_ARG" >> $GITHUB_OUTPUT
-          echo "groups=$GROUPS" >> $GITHUB_OUTPUT
+          echo "firebase_groups=$FIREBASE_GROUPS" >> $GITHUB_OUTPUT
 
         elif [ "$PLATFORM" = "web" ]; then
           HOSTING_TARGET=$(jq -r ".flavors[\"$FLAVOR_NAME\"].web.hosting_target // \"\"" "$CONFIG_FILE")

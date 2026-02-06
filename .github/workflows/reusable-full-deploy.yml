@@ -487,12 +487,12 @@ jobs:
           echo "🔍 Building Flutter APK..."
           echo "📋 Target: $TARGET_FILE"
           echo "📋 Flavor: ${FLAVOR:-'(none)'}"
-          
+
           if [ -z "$TARGET_FILE" ]; then
             echo "❌ Target file is empty! Falling back to lib/main.dart"
             TARGET_FILE="lib/main.dart"
           fi
-          
+
           if [ ! -f "$TARGET_FILE" ]; then
             echo "❌ Target file \"$TARGET_FILE\" not found."
             exit 1
@@ -540,7 +540,7 @@ jobs:
 
           firebase appdistribution:distribute "$APK_OUTPUT_PATH" \
             --app "${{ steps.flavor-config.outputs.firebase_app_id }}" \
-            --groups "${{ steps.flavor-config.outputs.groups }}" \
+            --groups "${{ steps.flavor-config.outputs.firebase_groups }}" \
             --release-notes "${{ inputs.release_notes }}"
 
           echo "✅ Android deployment completed"
@@ -584,7 +584,7 @@ jobs:
           echo "  target_file: '${{ steps.flavor-config.outputs.target_file }}'"
           echo "  firebase_app_id: '${{ steps.flavor-config.outputs.firebase_app_id }}'"
           echo "  flavor_arg: '${{ steps.flavor-config.outputs.flavor_arg }}'"
-          
+
           if [ -z "${{ steps.flavor-config.outputs.target_file }}" ]; then
             echo "❌ ERROR: target_file is empty!"
             exit 1
@@ -634,12 +634,12 @@ jobs:
           echo "🔍 Building iOS..."
           echo "📋 Target: $TARGET"
           echo "📋 Flavor: ${FLAVOR:-'(none)'}"
-          
+
           if [ -z "$TARGET" ]; then
             echo "❌ Target file is empty! Falling back to lib/main.dart"
             TARGET="lib/main.dart"
           fi
-          
+
           if [ ! -f "$TARGET" ]; then
             echo "❌ Target file \"$TARGET\" not found."
             exit 1
@@ -671,7 +671,7 @@ jobs:
 
           firebase appdistribution:distribute "$APP_PATH" \
             --app "${{ steps.flavor-config.outputs.firebase_app_id }}" \
-            --groups "${{ steps.flavor-config.outputs.groups }}" \
+            --groups "${{ steps.flavor-config.outputs.firebase_groups }}" \
             --release-notes "${{ inputs.release_notes }}"
 
           echo "✅ iOS deployment completed"
@@ -716,7 +716,7 @@ jobs:
           echo "  hosting_target: '${{ steps.flavor-config.outputs.hosting_target }}'"
           echo "  deploy_only: '${{ steps.flavor-config.outputs.deploy_only }}'"
           echo "  flutter_version: '${{ steps.flavor-config.outputs.flutter_version }}'"
-          
+
           # Validate target_file
           if [ -z "${{ steps.flavor-config.outputs.target_file }}" ]; then
             echo "❌ ERROR: target_file is empty!"
@@ -769,17 +769,17 @@ jobs:
 
           echo "🔍 Building Flutter Web..."
           echo "📋 Target: $TARGET_FILE"
-          
+
           if [ -z "$TARGET_FILE" ]; then
             echo "❌ Target file is empty! Falling back to lib/main.dart"
             TARGET_FILE="lib/main.dart"
           fi
-          
+
           if [ ! -f "$TARGET_FILE" ]; then
             echo "❌ Target file \"$TARGET_FILE\" not found."
             exit 1
           fi
-          
+
           flutter build web --release -t "$TARGET_FILE" $BUILD_ARGS
           echo "✅ Web build completed"
 
