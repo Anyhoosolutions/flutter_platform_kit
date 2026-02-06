@@ -432,12 +432,26 @@ jobs:
           ref: ${{ needs.prepare.outputs.checkout_ref }}
           fetch-depth: 0
 
+      - name: Debug matrix values
+        run: |
+          echo "🔍 Matrix debug:"
+          echo "  matrix.include.slot: ${{ matrix.include.slot }}"
+          echo "  matrix.include.name: ${{ matrix.include.name }}"
+
       - name: Load flavor configuration
         id: flavor-config
         uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/manual_full_deploy/actions/load-deploy-config@main
         with:
           flavor_name: ${{ matrix.include.name }}
           platform: android
+
+      - name: Debug loaded config
+        run: |
+          echo "🔍 Loaded config debug:"
+          echo "  target_file: ${{ steps.flavor-config.outputs.target_file }}"
+          echo "  firebase_app_id: ${{ steps.flavor-config.outputs.firebase_app_id }}"
+          echo "  flavor_arg: ${{ steps.flavor-config.outputs.flavor_arg }}"
+          echo "  build_args: ${{ steps.flavor-config.outputs.build_args }}"
 
       - name: Setup SOPS and decrypt secrets
         uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/manual_full_deploy/actions/setup-sops@main
