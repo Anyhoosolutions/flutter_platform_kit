@@ -139,7 +139,6 @@ jobs:
       has_android: ${{ steps.compute-matrices.outputs.has_android }}
       has_ios: ${{ steps.compute-matrices.outputs.has_ios }}
       has_web: ${{ steps.compute-matrices.outputs.has_web }}
-      has_functions: ${{ steps.compute-matrices.outputs.has_functions }}
       has_widgetbook: ${{ steps.compute-matrices.outputs.has_widgetbook }}
       # Checkout ref
       checkout_ref: ${{ steps.determine-ref.outputs.checkout_ref }}
@@ -204,7 +203,6 @@ jobs:
           echo "  flavor5: ${{ inputs.web_flavor5 }}"
           echo ""
           echo "Other Deployments:"
-          echo "  functions: ${{ inputs.functions }}"
           echo "  widgetbook: ${{ inputs.widgetbook }}"
           echo "===================================================="
 
@@ -365,7 +363,6 @@ jobs:
           echo "has_android=$( [ $ANDROID_COUNT -gt 0 ] && echo 'true' || echo 'false' )" >> $GITHUB_OUTPUT
           echo "has_ios=$( [ $IOS_COUNT -gt 0 ] && echo 'true' || echo 'false' )" >> $GITHUB_OUTPUT
           echo "has_web=$( [ $WEB_COUNT -gt 0 ] && echo 'true' || echo 'false' )" >> $GITHUB_OUTPUT
-          echo "has_functions=${{ inputs.functions }}" >> $GITHUB_OUTPUT
           echo "has_widgetbook=${{ inputs.widgetbook }}" >> $GITHUB_OUTPUT
 
           echo ""
@@ -373,7 +370,6 @@ jobs:
           echo "  Android: $ANDROID_FLAVORS (count: $ANDROID_COUNT)"
           echo "  iOS: $IOS_FLAVORS (count: $IOS_COUNT)"
           echo "  Web: $WEB_FLAVORS (count: $WEB_COUNT)"
-          echo "  Functions: ${{ inputs.functions }}"
           echo "  Widgetbook: ${{ inputs.widgetbook }}"
 
       - name: Check SOPS key availability
@@ -405,7 +401,6 @@ jobs:
              [ "${{ inputs.web_flavor3 }}" != "true" ] && \
              [ "${{ inputs.web_flavor4 }}" != "true" ] && \
              [ "${{ inputs.web_flavor5 }}" != "true" ] && \
-             [ "${{ inputs.functions }}" != "true" ] && \
              [ "${{ inputs.widgetbook }}" != "true" ]; then
             echo "❌ No deployments selected! Please select at least one deployment option."
             exit 1
@@ -416,7 +411,7 @@ jobs:
   # ANDROID DEPLOYMENT JOB
   # ============================================================================
   build-deploy-android:
-    name: Android - ${{ matrix.include.name }}
+    name: Android - ${{ matrix.name }}
     needs: prepare
     if: needs.prepare.outputs.has_android == 'true'
     runs-on: ubuntu-latest
@@ -435,14 +430,14 @@ jobs:
       - name: Debug matrix values
         run: |
           echo "🔍 Matrix debug:"
-          echo "  matrix.include.slot: ${{ matrix.include.slot }}"
-          echo "  matrix.include.name: ${{ matrix.include.name }}"
+          echo "  matrix.slot: ${{ matrix.slot }}"
+          echo "  matrix.name: ${{ matrix.name }}"
 
       - name: Load flavor configuration
         id: flavor-config
         uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/manual_full_deploy/actions/load-deploy-config@main
         with:
-          flavor_name: ${{ matrix.include.name }}
+          flavor_name: ${{ matrix.name }}
           platform: android
 
       - name: Debug loaded config
@@ -476,6 +471,40 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('android/**/*.gradle*', 'android/**/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
+
+      - name: Update release_info.dart
+        run: |
+          RELEASE_INFO_PATH="${{ steps.flavor-config.outputs.release_info_path }}"
+          
+          if [ -z "$RELEASE_INFO_PATH" ] || [ ! -f "$RELEASE_INFO_PATH" ]; then
+            echo "⏭️ Skipping release_info.dart update - file not configured or not found"
+            exit 0
+          fi
+          
+          echo "📝 Updating $RELEASE_INFO_PATH..."
+          
+          VERSION="${{ inputs.version }}"
+          COMMIT_HASH="${{ github.sha }}"
+          COMMIT_HASH_SHORT="${COMMIT_HASH:0:7}"
+          CURRENT_BRANCH="${{ github.ref_name }}"
+          BUILD_DATE=$(date '+%Y-%m-%d %H:%M:%S')
+          
+          # Update release_info.dart file (support both field defaults and constructor defaults)
+          sed -i "s/final String version = '.*';/final String version = '$VERSION';/" "$RELEASE_INFO_PATH"
+          sed -i "s/final String buildDate = '.*';/final String buildDate = '${BUILD_DATE}';/" "$RELEASE_INFO_PATH"
+          sed -i "s/final String commitHash = '.*';/final String commitHash = '${COMMIT_HASH}';/" "$RELEASE_INFO_PATH"
+          sed -i "s/final String branch = '.*';/final String branch = '${CURRENT_BRANCH}';/" "$RELEASE_INFO_PATH"
+          sed -i "s/final String commitHashShort = '.*';/final String commitHashShort = '${COMMIT_HASH_SHORT}';/" "$RELEASE_INFO_PATH"
+          
+          # Constructor format
+          sed -i "s/this\.version = '[^']*'/this.version = '$VERSION'/" "$RELEASE_INFO_PATH"
+          sed -i "s/this\.buildDate = '[^']*'/this.buildDate = '${BUILD_DATE}'/" "$RELEASE_INFO_PATH"
+          sed -i "s/this\.commitHash = '[^']*'/this.commitHash = '${COMMIT_HASH}'/" "$RELEASE_INFO_PATH"
+          sed -i "s/this\.branch = '[^']*'/this.branch = '${CURRENT_BRANCH}'/" "$RELEASE_INFO_PATH"
+          sed -i "s/this\.commitHashShort = '[^']*'/this.commitHashShort = '${COMMIT_HASH_SHORT}'/" "$RELEASE_INFO_PATH"
+          
+          echo "✅ Updated release_info.dart"
+          cat "$RELEASE_INFO_PATH"
 
       - name: Build Flutter APK
         run: |
@@ -525,7 +554,7 @@ jobs:
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: apk-${{ matrix.include.name }}
+          name: apk-${{ matrix.name }}
           path: ${{ env.APK_OUTPUT_PATH }}
 
       - name: Setup Firebase CLI
@@ -548,7 +577,7 @@ jobs:
   # iOS DEPLOYMENT JOB
   # ============================================================================
   build-deploy-ios:
-    name: iOS - ${{ matrix.include.name }}
+    name: iOS - ${{ matrix.name }}
     needs: prepare
     if: needs.prepare.outputs.has_ios == 'true'
     runs-on: macos-latest
@@ -567,14 +596,14 @@ jobs:
       - name: Debug matrix values
         run: |
           echo "🔍 Matrix debug (iOS):"
-          echo "  matrix.include.slot: ${{ matrix.include.slot }}"
-          echo "  matrix.include.name: ${{ matrix.include.name }}"
+          echo "  matrix.slot: ${{ matrix.slot }}"
+          echo "  matrix.name: ${{ matrix.name }}"
 
       - name: Load flavor configuration
         id: flavor-config
         uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/manual_full_deploy/actions/load-deploy-config@main
         with:
-          flavor_name: ${{ matrix.include.name }}
+          flavor_name: ${{ matrix.name }}
           platform: ios
 
       - name: Debug loaded config
@@ -617,6 +646,40 @@ jobs:
       - name: Install CocoaPods dependencies
         working-directory: ios
         run: pod install --repo-update
+
+      - name: Update release_info.dart
+        run: |
+          RELEASE_INFO_PATH="${{ steps.flavor-config.outputs.release_info_path }}"
+          
+          if [ -z "$RELEASE_INFO_PATH" ] || [ ! -f "$RELEASE_INFO_PATH" ]; then
+            echo "⏭️ Skipping release_info.dart update - file not configured or not found"
+            exit 0
+          fi
+          
+          echo "📝 Updating $RELEASE_INFO_PATH..."
+          
+          VERSION="${{ inputs.version }}"
+          COMMIT_HASH="${{ github.sha }}"
+          COMMIT_HASH_SHORT="${COMMIT_HASH:0:7}"
+          CURRENT_BRANCH="${{ github.ref_name }}"
+          BUILD_DATE=$(date '+%Y-%m-%d %H:%M:%S')
+          
+          # Update release_info.dart file (macOS sed requires '' for in-place)
+          sed -i '' "s/final String version = '.*';/final String version = '$VERSION';/" "$RELEASE_INFO_PATH"
+          sed -i '' "s/final String buildDate = '.*';/final String buildDate = '${BUILD_DATE}';/" "$RELEASE_INFO_PATH"
+          sed -i '' "s/final String commitHash = '.*';/final String commitHash = '${COMMIT_HASH}';/" "$RELEASE_INFO_PATH"
+          sed -i '' "s/final String branch = '.*';/final String branch = '${CURRENT_BRANCH}';/" "$RELEASE_INFO_PATH"
+          sed -i '' "s/final String commitHashShort = '.*';/final String commitHashShort = '${COMMIT_HASH_SHORT}';/" "$RELEASE_INFO_PATH"
+          
+          # Constructor format
+          sed -i '' "s/this\.version = '[^']*'/this.version = '$VERSION'/" "$RELEASE_INFO_PATH"
+          sed -i '' "s/this\.buildDate = '[^']*'/this.buildDate = '${BUILD_DATE}'/" "$RELEASE_INFO_PATH"
+          sed -i '' "s/this\.commitHash = '[^']*'/this.commitHash = '${COMMIT_HASH}'/" "$RELEASE_INFO_PATH"
+          sed -i '' "s/this\.branch = '[^']*'/this.branch = '${CURRENT_BRANCH}'/" "$RELEASE_INFO_PATH"
+          sed -i '' "s/this\.commitHashShort = '[^']*'/this.commitHashShort = '${COMMIT_HASH_SHORT}'/" "$RELEASE_INFO_PATH"
+          
+          echo "✅ Updated release_info.dart"
+          cat "$RELEASE_INFO_PATH"
 
       - name: Build iOS
         run: |
@@ -673,7 +736,7 @@ jobs:
   # WEB DEPLOYMENT JOB
   # ============================================================================
   build-deploy-web:
-    name: Web - ${{ matrix.include.name }}
+    name: Web - ${{ matrix.name }}
     needs: prepare
     if: needs.prepare.outputs.has_web == 'true'
     runs-on: ubuntu-latest
@@ -692,14 +755,14 @@ jobs:
       - name: Debug matrix values
         run: |
           echo "🔍 Matrix debug (Web):"
-          echo "  matrix.include.slot: ${{ matrix.include.slot }}"
-          echo "  matrix.include.name: ${{ matrix.include.name }}"
+          echo "  matrix.slot: ${{ matrix.slot }}"
+          echo "  matrix.name: ${{ matrix.name }}"
 
       - name: Load flavor configuration
         id: flavor-config
         uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/manual_full_deploy/actions/load-deploy-config@main
         with:
-          flavor_name: ${{ matrix.include.name }}
+          flavor_name: ${{ matrix.name }}
           platform: web
 
       - name: Debug loaded config
@@ -749,6 +812,39 @@ jobs:
           cd ..
           echo "✅ Functions built successfully"
 
+      - name: Update release_info.dart
+        run: |
+          RELEASE_INFO_PATH="${{ steps.flavor-config.outputs.release_info_path }}"
+          
+          if [ -z "$RELEASE_INFO_PATH" ] || [ ! -f "$RELEASE_INFO_PATH" ]; then
+            echo "⏭️ Skipping release_info.dart update - file not configured or not found"
+            exit 0
+          fi
+          
+          echo "📝 Updating $RELEASE_INFO_PATH..."
+          
+          VERSION="${{ inputs.version }}"
+          COMMIT_HASH="${{ github.sha }}"
+          COMMIT_HASH_SHORT="${COMMIT_HASH:0:7}"
+          CURRENT_BRANCH="${{ github.ref_name }}"
+          BUILD_DATE=$(date '+%Y-%m-%d %H:%M:%S')
+          
+          # Update release_info.dart file
+          sed -i "s/final String version = '.*';/final String version = '$VERSION';/" "$RELEASE_INFO_PATH"
+          sed -i "s/final String buildDate = '.*';/final String buildDate = '${BUILD_DATE}';/" "$RELEASE_INFO_PATH"
+          sed -i "s/final String commitHash = '.*';/final String commitHash = '${COMMIT_HASH}';/" "$RELEASE_INFO_PATH"
+          sed -i "s/final String branch = '.*';/final String branch = '${CURRENT_BRANCH}';/" "$RELEASE_INFO_PATH"
+          sed -i "s/final String commitHashShort = '.*';/final String commitHashShort = '${COMMIT_HASH_SHORT}';/" "$RELEASE_INFO_PATH"
+          
+          # Constructor format
+          sed -i "s/this\.version = '[^']*'/this.version = '$VERSION'/" "$RELEASE_INFO_PATH"
+          sed -i "s/this\.buildDate = '[^']*'/this.buildDate = '${BUILD_DATE}'/" "$RELEASE_INFO_PATH"
+          sed -i "s/this\.commitHash = '[^']*'/this.commitHash = '${COMMIT_HASH}'/" "$RELEASE_INFO_PATH"
+          sed -i "s/this\.branch = '[^']*'/this.branch = '${CURRENT_BRANCH}'/" "$RELEASE_INFO_PATH"
+          sed -i "s/this\.commitHashShort = '[^']*'/this.commitHashShort = '${COMMIT_HASH_SHORT}'/" "$RELEASE_INFO_PATH"
+          
+          echo "✅ Updated release_info.dart"
+
       - name: Build Flutter Web
         run: |
           TARGET_FILE="${{ steps.flavor-config.outputs.target_file }}"
@@ -794,73 +890,6 @@ jobs:
           echo "✅ Web deployment completed"
 
   # ============================================================================
-  # FUNCTIONS DEPLOYMENT JOB
-  # ============================================================================
-  deploy-functions:
-    name: Deploy Functions
-    needs: prepare
-    if: needs.prepare.outputs.has_functions == 'true'
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ needs.prepare.outputs.checkout_ref }}
-          fetch-depth: 0
-
-      - name: Load configuration
-        id: config
-        run: |
-          CONFIG_FILE=".github/deploy-config.json"
-
-          FIREBASE_PROJECT=$(jq -r ".firebase.project_id // empty" "$CONFIG_FILE")
-          SERVICE_ACCOUNT=$(jq -r ".firebase.service_account_path // \"firebase_service_account.json\"" "$CONFIG_FILE")
-          FUNCTIONS_PATH=$(jq -r ".functions.path // \"functions\"" "$CONFIG_FILE")
-          INSTALL_CMD=$(jq -r ".functions.install_command // \"npm install\"" "$CONFIG_FILE")
-          BUILD_CMD=$(jq -r ".functions.build_command // \"npm run build\"" "$CONFIG_FILE")
-          CHMOD_BIOME=$(jq -r ".functions.chmod_biome // false" "$CONFIG_FILE")
-
-          echo "firebase_project=$FIREBASE_PROJECT" >> $GITHUB_OUTPUT
-          echo "service_account=$SERVICE_ACCOUNT" >> $GITHUB_OUTPUT
-          echo "functions_path=$FUNCTIONS_PATH" >> $GITHUB_OUTPUT
-          echo "install_cmd=$INSTALL_CMD" >> $GITHUB_OUTPUT
-          echo "build_cmd=$BUILD_CMD" >> $GITHUB_OUTPUT
-          echo "chmod_biome=$CHMOD_BIOME" >> $GITHUB_OUTPUT
-
-      - name: Setup SOPS and decrypt secrets
-        uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/manual_full_deploy/actions/setup-sops@main
-        with:
-          sops_age_key: ${{ secrets.SOPS_AGE_KEY }}
-          verify_files: "${{ steps.config.outputs.service_account }}"
-
-      - name: Setup Firebase CLI
-        uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/manual_full_deploy/actions/setup-firebase-cli@main
-
-      - name: Install and build functions
-        working-directory: ${{ steps.config.outputs.functions_path }}
-        run: |
-          echo "📦 Installing dependencies..."
-          ${{ steps.config.outputs.install_cmd }}
-
-          if [ "${{ steps.config.outputs.chmod_biome }}" = "true" ]; then
-            if [ -f "node_modules/@biomejs/cli-linux-x64/biome" ]; then
-              chmod +x node_modules/@biomejs/cli-linux-x64/biome
-            fi
-          fi
-
-          echo "🔨 Building functions..."
-          ${{ steps.config.outputs.build_cmd }}
-
-      - name: Deploy functions to Firebase
-        env:
-          GOOGLE_APPLICATION_CREDENTIALS: ${{ github.workspace }}/${{ steps.config.outputs.service_account }}
-        run: |
-          echo "🚀 Deploying functions..."
-          firebase deploy --only functions --project ${{ steps.config.outputs.firebase_project }} --non-interactive
-          echo "✅ Functions deployment completed"
-
-  # ============================================================================
   # WIDGETBOOK DEPLOYMENT JOB
   # ============================================================================
   deploy-widgetbook:
@@ -887,6 +916,7 @@ jobs:
           HOSTING_TARGET=$(jq -r ".widgetbook.hosting_target // \"widgetbook\"" "$CONFIG_FILE")
           FLUTTER_VERSION=$(jq -r ".flutter_version // \"3.38.4\"" "$CONFIG_FILE")
           FLUTTER_CHANNEL=$(jq -r ".flutter_channel // \"stable\"" "$CONFIG_FILE")
+          RELEASE_INFO_PATH=$(jq -r ".release_info.path // \"\"" "$CONFIG_FILE")
 
           echo "firebase_project=$FIREBASE_PROJECT" >> $GITHUB_OUTPUT
           echo "service_account=$SERVICE_ACCOUNT" >> $GITHUB_OUTPUT
@@ -894,6 +924,7 @@ jobs:
           echo "hosting_target=$HOSTING_TARGET" >> $GITHUB_OUTPUT
           echo "flutter_version=$FLUTTER_VERSION" >> $GITHUB_OUTPUT
           echo "flutter_channel=$FLUTTER_CHANNEL" >> $GITHUB_OUTPUT
+          echo "release_info_path=$RELEASE_INFO_PATH" >> $GITHUB_OUTPUT
 
       - name: Setup SOPS and decrypt secrets
         uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/manual_full_deploy/actions/setup-sops@main
@@ -906,6 +937,39 @@ jobs:
         with:
           flutter_version: ${{ steps.config.outputs.flutter_version }}
           flutter_channel: ${{ steps.config.outputs.flutter_channel }}
+
+      - name: Update release_info.dart
+        run: |
+          RELEASE_INFO_PATH="${{ steps.config.outputs.release_info_path }}"
+          
+          if [ -z "$RELEASE_INFO_PATH" ] || [ ! -f "$RELEASE_INFO_PATH" ]; then
+            echo "⏭️ Skipping release_info.dart update - file not configured or not found"
+            exit 0
+          fi
+          
+          echo "📝 Updating $RELEASE_INFO_PATH..."
+          
+          VERSION="${{ inputs.version }}"
+          COMMIT_HASH="${{ github.sha }}"
+          COMMIT_HASH_SHORT="${COMMIT_HASH:0:7}"
+          CURRENT_BRANCH="${{ github.ref_name }}"
+          BUILD_DATE=$(date '+%Y-%m-%d %H:%M:%S')
+          
+          # Update release_info.dart file
+          sed -i "s/final String version = '.*';/final String version = '$VERSION';/" "$RELEASE_INFO_PATH"
+          sed -i "s/final String buildDate = '.*';/final String buildDate = '${BUILD_DATE}';/" "$RELEASE_INFO_PATH"
+          sed -i "s/final String commitHash = '.*';/final String commitHash = '${COMMIT_HASH}';/" "$RELEASE_INFO_PATH"
+          sed -i "s/final String branch = '.*';/final String branch = '${CURRENT_BRANCH}';/" "$RELEASE_INFO_PATH"
+          sed -i "s/final String commitHashShort = '.*';/final String commitHashShort = '${COMMIT_HASH_SHORT}';/" "$RELEASE_INFO_PATH"
+          
+          # Constructor format
+          sed -i "s/this\.version = '[^']*'/this.version = '$VERSION'/" "$RELEASE_INFO_PATH"
+          sed -i "s/this\.buildDate = '[^']*'/this.buildDate = '${BUILD_DATE}'/" "$RELEASE_INFO_PATH"
+          sed -i "s/this\.commitHash = '[^']*'/this.commitHash = '${COMMIT_HASH}'/" "$RELEASE_INFO_PATH"
+          sed -i "s/this\.branch = '[^']*'/this.branch = '${CURRENT_BRANCH}'/" "$RELEASE_INFO_PATH"
+          sed -i "s/this\.commitHashShort = '[^']*'/this.commitHashShort = '${COMMIT_HASH_SHORT}'/" "$RELEASE_INFO_PATH"
+          
+          echo "✅ Updated release_info.dart"
 
       - name: Get Widgetbook dependencies
         working-directory: ${{ steps.config.outputs.widgetbook_dir }}
@@ -942,7 +1006,6 @@ jobs:
         build-deploy-android,
         build-deploy-ios,
         build-deploy-web,
-        deploy-functions,
         deploy-widgetbook,
       ]
     if: always()
@@ -990,16 +1053,6 @@ jobs:
               echo "| Web | ❌ Failed |" >> $GITHUB_STEP_SUMMARY
             else
               echo "| Web | ⏭️ Skipped |" >> $GITHUB_STEP_SUMMARY
-            fi
-          fi
-
-          if [ "${{ needs.prepare.outputs.has_functions }}" = "true" ]; then
-            if [ "${{ needs.deploy-functions.result }}" = "success" ]; then
-              echo "| Functions | ✅ Success |" >> $GITHUB_STEP_SUMMARY
-            elif [ "${{ needs.deploy-functions.result }}" = "failure" ]; then
-              echo "| Functions | ❌ Failed |" >> $GITHUB_STEP_SUMMARY
-            else
-              echo "| Functions | ⏭️ Skipped |" >> $GITHUB_STEP_SUMMARY
             fi
           fi
 

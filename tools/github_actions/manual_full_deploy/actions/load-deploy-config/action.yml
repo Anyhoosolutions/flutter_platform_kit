@@ -59,6 +59,9 @@ outputs:
   functions_path:
     description: "Path to functions directory"
     value: ${{ steps.load-config.outputs.functions_path }}
+  release_info_path:
+    description: "Path to release_info.dart file"
+    value: ${{ steps.load-config.outputs.release_info_path }}
 
 runs:
   using: "composite"
@@ -83,6 +86,7 @@ runs:
         FIREBASE_PROJECT=$(jq -r '.firebase.project_id // ""' "$CONFIG_FILE")
         SERVICE_ACCOUNT=$(jq -r '.firebase.service_account_path // "firebase_service_account.json"' "$CONFIG_FILE")
         FUNCTIONS_PATH=$(jq -r '.functions.path // "functions"' "$CONFIG_FILE")
+        RELEASE_INFO_PATH=$(jq -r '.release_info.path // ""' "$CONFIG_FILE")
 
         # Minify and output full config
         CONFIG_JSON=$(cat "$CONFIG_FILE" | jq -c '.')
@@ -93,6 +97,7 @@ runs:
         echo "firebase_project=$FIREBASE_PROJECT" >> $GITHUB_OUTPUT
         echo "service_account=$SERVICE_ACCOUNT" >> $GITHUB_OUTPUT
         echo "functions_path=$FUNCTIONS_PATH" >> $GITHUB_OUTPUT
+        echo "release_info_path=$RELEASE_INFO_PATH" >> $GITHUB_OUTPUT
 
         echo "📋 Global configuration loaded:"
         echo "  Flutter: $FLUTTER_VERSION ($FLUTTER_CHANNEL)"
