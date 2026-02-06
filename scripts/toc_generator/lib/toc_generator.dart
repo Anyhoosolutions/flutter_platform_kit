@@ -116,14 +116,37 @@ class TocGenerator {
         print('  ⚠️  Skipped $actionName (no README.md)');
         continue;
       }
+      
+      // Find additional .md files in the action directory (subpages)
+      final subpages = <Map<String, dynamic>>[];
+      await for (final file in Directory(entity.path).list()) {
+        if (file is File &&
+            file.path.endsWith('.md') &&
+            !file.path.endsWith('README.md') &&
+            !file.path.endsWith('CHANGELOG.md')) {
+          final filename = file.path.split('/').last;
+          final docName = _getDocName(filename);
+          subpages.add({
+            'filepath': '$actionName/$filename',
+            'name': docName,
+            'title': docName,
+            'subpages': [],
+          });
+          print('    📄 Found subpage: $filename');
+        }
+      }
+      
+      // Sort subpages alphabetically
+      subpages.sort((a, b) => (a['name'] as String).compareTo(b['name'] as String));
+      
       final displayName = _getDocName('$actionName.md');
       actions.add({
         'filepath': '$actionName/README.md',
         'name': displayName,
         'title': displayName,
-        'subpages': [],
+        'subpages': subpages,
       });
-      print('  ✅ Added GitHub Action: $actionName');
+      print('  ✅ Added GitHub Action: $actionName (${subpages.length} subpages)');
     }
 
     actions.sort((a, b) => (a['name'] as String).compareTo(b['name'] as String));
