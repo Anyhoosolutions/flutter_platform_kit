@@ -1,0 +1,32 @@
+# ============================================================================
+# POINTER FILE
+# ============================================================================
+#
+# The actual reusable workflow is located at:
+#   .github/workflows/reusable-full-deploy.yml
+#
+# GitHub requires reusable workflows to be in the .github/workflows/ directory
+# when called from other repositories using the workflow_call pattern.
+#
+# This file exists for discoverability - all the manual_full_deploy code
+# is organized in this directory:
+#
+#   tools/github_actions/manual_full_deploy/
+#   ├── actions/
+#   │   ├── setup-sops/
+#   │   │   └── action.yml           # SOPS installation and secret decryption
+#   │   ├── setup-flutter-env/
+#   │   │   └── action.yml           # Flutter setup with caching
+#   │   ├── setup-firebase-cli/
+#   │   │   └── action.yml           # Firebase CLI installation
+#   │   └── load-deploy-config/
+#   │       └── action.yml           # Load and parse deploy-config.json
+#   ├── deploy-config-template.json  # Template for app repo configuration
+#   ├── deploy-workflow-template.yml # Template for app repo wrapper workflow
+#   ├── README.md                    # Documentation
+#   └── reusable-full-deploy.yml     # This pointer file
+#
+# The actual workflow file:
+#   .github/workflows/reusable-full-deploy.yml
+#
+# ============================================================================

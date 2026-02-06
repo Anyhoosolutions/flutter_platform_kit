@@ -10,6 +10,7 @@ A reusable GitHub Actions workflow for deploying Flutter applications to multipl
 - **Branch/commit selection**: Deploy any branch or specific commit
 - **Firebase integration**: Firebase App Distribution (Android/iOS) and Hosting (Web)
 - **Automatic updates**: Future improvements (e.g., Play Store support) work automatically
+- **Self-contained**: All logic is in this repository with no external dependencies
 
 ## Quick Start
 
@@ -126,8 +127,95 @@ In your repository settings, add:
 │              flutter_platform_kit Repository                 │
 ├─────────────────────────────────────────────────────────────┤
 │  .github/workflows/                                          │
-│    reusable-full-deploy.yml  ← All the logic lives here     │
+│    reusable-full-deploy.yml  ← Main workflow                │
+│                                                              │
+│  tools/github_actions/manual_full_deploy/                   │
+│    actions/                                                  │
+│      setup-sops/           ← SOPS installation & decryption │
+│      setup-flutter-env/    ← Flutter setup with caching     │
+│      setup-firebase-cli/   ← Firebase CLI installation      │
+│      load-deploy-config/   ← Config file parser             │
+│    deploy-config-template.json  ← Template for app repos    │
+│    deploy-workflow-template.yml ← Template wrapper          │
+│    README.md                    ← This documentation        │
 └─────────────────────────────────────────────────────────────┘
+```
+
+## Directory Structure
+
+All the manual deployment code is organized in this directory:
+
+```
+tools/github_actions/manual_full_deploy/
+├── actions/
+│   ├── setup-sops/
+│   │   └── action.yml           # SOPS installation and secret decryption
+│   ├── setup-flutter-env/
+│   │   └── action.yml           # Flutter setup with caching
+│   ├── setup-firebase-cli/
+│   │   └── action.yml           # Firebase CLI installation
+│   └── load-deploy-config/
+│       └── action.yml           # Load and parse deploy-config.json
+├── deploy-config-template.json  # Template for app repo configuration
+├── deploy-workflow-template.yml # Template for app repo wrapper workflow
+├── README.md                    # This documentation
+└── reusable-full-deploy.yml     # Pointer to actual workflow location
+
+.github/workflows/
+└── reusable-full-deploy.yml     # The actual reusable workflow
+```
+
+> **Note**: GitHub requires reusable workflows to be in `.github/workflows/` when called from other repositories. The workflow file in this directory is a pointer for discoverability.
+
+## Composite Actions
+
+The workflow uses modular composite actions for common tasks:
+
+### `setup-sops`
+
+Installs SOPS and decrypts secrets. Supports both Linux and macOS runners.
+
+```yaml
+- uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/manual_full_deploy/actions/setup-sops@main
+  with:
+    sops_age_key: ${{ secrets.SOPS_AGE_KEY }}
+    verify_files: "lib/firebase_options.dart,firebase_service_account.json"
+    runner_os: linux  # or 'macos' for iOS builds
+```
+
+### `setup-flutter-env`
+
+Sets up Flutter with caching, gets dependencies, and optionally runs analyze.
+
+```yaml
+- uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/manual_full_deploy/actions/setup-flutter-env@main
+  with:
+    flutter_version: "3.38.4"
+    flutter_channel: "stable"
+    run_analyze: "true"
+```
+
+### `setup-firebase-cli`
+
+Installs the Firebase CLI and optionally tests authentication.
+
+```yaml
+- uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/manual_full_deploy/actions/setup-firebase-cli@main
+  with:
+    test_auth: "true"
+    firebase_project_id: "your-project-id"
+    service_account_path: "firebase_service_account.json"
+```
+
+### `load-deploy-config`
+
+Loads and parses the deploy configuration file, with optional flavor-specific extraction.
+
+```yaml
+- uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/manual_full_deploy/actions/load-deploy-config@main
+  with:
+    flavor_name: "main"
+    platform: "android"  # or 'ios' or 'web'
 ```
 
 ## Workflow Inputs
@@ -428,8 +516,17 @@ Ensure your service account has these roles:
 
 | File | Location | Purpose |
 |------|----------|---------|
-| `reusable-full-deploy.yml` | flutter_platform_kit | The reusable workflow (don't modify) |
-| `deploy-workflow-template.yml` | flutter_platform_kit | Template for app repos |
-| `deploy-config-template.json` | flutter_platform_kit | Template config file |
+| `reusable-full-deploy.yml` | `.github/workflows/` | The reusable workflow |
+| `actions/*` | `tools/github_actions/manual_full_deploy/` | Composite actions |
+| `deploy-workflow-template.yml` | `tools/github_actions/manual_full_deploy/` | Template for app repos |
+| `deploy-config-template.json` | `tools/github_actions/manual_full_deploy/` | Template config file |
 | `deploy.yml` | Your app repo | Your customized wrapper |
 | `deploy-config.json` | Your app repo | Your flavor configurations |
+
+## Migration from Old Actions
+
+If you were using the old composite actions (`prepare-deployment`, `build-deploy-flutter-apk`, `build-deploy-flutter-web`), you can migrate to this new workflow:
+
+1. Remove the old workflow calls from your app repo
+2. Follow the Quick Start guide above to set up the new wrapper workflow
+3. The old actions remain available but are deprecated in favor of this self-contained approach

@@ -1,0 +1,97 @@
+name: "Setup SOPS and Decrypt Secrets"
+description: "Install SOPS, decrypt secrets, and verify files"
+
+inputs:
+  sops_age_key:
+    description: "SOPS AGE key for decrypting secrets"
+    required: true
+  sops_version:
+    description: "SOPS version to install"
+    required: false
+    default: "v3.7.3"
+  decrypt_script_url:
+    description: "URL to the decrypt-secrets.sh script"
+    required: false
+    default: "https://raw.githubusercontent.com/Anyhoosolutions/flutter_platform_kit/main/tools/sops_secrets/decrypt-secrets.sh"
+  verify_files:
+    description: "Comma-separated list of files to verify exist after decryption"
+    required: false
+    default: ""
+  runner_os:
+    description: "The runner OS (linux, macos)"
+    required: false
+    default: "linux"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Install SOPS
+      shell: bash
+      run: |
+        echo "📦 Installing SOPS ${{ inputs.sops_version }}..."
+        
+        RUNNER_OS="${{ inputs.runner_os }}"
+        SOPS_VERSION="${{ inputs.sops_version }}"
+        
+        if [ "$RUNNER_OS" = "macos" ]; then
+          # macOS installation
+          ARCH=$(uname -m)
+          if [ "$ARCH" = "arm64" ]; then
+            SOPS_URL="https://github.com/mozilla/sops/releases/download/${SOPS_VERSION}/sops-${SOPS_VERSION}.darwin.arm64"
+          else
+            SOPS_URL="https://github.com/mozilla/sops/releases/download/${SOPS_VERSION}/sops-${SOPS_VERSION}.darwin"
+          fi
+          curl -sSL -o sops "$SOPS_URL"
+        else
+          # Linux installation
+          wget -q -O sops "https://github.com/mozilla/sops/releases/download/${SOPS_VERSION}/sops-${SOPS_VERSION}.linux"
+        fi
+        
+        chmod +x sops
+        sudo mv sops /usr/local/bin/
+        echo "✅ SOPS installed"
+        sops --version
+
+    - name: Decrypt secrets with SOPS
+      shell: bash
+      env:
+        SOPS_AGE_KEY: ${{ inputs.sops_age_key }}
+      run: |
+        echo "🔓 Decrypting secrets with SOPS..."
+        curl -sSL "${{ inputs.decrypt_script_url }}" | bash
+        echo "✅ Secrets decrypted"
+
+    - name: Verify decrypted files
+      shell: bash
+      if: ${{ inputs.verify_files != '' }}
+      run: |
+        echo "🔍 Verifying decrypted files..."
+        IFS=',' read -ra FILES <<< "${{ inputs.verify_files }}"
+        FAILED=0
+
+        for file in "${FILES[@]}"; do
+          file=$(echo "$file" | xargs)  # Trim whitespace
+          if [ -f "$file" ]; then
+            echo "✅ $file exists ($(wc -c < "$file") bytes)"
+
+            # If it's a JSON file, verify it's valid JSON
+            if [[ "$file" == *.json ]]; then
+              if python3 -m json.tool "$file" > /dev/null 2>&1; then
+                echo "✅ $file is valid JSON"
+              else
+                echo "❌ $file is not valid JSON"
+                FAILED=1
+              fi
+            fi
+          else
+            echo "❌ $file not found"
+            FAILED=1
+          fi
+        done
+
+        if [ $FAILED -eq 1 ]; then
+          echo "❌ Some required files are missing or invalid"
+          exit 1
+        fi
+
+        echo "✅ All required files verified"
