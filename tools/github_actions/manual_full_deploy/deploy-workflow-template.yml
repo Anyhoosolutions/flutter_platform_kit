@@ -113,11 +113,6 @@ on:
         default: false
 
       # ==================== OTHER DEPLOYMENTS ====================
-      functions:
-        description: "Firebase Functions"
-        required: false
-        type: boolean
-        default: false
       widgetbook:
         description: "Widgetbook"
         required: false
@@ -146,6 +141,5 @@ jobs:
       web_flavor3: ${{ inputs.web_flavor3 }}
       web_flavor4: ${{ inputs.web_flavor4 }}
       web_flavor5: ${{ inputs.web_flavor5 }}
-      functions: ${{ inputs.functions }}
       widgetbook: ${{ inputs.widgetbook }}
     secrets: inherit
