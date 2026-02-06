@@ -301,6 +301,54 @@ Configuration for each flavor:
 - Set `hosting_target` to your target name (must match `firebase.json`)
 - The workflow automatically replaces `hosting` with `hosting:<target>` to avoid deploying ALL sites
 
+**Setting up hosting targets:**
+
+When using multiple hosting sites, you need to configure both `firebase.json` and `.firebaserc`:
+
+1. **Apply targets** (run once per project):
+```bash
+# Map target name "app" to your main hosting site
+firebase target:apply hosting app your-project-id
+
+# Map target name "widgetbook" to your widgetbook hosting site
+firebase target:apply hosting widgetbook your-project-widgetbook
+```
+
+2. **Update firebase.json** to use targets:
+```json
+{
+  "hosting": [
+    {
+      "target": "app",
+      "public": "build/web",
+      "ignore": ["firebase.json", "**/.*", "**/node_modules/**"]
+    },
+    {
+      "target": "widgetbook",
+      "public": "widgetbook/build/web",
+      "ignore": ["firebase.json", "**/.*", "**/node_modules/**"]
+    }
+  ]
+}
+```
+
+3. **Verify .firebaserc** was updated:
+```json
+{
+  "projects": {
+    "default": "your-project-id"
+  },
+  "targets": {
+    "your-project-id": {
+      "hosting": {
+        "app": ["your-project-id"],
+        "widgetbook": ["your-project-widgetbook"]
+      }
+    }
+  }
+}
+```
+
 ### `firebase`
 
 Firebase project settings:
