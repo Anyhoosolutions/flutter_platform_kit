@@ -63,7 +63,7 @@ runs:
 
     - name: Verify decrypted files
       shell: bash
-      if: inputs.verify_files != ''
+      if: ${{ inputs.verify_files != '' }}
       run: |
         echo "🔍 Verifying decrypted files..."
         IFS=',' read -ra FILES <<< "${{ inputs.verify_files }}"

@@ -58,7 +58,7 @@ outputs:
     value: ${{ steps.load-flavor.outputs.build_functions }}
   functions_path:
     description: "Path to functions directory"
-    value: ${{ steps.load-flavor.outputs.functions_path }}
+    value: ${{ steps.load-config.outputs.functions_path }}
 
 runs:
   using: "composite"

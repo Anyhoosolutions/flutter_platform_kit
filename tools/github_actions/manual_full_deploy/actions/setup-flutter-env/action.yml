@@ -61,7 +61,7 @@ runs:
 
     - name: Flutter analyze
       shell: bash
-      if: inputs.run_analyze == 'true'
+      if: ${{ inputs.run_analyze == 'true' }}
       working-directory: ${{ inputs.working_directory }}
       run: |
         echo "🔍 Running Flutter analyze..."

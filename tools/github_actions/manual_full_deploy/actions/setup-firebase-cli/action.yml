@@ -27,7 +27,7 @@ runs:
 
     - name: Test Firebase service account authentication
       shell: bash
-      if: inputs.test_auth == 'true' && inputs.firebase_project_id != ''
+      if: ${{ inputs.test_auth == 'true' && inputs.firebase_project_id != '' }}
       env:
         GOOGLE_APPLICATION_CREDENTIALS: ${{ github.workspace }}/${{ inputs.service_account_path }}
       run: |
