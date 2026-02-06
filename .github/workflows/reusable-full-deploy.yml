@@ -486,6 +486,16 @@ jobs:
           echo "🔍 Building Flutter APK..."
           echo "📋 Target: $TARGET_FILE"
           echo "📋 Flavor: ${FLAVOR:-'(none)'}"
+          
+          if [ -z "$TARGET_FILE" ]; then
+            echo "❌ Target file is empty! Falling back to lib/main.dart"
+            TARGET_FILE="lib/main.dart"
+          fi
+          
+          if [ ! -f "$TARGET_FILE" ]; then
+            echo "❌ Target file \"$TARGET_FILE\" not found."
+            exit 1
+          fi
 
           BUILD_CMD="flutter build apk --release -t $TARGET_FILE"
           [ -n "$FLAVOR" ] && BUILD_CMD="$BUILD_CMD --flavor $FLAVOR"
@@ -554,12 +564,30 @@ jobs:
           ref: ${{ needs.prepare.outputs.checkout_ref }}
           fetch-depth: 0
 
+      - name: Debug matrix values
+        run: |
+          echo "🔍 Matrix debug (iOS):"
+          echo "  matrix.include.slot: ${{ matrix.include.slot }}"
+          echo "  matrix.include.name: ${{ matrix.include.name }}"
+
       - name: Load flavor configuration
         id: flavor-config
         uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/manual_full_deploy/actions/load-deploy-config@main
         with:
           flavor_name: ${{ matrix.include.name }}
           platform: ios
+
+      - name: Debug loaded config
+        run: |
+          echo "🔍 Loaded config debug (iOS):"
+          echo "  target_file: '${{ steps.flavor-config.outputs.target_file }}'"
+          echo "  firebase_app_id: '${{ steps.flavor-config.outputs.firebase_app_id }}'"
+          echo "  flavor_arg: '${{ steps.flavor-config.outputs.flavor_arg }}'"
+          
+          if [ -z "${{ steps.flavor-config.outputs.target_file }}" ]; then
+            echo "❌ ERROR: target_file is empty!"
+            exit 1
+          fi
 
       - name: Setup SOPS and decrypt secrets (macOS)
         uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/manual_full_deploy/actions/setup-sops@main
@@ -595,6 +623,20 @@ jobs:
           TARGET="${{ steps.flavor-config.outputs.target_file }}"
           FLAVOR="${{ steps.flavor-config.outputs.flavor_arg }}"
           BUILD_ARGS="${{ steps.flavor-config.outputs.build_args }}"
+
+          echo "🔍 Building iOS..."
+          echo "📋 Target: $TARGET"
+          echo "📋 Flavor: ${FLAVOR:-'(none)'}"
+          
+          if [ -z "$TARGET" ]; then
+            echo "❌ Target file is empty! Falling back to lib/main.dart"
+            TARGET="lib/main.dart"
+          fi
+          
+          if [ ! -f "$TARGET" ]; then
+            echo "❌ Target file \"$TARGET\" not found."
+            exit 1
+          fi
 
           BUILD_CMD="flutter build ios --release --no-codesign --target $TARGET"
           [ -n "$FLAVOR" ] && BUILD_CMD="$BUILD_CMD --flavor $FLAVOR"
@@ -647,12 +689,34 @@ jobs:
           ref: ${{ needs.prepare.outputs.checkout_ref }}
           fetch-depth: 0
 
+      - name: Debug matrix values
+        run: |
+          echo "🔍 Matrix debug (Web):"
+          echo "  matrix.include.slot: ${{ matrix.include.slot }}"
+          echo "  matrix.include.name: ${{ matrix.include.name }}"
+
       - name: Load flavor configuration
         id: flavor-config
         uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/manual_full_deploy/actions/load-deploy-config@main
         with:
           flavor_name: ${{ matrix.include.name }}
           platform: web
+
+      - name: Debug loaded config
+        run: |
+          echo "🔍 Loaded config debug (Web):"
+          echo "  target_file: '${{ steps.flavor-config.outputs.target_file }}'"
+          echo "  hosting_target: '${{ steps.flavor-config.outputs.hosting_target }}'"
+          echo "  deploy_only: '${{ steps.flavor-config.outputs.deploy_only }}'"
+          echo "  flutter_version: '${{ steps.flavor-config.outputs.flutter_version }}'"
+          
+          # Validate target_file
+          if [ -z "${{ steps.flavor-config.outputs.target_file }}" ]; then
+            echo "❌ ERROR: target_file is empty!"
+            echo "This usually means the flavor configuration wasn't loaded correctly."
+            echo "Check that .github/deploy-config.json has the flavor configured."
+            exit 1
+          fi
 
       - name: Setup SOPS and decrypt secrets
         uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/manual_full_deploy/actions/setup-sops@main
@@ -691,6 +755,18 @@ jobs:
           BUILD_ARGS="${{ steps.flavor-config.outputs.build_args }}"
 
           echo "🔍 Building Flutter Web..."
+          echo "📋 Target: $TARGET_FILE"
+          
+          if [ -z "$TARGET_FILE" ]; then
+            echo "❌ Target file is empty! Falling back to lib/main.dart"
+            TARGET_FILE="lib/main.dart"
+          fi
+          
+          if [ ! -f "$TARGET_FILE" ]; then
+            echo "❌ Target file \"$TARGET_FILE\" not found."
+            exit 1
+          fi
+          
           flutter build web --release -t "$TARGET_FILE" $BUILD_ARGS
           echo "✅ Web build completed"
 
