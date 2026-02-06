@@ -101,11 +101,17 @@ runs:
     - name: Load flavor configuration
       id: load-flavor
       shell: bash
-      if: inputs.flavor_name != ''
+      if: ${{ inputs.flavor_name != '' }}
       run: |
         CONFIG_FILE="${{ inputs.config_file }}"
         FLAVOR_NAME="${{ inputs.flavor_name }}"
         PLATFORM="${{ inputs.platform }}"
+
+        # Safety check - exit gracefully if flavor_name is empty
+        if [ -z "$FLAVOR_NAME" ]; then
+          echo "⚠️ No flavor name provided, skipping flavor configuration"
+          exit 0
+        fi
 
         echo "🔍 Loading configuration for flavor: $FLAVOR_NAME, platform: $PLATFORM"
 
