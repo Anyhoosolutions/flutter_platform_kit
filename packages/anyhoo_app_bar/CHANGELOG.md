@@ -1,3 +1,7 @@
+## 0.0.8
+ 
+* Log if image can't be shown
+
 ## 0.0.7
  
 * Simplify AnyhooAppBar
