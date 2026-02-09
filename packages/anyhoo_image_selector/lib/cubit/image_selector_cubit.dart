@@ -46,11 +46,13 @@ class ImageSelectorCubit extends Cubit<ImageSelectorState> {
         } else {
           // On mobile, store the File object
           final File file = File(xFile.path);
+          _log.info('Mobile mime type from picker: ${xFile.mimeType}');
 
           emit(ImageSelectorState(
             selectedFile: file,
             sourceType: sourceType,
             isLoading: false,
+            mimeType: xFile.mimeType,
           ));
         }
       } else {
