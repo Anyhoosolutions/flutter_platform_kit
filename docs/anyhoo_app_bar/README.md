@@ -29,6 +29,10 @@ use a background image or just a top bar.
 
 ## Changelog
 
+### 0.0.8
+ 
+* Log if image can't be shown
+
 ### 0.0.7
  
 * Simplify AnyhooAppBar
