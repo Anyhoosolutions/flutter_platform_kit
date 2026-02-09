@@ -196,7 +196,20 @@
 					"filepath": "manual_full_deploy/README.md",
 					"name": "Manual Full Deploy",
 					"title": "Manual Full Deploy",
-					"subpages": []
+					"subpages": [
+						{
+							"filepath": "manual_full_deploy/CONFIG-REFERENCE.md",
+							"name": "Config Reference",
+							"title": "Config Reference",
+							"subpages": []
+						},
+						{
+							"filepath": "manual_full_deploy/WORKFLOW-REFERENCE.md",
+							"name": "Workflow Reference",
+							"title": "Workflow Reference",
+							"subpages": []
+						}
+					]
 				},
 				{
 					"filepath": "prepare-deployment/README.md",

@@ -1,3 +1,24 @@
+# ==============================================================================
+# REUSABLE WORKFLOW - Full Deploy Pipeline
+# ==============================================================================
+#
+# This workflow is NOT used by this repository's own CI/CD.
+# It is a reusable workflow designed to be called from other repositories
+# via `workflow_call`. Consumer repos reference it like:
+#
+#   jobs:
+#     deploy:
+#       uses: <org>/flutter_platform_kit/.github/workflows/reusable-full-deploy.yml@main
+#       with:
+#         version: "1.0.0+1"
+#         ...
+#
+# Other files related to this workflow:
+#   - tools/github_actions/manual_full_deploy/README.md
+#   - tools/github_actions/manual_full_deploy/CONFIG-REFERENCE.md
+#   - tools/github_actions/manual_full_deploy/WORKFLOW-REFERENCE.md
+# ==============================================================================
+
 name: Reusable Full Deploy
 
 on:
