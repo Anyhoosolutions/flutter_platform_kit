@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart';
 import 'package:anyhoo_shimmer/anyhoo_shimmer.dart';
 
+final _log = Logger('AnyhooAppBar');
+
 class AnyhooAppBar extends StatefulWidget {
   const AnyhooAppBar({
     super.key,
@@ -32,7 +34,6 @@ class AnyhooAppBar extends StatefulWidget {
 
 class _AnyhooAppBarState extends State<AnyhooAppBar> {
   // ignore: unused_field
-  final _log = Logger('CustomAppBar');
 
   final collapsedHeight = 40.0;
   final expandedHeight = 300.0;
@@ -280,10 +281,16 @@ class _AnyhooAppBarState extends State<AnyhooAppBar> {
           },
         );
       }
+      _log.info('Loading network image: ${widget.imageUrl}');
       return Image.network(
         widget.imageUrl!,
         fit: BoxFit.cover,
         errorBuilder: (context, error, stackTrace) {
+          _log.severe(
+            'Failed to load network image: ${widget.imageUrl}',
+            error,
+            stackTrace,
+          );
           return _getFallbackBackground();
         },
       );

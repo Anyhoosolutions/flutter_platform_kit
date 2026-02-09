@@ -104,7 +104,11 @@ class SentryHelper {
   /// Reports a LogRecord to Sentry if available.
   ///
   /// This is used internally by LoggingConfiguration to forward logs to Sentry.
-  static Future<void> captureLogRecord(LogRecord record) async {
+  ///
+  /// When [forceMessage] is true, INFO/DEBUG logs are sent as Sentry messages
+  /// (independent events) instead of breadcrumbs. This is useful for specific
+  /// loggers whose output you want to be independently searchable in Sentry.
+  static Future<void> captureLogRecord(LogRecord record, {bool forceMessage = false}) async {
     if (_sentryService == null) return;
 
     final level = _logLevelToSentryLevel(record.level);
@@ -120,7 +124,7 @@ class SentryHelper {
       );
     } else {
       // For other levels, capture as message or breadcrumb
-      if (record.level >= Level.WARNING) {
+      if (record.level >= Level.WARNING || forceMessage) {
         final hint = {'logger': record.loggerName, 'time': record.time.toIso8601String()};
         if (record.error != null) {
           hint['error'] = record.error.toString();
