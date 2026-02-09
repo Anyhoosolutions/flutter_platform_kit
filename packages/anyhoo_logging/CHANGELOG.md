@@ -1,3 +1,7 @@
+## 0.0.6
+
+* Allow to force logs to sentry
+
 ## 0.0.5
 
 * Remove direct Sentry dependency
