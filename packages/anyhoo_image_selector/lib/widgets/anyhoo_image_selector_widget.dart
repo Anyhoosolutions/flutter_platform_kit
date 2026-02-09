@@ -111,7 +111,9 @@ class _ImageSelectorView extends StatelessWidget {
           path: state.path,
           selectedFile: state.selectedFile,
           selectedImage: state.selectedImage,
+          mimeType: state.mimeType,
         );
+        _log.info('SelectedImage created: $selectedImage');
         if (onImageSelected != null) {
           onImageSelected!(selectedImage);
         }
