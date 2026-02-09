@@ -10,6 +10,11 @@ class LoggingConfiguration {
   final SentryService? sentryService;
   final Level? sentryLogLevelFilter;
 
+  /// Logger names whose logs should be forwarded to Sentry as messages
+  /// (independent events) instead of breadcrumbs. This makes their output
+  /// independently searchable in the Sentry dashboard.
+  final Set<String> sentryMessageLoggerNames;
+
   LoggingConfiguration({
     required this.logLevel,
     required List<String> loggersAtInfo,
@@ -18,6 +23,7 @@ class LoggingConfiguration {
     this.loggingCubit,
     this.sentryService,
     this.sentryLogLevelFilter,
+    this.sentryMessageLoggerNames = const {},
   }) {
     for (final logger in loggersAtInfo) {
       loggers[logger] = Level.INFO;
@@ -56,7 +62,8 @@ class LoggingConfiguration {
       if (sentryService != null) {
         // If filter is set, only forward logs at or above the filter level
         if (sentryLogLevelFilter == null || record.level >= sentryLogLevelFilter!) {
-          SentryHelper.captureLogRecord(record);
+          final forceMessage = sentryMessageLoggerNames.contains(record.loggerName);
+          SentryHelper.captureLogRecord(record, forceMessage: forceMessage);
         }
       }
     });
