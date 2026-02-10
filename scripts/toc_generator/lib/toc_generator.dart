@@ -333,6 +333,6 @@ class TocGenerator {
   Future<void> _writeToc(Map<String, dynamic> toc) async {
     final file = File(tocPath);
     const encoder = JsonEncoder.withIndent('\t');
-    await file.writeAsString(encoder.convert(toc));
+    await file.writeAsString('${encoder.convert(toc)}\n');
   }
 }

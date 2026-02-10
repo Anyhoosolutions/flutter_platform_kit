@@ -38,3 +38,49 @@ runs:
         else
           echo "✅ Documentation is up-to-date!"
         fi
+
+    - name: Verify documentation completeness
+      shell: bash
+      run: |
+        echo "🔍 Verifying documentation completeness..."
+
+        # Extract all filepath values from toc.json
+        toc_files=$(grep '"filepath"' docs/toc.json | sed 's/.*"filepath":[[:space:]]*"//;s/".*//' | sort)
+
+        # Find all .md files in docs/ relative to docs/
+        doc_files=$(cd docs && find . -name "*.md" -type f | sed 's|^\./||' | sort)
+
+        errors=0
+
+        # Check: every toc.json entry has a matching file in docs/
+        echo ""
+        echo "📋 Checking toc.json entries have matching files..."
+        while IFS= read -r filepath; do
+          [ -z "$filepath" ] && continue
+          if [ ! -f "docs/$filepath" ]; then
+            echo "  ❌ Missing file: docs/$filepath (referenced in toc.json)"
+            errors=$((errors + 1))
+          fi
+        done <<< "$toc_files"
+
+        # Check: every .md file in docs/ has a toc.json entry
+        echo "📄 Checking .md files have toc.json entries..."
+        while IFS= read -r filepath; do
+          [ -z "$filepath" ] && continue
+          if ! echo "$toc_files" | grep -qxF "$filepath"; then
+            echo "  ❌ Orphaned file: docs/$filepath (not referenced in toc.json)"
+            errors=$((errors + 1))
+          fi
+        done <<< "$doc_files"
+
+        if [ "$errors" -gt 0 ]; then
+          echo ""
+          echo "❌ Found $errors documentation completeness error(s)!"
+          echo ""
+          echo "To fix:"
+          echo "  - For missing files: create the .md file or remove the toc.json entry"
+          echo "  - For orphaned files: add the file to toc.json or remove it from docs/"
+          exit 1
+        else
+          echo "✅ Documentation is complete — all files and toc.json entries match!"
+        fi
