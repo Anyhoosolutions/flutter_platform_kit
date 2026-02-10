@@ -75,30 +75,40 @@ All apps depend on a monorepo called `flutter_platform_kit` which provides:
 - Integration tests for critical user flows
 
 ### Project Structure Convention
+
+Each app flavor gets its own directory under `lib/`. Shared code lives in `lib/shared/`. Models that are converted to TypeScript for Cloud Functions live in `lib/sharedModels/`.
+
 ```
 lib/
-  main.dart                    # App entry point, Firebase init, Sentry init
-  app.dart                     # MaterialApp with router, BlocProviders
   firebase_options.dart        # Generated Firebase config (encrypted in repo)
-  features/
-    auth/                      # Login, signup, profile screens + cubits
-    home/                      # Home/dashboard
-    settings/                  # Settings, about, release info
-    <feature>/                 # Each feature has its own folder
-      cubit/                   # Feature-specific cubits
-      models/                  # Feature-specific freezed models
-      screens/                 # Screens/pages
-      widgets/                 # Feature-specific widgets
-  models/                      # App-wide shared models
-  sharedModels/                # Models shared with Cloud Functions (→ TypeScript)
-  services/                    # App-level services (Sentry impl, etc.)
-  theme/                       # App theme, colors, text styles
+  sharedModels/                # Models shared with Cloud Functions (→ TypeScript via freezed_to_ts)
+    user.dart
+    <entity>.dart
+  shared/                      # Code shared across all flavors
+    services/                  # App-level services (Sentry impl, etc.)
+    models/                    # App-wide shared Dart models (not necessarily shared with TS)
+    widgets/                   # Reusable widgets shared across flavors
+    theme/                     # App theme, colors, text styles
+  <flavor>/                    # e.g. main/, admin/ — one per flavor
+    main.dart                  # Flavor entry point, Firebase init, Sentry init
+    app.dart                   # MaterialApp with router, BlocProviders
+    features/
+      auth/                    # Login, signup, profile screens + cubits
+      home/                    # Home/dashboard
+      settings/                # Settings, about, release info
+      <feature>/               # Each feature has its own folder
+        cubit/                 # Feature-specific cubits
+        models/                # Feature-specific freezed models
+        screens/               # Screens/pages
+        widgets/               # Feature-specific widgets
 functions/                     # Firebase Cloud Functions (TypeScript)
   src/
     index.ts
 widgetbook/                    # Widgetbook app
 test/                          # Tests mirroring lib/ structure
 ```
+
+For single-flavor apps, you can use `lib/app/` as the sole flavor directory alongside `lib/shared/` and `lib/sharedModels/`.
 
 ---
 
