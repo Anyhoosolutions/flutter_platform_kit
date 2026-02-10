@@ -11,6 +11,13 @@
 			"subpages": []
 		},
 		{
+			"filepath": "prd_prompt.md",
+			"name": "PRD Prompt for making a new app",
+			"title": "PRD Prompt for making a new app",
+			"subpages": []
+		},
+
+		{
 			"filepath": "how_to_new_package.md",
 			"name": "How to add a new package",
 			"title": "How to add a new package",
