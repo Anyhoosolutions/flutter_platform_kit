@@ -79,7 +79,7 @@ Future<void> main(List<String> args) async {
   );
 
   // Commands that only need org-level auth (no project required)
-  final orgOnlyCommands = {'projects'};
+  final orgOnlyCommands = {'projects', 'show'};
 
   final error = orgOnlyCommands.contains(command)
       ? config.validateForOrg()

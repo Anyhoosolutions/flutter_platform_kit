@@ -185,18 +185,35 @@ class SentryApiClient {
         .toList();
   }
 
-  /// Get a single issue by ID.
+  /// Get a single issue by ID (numeric) or short ID (e.g. FLUTTER-17).
   Future<Map<String, dynamic>> getIssue(String issueId) async {
-    final uri = Uri.parse('$_baseUrl/issues/$issueId/');
+    final resolved = await _resolveIssueId(issueId);
+    final uri = Uri.parse('$_baseUrl/issues/$resolved/');
     final response = await _request(uri);
     return jsonDecode(response.body) as Map<String, dynamic>;
   }
 
   /// Get the latest event for an issue (includes stacktrace).
   Future<Map<String, dynamic>> getLatestEvent(String issueId) async {
-    final uri = Uri.parse('$_baseUrl/issues/$issueId/events/latest/');
+    final resolved = await _resolveIssueId(issueId);
+    final uri = Uri.parse('$_baseUrl/issues/$resolved/events/latest/');
     final response = await _request(uri);
     return jsonDecode(response.body) as Map<String, dynamic>;
+  }
+
+  /// Resolve a short ID (e.g. FLUTTER-17) to a numeric issue ID.
+  /// If the ID is already numeric, returns it as-is.
+  Future<String> _resolveIssueId(String issueId) async {
+    // If it's purely numeric, use directly
+    if (int.tryParse(issueId) != null) return issueId;
+
+    // Otherwise treat it as a short ID and resolve via the org endpoint
+    final uri = Uri.parse(
+      '$_baseUrl/organizations/${config.org}/shortids/$issueId/',
+    );
+    final response = await _request(uri);
+    final body = jsonDecode(response.body) as Map<String, dynamic>;
+    return body['groupId'] as String;
   }
 
   Future<http.Response> _request(Uri uri) async {
