@@ -132,6 +132,12 @@
 					"subpages": []
 				},
 				{
+					"filepath": "sentry_cli/README.md",
+					"name": "Sentry Cli",
+					"title": "Sentry Cli",
+					"subpages": []
+				},
+				{
 					"filepath": "sops_secrets/README.md",
 					"name": "Sops Secrets",
 					"title": "Sops Secrets",
