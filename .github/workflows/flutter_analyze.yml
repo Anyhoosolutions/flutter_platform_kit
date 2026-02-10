@@ -6,12 +6,49 @@ on:
       - main
 
 jobs:
+  check-changes:
+    name: Check for Dart changes
+    runs-on: ubuntu-latest
+    outputs:
+      dart_changed: ${{ steps.changes.outputs.dart_changed }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check for Dart-related file changes
+        id: changes
+        run: |
+          if [ "${{ github.event.action }}" == "synchronize" ]; then
+            echo "Comparing against previous push: ${{ github.event.before }}"
+            CHANGED=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} || true)
+          else
+            echo "Comparing against base branch: ${{ github.event.pull_request.base.sha }}"
+            CHANGED=$(git diff --name-only ${{ github.event.pull_request.base.sha }}...${{ github.sha }} || true)
+          fi
+
+          echo "Changed files:"
+          echo "$CHANGED"
+
+          DART_CHANGED=$(echo "$CHANGED" | grep -E '\.(dart)$|pubspec\.(yaml|lock)$|analysis_options\.yaml$' || true)
+
+          if [ -z "$DART_CHANGED" ]; then
+            echo "No Dart-related files changed"
+            echo "dart_changed=false" >> $GITHUB_OUTPUT
+          else
+            echo "Dart-related files changed:"
+            echo "$DART_CHANGED"
+            echo "dart_changed=true" >> $GITHUB_OUTPUT
+          fi
+
   analyze-and-test:
     name: Flutter analyze and test
     runs-on: ubuntu-latest
-
-    # Skip if PR title contains "WIP: "
-    if: ${{ github.event_name == 'push' || !contains(github.event.pull_request.title, 'WIP') }}
+    needs: check-changes
+    if: |
+      needs.check-changes.outputs.dart_changed == 'true' &&
+      (github.event_name == 'push' || !contains(github.event.pull_request.title, 'WIP'))
 
     steps:
       - name: Checkout code
