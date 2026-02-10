@@ -63,14 +63,21 @@ class SentryConfig {
 
   /// Validate that required fields are present.
   String? validate() {
+    final orgError = validateForOrg();
+    if (orgError != null) return orgError;
+    if (project.isEmpty) {
+      return 'No Sentry project. Set via --project, SENTRY_PROJECT env var, or ~/.sentryrc';
+    }
+    return null;
+  }
+
+  /// Validate only token + org (project not required).
+  String? validateForOrg() {
     if (token.isEmpty) {
       return 'No Sentry auth token. Set via --token, SENTRY_AUTH_TOKEN env var, or ~/.sentryrc';
     }
     if (org.isEmpty) {
       return 'No Sentry organization. Set via --org, SENTRY_ORG env var, or ~/.sentryrc';
-    }
-    if (project.isEmpty) {
-      return 'No Sentry project. Set via --project, SENTRY_PROJECT env var, or ~/.sentryrc';
     }
     return null;
   }

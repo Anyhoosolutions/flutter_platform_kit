@@ -81,6 +81,16 @@ dart run bin/sentry_cli.dart --level error --sort freq --limit 10
 dart run bin/sentry_cli.dart --all
 ```
 
+### List projects
+
+```bash
+# List all projects in the organization
+dart run bin/sentry_cli.dart projects
+
+# Output as JSON
+dart run bin/sentry_cli.dart projects --json
+```
+
 ### Show issue details
 
 ```bash

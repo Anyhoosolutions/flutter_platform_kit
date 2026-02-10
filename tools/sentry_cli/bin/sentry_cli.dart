@@ -78,7 +78,12 @@ Future<void> main(List<String> args) async {
     projectFlag: results.option('project'),
   );
 
-  final error = config.validate();
+  // Commands that only need org-level auth (no project required)
+  final orgOnlyCommands = {'projects'};
+
+  final error = orgOnlyCommands.contains(command)
+      ? config.validateForOrg()
+      : config.validate();
   if (error != null) {
     stderr.writeln('Error: $error');
     exit(1);
@@ -97,9 +102,11 @@ Future<void> main(List<String> args) async {
           exit(1);
         }
         await _runShow(client, results.rest[1], results);
+      case 'projects':
+        await _runProjects(client, results);
       default:
         stderr.writeln('Unknown command: $command');
-        stderr.writeln('Available commands: list, show');
+        stderr.writeln('Available commands: list, show, projects');
         exit(1);
     }
   } on SentryApiException catch (e) {
@@ -107,6 +114,22 @@ Future<void> main(List<String> args) async {
     exit(1);
   } finally {
     client.close();
+  }
+}
+
+Future<void> _runProjects(SentryApiClient client, ArgResults results) async {
+  final projects = await client.listProjects();
+
+  if (results.flag('json')) {
+    print(const JsonEncoder.withIndent('  ')
+        .convert(projects.map((p) => p.toJson()).toList()));
+  } else {
+    print(ProjectTableRenderer.render(projects));
+    if (projects.isNotEmpty) {
+      stderr.writeln(
+          '\n${projects.length} project${projects.length == 1 ? '' : 's'} '
+          '(org: ${client.config.org})');
+    }
   }
 }
 
@@ -268,6 +291,7 @@ void _printUsage(ArgParser parser) {
   stderr.writeln('Commands:');
   stderr.writeln('  list              List issues (default)');
   stderr.writeln('  show <issue-id>   Show issue details and stacktrace');
+  stderr.writeln('  projects          List all projects in the organization');
   stderr.writeln('');
   stderr.writeln('Options:');
   stderr.writeln(parser.usage);
@@ -279,6 +303,7 @@ void _printUsage(ArgParser parser) {
   stderr.writeln('  sentry_cli list --release "com.example.*@1.2.*"');
   stderr.writeln('  sentry_cli list --query "assigned:me"');
   stderr.writeln('  sentry_cli show PROJ-123');
+  stderr.writeln('  sentry_cli projects');
   stderr.writeln('');
   stderr.writeln('Config (~/.sentryrc):');
   stderr.writeln('  {');

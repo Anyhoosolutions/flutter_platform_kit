@@ -2,6 +2,68 @@ import 'dart:math';
 
 import 'sentry_api.dart';
 
+/// Renders a list of Sentry projects as an ASCII table.
+class ProjectTableRenderer {
+  static String render(List<SentryProject> projects) {
+    if (projects.isEmpty) {
+      return 'No projects found.';
+    }
+
+    final columns = <_GenericColumn<SentryProject>>[
+      _GenericColumn('Slug', (p) => p.slug),
+      _GenericColumn('Name', (p) => p.name),
+      _GenericColumn('Platform', (p) => p.platform ?? '-'),
+      _GenericColumn('Status', (p) => p.status),
+    ];
+
+    // Calculate column widths
+    for (final col in columns) {
+      col.width = col.header.length;
+      for (final project in projects) {
+        col.width = max(col.width, col.extract(project).length);
+      }
+    }
+
+    final buf = StringBuffer();
+
+    // Header
+    buf.writeln(_renderRow(columns, (col) => col.header));
+
+    // Separator
+    buf.writeln(columns.map((c) => '-' * (c.width + 2)).join('+'));
+
+    // Rows
+    for (final project in projects) {
+      buf.writeln(_renderRow(columns, (col) => col.extract(project)));
+    }
+
+    return buf.toString();
+  }
+
+  static String _renderRow(
+    List<_GenericColumn<SentryProject>> columns,
+    String Function(_GenericColumn<SentryProject>) getValue,
+  ) {
+    return columns.map((col) {
+      final value = getValue(col);
+      if (col.rightAlign) {
+        return ' ${value.padLeft(col.width)} ';
+      }
+      return ' ${value.padRight(col.width)} ';
+    }).join('|');
+  }
+}
+
+class _GenericColumn<T> {
+  final String header;
+  final String Function(T) extract;
+  final bool rightAlign;
+  int width;
+
+  _GenericColumn(this.header, this.extract, {this.rightAlign = false})
+      : width = header.length;
+}
+
 /// Renders a list of Sentry issues as an ASCII table.
 class TableRenderer {
   /// Render issues as an ASCII table to stdout.

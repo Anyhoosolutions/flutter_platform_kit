@@ -74,6 +74,43 @@ class SentryIssue {
       };
 }
 
+/// A Sentry project from the API.
+class SentryProject {
+  final String slug;
+  final String name;
+  final String? platform;
+  final String status;
+  final DateTime dateCreated;
+
+  SentryProject({
+    required this.slug,
+    required this.name,
+    this.platform,
+    required this.status,
+    required this.dateCreated,
+  });
+
+  factory SentryProject.fromJson(Map<String, dynamic> json) {
+    return SentryProject(
+      slug: json['slug'] as String? ?? '',
+      name: json['name'] as String? ?? '',
+      platform: json['platform'] as String?,
+      status: json['status'] as String? ?? 'active',
+      dateCreated:
+          DateTime.tryParse(json['dateCreated'] as String? ?? '') ??
+              DateTime.now(),
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        'slug': slug,
+        'name': name,
+        'platform': platform,
+        'status': status,
+        'dateCreated': dateCreated.toIso8601String(),
+      };
+}
+
 /// Client for the Sentry API.
 class SentryApiClient {
   static const _baseUrl = 'https://sentry.io/api/0';
@@ -112,6 +149,19 @@ class SentryApiClient {
     }
 
     return parts.join(' ');
+  }
+
+  /// List all projects for the configured organization.
+  Future<List<SentryProject>> listProjects() async {
+    final uri = Uri.parse(
+      '$_baseUrl/organizations/${config.org}/projects/',
+    );
+
+    final response = await _request(uri);
+    final List<dynamic> body = jsonDecode(response.body) as List<dynamic>;
+    return body
+        .map((e) => SentryProject.fromJson(e as Map<String, dynamic>))
+        .toList();
   }
 
   /// List issues for the configured project.
