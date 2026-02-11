@@ -25,6 +25,7 @@ This acts as the "courier" that takes text from Cursor and sends it to your serv
 *    sudo nano /usr/local/bin/tablet
 
 *    Paste this code into the editor:
+    
     Bash
 
     #!/bin/bash
