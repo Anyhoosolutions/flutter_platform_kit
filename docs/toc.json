@@ -150,6 +150,12 @@
 					"subpages": []
 				},
 				{
+					"filepath": "tablet_viewing_service/README.md",
+					"name": "Tablet Viewing Service",
+					"title": "Tablet Viewing Service",
+					"subpages": []
+				},
+				{
 					"filepath": "upload_documentation/README.md",
 					"name": "Upload Documentation",
 					"title": "Upload Documentation",
