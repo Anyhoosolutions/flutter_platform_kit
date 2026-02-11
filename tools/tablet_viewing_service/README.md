@@ -26,17 +26,19 @@ This acts as the "courier" that takes text from Cursor and sends it to your serv
 
 *    Paste this code into the editor:
     
-    Bash
+```bash
+#!/bin/bash
+# Takes input from Cursor and sends it to the local Python server
+curl -s -X POST -H "Content-Type: text/plain" --data-binary @- http://localhost:8080
+```
 
-    #!/bin/bash
-    # Takes input from Cursor and sends it to the local Python server
-    curl -s -X POST -H "Content-Type: text/plain" --data-binary @- http://localhost:8080
-
-*    Save and exit (Ctrl+O, Enter, then Ctrl+X).
+*    Save and exit (`Ctrl+O, Enter`, then `Ctrl+X`).
 
 *    Make the script executable:
 
-    sudo chmod +x /usr/local/bin/tablet
+```bash
+sudo chmod +x /usr/local/bin/tablet
+```
 
 ### Step 2: Set up the Python Receiver
 
