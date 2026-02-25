@@ -73,7 +73,7 @@ class _AnyhooBottomBarState extends State<AnyhooBottomBar> {
       key: Key(key),
       onTap: () {
         _log.info('Tapping on $label to go to $url');
-        GoRouterWrapper().push(context, url);
+        GoRouterWrapper().go(context, url);
       },
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
