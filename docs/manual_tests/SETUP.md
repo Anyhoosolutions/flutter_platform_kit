@@ -71,15 +71,15 @@ Unlike the deploy workflow, manual tests do not need SOPS, age keys, or Firebase
 4. Check the test types to run
 5. Click **Run workflow**
 
-### From a PR comment
+### From a PR or issue comment
 
-Comment on a pull request with:
+Comment on a pull request or issue with:
 
 ```
 /test flutter patrol
 ```
 
-**Format:** `/test` followed by space- or comma-separated test types.
+**Format:** `/test` followed by space- or comma-separated test types. On a PR, tests run on the PR head commit; on an issue, tests run on the default branch.
 
 **Test type aliases:**
 

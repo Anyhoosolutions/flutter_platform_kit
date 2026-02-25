@@ -153,7 +153,14 @@
 					"filepath": "tablet_viewing_service/README.md",
 					"name": "Tablet Viewing Service",
 					"title": "Tablet Viewing Service",
-					"subpages": []
+					"subpages": [
+						{
+							"filepath": "tablet_viewing_service/tablet_content.md",
+							"name": "Tablet Content",
+							"title": "Tablet Content",
+							"subpages": []
+						}
+					]
 				},
 				{
 					"filepath": "upload_documentation/README.md",
