@@ -45,7 +45,7 @@ Configuration for Flutter unit tests (`flutter test`).
 
 | Field | Type | Required | Default | Description |
 |-------|------|----------|---------|-------------|
-| `packages` | array | No | `["packages/*", "tools/*"]` | Glob patterns for directories containing packages with `test/` |
+| `packages` | array | No | `["."]` | Directories containing `pubspec.yaml` and `test/` (use `["."]` for single app, `["packages/*", "tools/*"]` for monorepos) |
 | `command` | string | No | `"flutter test"` | Command to run in each package |
 
 ---
@@ -95,7 +95,7 @@ Configuration for Firestore security rules tests (Node.js with `@firebase/rules-
 |-------|------|----------|---------|-------------|
 | `working_directory` | string | No | `"."` | Directory containing firebase.json (e.g. `example_app` for monorepos) |
 | `rules_path` | string | No | `"firestore.rules"` | Path to rules file (from firebase.json) |
-| `test_directory` | string | No | `"firestore.rules.test"` | Directory with `package.json` and test files (relative to working_directory) |
+| `test_directory` | string | No | `"firestore-rules-test"` | Directory with `package.json` and test files (relative to working_directory) |
 | `test_command` | string | No | `"npm test"` | Command to run (e.g. `npm test`) |
 
 The test directory should have `package.json` with `@firebase/rules-unit-testing` and tests that use the Firestore emulator.

@@ -122,7 +122,7 @@ jobs:
           CONFIG=".github/tests-config.json"
           CMD=$(jq -r '.flutter_unit_tests.command // "flutter test"' "$CONFIG")
           
-          for pattern in $(jq -r '(.flutter_unit_tests.packages // ["packages/*", "tools/*"])[]' "$CONFIG"); do
+          for pattern in $(jq -r '(.flutter_unit_tests.packages // ["."])[]' "$CONFIG"); do
             for package in $pattern; do
               if [ -d "$package" ] && [ -f "$package/pubspec.yaml" ]; then
                 test_dir="$package/test"
@@ -224,7 +224,7 @@ jobs:
           CONFIG=".github/tests-config.json"
           PROJECT_ID=$(jq -r '.firebase_project_id // "demo-project-id"' "$CONFIG")
           WORK_DIR=$(jq -r '.firestore_rules_tests.working_directory // "."' "$CONFIG")
-          TEST_DIR=$(jq -r '.firestore_rules_tests.test_directory // "firestore.rules.test"' "$CONFIG")
+          TEST_DIR=$(jq -r '.firestore_rules_tests.test_directory // "firestore-rules-test"' "$CONFIG")
           TEST_CMD=$(jq -r '.firestore_rules_tests.test_command // "npm test"' "$CONFIG")
           
           if [ ! -d "$WORK_DIR/$TEST_DIR" ]; then

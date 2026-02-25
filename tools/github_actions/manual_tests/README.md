@@ -30,7 +30,7 @@ Copy `tests-config-template.json` to `.github/tests-config.json` and customize:
 {
   "firebase_project_id": "demo-project-id",
   "flutter_unit_tests": {
-    "packages": ["packages/*", "tools/*"],
+    "packages": ["."],
     "command": "flutter test"
   },
   "patrol_integration_tests": {
@@ -39,7 +39,7 @@ Copy `tests-config-template.json` to `.github/tests-config.json` and customize:
     "command": "patrol test"
   },
   "firestore_rules_tests": {
-    "test_directory": "firestore.rules.test",
+    "test_directory": "firestore-rules-test",
     "test_command": "npm test"
   },
   "functions_tests": {

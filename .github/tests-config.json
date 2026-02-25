@@ -16,7 +16,7 @@
   "firestore_rules_tests": {
     "working_directory": "example_app",
     "rules_path": "firestore.rules",
-    "test_directory": "firestore.rules.test",
+    "test_directory": "firestore-rules-test",
     "test_command": "npm test"
   },
   "functions_tests": {

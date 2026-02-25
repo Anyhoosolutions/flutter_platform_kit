@@ -4,7 +4,7 @@
   "flutter_channel": "stable",
   "firebase_project_id": "demo-project-id",
   "flutter_unit_tests": {
-    "packages": ["packages/*", "tools/*"],
+    "packages": ["."],
     "command": "flutter test"
   },
   "patrol_integration_tests": {
@@ -17,7 +17,7 @@
   "firestore_rules_tests": {
     "working_directory": ".",
     "rules_path": "firestore.rules",
-    "test_directory": "firestore.rules.test",
+    "test_directory": "firestore-rules-test",
     "test_command": "npm test"
   },
   "functions_tests": {
