@@ -222,6 +222,12 @@
 							"subpages": []
 						},
 						{
+							"filepath": "manual_full_deploy/SETUP.md",
+							"name": "Setup",
+							"title": "Setup",
+							"subpages": []
+						},
+						{
 							"filepath": "manual_full_deploy/WORKFLOW-REFERENCE.md",
 							"name": "Workflow Reference",
 							"title": "Workflow Reference",

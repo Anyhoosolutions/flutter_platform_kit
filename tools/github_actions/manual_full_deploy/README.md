@@ -14,6 +14,7 @@ A reusable GitHub Actions workflow for deploying Flutter applications to multipl
 
 | Document | Description |
 |----------|-------------|
+| [SETUP.md](SETUP.md) | **Prerequisites:** Age-key setup, Firebase service account, IAM roles, and secrets |
 | [CONFIG-REFERENCE.md](CONFIG-REFERENCE.md) | Complete `deploy-config.json` field reference |
 | [WORKFLOW-REFERENCE.md](WORKFLOW-REFERENCE.md) | Complete workflow input reference |
 
@@ -94,6 +95,10 @@ In your repository settings, add:
 | Secret | Description |
 |--------|-------------|
 | `SOPS_AGE_KEY` | Age private key for SOPS decryption |
+
+See [SETUP.md](SETUP.md) for detailed setup instructions including:
+- **Age-key:** How to generate and configure SOPS/age encryption
+- **Firebase service account:** Creating the service account, required IAM roles (App Distribution, Hosting, Functions), and links to official docs
 
 ### 4. Deploy
 
@@ -259,6 +264,7 @@ analyzer:
 | File | Description |
 |------|-------------|
 | `README.md` | This quick start guide |
+| `SETUP.md` | Prerequisites: Age-key and Firebase service account setup |
 | `CONFIG-REFERENCE.md` | Complete config field reference |
 | `WORKFLOW-REFERENCE.md` | Complete workflow input reference |
 | `deploy-config-template.json` | Template for `.github/deploy-config.json` |
