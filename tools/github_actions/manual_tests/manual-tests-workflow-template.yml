@@ -58,13 +58,6 @@ jobs:
       - name: Parse /test command
         id: parse
         run: |
-          # Skip if not a PR
-          if [ -z "${{ github.event.issue.pull_request }}" ]; then
-            echo "run=false" >> $GITHUB_OUTPUT
-            echo "::notice::Comment is not on a PR, skipping"
-            exit 0
-          fi
-
           COMMENT="${{ github.event.comment.body }}"
           # Match /test (case-insensitive)
           if ! echo "$COMMENT" | grep -qiE '^\s*/test\b'; then
@@ -73,10 +66,15 @@ jobs:
             exit 0
           fi
 
-          # Get PR head SHA
-          HEAD_SHA=$(gh api "repos/${{ github.repository }}/pulls/${{ github.event.issue.number }}" --jq '.head.sha')
+          # Get ref: PR head SHA if on a PR, else default branch SHA
+          if [ -n "${{ github.event.issue.pull_request }}" ]; then
+            HEAD_SHA=$(gh api "repos/${{ github.repository }}/pulls/${{ github.event.issue.number }}" --jq '.head.sha')
+          else
+            DEFAULT_BRANCH=$(gh api "repos/${{ github.repository }}" --jq '.default_branch')
+            HEAD_SHA=$(gh api "repos/${{ github.repository }}/commits/$DEFAULT_BRANCH" --jq '.sha')
+          fi
           if [ -z "$HEAD_SHA" ]; then
-            echo "::error::Could not get PR head SHA"
+            echo "::error::Could not get ref"
             exit 1
           fi
 
@@ -114,10 +112,10 @@ jobs:
     uses: Anyhoosolutions/flutter_platform_kit/.github/workflows/reusable-manual-tests.yml@main
     with:
       ref: ${{ inputs.ref }}
-      flutter_unit_tests: ${{ inputs.flutter_unit_tests }}
-      patrol_integration_tests: ${{ inputs.patrol_integration_tests }}
-      firestore_rules_tests: ${{ inputs.firestore_rules_tests }}
-      functions_tests: ${{ inputs.functions_tests }}
+      flutter_unit_tests: ${{ inputs.flutter_unit_tests && 'true' || 'false' }}
+      patrol_integration_tests: ${{ inputs.patrol_integration_tests && 'true' || 'false' }}
+      firestore_rules_tests: ${{ inputs.firestore_rules_tests && 'true' || 'false' }}
+      functions_tests: ${{ inputs.functions_tests && 'true' || 'false' }}
 
   tests-comment:
     if: github.event_name == 'issue_comment' && needs.parse-comment.outputs.run == 'true'

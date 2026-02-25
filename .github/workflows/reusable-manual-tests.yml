@@ -29,23 +29,23 @@ on:
       flutter_unit_tests:
         description: "Run Flutter unit tests"
         required: false
-        type: boolean
-        default: false
+        type: string
+        default: "false"
       patrol_integration_tests:
         description: "Run Patrol or integration tests"
         required: false
-        type: boolean
-        default: false
+        type: string
+        default: "false"
       firestore_rules_tests:
         description: "Run Firestore rules tests"
         required: false
-        type: boolean
-        default: false
+        type: string
+        default: "false"
       functions_tests:
         description: "Run Firebase Functions tests"
         required: false
-        type: boolean
-        default: false
+        type: string
+        default: "false"
 
 jobs:
   prepare:
