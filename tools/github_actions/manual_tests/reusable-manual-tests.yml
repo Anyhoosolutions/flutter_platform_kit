@@ -1,0 +1,22 @@
+# ============================================================================
+# POINTER FILE
+# ============================================================================
+#
+# The actual reusable workflow is located at:
+#   .github/workflows/reusable-manual-tests.yml
+#
+# GitHub requires reusable workflows to be in the .github/workflows/ directory
+# when called from other repositories using the workflow_call pattern.
+#
+# This file exists for discoverability - all the manual_tests code is in:
+#
+#   tools/github_actions/manual_tests/
+#   ├── scripts/
+#   │   └── generate-firebase-options.sh
+#   ├── tests-config-template.json
+#   ├── manual-tests-workflow-template.yml
+#   ├── README.md
+#   ├── CONFIG-REFERENCE.md
+#   └── reusable-manual-tests.yml     # This pointer file
+#
+# ============================================================================

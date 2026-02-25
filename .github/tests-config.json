@@ -1,0 +1,29 @@
+{
+  "flutter_version": "3.38.4",
+  "flutter_channel": "stable",
+  "firebase_project_id": "demo-project-id",
+  "flutter_unit_tests": {
+    "packages": ["packages/*", "tools/*"],
+    "command": "flutter test"
+  },
+  "patrol_integration_tests": {
+    "type": "patrol",
+    "directory": "patrol_test",
+    "command": "patrol test",
+    "app_directory": "example_app",
+    "firebase_options_path": "example_app/lib/firebase_options.dart"
+  },
+  "firestore_rules_tests": {
+    "working_directory": "example_app",
+    "rules_path": "firestore.rules",
+    "test_directory": "firestore-rules-test",
+    "test_command": "npm test"
+  },
+  "functions_tests": {
+    "path": "example_app/functions",
+    "install_command": "npm install",
+    "build_command": "npm run build",
+    "test_command": "npm test",
+    "emulators": "functions,firestore"
+  }
+}

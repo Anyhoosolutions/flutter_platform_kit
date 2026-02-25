@@ -1,0 +1,131 @@
+# =============================================================================
+# MANUAL TESTS WORKFLOW TEMPLATE
+# =============================================================================
+# Copy this file to your app repository as .github/workflows/manual-tests.yml
+# Then create .github/tests-config.json based on tests-config-template.json
+# See SETUP.md for one-time setup instructions.
+# =============================================================================
+
+name: Manual Tests
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "Branch or commit SHA to test (empty = default branch)"
+        required: false
+        type: string
+      flutter_unit_tests:
+        description: "Flutter unit tests"
+        required: false
+        type: boolean
+        default: false
+      patrol_integration_tests:
+        description: "Patrol / Integration tests"
+        required: false
+        type: boolean
+        default: false
+      firestore_rules_tests:
+        description: "Firestore rules tests"
+        required: false
+        type: boolean
+        default: false
+      functions_tests:
+        description: "Functions tests"
+        required: false
+        type: boolean
+        default: false
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  # Parse and validate comment when triggered by /test
+  parse-comment:
+    if: github.event_name == 'issue_comment'
+    runs-on: ubuntu-latest
+    outputs:
+      run: ${{ steps.parse.outputs.run }}
+      ref: ${{ steps.parse.outputs.ref }}
+      flutter_unit_tests: ${{ steps.parse.outputs.flutter_unit_tests }}
+      patrol_integration_tests: ${{ steps.parse.outputs.patrol_integration_tests }}
+      firestore_rules_tests: ${{ steps.parse.outputs.firestore_rules_tests }}
+      functions_tests: ${{ steps.parse.outputs.functions_tests }}
+    steps:
+      - name: Parse /test command
+        id: parse
+        run: |
+          # Skip if not a PR
+          if [ -z "${{ github.event.issue.pull_request }}" ]; then
+            echo "run=false" >> $GITHUB_OUTPUT
+            echo "::notice::Comment is not on a PR, skipping"
+            exit 0
+          fi
+
+          COMMENT="${{ github.event.comment.body }}"
+          # Match /test (case-insensitive)
+          if ! echo "$COMMENT" | grep -qiE '^\s*/test\b'; then
+            echo "run=false" >> $GITHUB_OUTPUT
+            echo "::notice::Comment does not match /test command, skipping"
+            exit 0
+          fi
+
+          # Get PR head SHA
+          HEAD_SHA=$(gh api "repos/${{ github.repository }}/pulls/${{ github.event.issue.number }}" --jq '.head.sha')
+          if [ -z "$HEAD_SHA" ]; then
+            echo "::error::Could not get PR head SHA"
+            exit 1
+          fi
+
+          # Extract args after /test
+          ARGS=$(echo "$COMMENT" | sed -n 's/^[[:space:]]*\/test[[:space:]]*//pi' | tr '[:upper:]' '[:lower:]' | tr ',' ' ')
+
+          # Parse tokens: f|flutter|unit, p|patrol|integration, r|rules|firestore, func|functions
+          FLUTTER=false
+          PATROL=false
+          RULES=false
+          FUNC=false
+          for token in $ARGS; do
+            case "$token" in
+              f|flutter|unit) FLUTTER=true ;;
+              p|patrol|integration) PATROL=true ;;
+              r|rules|firestore) RULES=true ;;
+              func|functions) FUNC=true ;;
+            esac
+          done
+
+          if [ "$FLUTTER" != "true" ] && [ "$PATROL" != "true" ] && [ "$RULES" != "true" ] && [ "$FUNC" != "true" ]; then
+            echo "::error::No valid test types. Use: flutter, patrol, rules, functions (or f, p, r, func)"
+            exit 1
+          fi
+
+          echo "run=true" >> $GITHUB_OUTPUT
+          echo "ref=$HEAD_SHA" >> $GITHUB_OUTPUT
+          echo "flutter_unit_tests=$FLUTTER" >> $GITHUB_OUTPUT
+          echo "patrol_integration_tests=$PATROL" >> $GITHUB_OUTPUT
+          echo "firestore_rules_tests=$RULES" >> $GITHUB_OUTPUT
+          echo "functions_tests=$FUNC" >> $GITHUB_OUTPUT
+
+  tests-dispatch:
+    if: github.event_name == 'workflow_dispatch'
+    uses: Anyhoosolutions/flutter_platform_kit/.github/workflows/reusable-manual-tests.yml@main
+    with:
+      ref: ${{ inputs.ref }}
+      flutter_unit_tests: ${{ inputs.flutter_unit_tests }}
+      patrol_integration_tests: ${{ inputs.patrol_integration_tests }}
+      firestore_rules_tests: ${{ inputs.firestore_rules_tests }}
+      functions_tests: ${{ inputs.functions_tests }}
+
+  tests-comment:
+    if: github.event_name == 'issue_comment' && needs.parse-comment.outputs.run == 'true'
+    needs: parse-comment
+    uses: Anyhoosolutions/flutter_platform_kit/.github/workflows/reusable-manual-tests.yml@main
+    with:
+      ref: ${{ needs.parse-comment.outputs.ref }}
+      flutter_unit_tests: ${{ needs.parse-comment.outputs.flutter_unit_tests }}
+      patrol_integration_tests: ${{ needs.parse-comment.outputs.patrol_integration_tests }}
+      firestore_rules_tests: ${{ needs.parse-comment.outputs.firestore_rules_tests }}
+      functions_tests: ${{ needs.parse-comment.outputs.functions_tests }}

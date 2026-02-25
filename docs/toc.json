@@ -236,6 +236,25 @@
 					]
 				},
 				{
+					"filepath": "manual_tests/README.md",
+					"name": "Manual Tests",
+					"title": "Manual Tests",
+					"subpages": [
+						{
+							"filepath": "manual_tests/CONFIG-REFERENCE.md",
+							"name": "Config Reference",
+							"title": "Config Reference",
+							"subpages": []
+						},
+						{
+							"filepath": "manual_tests/SETUP.md",
+							"name": "Setup",
+							"title": "Setup",
+							"subpages": []
+						}
+					]
+				},
+				{
 					"filepath": "prepare-deployment/README.md",
 					"name": "Prepare Deployment",
 					"title": "Prepare Deployment",
