@@ -99,9 +99,9 @@ Builds Flutter APK files and deploys them to Firebase App Distribution. Supports
 ## Reusable Workflows
 
 ### [manual_tests](./manual_tests/)
-Manual workflow for running tests on demand. Select branch/commit and test types (Flutter unit, Patrol/integration, Firestore rules, Functions). Config-driven via `.github/tests-config.json`. No SOPS required for emulator tests.
+Manual workflow for running tests on demand. Select branch/commit and test types (Flutter unit, Patrol/integration, Firestore rules, Functions). Trigger from Actions UI or PR comment (`/test flutter patrol`). Config-driven via `.github/tests-config.json`. No SOPS required for emulator tests.
 
-**Usage:** Copy `manual-tests-workflow-template.yml` to `.github/workflows/manual-tests.yml` and `tests-config-template.json` to `.github/tests-config.json`. See [manual_tests/README.md](./manual_tests/README.md).
+**Usage:** Copy `manual-tests-workflow-template.yml` to `.github/workflows/manual-tests.yml` and `tests-config-template.json` to `.github/tests-config.json`. See [manual_tests/SETUP.md](./manual_tests/SETUP.md).
 
 ## Structure
 

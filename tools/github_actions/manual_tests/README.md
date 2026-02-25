@@ -13,6 +13,7 @@ A reusable GitHub Actions workflow for running tests on demand with configurable
 
 | Document | Description |
 |----------|-------------|
+| [SETUP.md](SETUP.md) | One-time setup (per repo and org) |
 | [CONFIG-REFERENCE.md](CONFIG-REFERENCE.md) | Complete `tests-config.json` field reference |
 
 ## Quick Start
@@ -50,11 +51,9 @@ Copy `tests-config-template.json` to `.github/tests-config.json` and customize:
 
 ### 3. Run tests
 
-1. Go to Actions → Manual Tests
-2. Click "Run workflow"
-3. Optionally enter a branch name or commit SHA (empty = default branch)
-4. Check the test types to run
-5. Click "Run workflow"
+**From the Actions UI:** Go to Actions → Manual Tests → Run workflow, select branch/commit and test types.
+
+**From a PR comment:** Comment `/test flutter patrol` (or `f`, `p`, `r`, `func`). Runs tests on the PR head commit. See [SETUP.md](SETUP.md) for details.
 
 ## Test Types
 
@@ -74,6 +73,7 @@ Patrol and integration tests run against Firebase emulators. Instead of decrypti
 | File | Description |
 |------|-------------|
 | `README.md` | This quick start guide |
+| `SETUP.md` | One-time setup (per repo and org) |
 | `CONFIG-REFERENCE.md` | Complete config field reference |
 | `tests-config-template.json` | Template for `.github/tests-config.json` |
 | `manual-tests-workflow-template.yml` | Template for `.github/workflows/manual-tests.yml` |

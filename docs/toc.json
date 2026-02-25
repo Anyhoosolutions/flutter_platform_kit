@@ -241,6 +241,12 @@
 					"title": "Manual Tests",
 					"subpages": [
 						{
+							"filepath": "manual_tests/SETUP.md",
+							"name": "Setup",
+							"title": "Setup",
+							"subpages": []
+						},
+						{
 							"filepath": "manual_tests/CONFIG-REFERENCE.md",
 							"name": "Config Reference",
 							"title": "Config Reference",
