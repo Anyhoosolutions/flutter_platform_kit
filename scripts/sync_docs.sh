@@ -20,6 +20,11 @@ PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 
 cd "$PROJECT_ROOT"
 
+# Returns 0 (success) if path is gitignored
+is_gitignored() {
+  git check-ignore -q "$1" 2>/dev/null
+}
+
 # Configuration
 DOCS_DIR="docs"
 PACKAGE_DIRS="packages/*/ tools/*/"
@@ -111,8 +116,9 @@ for action_dir in tools/github_actions/*/; do
       echo "  ✅ $action_name/README.md"
     fi
     
-    # Copy additional .md files (excluding README.md and CHANGELOG.md)
+    # Copy additional .md files (excluding README.md and CHANGELOG.md, skipping gitignored)
     find "$action_dir" -maxdepth 1 -type f -name "*.md" ! -name "README.md" ! -name "CHANGELOG.md" 2>/dev/null | while read -r doc_file; do
+      [ -n "$doc_file" ] && ! is_gitignored "$doc_file" || continue
       filename=$(basename "$doc_file")
       cp "$doc_file" "$DOCS_DIR/$action_name/$filename"
       echo "  ✅ $action_name/$filename"
@@ -130,8 +136,9 @@ for package_dir in $PACKAGE_DIRS; do
   
   if [ -d "$docs_dir" ]; then
     mkdir -p "$DOCS_DIR/$package_name"
-    # Copy all .md files from the package's docs directory, preserving structure
+    # Copy all .md files from the package's docs directory, preserving structure (skipping gitignored)
     find "$docs_dir" -type f -name "*.md" | while read -r doc_file; do
+      [ -n "$doc_file" ] && ! is_gitignored "$doc_file" || continue
       rel_path="${doc_file#$docs_dir/}"
       target_dir="$DOCS_DIR/$package_name/$(dirname "$rel_path")"
       mkdir -p "$target_dir"
@@ -148,8 +155,9 @@ for package_dir in $PACKAGE_DIRS; do
   [ -d "$package_dir" ] || continue
   package_name=$(basename "$package_dir")
   
-  # Find all .md files in package root that aren't README.md or CHANGELOG.md
+  # Find all .md files in package root that aren't README.md or CHANGELOG.md (skipping gitignored)
   find "$package_dir" -maxdepth 1 -type f -name "*.md" ! -name "README.md" ! -name "CHANGELOG.md" 2>/dev/null | while read -r doc_file; do
+    [ -n "$doc_file" ] && ! is_gitignored "$doc_file" || continue
     filename=$(basename "$doc_file")
     mkdir -p "$DOCS_DIR/$package_name"
     cp "$doc_file" "$DOCS_DIR/$package_name/$filename"
