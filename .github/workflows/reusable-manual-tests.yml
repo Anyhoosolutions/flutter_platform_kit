@@ -1,0 +1,257 @@
+# ==============================================================================
+# REUSABLE WORKFLOW - Manual Tests
+# ==============================================================================
+#
+# This workflow is designed to be called from other repositories via workflow_call.
+# Consumer repos reference it like:
+#
+#   jobs:
+#     tests:
+#       uses: <org>/flutter_platform_kit/.github/workflows/reusable-manual-tests.yml@main
+#       with:
+#         ref: "main"
+#         flutter_unit_tests: true
+#         ...
+#
+# Other files: tools/github_actions/manual_tests/
+# ==============================================================================
+
+name: Reusable Manual Tests
+
+on:
+  workflow_call:
+    inputs:
+      ref:
+        description: "Branch name or commit SHA to test (empty = default branch)"
+        required: false
+        type: string
+        default: ""
+      flutter_unit_tests:
+        description: "Run Flutter unit tests"
+        required: false
+        type: boolean
+        default: false
+      patrol_integration_tests:
+        description: "Run Patrol or integration tests"
+        required: false
+        type: boolean
+        default: false
+      firestore_rules_tests:
+        description: "Run Firestore rules tests"
+        required: false
+        type: boolean
+        default: false
+      functions_tests:
+        description: "Run Firebase Functions tests"
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  prepare:
+    name: Prepare
+    runs-on: ubuntu-latest
+    outputs:
+      checkout_ref: ${{ steps.determine-ref.outputs.checkout_ref }}
+    steps:
+      - name: Validate inputs
+        run: |
+          if [ "${{ inputs.flutter_unit_tests }}" != "true" ] && \
+             [ "${{ inputs.patrol_integration_tests }}" != "true" ] && \
+             [ "${{ inputs.firestore_rules_tests }}" != "true" ] && \
+             [ "${{ inputs.functions_tests }}" != "true" ]; then
+            echo "::error::Select at least one test type to run"
+            exit 1
+          fi
+          echo "At least one test type selected"
+
+      - name: Determine checkout ref
+        id: determine-ref
+        run: |
+          if [ -n "${{ inputs.ref }}" ]; then
+            echo "checkout_ref=${{ inputs.ref }}" >> $GITHUB_OUTPUT
+            echo "Will checkout: ${{ inputs.ref }}"
+          else
+            echo "checkout_ref=${{ github.ref }}" >> $GITHUB_OUTPUT
+            echo "Will checkout default branch: ${{ github.ref }}"
+          fi
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.determine-ref.outputs.checkout_ref }}
+          fetch-depth: 0
+
+      - name: Verify tests config
+        run: |
+          if [ ! -f ".github/tests-config.json" ]; then
+            echo "::error::.github/tests-config.json not found. Copy from tests-config-template.json and customize."
+            exit 1
+          fi
+          echo "Config found"
+          jq . .github/tests-config.json > /dev/null || (echo "::error::Invalid JSON in tests-config.json" && exit 1)
+
+  flutter-unit-tests:
+    name: Flutter Unit Tests
+    runs-on: ubuntu-latest
+    needs: prepare
+    if: inputs.flutter_unit_tests == 'true'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
+          fetch-depth: 0
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: $(jq -r '.flutter_version // "3.38.4"' .github/tests-config.json)
+          channel: $(jq -r '.flutter_channel // "stable"' .github/tests-config.json)
+
+      - name: Cache Flutter dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.pub-cache
+            **/.dart_tool
+          key: ${{ runner.os }}-flutter-${{ hashFiles('**/pubspec.yaml') }}
+
+      - name: Load config and run unit tests
+        run: |
+          CONFIG=".github/tests-config.json"
+          CMD=$(jq -r '.flutter_unit_tests.command // "flutter test"' "$CONFIG")
+          
+          for pattern in $(jq -r '(.flutter_unit_tests.packages // ["packages/*", "tools/*"])[]' "$CONFIG"); do
+            for package in $pattern; do
+              if [ -d "$package" ] && [ -f "$package/pubspec.yaml" ]; then
+                test_dir="$package/test"
+                if [ -d "$test_dir" ] && [ -n "$(find "$test_dir" -name '*_test.dart' -type f 2>/dev/null)" ]; then
+                  echo "Running tests for $package"
+                  (cd "$package" && flutter pub get && $CMD)
+                  echo "Tests passed for $package"
+                else
+                  echo "Skipping $package (no test files)"
+                fi
+              fi
+            done
+          done
+
+  patrol-integration-tests:
+    name: Patrol / Integration Tests
+    runs-on: ubuntu-latest
+    needs: prepare
+    if: inputs.patrol_integration_tests == 'true'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
+          fetch-depth: 0
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: $(jq -r '.flutter_version // "3.38.4"' .github/tests-config.json)
+          channel: $(jq -r '.flutter_channel // "stable"' .github/tests-config.json)
+
+      - name: Get dependencies
+        run: |
+          APP_DIR=$(jq -r '.patrol_integration_tests.app_directory // "."' .github/tests-config.json)
+          for pkg in packages/*/ tools/*/ 2>/dev/null; do
+            [ -f "$pkg/pubspec.yaml" ] && (cd "$pkg" && flutter pub get) || true
+          done
+          (cd "$APP_DIR" && flutter pub get)
+
+      - name: Generate firebase_options.dart
+        run: |
+          PROJECT_ID=$(jq -r '.firebase_project_id // "demo-project-id"' .github/tests-config.json)
+          OPTIONS_PATH=$(jq -r '.patrol_integration_tests.firebase_options_path // "lib/firebase_options.dart"' .github/tests-config.json)
+          curl -sSL https://raw.githubusercontent.com/Anyhoosolutions/flutter_platform_kit/main/tools/github_actions/manual_tests/scripts/generate-firebase-options.sh | bash -s -- "$PROJECT_ID" "$OPTIONS_PATH"
+
+      - name: Install Patrol CLI
+        run: |
+          CONFIG=".github/tests-config.json"
+          TYPE=$(jq -r '.patrol_integration_tests.type // "patrol"' "$CONFIG")
+          if [ "$TYPE" = "patrol" ]; then
+            dart pub global activate patrol_cli
+            echo "$HOME/.pub-cache/bin" >> $GITHUB_PATH
+            patrol --version
+          fi
+
+      - name: Run Patrol / Integration tests
+        run: |
+          CONFIG=".github/tests-config.json"
+          DIR=$(jq -r '.patrol_integration_tests.directory // "patrol_test"' "$CONFIG")
+          CMD=$(jq -r '.patrol_integration_tests.command // "patrol test"' "$CONFIG")
+          APP_DIR=$(jq -r '.patrol_integration_tests.app_directory // "."' "$CONFIG")
+          
+          cd "$APP_DIR"
+          if [ -d "$DIR" ]; then
+            $CMD
+          else
+            echo "::warning::Test directory $DIR not found, skipping"
+          fi
+
+  firestore-rules-tests:
+    name: Firestore Rules Tests
+    runs-on: ubuntu-latest
+    needs: prepare
+    if: inputs.firestore_rules_tests == 'true'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: "21"
+          distribution: "temurin"
+
+      - name: Install Firebase CLI
+        run: npm install -g firebase-tools
+
+      - name: Run Firestore rules tests
+        run: |
+          CONFIG=".github/tests-config.json"
+          PROJECT_ID=$(jq -r '.firebase_project_id // "demo-project-id"' "$CONFIG")
+          WORK_DIR=$(jq -r '.firestore_rules_tests.working_directory // "."' "$CONFIG")
+          TEST_DIR=$(jq -r '.firestore_rules_tests.test_directory // "firestore.rules.test"' "$CONFIG")
+          TEST_CMD=$(jq -r '.firestore_rules_tests.test_command // "npm test"' "$CONFIG")
+          
+          if [ ! -d "$WORK_DIR/$TEST_DIR" ]; then
+            echo "::error::Firestore rules test directory $WORK_DIR/$TEST_DIR not found"
+            exit 1
+          fi
+          (cd "$WORK_DIR/$TEST_DIR" && npm install)
+          (cd "$WORK_DIR" && firebase --project "$PROJECT_ID" emulators:exec --only firestore -- sh -c "cd $TEST_DIR && $TEST_CMD")
+
+  functions-tests:
+    name: Functions Tests
+    runs-on: ubuntu-latest
+    needs: prepare
+    if: inputs.functions_tests == 'true'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
+          fetch-depth: 0
+
+      - name: Run Functions tests
+        uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/firebase-functions-test@main
+        with:
+          functions_path: $(jq -r '.functions_tests.path // "functions"' .github/tests-config.json)
+          firebase_project_id: $(jq -r '.firebase_project_id // "demo-project-id"' .github/tests-config.json)
+          install_command: $(jq -r '.functions_tests.install_command // "npm install"' .github/tests-config.json)
+          build_command: $(jq -r '.functions_tests.build_command // "npm run build"' .github/tests-config.json)
+          test_command: $(jq -r '.functions_tests.test_command // "npm test"' .github/tests-config.json)
+          emulators: $(jq -r '.functions_tests.emulators // "functions,firestore"' .github/tests-config.json)
