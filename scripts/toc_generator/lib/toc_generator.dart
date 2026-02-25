@@ -116,14 +116,15 @@ class TocGenerator {
         print('  ⚠️  Skipped $actionName (no README.md)');
         continue;
       }
-      
+
       // Find additional .md files in the action directory (subpages)
       final subpages = <Map<String, dynamic>>[];
       await for (final file in Directory(entity.path).list()) {
         if (file is File &&
             file.path.endsWith('.md') &&
             !file.path.endsWith('README.md') &&
-            !file.path.endsWith('CHANGELOG.md')) {
+            !file.path.endsWith('CHANGELOG.md') &&
+            !await _isGitignored(file.path)) {
           final filename = file.path.split('/').last;
           final docName = _getDocName(filename);
           subpages.add({
@@ -135,10 +136,10 @@ class TocGenerator {
           print('    📄 Found subpage: $filename');
         }
       }
-      
+
       // Sort subpages alphabetically
       subpages.sort((a, b) => (a['name'] as String).compareTo(b['name'] as String));
-      
+
       final displayName = _getDocName('$actionName.md');
       actions.add({
         'filepath': '$actionName/README.md',
@@ -176,7 +177,7 @@ class TocGenerator {
     final docsDir = Directory('${packageDir.path}/docs');
     if (await docsDir.exists()) {
       await for (final entity in docsDir.list(recursive: true)) {
-        if (entity is File && entity.path.endsWith('.md')) {
+        if (entity is File && entity.path.endsWith('.md') && !await _isGitignored(entity.path)) {
           final relativePath = entity.path.replaceFirst('${packageDir.path}/docs/', '');
           final docName = _getDocName(relativePath);
           subpages.add({
@@ -194,7 +195,8 @@ class TocGenerator {
       if (entity is File &&
           entity.path.endsWith('.md') &&
           !entity.path.endsWith('README.md') &&
-          !entity.path.endsWith('CHANGELOG.md')) {
+          !entity.path.endsWith('CHANGELOG.md') &&
+          !await _isGitignored(entity.path)) {
         final filename = entity.path.split('/').last;
         final docName = _getDocName(filename);
         subpages.add({
@@ -215,6 +217,17 @@ class TocGenerator {
       'title': displayName,
       'subpages': subpages,
     };
+  }
+
+  /// Returns true if the path is gitignored.
+  Future<bool> _isGitignored(String path) async {
+    final result = await Process.run(
+      'git',
+      ['check-ignore', '-q', path],
+      runInShell: false,
+      workingDirectory: projectRoot,
+    );
+    return result.exitCode == 0;
   }
 
   /// Get a display name from a filename (remove .md, convert to Title Case)
