@@ -103,11 +103,17 @@ jobs:
           ref: ${{ needs.prepare.outputs.checkout_ref }}
           fetch-depth: 0
 
+      - name: Read Flutter config
+        id: flutter-config
+        run: |
+          echo "version=$(jq -r '.flutter_version // "3.38.4"' .github/tests-config.json)" >> $GITHUB_OUTPUT
+          echo "channel=$(jq -r '.flutter_channel // "stable"' .github/tests-config.json)" >> $GITHUB_OUTPUT
+
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: $(jq -r '.flutter_version // "3.38.4"' .github/tests-config.json)
-          channel: $(jq -r '.flutter_channel // "stable"' .github/tests-config.json)
+          flutter-version: ${{ steps.flutter-config.outputs.version }}
+          channel: ${{ steps.flutter-config.outputs.channel }}
 
       - name: Cache Flutter dependencies
         uses: actions/cache@v3
@@ -121,7 +127,7 @@ jobs:
         run: |
           CONFIG=".github/tests-config.json"
           CMD=$(jq -r '.flutter_unit_tests.command // "flutter test"' "$CONFIG")
-          
+
           for pattern in $(jq -r '(.flutter_unit_tests.packages // ["."])[]' "$CONFIG"); do
             for package in $pattern; do
               if [ -d "$package" ] && [ -f "$package/pubspec.yaml" ]; then
@@ -149,11 +155,17 @@ jobs:
           ref: ${{ needs.prepare.outputs.checkout_ref }}
           fetch-depth: 0
 
+      - name: Read Flutter config
+        id: flutter-config
+        run: |
+          echo "version=$(jq -r '.flutter_version // "3.38.4"' .github/tests-config.json)" >> $GITHUB_OUTPUT
+          echo "channel=$(jq -r '.flutter_channel // "stable"' .github/tests-config.json)" >> $GITHUB_OUTPUT
+
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: $(jq -r '.flutter_version // "3.38.4"' .github/tests-config.json)
-          channel: $(jq -r '.flutter_channel // "stable"' .github/tests-config.json)
+          flutter-version: ${{ steps.flutter-config.outputs.version }}
+          channel: ${{ steps.flutter-config.outputs.channel }}
 
       - name: Get dependencies
         run: |
@@ -185,7 +197,7 @@ jobs:
           DIR=$(jq -r '.patrol_integration_tests.directory // "patrol_test"' "$CONFIG")
           CMD=$(jq -r '.patrol_integration_tests.command // "patrol test"' "$CONFIG")
           APP_DIR=$(jq -r '.patrol_integration_tests.app_directory // "."' "$CONFIG")
-          
+
           cd "$APP_DIR"
           if [ -d "$DIR" ]; then
             $CMD
@@ -226,7 +238,7 @@ jobs:
           WORK_DIR=$(jq -r '.firestore_rules_tests.working_directory // "."' "$CONFIG")
           TEST_DIR=$(jq -r '.firestore_rules_tests.test_directory // "firestore-rules-test"' "$CONFIG")
           TEST_CMD=$(jq -r '.firestore_rules_tests.test_command // "npm test"' "$CONFIG")
-          
+
           if [ ! -d "$WORK_DIR/$TEST_DIR" ]; then
             echo "::error::Firestore rules test directory $WORK_DIR/$TEST_DIR not found"
             exit 1
@@ -246,12 +258,22 @@ jobs:
           ref: ${{ needs.prepare.outputs.checkout_ref }}
           fetch-depth: 0
 
+      - name: Read functions config
+        id: func-config
+        run: |
+          echo "path=$(jq -r '.functions_tests.path // "functions"' .github/tests-config.json)" >> $GITHUB_OUTPUT
+          echo "project_id=$(jq -r '.firebase_project_id // "demo-project-id"' .github/tests-config.json)" >> $GITHUB_OUTPUT
+          echo "install=$(jq -r '.functions_tests.install_command // "npm install"' .github/tests-config.json)" >> $GITHUB_OUTPUT
+          echo "build=$(jq -r '.functions_tests.build_command // "npm run build"' .github/tests-config.json)" >> $GITHUB_OUTPUT
+          echo "test=$(jq -r '.functions_tests.test_command // "npm test"' .github/tests-config.json)" >> $GITHUB_OUTPUT
+          echo "emulators=$(jq -r '.functions_tests.emulators // "functions,firestore"' .github/tests-config.json)" >> $GITHUB_OUTPUT
+
       - name: Run Functions tests
         uses: Anyhoosolutions/flutter_platform_kit/tools/github_actions/firebase-functions-test@main
         with:
-          functions_path: $(jq -r '.functions_tests.path // "functions"' .github/tests-config.json)
-          firebase_project_id: $(jq -r '.firebase_project_id // "demo-project-id"' .github/tests-config.json)
-          install_command: $(jq -r '.functions_tests.install_command // "npm install"' .github/tests-config.json)
-          build_command: $(jq -r '.functions_tests.build_command // "npm run build"' .github/tests-config.json)
-          test_command: $(jq -r '.functions_tests.test_command // "npm test"' .github/tests-config.json)
-          emulators: $(jq -r '.functions_tests.emulators // "functions,firestore"' .github/tests-config.json)
+          functions_path: ${{ steps.func-config.outputs.path }}
+          firebase_project_id: ${{ steps.func-config.outputs.project_id }}
+          install_command: ${{ steps.func-config.outputs.install }}
+          build_command: ${{ steps.func-config.outputs.build }}
+          test_command: ${{ steps.func-config.outputs.test }}
+          emulators: ${{ steps.func-config.outputs.emulators }}
