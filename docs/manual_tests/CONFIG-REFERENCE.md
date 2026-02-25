@@ -37,7 +37,7 @@ Configuration for Flutter unit tests (`flutter test`).
 ```json
 {
   "flutter_unit_tests": {
-    "packages": ["packages/*", "tools/*"],
+    "packages": ["."],
     "command": "flutter test"
   }
 }
@@ -85,7 +85,7 @@ Configuration for Firestore security rules tests (Node.js with `@firebase/rules-
   "firestore_rules_tests": {
     "working_directory": ".",
     "rules_path": "firestore.rules",
-    "test_directory": "firestore.rules.test",
+    "test_directory": "firestore-rules-test",
     "test_command": "npm test"
   }
 }
@@ -154,7 +154,7 @@ Uses `firebase_project_id` from global config for the emulator project.
   "firestore_rules_tests": {
     "working_directory": ".",
     "rules_path": "firestore.rules",
-    "test_directory": "firestore.rules.test",
+    "test_directory": "firestore-rules-test",
     "test_command": "npm test"
   },
 

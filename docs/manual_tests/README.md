@@ -2,8 +2,6 @@
 
 A reusable GitHub Actions workflow for running tests on demand with configurable branch/commit and test type selection.
 
-> **Source:** `tools/github_actions/manual_tests/`
-
 ## Features
 
 - **Branch/commit selection**: Test any branch or specific commit SHA
@@ -15,25 +13,47 @@ A reusable GitHub Actions workflow for running tests on demand with configurable
 
 | Document | Description |
 |----------|-------------|
+| [SETUP.md](SETUP.md) | One-time setup (per repo and org) |
 | [CONFIG-REFERENCE.md](CONFIG-REFERENCE.md) | Complete `tests-config.json` field reference |
 
 ## Quick Start
 
 ### 1. Create the workflow file
 
-Copy `manual-tests-workflow-template.yml` from `tools/github_actions/manual_tests/` to `.github/workflows/manual-tests.yml` in your app repository.
+Copy `manual-tests-workflow-template.yml` to `.github/workflows/manual-tests.yml` in your app repository.
 
 ### 2. Create the configuration file
 
-Copy `tests-config-template.json` from `tools/github_actions/manual_tests/` to `.github/tests-config.json` and customize.
+Copy `tests-config-template.json` to `.github/tests-config.json` and customize:
+
+```json
+{
+  "firebase_project_id": "demo-project-id",
+  "flutter_unit_tests": {
+    "packages": ["."],
+    "command": "flutter test"
+  },
+  "patrol_integration_tests": {
+    "type": "patrol",
+    "directory": "patrol_test",
+    "command": "patrol test"
+  },
+  "firestore_rules_tests": {
+    "test_directory": "firestore-rules-test",
+    "test_command": "npm test"
+  },
+  "functions_tests": {
+    "path": "functions",
+    "test_command": "npm test"
+  }
+}
+```
 
 ### 3. Run tests
 
-1. Go to Actions → Manual Tests
-2. Click "Run workflow"
-3. Optionally enter a branch name or commit SHA (empty = default branch)
-4. Check the test types to run
-5. Click "Run workflow"
+**From the Actions UI:** Go to Actions → Manual Tests → Run workflow, select branch/commit and test types.
+
+**From a PR comment:** Comment `/test flutter patrol` (or `f`, `p`, `r`, `func`). Runs tests on the PR head commit. See [SETUP.md](SETUP.md) for details.
 
 ## Test Types
 
@@ -47,3 +67,14 @@ Copy `tests-config-template.json` from `tools/github_actions/manual_tests/` to `
 ## Firebase Options for Emulator Tests
 
 Patrol and integration tests run against Firebase emulators. Instead of decrypting SOPS-encrypted `firebase_options.dart`, the workflow generates a minimal placeholder file at runtime with `projectId: demo-project-id` (or your configured `firebase_project_id`). No secrets required.
+
+## Files in This Directory
+
+| File | Description |
+|------|-------------|
+| `README.md` | This quick start guide |
+| `SETUP.md` | One-time setup (per repo and org) |
+| `CONFIG-REFERENCE.md` | Complete config field reference |
+| `tests-config-template.json` | Template for `.github/tests-config.json` |
+| `manual-tests-workflow-template.yml` | Template for `.github/workflows/manual-tests.yml` |
+| `scripts/generate-firebase-options.sh` | Generates minimal firebase_options.dart for emulator tests |
