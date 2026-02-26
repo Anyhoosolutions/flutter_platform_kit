@@ -107,6 +107,39 @@ When `commit_hash` is provided, the upload tool will:
 - Add a commit hash suffix to the project name
 - Use the commit hash as the project ID
 
+## Configuration Files
+
+The upload reads from `docs/metadata.yml` and `docs/toc.json`. For complete details, see:
+
+- [Upload tool documentation](../../../docs/upload_documentation/README.md) — metadata format, toc.json structure, troubleshooting
+- [Documentation project (Anyhoosolutions)](https://anyhoosolutions.web.app/documentation/anyhoo_solutions/page/documentation_project%7Cdocumentation_project) — alternative GitHub App for documentation
+
+### `metadata.yml` fields
+
+| Field | Description | Required |
+|-------|-------------|----------|
+| `projectId` | Unique identifier for the project | Yes |
+| `name` | Display name of the project | Yes |
+| `description` | Project description | Yes |
+| `contactName` | Contact person name | Yes |
+| `contactEmail` | Contact email address | Yes |
+| `contactPerson` | Alternative: `{ name, email }` object | No |
+| `allowedUsers` | List of email addresses with access to restricted pages | No |
+| `projectImage` | URL or path to project image | No |
+| `webpages` | List of webpage URLs (e.g. app, dashboard links) | No |
+
+The full interface is defined in the [sync service](https://github.com/Anyhoosolutions/anyhoosolutions/blob/main/functions/src/syncFromGit.ts) (`syncFromGit.ts`).
+
+### `toc.json` fields
+
+| Field | Description |
+|-------|-------------|
+| `filepath` | Path to markdown file (relative to `docs/`) |
+| `name` | Short name for navigation |
+| `title` | Page title |
+| `onlyAllowedUsers` | If true, restricts access to `allowedUsers` |
+| `subpages` | Nested pages |
+
 ## Pre-processing
 
 This action does **not** handle pre-processing steps like:
