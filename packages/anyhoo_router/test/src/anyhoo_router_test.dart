@@ -73,7 +73,7 @@ void main() {
     });
 
     group('Redirect if route doesn\'t exist', () {
-      testWidgets('should redirect if route doesn\'t exist', (WidgetTester tester) async {
+      testWidgets("should redirect if route doesn't exist", (WidgetTester tester) async {
         await tester.pumpWidget(MaterialApp.router(routerConfig: goRouter));
 
         // Navigate to /accounts which should redirect to /profiles, then to /users
@@ -85,7 +85,7 @@ void main() {
 
         expect(find.text('Home'), findsOneWidget);
       });
-      testWidgets('should redirect to specified route if route doesn\'t exist', (WidgetTester tester) async {
+      testWidgets("should redirect to specified route if route doesn't exist", (WidgetTester tester) async {
         // Verify we ended up at /users (the final destination after recursive redirects)
         expect(goRouter.routeInformationProvider.value.uri.path, '/');
 

@@ -43,31 +43,66 @@
 					"filepath": "anyhoo_auth/README.md",
 					"name": "Anyhoo Auth",
 					"title": "Anyhoo Auth",
-					"subpages": []
+					"subpages": [
+						{
+							"filepath": "anyhoo_auth/tests.md",
+							"name": "Tests",
+							"title": "Tests",
+							"subpages": []
+						}
+					]
 				},
 				{
 					"filepath": "anyhoo_core/README.md",
 					"name": "Anyhoo Core",
 					"title": "Anyhoo Core",
-					"subpages": []
+					"subpages": [
+						{
+							"filepath": "anyhoo_core/tests.md",
+							"name": "Tests",
+							"title": "Tests",
+							"subpages": []
+						}
+					]
 				},
 				{
 					"filepath": "anyhoo_firebase/README.md",
 					"name": "Anyhoo Firebase",
 					"title": "Anyhoo Firebase",
-					"subpages": []
+					"subpages": [
+						{
+							"filepath": "anyhoo_firebase/tests.md",
+							"name": "Tests",
+							"title": "Tests",
+							"subpages": []
+						}
+					]
 				},
 				{
 					"filepath": "anyhoo_form_builder_widgets/README.md",
 					"name": "Anyhoo Form Builder Widgets",
 					"title": "Anyhoo Form Builder Widgets",
-					"subpages": []
+					"subpages": [
+						{
+							"filepath": "anyhoo_form_builder_widgets/tests.md",
+							"name": "Tests",
+							"title": "Tests",
+							"subpages": []
+						}
+					]
 				},
 				{
 					"filepath": "anyhoo_image_selector/README.md",
 					"name": "Anyhoo Image Selector",
 					"title": "Anyhoo Image Selector",
-					"subpages": []
+					"subpages": [
+						{
+							"filepath": "anyhoo_image_selector/tests.md",
+							"name": "Tests",
+							"title": "Tests",
+							"subpages": []
+						}
+					]
 				},
 				{
 					"filepath": "anyhoo_logging/README.md",
@@ -85,6 +120,12 @@
 							"name": "Sentry Setup",
 							"title": "Sentry Setup",
 							"subpages": []
+						},
+						{
+							"filepath": "anyhoo_logging/tests.md",
+							"name": "Tests",
+							"title": "Tests",
+							"subpages": []
 						}
 					]
 				},
@@ -92,31 +133,66 @@
 					"filepath": "anyhoo_map/README.md",
 					"name": "Anyhoo Map",
 					"title": "Anyhoo Map",
-					"subpages": []
+					"subpages": [
+						{
+							"filepath": "anyhoo_map/tests.md",
+							"name": "Tests",
+							"title": "Tests",
+							"subpages": []
+						}
+					]
 				},
 				{
 					"filepath": "anyhoo_remote_config/README.md",
 					"name": "Anyhoo Remote Config",
 					"title": "Anyhoo Remote Config",
-					"subpages": []
+					"subpages": [
+						{
+							"filepath": "anyhoo_remote_config/tests.md",
+							"name": "Tests",
+							"title": "Tests",
+							"subpages": []
+						}
+					]
 				},
 				{
 					"filepath": "anyhoo_router/README.md",
 					"name": "Anyhoo Router",
 					"title": "Anyhoo Router",
-					"subpages": []
+					"subpages": [
+						{
+							"filepath": "anyhoo_router/tests.md",
+							"name": "Tests",
+							"title": "Tests",
+							"subpages": []
+						}
+					]
 				},
 				{
 					"filepath": "anyhoo_search_bar/README.md",
 					"name": "Anyhoo Search Bar",
 					"title": "Anyhoo Search Bar",
-					"subpages": []
+					"subpages": [
+						{
+							"filepath": "anyhoo_search_bar/tests.md",
+							"name": "Tests",
+							"title": "Tests",
+							"subpages": []
+						}
+					]
 				},
 				{
 					"filepath": "anyhoo_shimmer/README.md",
 					"name": "Anyhoo Shimmer",
 					"title": "Anyhoo Shimmer",
-					"subpages": []
+					"subpages": [
+						{
+							"filepath": "anyhoo_shimmer/tests.md",
+							"name": "Tests",
+							"title": "Tests",
+							"subpages": []
+						}
+					]
 				}
 			]
 		},

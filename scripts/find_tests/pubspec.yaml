@@ -1,0 +1,18 @@
+name: find_tests
+description: A command-line tool for discovering and documenting all tests in a Flutter project.
+version: 1.0.0
+repository: https://github.com/Anyhoosolutions/flutter_platform_kit
+
+environment:
+  sdk: ^3.5.2
+
+executables:
+  find_tests:
+
+dependencies:
+  path: ^1.9.0
+  yaml: ^3.1.0
+
+dev_dependencies:
+  lints: ^4.0.0
+  test: '>=1.25.0 <2.0.0'
