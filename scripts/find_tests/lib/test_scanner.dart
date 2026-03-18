@@ -2,7 +2,9 @@ import 'dart:io';
 
 import 'package:path/path.dart' as path;
 
-/// Result of scanning: categorized and grouped test files
+import 'test_extractor.dart';
+
+/// Result of scanning: categorized and grouped test files with extracted tests.
 class ScanResult {
   ScanResult({
     required this.flutterUnit,
@@ -11,10 +13,10 @@ class ScanResult {
     required this.firestoreRules,
   });
 
-  final Map<String, List<String>> flutterUnit;
-  final Map<String, List<String>> patrolIntegration;
-  final Map<String, List<String>> firebaseFunctions;
-  final Map<String, List<String>> firestoreRules;
+  final Map<String, List<TestFileEntry>> flutterUnit;
+  final Map<String, List<TestFileEntry>> patrolIntegration;
+  final Map<String, List<TestFileEntry>> firebaseFunctions;
+  final Map<String, List<TestFileEntry>> firestoreRules;
 
   bool get isEmpty =>
       flutterUnit.isEmpty &&
@@ -42,10 +44,10 @@ class TestScanner {
       throw ArgumentError('Project root does not exist: $projectRoot');
     }
 
-    final flutterUnit = <String, List<String>>{};
-    final patrolIntegration = <String, List<String>>{};
-    final firebaseFunctions = <String, List<String>>{};
-    final firestoreRules = <String, List<String>>{};
+    final flutterUnit = <String, List<TestFileEntry>>{};
+    final patrolIntegration = <String, List<TestFileEntry>>{};
+    final firebaseFunctions = <String, List<TestFileEntry>>{};
+    final firestoreRules = <String, List<TestFileEntry>>{};
 
     await for (final entity in rootDir.list(recursive: true, followLinks: false)) {
       if (entity is! File) continue;
@@ -54,48 +56,53 @@ class TestScanner {
       if (_isExcluded(relativePath)) continue;
 
       final normalized = relativePath.replaceAll(r'\', '/');
+      final fullPath = path.join(projectRoot, normalized);
 
       // Flutter unit/widget tests
       if (_isFlutterUnitTest(normalized)) {
         final group = _groupForFlutterTest(normalized);
-        flutterUnit.putIfAbsent(group, () => []).add(normalized);
+        final entry = await _extractDartTests(fullPath, normalized);
+        flutterUnit.putIfAbsent(group, () => []).add(entry);
         continue;
       }
 
       // Patrol integration tests
       if (_isPatrolTest(normalized)) {
         final group = _groupForPatrolTest(normalized);
-        patrolIntegration.putIfAbsent(group, () => []).add(normalized);
+        final entry = await _extractDartTests(fullPath, normalized);
+        patrolIntegration.putIfAbsent(group, () => []).add(entry);
         continue;
       }
 
       // Firestore rules tests (Node.js describe/test)
       if (_isFirestoreRulesTest(normalized)) {
         final group = _groupForNodeTest(normalized);
-        firestoreRules.putIfAbsent(group, () => []).add(normalized);
+        final entry = await _extractNodeTests(fullPath, normalized);
+        firestoreRules.putIfAbsent(group, () => []).add(entry);
         continue;
       }
 
       // Firebase Functions tests
       if (_isFirebaseFunctionsTest(normalized)) {
         final group = _groupForNodeTest(normalized);
-        firebaseFunctions.putIfAbsent(group, () => []).add(normalized);
+        final entry = await _extractNodeTests(fullPath, normalized);
+        firebaseFunctions.putIfAbsent(group, () => []).add(entry);
         continue;
       }
     }
 
-    // Sort file lists within each group
+    // Sort file lists within each group (by file path)
     for (final list in flutterUnit.values) {
-      list.sort();
+      list.sort((a, b) => a.filePath.compareTo(b.filePath));
     }
     for (final list in patrolIntegration.values) {
-      list.sort();
+      list.sort((a, b) => a.filePath.compareTo(b.filePath));
     }
     for (final list in firebaseFunctions.values) {
-      list.sort();
+      list.sort((a, b) => a.filePath.compareTo(b.filePath));
     }
     for (final list in firestoreRules.values) {
-      list.sort();
+      list.sort((a, b) => a.filePath.compareTo(b.filePath));
     }
 
     return ScanResult(
@@ -171,5 +178,25 @@ class TestScanner {
     }
     final dir = path.dirname(filePath);
     return dir.isEmpty ? '(root)' : dir;
+  }
+
+  Future<TestFileEntry> _extractDartTests(String fullPath, String relativePath) async {
+    try {
+      final file = File(fullPath);
+      final content = await file.readAsString();
+      return TestExtractor.extractFromDart(relativePath, content);
+    } catch (_) {
+      return TestFileEntry(filePath: relativePath, tests: []);
+    }
+  }
+
+  Future<TestFileEntry> _extractNodeTests(String fullPath, String relativePath) async {
+    try {
+      final file = File(fullPath);
+      final content = await file.readAsString();
+      return TestExtractor.extractFromNode(relativePath, content);
+    } catch (_) {
+      return TestFileEntry(filePath: relativePath, tests: []);
+    }
   }
 }

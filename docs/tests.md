@@ -23,6 +23,8 @@ Overview of test suites in this project.
 ### packages/anyhoo_router
 - `packages/anyhoo_router/test/src/anyhoo_route_redirector_test.dart`
 - `packages/anyhoo_router/test/src/anyhoo_router_test.dart`
+  - Redirect if route doesn't exist > should redirect if route doesn't exist
+  - should redirect to specified route if route doesn't exist
 
 ### scripts/toc_generator
 - `scripts/toc_generator/test/dart_test.dart`

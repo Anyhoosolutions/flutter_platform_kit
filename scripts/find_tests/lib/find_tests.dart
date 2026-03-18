@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:path/path.dart' as path;
 import 'package:yaml/yaml.dart';
 
+import 'test_extractor.dart';
 import 'test_scanner.dart';
 
 /// Generates a markdown summary of all tests in a Flutter project.
@@ -45,11 +46,15 @@ class FindTests {
     }
 
     if (!quiet) {
-      final total = result.flutterUnit.values.fold<int>(0, (s, l) => s + l.length) +
+      final fileCount = result.flutterUnit.values.fold<int>(0, (s, l) => s + l.length) +
           result.patrolIntegration.values.fold<int>(0, (s, l) => s + l.length) +
           result.firebaseFunctions.values.fold<int>(0, (s, l) => s + l.length) +
           result.firestoreRules.values.fold<int>(0, (s, l) => s + l.length);
-      print('✅ Found $total test files');
+      final testCount = result.flutterUnit.values.fold<int>(0, (s, l) => s + l.fold<int>(0, (t, e) => t + e.tests.length)) +
+          result.patrolIntegration.values.fold<int>(0, (s, l) => s + l.fold<int>(0, (t, e) => t + e.tests.length)) +
+          result.firebaseFunctions.values.fold<int>(0, (s, l) => s + l.fold<int>(0, (t, e) => t + e.tests.length)) +
+          result.firestoreRules.values.fold<int>(0, (s, l) => s + l.fold<int>(0, (t, e) => t + e.tests.length));
+      print('✅ Found $fileCount test files ($testCount tests)');
     }
 
     await _writeMarkdown(result);
@@ -119,7 +124,7 @@ class FindTests {
   void _writeSection(
     StringBuffer buffer,
     String title,
-    Map<String, List<String>> groups,
+    Map<String, List<TestFileEntry>> groups,
   ) {
     buffer.writeln('## $title');
     buffer.writeln();
@@ -133,8 +138,11 @@ class FindTests {
     final sortedGroups = groups.keys.toList()..sort();
     for (final group in sortedGroups) {
       buffer.writeln('### $group');
-      for (final file in groups[group]!) {
-        buffer.writeln('- `$file`');
+      for (final entry in groups[group]!) {
+        buffer.writeln('- `${entry.filePath}`');
+        for (final testName in entry.tests) {
+          buffer.writeln('  - $testName');
+        }
       }
       buffer.writeln();
     }
