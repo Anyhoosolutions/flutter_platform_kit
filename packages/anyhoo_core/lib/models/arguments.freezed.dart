@@ -15,7 +15,8 @@ T _$identity<T>(T value) => value;
 mixin _$Arguments implements DiagnosticableTreeMixin {
 
 // @Default(false) bool useTestDb,
- bool get useFakeData; bool get useDeviceEmulator; DateTime? get currentTime; String? get location; bool get logoutAtStartup; bool get loginAtStartup; String? get userEmail; String? get userPassword; bool? get useFirebaseAnalytics; bool? get useFirebaseEmulator;
+ bool get useFakeData; bool get useDeviceEmulator;// If an Android emulator or iOS simulator is used, this should be true
+ DateTime? get currentTime; String? get location; bool get logoutAtStartup; bool get loginAtStartup; String? get userEmail; String? get userPassword; bool? get useFirebaseAnalytics; bool? get useFirebaseEmulator;
 /// Create a copy of Arguments
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -222,6 +223,7 @@ class _Arguments extends Arguments with DiagnosticableTreeMixin {
 // @Default(false) bool useTestDb,
 @override@JsonKey() final  bool useFakeData;
 @override@JsonKey() final  bool useDeviceEmulator;
+// If an Android emulator or iOS simulator is used, this should be true
 @override@JsonKey() final  DateTime? currentTime;
 @override@JsonKey() final  String? location;
 @override@JsonKey() final  bool logoutAtStartup;

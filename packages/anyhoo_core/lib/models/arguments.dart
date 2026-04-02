@@ -13,7 +13,7 @@ sealed class Arguments with _$Arguments {
   const factory Arguments({
     // @Default(false) bool useTestDb,
     @Default(false) bool useFakeData,
-    @Default(false) bool useDeviceEmulator,
+    @Default(false) bool useDeviceEmulator, // If an Android emulator or iOS simulator is used, this should be true
     @Default(null) DateTime? currentTime,
     @Default(null) String? location,
     @Default(false) bool logoutAtStartup,
