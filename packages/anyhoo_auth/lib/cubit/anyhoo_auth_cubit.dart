@@ -100,6 +100,7 @@ class AnyhooAuthCubit<T extends AnyhooUser> extends Cubit<AnyhooAuthState<T>> {
       await authService.loginWithEmailAndPassword(email, password);
     } catch (e, stackTrace) {
       _log.severe('Error logging in with email and password', e);
+      _log.info('stackTrace: $stackTrace');
       SentryHelper.captureException(e, stackTrace: stackTrace, fatal: false);
       emit(state.copyWith(
         isLoading: false,

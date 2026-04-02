@@ -1,3 +1,8 @@
+## 0.0.16
+
+* Resolve Firebase emulator host for macOS, Windows, Linux, and Fuchsia (`localhost`)
+* Log chosen emulator host with platform and `useDeviceEmulator`; warn when Auth/Firestore/Storage emulator is enabled but host is null
+
 ## 0.0.15
 
 * Allow _shouldSetupErrorHandling

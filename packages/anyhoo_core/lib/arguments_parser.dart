@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:anyhoo_core/models/arguments.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_launch_arguments/flutter_launch_arguments.dart';
@@ -7,7 +9,7 @@ class ArgumentsParser {
   static final _log = Logger('ArgumentsParser');
 
   static Future<Arguments> getArguments() async {
-    final fla = kIsWeb ? null : FlutterLaunchArguments();
+    final fla = kIsWeb || Platform.isMacOS ? null : FlutterLaunchArguments();
 
     final arguments = Arguments(
       currentTime: await getCurrentTime(fla),

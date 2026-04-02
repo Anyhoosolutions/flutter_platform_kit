@@ -62,13 +62,13 @@ class FirebaseInitializer {
       _firebaseApp = firebase;
 
       if (emulatorConfig.useFirebaseAuth) {
-        _setupFirebaseAuth();
+        await _setupFirebaseAuth();
       }
       if (emulatorConfig.useFirebaseFirestore) {
-        _setupFirebaseFirestore();
+        await _setupFirebaseFirestore();
       }
       if (emulatorConfig.useFirebaseStorage) {
-        _setupFirebaseStorage();
+        await _setupFirebaseStorage();
       }
 
       _setupErrorHandling();
@@ -123,13 +123,13 @@ class FirebaseInitializer {
           _log.info('!! Configuring Auth emulator with host: $host, port: ${emulatorConfig.authPort}');
           await _auth!.useAuthEmulator(host, emulatorConfig.authPort);
           _log.info('!! Successfully configured Auth emulator');
-          // On web, ensure emulator is fully ready before proceeding
-          if (kIsWeb) {
+          // On web and macOS desktop, brief delay so the native channel is ready
+          if (kIsWeb || defaultTargetPlatform == TargetPlatform.macOS) {
             await Future.delayed(const Duration(milliseconds: 200));
-            _log.info('!! Web emulator ready delay completed');
+            _log.info('!! Auth emulator ready delay completed');
           }
         } else {
-          _log.warning('!! Emulator enabled but host is null');
+          _log.warning('!! Auth emulator was enabled but host is null; Auth will use production Identity Toolkit');
         }
       } else {
         _log.info('!! Auth emulator is DISABLED - using production Firebase Auth');
@@ -173,6 +173,8 @@ class FirebaseInitializer {
           _log.info(
             '!! Successfully configured Firestore emulator with host: $host, port: ${emulatorConfig.firestorePort}',
           );
+        } else {
+          _log.warning('!! Firestore emulator was enabled but host is null; Firestore will use production');
         }
       }
       _log.info('!! Firestore configured: ${_firestore!.settings}');
@@ -203,9 +205,9 @@ class FirebaseInitializer {
     _log.info('!! hostIp: ${emulatorConfig.hostIp}');
     _log.info('!! arguments.shouldUseEmulator(): ${arguments.shouldUseFirebaseEmulator()}');
     _log.info('!! OSTool.getPlatformType(): ${OSTool.getPlatformType()}');
-    _log.info('!! arguments.useDeviceEmulator(): ${arguments.useDeviceEmulator}');
     if (arguments.shouldUseFirebaseEmulator()) {
-      final host = switch ((OSTool.getPlatformType(), arguments.useDeviceEmulator)) {
+      final platform = OSTool.getPlatformType();
+      final host = switch ((platform, arguments.useDeviceEmulator)) {
         // Web platform - always use localhost regardless of other parameters
         (PlatformType.web, _) => 'localhost',
 
@@ -219,10 +221,13 @@ class FirebaseInitializer {
         // Simulator iOS device
         (PlatformType.ios, true) => emulatorConfig.hostIp,
 
-        // Default case
-        (_, _) => null,
+        // Desktop / Fuchsia: emulators run on the same machine as the app
+        (PlatformType.macos, _) => 'localhost',
+        (PlatformType.windows, _) => 'localhost',
+        (PlatformType.linux, _) => 'localhost',
+        (PlatformType.fuchsia, _) => 'localhost',
       };
-      _log.info('!! host: $host');
+      _log.info('!! Emulator host for $platform (useDeviceEmulator: ${arguments.useDeviceEmulator}): $host');
       return host;
     } else {
       _log.info('!! host: null');
@@ -247,7 +252,11 @@ class FirebaseInitializer {
         final host = _getHost();
         if (host != null) {
           _storage!.useStorageEmulator(host, emulatorConfig.storagePort);
-          _log.info('!! Successfully configured Storage emulator');
+          _log.info(
+            '!! Successfully configured Storage emulator with host: $host, port: ${emulatorConfig.storagePort}',
+          );
+        } else {
+          _log.warning('!! Storage emulator was enabled but host is null; Storage will use production');
         }
       }
       _log.info('!! Storage configured: ${_storage!}');

@@ -1,3 +1,7 @@
+## 0.0.32
+
+* Bug fixes for auto logging in on macOS
+
 ## 0.0.31 
 
 * Replace svg files by coding svg in dart file

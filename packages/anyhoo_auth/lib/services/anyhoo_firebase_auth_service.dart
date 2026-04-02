@@ -68,12 +68,23 @@ class AnyhooFirebaseAuthService<T extends AnyhooUser> implements AnyhooAuthServi
   @override
   Future<void> loginWithEmailAndPassword(String email, String password) async {
     try {
+      final existing = _firebaseAuth.currentUser;
+      if (existing != null && existing.email?.toLowerCase() == email.toLowerCase()) {
+        _log.info(
+          'Already signed in as $email; skipping signInWithEmailAndPassword',
+        );
+        return;
+      }
       await _firebaseAuth.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
     } catch (e, stackTrace) {
       _log.severe('Error logging in with email and password', e);
+      if (e is firebase_auth.FirebaseAuthException) {
+        _log.info('FirebaseAuthException code: ${e.code}, message: ${e.message}');
+      }
+      _log.info('stackTrace: $stackTrace');
       SentryHelper.captureException(e, stackTrace: stackTrace, fatal: false);
       rethrow;
     }
@@ -151,7 +162,8 @@ class AnyhooFirebaseAuthService<T extends AnyhooUser> implements AnyhooAuthServi
               _log.severe('Firebase signInWithCredential timed out after $timeoutSeconds seconds');
               _log.severe('This might indicate a network connectivity issue or Firebase project configuration problem');
               _log.severe('Check if Firebase Auth is configured to use emulator (it should NOT be)');
-              final timeoutError = TimeoutException('Firebase authentication timed out', const Duration(seconds: timeoutSeconds));
+              final timeoutError =
+                  TimeoutException('Firebase authentication timed out', const Duration(seconds: timeoutSeconds));
               SentryHelper.captureException(timeoutError, fatal: false);
               throw timeoutError;
             },
