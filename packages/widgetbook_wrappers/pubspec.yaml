@@ -1,6 +1,6 @@
 name: widgetbook_wrappers
 description: "A package for wrapping widgets for widgetbook."
-version: 0.0.1
+version: 0.1.0
 homepage: https://anyhoosolutions.web.app/documentation/flutter_platform_kit
 publish_to: none
 
@@ -9,8 +9,10 @@ environment:
   flutter: ">=1.17.0"
 
 dependencies:
+  device_frame_plus: ^1.0.0
   flutter:
     sdk: flutter
+  widgetbook: ^3.20.0
 
 dev_dependencies:
   flutter_test:
@@ -22,6 +24,7 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
+  uses-material-design: true
 
   # To add assets to your package, add an assets section, like this:
   # assets:

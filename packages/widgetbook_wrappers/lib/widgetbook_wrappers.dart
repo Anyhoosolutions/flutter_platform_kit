@@ -1,5 +1,9 @@
-export 'src/calculator.dart';
+export 'src/widgetbook_device_option.dart';
+export 'src/widgetbook_phone_frame_config.dart';
+export 'src/widgetbook_simple_story_config.dart';
+export 'src/widgetbook_story_shell.dart';
+export 'src/widgetbook_story_wrapper.dart';
+export 'src/widgetbook_theme_config.dart';
 
-// Add exports for all public API files
-// export 'path/to/public_file1.dart';
-// export 'path/to/public_file2.dart';
+export 'package:device_frame_plus/device_frame_plus.dart'
+    show DeviceFrame, DeviceInfo, Devices;
