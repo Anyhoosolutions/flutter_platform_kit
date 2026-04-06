@@ -29,6 +29,23 @@ class WidgetbookPhoneFrameConfig {
     );
   }
 
+  factory WidgetbookPhoneFrameConfig.commonDevices(List<WidgetbookDeviceOption> devices) {
+    final ios = Devices.ios;
+    final android = Devices.android;
+    final macOS = Devices.macOS;
+    return WidgetbookPhoneFrameConfig(
+      devices: [
+        WidgetbookDeviceOption(device: ios.iPhone13),
+        WidgetbookDeviceOption(device: ios.iPhoneSE),
+        WidgetbookDeviceOption(device: android.samsungGalaxyS20),
+        WidgetbookDeviceOption(device: android.mediumTablet, label: 'Medium Android Tablet'),
+        WidgetbookDeviceOption(device: android.largeTablet, label: 'Large Android Tablet'),
+        WidgetbookDeviceOption(device: macOS.macBookPro),
+        WidgetbookDeviceOption(device: macOS.wideMonitor, label: 'Wide Monitor'),
+      ],
+    );
+  }
+
   final List<WidgetbookDeviceOption> devices;
 
   final String deviceKnobLabel;
