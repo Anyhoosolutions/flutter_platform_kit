@@ -29,7 +29,7 @@ class WidgetbookPhoneFrameConfig {
     );
   }
 
-  factory WidgetbookPhoneFrameConfig.commonDevices(List<WidgetbookDeviceOption> devices) {
+  factory WidgetbookPhoneFrameConfig.commonDevices() {
     final ios = Devices.ios;
     final android = Devices.android;
     final macOS = Devices.macOS;
