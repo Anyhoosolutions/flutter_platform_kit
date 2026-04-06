@@ -161,7 +161,7 @@ class ScreenshotCapturer {
       }
 
       // Crop the image
-      final cropped = img.copyCrop(
+      var cropped = img.copyCrop(
         image,
         x: geometry.xOffset,
         y: geometry.yOffset,
@@ -169,6 +169,10 @@ class ScreenshotCapturer {
         height: geometry.height > image.height - geometry.yOffset ? image.height - geometry.yOffset : geometry.height,
       );
       if (config.cornerRadius > 0) {
+        // RGB captures have no alpha channel; setPixelRgba alpha is ignored and corners look black.
+        if (!cropped.hasAlpha) {
+          cropped = cropped.convert(numChannels: 4, alpha: 255);
+        }
         _applyRoundedCorners(cropped, config.cornerRadius);
       }
 
@@ -199,10 +203,7 @@ class ScreenshotCapturer {
   }
 
   void _applyRoundedCorners(img.Image image, int requestedRadius) {
-    final radius = requestedRadius
-        .clamp(0, image.width ~/ 2)
-        .clamp(0, image.height ~/ 2)
-        .toInt();
+    final radius = requestedRadius.clamp(0, image.width ~/ 2).clamp(0, image.height ~/ 2).toInt();
     if (radius == 0) {
       return;
     }

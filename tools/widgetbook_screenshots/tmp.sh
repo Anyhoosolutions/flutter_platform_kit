@@ -1,14 +1,14 @@
 dart run bin/widgetbook_screenshots.dart \
   --port 9798 \
-  --device "Wide Monitor" \
-  --orientation landscape \
-  --theme-mode dark \
+  --device "iPhone 13" \
+  --orientation portrait \
+  --theme-mode light \
   --output-dir ./screenshots \
-  --crop-width 764 \
-  --crop-height 446 \
-  --crop-x-offset 258 \
+  --crop-width 350 \
+  --crop-height 1080 \
+  --crop-x-offset 260 \
   --crop-y-offset 0 \
-  --corner-radius 12 \
+  --corner-radius 57 \
   features/todos/alltodos/alltodospage/default
 
 
