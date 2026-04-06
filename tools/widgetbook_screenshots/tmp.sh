@@ -9,6 +9,7 @@ dart run bin/widgetbook_screenshots.dart \
   --crop-x-offset 260 \
   --crop-y-offset 0 \
   --corner-radius 57 \
+  --debug \
   features/todos/alltodos/alltodospage/default
 
 

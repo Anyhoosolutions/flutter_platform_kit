@@ -111,10 +111,10 @@ class Config {
       knobs['Orientation'] = orientation!.trim();
     }
     if (themeMode != null && themeMode!.trim().isNotEmpty) {
-      knobs['Theme mode'] = themeMode!.trim();
+      knobs['Theme'] = themeMode!.trim();
     } else if (darkMode) {
       // Backwards compatibility for older dark-mode only callers.
-      knobs['Theme mode'] = 'dark';
+      knobs['Theme'] = 'dark';
     }
 
     if (knobs.isNotEmpty) {

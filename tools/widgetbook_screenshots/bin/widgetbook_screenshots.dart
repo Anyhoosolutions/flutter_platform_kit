@@ -4,7 +4,6 @@ import 'package:logging/logging.dart';
 import 'package:widgetbook_screenshots/widgetbook_screenshots.dart';
 
 void main(List<String> arguments) async {
-  Logger.root.level = Level.INFO;
   Logger.root.onRecord.listen((record) {
     final str = '${record.level.name}: ${record.message}';
     // ignore: avoid_print
@@ -41,6 +40,12 @@ void main(List<String> arguments) async {
       'skip-existing-screenshots',
       help: 'Skip screenshot capture if file already exists (capture only missing screenshots)',
       defaultsTo: false,
+    )
+    ..addFlag(
+      'debug',
+      abbr: 'd',
+      help: 'Verbose logging (includes full Widgetbook URL per screenshot)',
+      defaultsTo: false,
     );
 
   ArgResults argResults;
@@ -50,6 +55,8 @@ void main(List<String> arguments) async {
     _printUsageAndExit(parser, error: e.toString());
     return;
   }
+
+  Logger.root.level = argResults['debug'] as bool ? Level.FINE : Level.INFO;
 
   final portValue = int.tryParse(argResults['port'] as String);
   if (portValue == null || portValue <= 0) {

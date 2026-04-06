@@ -75,8 +75,8 @@ class ScreenshotCapturer {
       }
 
       _logger.info('Capturing screenshot for ${screen.name}...');
-      _logger.fine('  URL: $url');
-      _logger.fine('  Output: $outputPath');
+      _logger.fine('Screenshot URL: $url');
+      _logger.fine('Output path: $outputPath');
 
       // Create temp file for Playwright to save to
       final tempDir = Directory.systemTemp;

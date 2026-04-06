@@ -81,6 +81,7 @@ widgetbook_screenshots --skip-existing-screenshots /path/one /path/two
 - `--crop-y-offset`: Crop Y offset in pixels (default: `0`)
 - `--corner-radius`: Rounded corner radius in pixels (default: `0`, disabled)
 - `--skip-existing-screenshots`: Skip stories that already have an output file
+- `--debug` / `-d`: Verbose logging (prints the full Widgetbook URL and output path for each capture)
 
 ## Story Path Input
 
