@@ -103,6 +103,12 @@ class Config {
     final path = screen.path.startsWith('/') ? screen.path.substring(1) : screen.path;
     var url = '$baseUrl/#/?path=$path';
 
+    // Screen path may already include `&knobs={...}` (e.g. per-use-case device/orientation/theme).
+    // Do not append a second `knobs=` from [darkMode] / [deviceName] — that breaks Widgetbook.
+    if (path.contains('&knobs=')) {
+      return url;
+    }
+
     final knobs = <String, String>{};
     if (deviceName != null && deviceName!.trim().isNotEmpty) {
       knobs['Device'] = deviceName!.trim();

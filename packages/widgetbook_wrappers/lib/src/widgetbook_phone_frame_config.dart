@@ -35,14 +35,14 @@ class WidgetbookPhoneFrameConfig {
     final macOS = Devices.macOS;
     return WidgetbookPhoneFrameConfig(
       devices: [
-        WidgetbookDeviceOption(device: ios.iPhone13),
-        WidgetbookDeviceOption(device: ios.iPhoneSE),
-        WidgetbookDeviceOption(device: android.samsungGalaxyS20),
-        WidgetbookDeviceOption(device: ios.iPadAir4),
-        WidgetbookDeviceOption(device: android.mediumTablet, label: 'Medium Android Tablet'),
-        WidgetbookDeviceOption(device: android.largeTablet, label: 'Large Android Tablet'),
-        WidgetbookDeviceOption(device: macOS.macBookPro),
-        WidgetbookDeviceOption(device: macOS.wideMonitor, label: 'Wide Monitor'),
+        WidgetbookDeviceOption(device: ios.iPhone13, label: 'iPhone_13'),
+        WidgetbookDeviceOption(device: ios.iPhoneSE, label: 'iPhone_SE'),
+        WidgetbookDeviceOption(device: android.samsungGalaxyS20, label: 'Samsung_Galaxy_S20'),
+        WidgetbookDeviceOption(device: ios.iPadAir4, label: 'iPad_Air_4'),
+        WidgetbookDeviceOption(device: android.mediumTablet, label: 'Medium_Android_Tablet'),
+        WidgetbookDeviceOption(device: android.largeTablet, label: 'Large_Android_Tablet'),
+        WidgetbookDeviceOption(device: macOS.macBookPro, label: 'MacBook_Pro'),
+        WidgetbookDeviceOption(device: macOS.wideMonitor, label: 'Wide_Monitor'),
       ],
     );
   }
