@@ -117,6 +117,12 @@
 					"name": "Anyhoo Shimmer",
 					"title": "Anyhoo Shimmer",
 					"subpages": []
+				},
+				{
+					"filepath": "widgetbook_wrappers/README.md",
+					"name": "Widgetbook Wrappers",
+					"title": "Widgetbook Wrappers",
+					"subpages": []
 				}
 			]
 		},
@@ -153,7 +159,14 @@
 					"filepath": "tablet_viewing_service/README.md",
 					"name": "Tablet Viewing Service",
 					"title": "Tablet Viewing Service",
-					"subpages": []
+					"subpages": [
+						{
+							"filepath": "tablet_viewing_service/tablet_content.md",
+							"name": "Tablet Content",
+							"title": "Tablet Content",
+							"subpages": []
+						}
+					]
 				},
 				{
 					"filepath": "upload_documentation/README.md",
