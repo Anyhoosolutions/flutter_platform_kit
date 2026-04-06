@@ -39,6 +39,35 @@ Widget buildMyScreen(BuildContext context) {
 }
 ```
 
+Example wrapper (your app supplies real cubits; this only shows shape):
+
+```dart
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:widgetbook_wrappers/widgetbook_wrappers.dart';
+
+class MyAppWidgetbookWrapper extends WidgetbookStoryWrapper {
+  const MyAppWidgetbookWrapper();
+
+  @override
+  Widget wrap(BuildContext context, Widget child) {
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<SettingsCubit>(
+          create: (_) => SettingsCubit.forWidgetbook(),
+        ),
+        BlocProvider<TodosCubit>(
+          create: (_) => TodosCubit.forWidgetbook(),
+        ),
+      ],
+      child: child,
+    );
+  }
+}
+```
+
+`child` is the framed `MaterialApp` subtree from [`WidgetbookStoryShell.wrapPhoneStory`](lib/src/widgetbook_story_shell.dart), so providers wrap the whole story shell output. Replace `SettingsCubit` / `TodosCubit` and `forWidgetbook()` with whatever you use for mocks or fakes in Widgetbook.
+
 `wrapSimpleStory` uses a padded `Scaffold` body without a device frame (good for small components).
 
 ### Wrapper placement and GoRouter
