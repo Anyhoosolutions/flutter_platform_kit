@@ -59,6 +59,10 @@ class Config {
   final List<Screen> screens;
   final CropGeometry cropGeometry;
   final bool darkMode;
+  final String? deviceName;
+  final String? orientation;
+  final String? themeMode;
+  final int cornerRadius;
 
   Config({
     required this.widgetbookUrl,
@@ -66,6 +70,10 @@ class Config {
     required this.screens,
     required this.cropGeometry,
     this.darkMode = false,
+    this.deviceName,
+    this.orientation,
+    this.themeMode,
+    this.cornerRadius = 0,
   });
 
   factory Config.fromJsonFile(String filePath, {bool darkMode = false}) {
@@ -83,6 +91,10 @@ class Config {
       screens: (json['screens'] as List<dynamic>).map((e) => Screen.fromJson(e as Map<String, dynamic>)).toList(),
       cropGeometry: CropGeometry.fromJson(json['cropGeometry'] as Map<String, dynamic>?),
       darkMode: darkMode,
+      deviceName: json['deviceName'] as String?,
+      orientation: json['orientation'] as String?,
+      themeMode: json['themeMode'] as String?,
+      cornerRadius: json['cornerRadius'] as int? ?? 0,
     );
   }
 
@@ -91,9 +103,25 @@ class Config {
     final path = screen.path.startsWith('/') ? screen.path.substring(1) : screen.path;
     var url = '$baseUrl/#/?path=$path';
 
-    // Append dark mode knobs if dark mode is enabled
-    if (darkMode) {
-      url += '&knobs={Theme%20mode:dark}';
+    final knobs = <String, String>{};
+    if (deviceName != null && deviceName!.trim().isNotEmpty) {
+      knobs['Device'] = deviceName!.trim();
+    }
+    if (orientation != null && orientation!.trim().isNotEmpty) {
+      knobs['Orientation'] = orientation!.trim();
+    }
+    if (themeMode != null && themeMode!.trim().isNotEmpty) {
+      knobs['Theme mode'] = themeMode!.trim();
+    } else if (darkMode) {
+      // Backwards compatibility for older dark-mode only callers.
+      knobs['Theme mode'] = 'dark';
+    }
+
+    if (knobs.isNotEmpty) {
+      final serializedKnobs = knobs.entries
+          .map((entry) => '${Uri.encodeComponent(entry.key)}:${Uri.encodeComponent(entry.value)}')
+          .join(',');
+      url += '&knobs={$serializedKnobs}';
     }
 
     return url;
