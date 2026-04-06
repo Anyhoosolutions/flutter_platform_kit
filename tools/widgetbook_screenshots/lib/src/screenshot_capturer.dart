@@ -75,8 +75,8 @@ class ScreenshotCapturer {
       }
 
       _logger.info('Capturing screenshot for ${screen.name}...');
-      _logger.fine('  URL: $url');
-      _logger.fine('  Output: $outputPath');
+      _logger.fine('Screenshot URL: $url');
+      _logger.fine('Output path: $outputPath');
 
       // Create temp file for Playwright to save to
       final tempDir = Directory.systemTemp;
@@ -161,13 +161,20 @@ class ScreenshotCapturer {
       }
 
       // Crop the image
-      final cropped = img.copyCrop(
+      var cropped = img.copyCrop(
         image,
         x: geometry.xOffset,
         y: geometry.yOffset,
         width: geometry.width > image.width - geometry.xOffset ? image.width - geometry.xOffset : geometry.width,
         height: geometry.height > image.height - geometry.yOffset ? image.height - geometry.yOffset : geometry.height,
       );
+      if (config.cornerRadius > 0) {
+        // RGB captures have no alpha channel; setPixelRgba alpha is ignored and corners look black.
+        if (!cropped.hasAlpha) {
+          cropped = cropped.convert(numChannels: 4, alpha: 255);
+        }
+        _applyRoundedCorners(cropped, config.cornerRadius);
+      }
 
       // Save the cropped image
       final outputFile = File(outputPath);
@@ -192,6 +199,30 @@ class ScreenshotCapturer {
       return result.exitCode == 0;
     } catch (e) {
       return false;
+    }
+  }
+
+  void _applyRoundedCorners(img.Image image, int requestedRadius) {
+    final radius = requestedRadius.clamp(0, image.width ~/ 2).clamp(0, image.height ~/ 2).toInt();
+    if (radius == 0) {
+      return;
+    }
+
+    final maxX = image.width - 1;
+    final maxY = image.height - 1;
+    final rr = radius * radius;
+
+    for (var y = 0; y < radius; y++) {
+      for (var x = 0; x < radius; x++) {
+        final dx = radius - 1 - x;
+        final dy = radius - 1 - y;
+        if ((dx * dx) + (dy * dy) >= rr) {
+          image.setPixelRgba(x, y, 0, 0, 0, 0);
+          image.setPixelRgba(maxX - x, y, 0, 0, 0, 0);
+          image.setPixelRgba(x, maxY - y, 0, 0, 0, 0);
+          image.setPixelRgba(maxX - x, maxY - y, 0, 0, 0, 0);
+        }
+      }
     }
   }
 }

@@ -43,3 +43,5 @@ A package for handling logging in and logging out.
 
 ### widgetbook_screenshots
 
+CLI tool for capturing Widgetbook screenshots from story paths. Supports port/device/orientation/theme knobs, crop geometry, optional rounded-corner transparency, and output directory configuration.
+

@@ -1,40 +1,40 @@
 import 'dart:io';
 import 'package:args/args.dart';
 import 'package:logging/logging.dart';
-import 'package:path/path.dart' as path;
 import 'package:widgetbook_screenshots/widgetbook_screenshots.dart';
 
 void main(List<String> arguments) async {
-  Logger.root.level = Level.INFO;
   Logger.root.onRecord.listen((record) {
     final str = '${record.level.name}: ${record.message}';
     // ignore: avoid_print
     print(str);
   });
 
-  final parser = ArgParser()
+  final parser = ArgParser(allowTrailingOptions: true)
+    ..addOption('port', help: 'Widgetbook port', defaultsTo: '45678')
+    ..addOption('device', help: 'Device knob value')
     ..addOption(
-      'config',
-      abbr: 'c',
-      help: 'Path to JSON config file',
-      mandatory: true,
+      'orientation',
+      help: 'Orientation knob value',
+      allowed: ['portrait', 'landscape'],
     )
     ..addOption(
-      'output',
-      abbr: 'o',
-      help: 'Output path for PNG (default: ./navigation_graph.png for graph mode, ./collage.png for collage mode)',
+      'theme-mode',
+      help: 'Theme mode knob value',
+      allowed: ['light', 'dark', 'system'],
     )
     ..addOption(
-      'mode',
-      abbr: 'm',
-      help: 'Generation mode: "graph" for navigation graph, "collage" for screenshot collage',
-      allowed: ['graph', 'collage'],
-      defaultsTo: 'graph',
+      'output-dir',
+      help: 'Directory for captured screenshots',
+      defaultsTo: './screenshots',
     )
-    ..addFlag(
-      'skip-screenshots',
-      help: 'Skip screenshot capture (use existing screenshots)',
-      defaultsTo: false,
+    ..addOption('crop-width', help: 'Crop width in pixels')
+    ..addOption('crop-height', help: 'Crop height in pixels')
+    ..addOption('crop-x-offset', help: 'Crop x-offset in pixels')
+    ..addOption('crop-y-offset', help: 'Crop y-offset in pixels')
+    ..addOption(
+      'corner-radius',
+      help: 'Rounded corner radius in pixels (0 disables transparency mask)',
     )
     ..addFlag(
       'skip-existing-screenshots',
@@ -42,174 +42,176 @@ void main(List<String> arguments) async {
       defaultsTo: false,
     )
     ..addFlag(
-      'dark-mode',
-      help: 'Capture screenshots in dark mode (appends dark mode knobs to URL)',
+      'debug',
+      abbr: 'd',
+      help: 'Verbose logging (includes full Widgetbook URL per screenshot)',
       defaultsTo: false,
     );
 
-  final argResults = parser.parse(arguments);
-
-  final configPath = argResults['config'] as String;
-  final mode = argResults['mode'] as String;
-  var outputPath = argResults['output'] as String?;
-  final skipScreenshots = argResults['skip-screenshots'] as bool;
-  final skipExistingScreenshots = argResults['skip-existing-screenshots'] as bool;
-  final darkMode = argResults['dark-mode'] as bool;
-
-  // Set default output path if not provided
-  outputPath ??= mode == 'collage' ? './collage.png' : './navigation_graph.png';
-
-  // Add "-dark" suffix to output filename if dark mode is enabled
-  if (darkMode) {
-    final pathParts = outputPath.split('.');
-    if (pathParts.length > 1) {
-      final extension = pathParts.removeLast();
-      final basePath = pathParts.join('.');
-      outputPath = '$basePath-dark.$extension';
-    } else {
-      outputPath = '$outputPath-dark';
-    }
+  ArgResults argResults;
+  try {
+    argResults = parser.parse(arguments);
+  } catch (e) {
+    _printUsageAndExit(parser, error: e.toString());
+    return;
   }
 
-  // Load config
-  final logger = Logger('main');
-  logger.info('Loading config from: $configPath');
-  logger.info('Mode: $mode');
+  Logger.root.level = argResults['debug'] as bool ? Level.FINE : Level.INFO;
 
-  if (mode == 'collage') {
-    // Collage mode
-    CollageConfig config;
-    try {
-      config = CollageConfig.fromJsonFile(configPath, darkMode: darkMode);
-    } catch (e) {
-      logger.severe('Failed to load collage config: $e');
-      exit(1);
-    }
+  final portValue = int.tryParse(argResults['port'] as String);
+  if (portValue == null || portValue <= 0) {
+    _printUsageAndExit(parser, error: 'Invalid --port value. Must be a positive integer.');
+    return;
+  }
+  final defaultCropGeometry = CropGeometry.fromJson(null);
+  final cropWidth = _parseIntOption(
+    parser: parser,
+    argResults: argResults,
+    name: 'crop-width',
+    defaultValue: defaultCropGeometry.width,
+    mustBePositive: true,
+  );
+  final cropHeight = _parseIntOption(
+    parser: parser,
+    argResults: argResults,
+    name: 'crop-height',
+    defaultValue: defaultCropGeometry.height,
+    mustBePositive: true,
+  );
+  final cropXOffset = _parseIntOption(
+    parser: parser,
+    argResults: argResults,
+    name: 'crop-x-offset',
+    defaultValue: defaultCropGeometry.xOffset,
+    mustBePositive: false,
+  );
+  final cropYOffset = _parseIntOption(
+    parser: parser,
+    argResults: argResults,
+    name: 'crop-y-offset',
+    defaultValue: defaultCropGeometry.yOffset,
+    mustBePositive: false,
+  );
+  if (cropWidth == null || cropHeight == null || cropXOffset == null || cropYOffset == null) {
+    return;
+  }
+  final cornerRadius = _parseIntOption(
+    parser: parser,
+    argResults: argResults,
+    name: 'corner-radius',
+    defaultValue: 0,
+    mustBePositive: false,
+  );
+  if (cornerRadius == null) {
+    return;
+  }
 
-    logger.info('Widgetbook URL: ${config.widgetbookUrl}');
-    logger.info('Output directory: ${config.outputDir}');
-    logger.info('Screens: ${config.screens.length}');
-    logger.info('Scale: ${config.scale}');
-    logger.info('Background color: ${config.backgroundColor}');
-    logger.info('Use titles: ${config.useTitles}');
-    if (darkMode) {
-      logger.info('Dark mode: enabled');
-    }
-
-    // Capture screenshots
-    if (!skipScreenshots) {
-      logger.info('\n📸 Capturing screenshots...');
-      // For collage, we need to capture screenshots using the same capturer
-      // but we need to adapt it. For now, let's create a temporary Config
-      // to reuse ScreenshotCapturer, or we could make ScreenshotCapturer work with both
-      // Let's create a temporary Config for screenshot capture
-      final tempConfig = Config(
-        widgetbookUrl: config.widgetbookUrl,
-        outputDir: config.outputDir,
-        screens: config.screens
-            .map((s) => Screen(
-                  name: s.name,
-                  title: s.title,
-                  path: s.path,
-                  navigatesTo: [],
-                ))
-            .toList(),
-        cropGeometry: config.cropGeometry,
-        darkMode: darkMode,
-      );
-      final capturer = ScreenshotCapturer(tempConfig, skipExisting: skipExistingScreenshots);
-      final success = await capturer.captureAll();
-      if (!success) {
-        logger.warning('Some screenshots failed to capture. Continuing anyway...');
-      }
-    } else {
-      logger.info('⏭️  Skipping screenshot capture');
-    }
-
-    // Generate collage
-    logger.info('\n🖼️  Generating collage...');
-    logger.info('Loading first screenshot to get actual dimensions...');
-
-    // Load first screenshot to get actual dimensions (assuming all screenshots are the same size)
-    int? actualScreenshotWidth;
-    int? actualScreenshotHeight;
-    if (config.screens.isNotEmpty) {
-      final imageUtils = ImageUtils();
-      final firstScreen = config.screens.first;
-      final filename = config.getFilename(firstScreen);
-      final screenshotPath = path.join(config.outputDir, filename);
-      final firstImage = await imageUtils.loadImage(screenshotPath);
-      if (firstImage != null) {
-        actualScreenshotWidth = firstImage.width;
-        actualScreenshotHeight = firstImage.height;
-        logger.info('First screenshot dimensions: ${actualScreenshotWidth}x$actualScreenshotHeight');
-      } else {
-        logger.warning('Could not load first screenshot, using configured dimensions');
-      }
-    }
-
-    logger.info('Creating collage layout...');
-    final layout = CollageLayout(
-      config,
-      actualScreenshotWidth: actualScreenshotWidth,
-      actualScreenshotHeight: actualScreenshotHeight,
+  final outputDir = argResults['output-dir'] as String;
+  final storyPaths = argResults.rest;
+  if (storyPaths.isEmpty) {
+    _printUsageAndExit(
+      parser,
+      error: 'Provide at least one story path as positional input.',
     );
-    logger.info('Collage layout created, creating collage generator...');
-    final generator = CollageGenerator(config, layout);
-    logger.info('Collage generator created, generating PNG...');
-    final success = await generator.generate(outputPath);
-
-    if (success) {
-      logger.info('\n✅ Done! Collage saved to: $outputPath');
-      exit(0);
-    } else {
-      logger.severe('\n❌ Failed to generate collage');
-      exit(1);
-    }
-  } else {
-    // Graph mode (default)
-    Config config;
-    try {
-      config = Config.fromJsonFile(configPath, darkMode: darkMode);
-    } catch (e) {
-      logger.severe('Failed to load config: $e');
-      exit(1);
-    }
-
-    logger.info('Widgetbook URL: ${config.widgetbookUrl}');
-    logger.info('Output directory: ${config.outputDir}');
-    logger.info('Screens: ${config.screens.length}');
-    if (darkMode) {
-      logger.info('Dark mode: enabled');
-    }
-
-    // Capture screenshots
-    if (!skipScreenshots) {
-      logger.info('\n📸 Capturing screenshots...');
-      final capturer = ScreenshotCapturer(config, skipExisting: skipExistingScreenshots);
-      final success = await capturer.captureAll();
-      if (!success) {
-        logger.warning('Some screenshots failed to capture. Continuing anyway...');
-      }
-    } else {
-      logger.info('⏭️  Skipping screenshot capture');
-    }
-
-    // Generate navigation graph
-    logger.info('\n📊 Generating navigation graph...');
-    logger.info('Creating graph layout...');
-    final layout = GraphLayout(config);
-    logger.info('Graph layout created, creating PNG generator...');
-    final generator = PngGenerator(config, layout);
-    logger.info('PNG generator created, generating PNG...');
-    final success = await generator.generate(outputPath);
-
-    if (success) {
-      logger.info('\n✅ Done! Navigation graph saved to: $outputPath');
-      exit(0);
-    } else {
-      logger.severe('\n❌ Failed to generate navigation graph');
-      exit(1);
-    }
+    return;
   }
+
+  final config = Config(
+    widgetbookUrl: 'http://localhost:$portValue',
+    outputDir: outputDir,
+    screens: storyPaths.map(_screenFromPath).toList(),
+    cropGeometry: CropGeometry(
+      width: cropWidth,
+      height: cropHeight,
+      xOffset: cropXOffset,
+      yOffset: cropYOffset,
+    ),
+    deviceName: argResults['device'] as String?,
+    orientation: argResults['orientation'] as String?,
+    themeMode: argResults['theme-mode'] as String?,
+    cornerRadius: cornerRadius,
+  );
+  final skipExistingScreenshots = argResults['skip-existing-screenshots'] as bool;
+
+  final logger = Logger('main');
+  logger.info('Widgetbook URL: ${config.widgetbookUrl}');
+  logger.info('Output directory: ${config.outputDir}');
+  logger.info('Screens: ${config.screens.length}');
+  if (config.deviceName != null) {
+    logger.info('Device: ${config.deviceName}');
+  }
+  if (config.orientation != null) {
+    logger.info('Orientation: ${config.orientation}');
+  }
+  if (config.themeMode != null) {
+    logger.info('Theme mode: ${config.themeMode}');
+  }
+  logger.info(
+    'Crop geometry: ${config.cropGeometry.width}x${config.cropGeometry.height}'
+    '+${config.cropGeometry.xOffset}+${config.cropGeometry.yOffset}',
+  );
+  if (config.cornerRadius > 0) {
+    logger.info('Corner radius: ${config.cornerRadius}px');
+  }
+
+  logger.info('\n📸 Capturing screenshots...');
+  final capturer = ScreenshotCapturer(config, skipExisting: skipExistingScreenshots);
+  final success = await capturer.captureAll();
+  if (success) {
+    logger.info('\n✅ Done! Screenshots saved to: ${config.outputDir}');
+    exit(0);
+  } else {
+    logger.severe('\n❌ Some screenshots failed to capture');
+    exit(1);
+  }
+}
+
+void _printUsageAndExit(ArgParser parser, {String? error}) {
+  if (error != null) {
+    stderr.writeln('Error: $error');
+    stderr.writeln('');
+  }
+  stderr.writeln('Usage: widgetbook_screenshots [options] <story-path> [more-story-paths]');
+  stderr.writeln(parser.usage);
+  exit(64);
+}
+
+Screen _screenFromPath(String storyPath) {
+  final trimmedPath = storyPath.trim();
+  final withoutLeadingSlash = trimmedPath.startsWith('/')
+      ? trimmedPath.substring(1)
+      : trimmedPath;
+  final slug = withoutLeadingSlash
+      .replaceAll(RegExp(r'[^a-zA-Z0-9]+'), '_')
+      .replaceAll(RegExp(r'^_+|_+$'), '')
+      .toLowerCase();
+  final safeSlug = slug.isEmpty ? 'story' : slug;
+
+  return Screen(
+    name: safeSlug,
+    title: safeSlug,
+    path: trimmedPath,
+    navigatesTo: const [],
+  );
+}
+
+int? _parseIntOption({
+  required ArgParser parser,
+  required ArgResults argResults,
+  required String name,
+  required int defaultValue,
+  required bool mustBePositive,
+}) {
+  final rawValue = argResults[name] as String?;
+  if (rawValue == null) {
+    return defaultValue;
+  }
+  final parsed = int.tryParse(rawValue);
+  final isValid = parsed != null && (mustBePositive ? parsed > 0 : parsed >= 0);
+  if (!isValid) {
+    final expectation = mustBePositive ? 'a positive integer' : 'a non-negative integer';
+    _printUsageAndExit(parser, error: 'Invalid --$name value. Must be $expectation.');
+    return null;
+  }
+  return parsed;
 }
