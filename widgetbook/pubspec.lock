@@ -46,7 +46,7 @@ packages:
       path: "../packages/anyhoo_auth"
       relative: true
     source: path
-    version: "0.0.31"
+    version: "0.0.32"
   anyhoo_core:
     dependency: "direct main"
     description:
@@ -60,7 +60,7 @@ packages:
       path: "../packages/anyhoo_firebase"
       relative: true
     source: path
-    version: "0.0.15"
+    version: "0.0.16"
   anyhoo_form_builder_widgets:
     dependency: "direct main"
     description:
