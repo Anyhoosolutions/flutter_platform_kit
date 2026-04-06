@@ -38,6 +38,7 @@ class WidgetbookPhoneFrameConfig {
         WidgetbookDeviceOption(device: ios.iPhone13),
         WidgetbookDeviceOption(device: ios.iPhoneSE),
         WidgetbookDeviceOption(device: android.samsungGalaxyS20),
+        WidgetbookDeviceOption(device: ios.iPadAir4),
         WidgetbookDeviceOption(device: android.mediumTablet, label: 'Medium Android Tablet'),
         WidgetbookDeviceOption(device: android.largeTablet, label: 'Large Android Tablet'),
         WidgetbookDeviceOption(device: macOS.macBookPro),
