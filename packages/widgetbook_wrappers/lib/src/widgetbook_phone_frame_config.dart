@@ -65,6 +65,16 @@ class WidgetbookPhoneFrameConfig {
             ),
             label: 'Full_Monitor_Maximized',
           ),
+          WidgetbookDeviceOption(
+            device: DeviceInfo.genericDesktopMonitor(
+              platform: TargetPlatform.macOS,
+              id: 'macos_macbookpro_maximized',
+              name: 'Full_Monitor',
+              screenSize: Size(1680, 1050),
+              windowPosition: Rect.fromLTWH(0, 0, 1680, 1050),
+            ),
+            label: 'Full_Monitor',
+          ),
         ],
       ],
     );
