@@ -14,12 +14,18 @@ class ScreenshotCapturer {
   final Logger _logger = Logger('ScreenshotCapturer');
   final Config config;
   final bool skipExisting;
+  final bool keepTempScreenshots;
 
-  ScreenshotCapturer(this.config, {this.skipExisting = false});
+  ScreenshotCapturer(
+    this.config, {
+    this.skipExisting = false,
+    this.keepTempScreenshots = true,
+  });
 
   /// Captures screenshots for all screens using Playwright CLI
   Future<bool> captureAll() async {
-    _logger.info('Starting screenshot capture for ${config.screens.length} screens');
+    _logger.info(
+        'Starting screenshot capture for ${config.screens.length} screens');
 
     // Check if Playwright is available
     if (!await _isPlaywrightAvailable()) {
@@ -53,7 +59,8 @@ class ScreenshotCapturer {
       _logger.info(
           'Captured $successCount/${config.screens.length} screenshots ($skippedCount skipped, ${successCount - skippedCount} new)');
     } else {
-      _logger.info('Captured $successCount/${config.screens.length} screenshots');
+      _logger
+          .info('Captured $successCount/${config.screens.length} screenshots');
     }
     return successCount == config.screens.length;
   }
@@ -69,7 +76,8 @@ class ScreenshotCapturer {
       if (skipExisting) {
         final outputFile = File(outputPath);
         if (outputFile.existsSync()) {
-          _logger.info('⏭️  Skipping ${screen.name} (file already exists: $filename)');
+          _logger.info(
+              '⏭️  Skipping ${screen.name} (file already exists: $filename)');
           return CaptureResult.skipped;
         }
       }
@@ -80,8 +88,8 @@ class ScreenshotCapturer {
 
       // Create temp file for Playwright to save to
       final tempDir = Directory.systemTemp;
-      tempFile = File(
-          path.join(tempDir.path, 'widgetbook_screenshot_${screen.name}_${DateTime.now().millisecondsSinceEpoch}.png'));
+      tempFile = File(path.join(tempDir.path,
+          'widgetbook_screenshot_${screen.name}_${DateTime.now().millisecondsSinceEpoch}.png'));
 
       // Use Playwright CLI to capture screenshot to temp file
       // Note: Omitting --full-page means we capture only the viewport (default behavior)
@@ -124,8 +132,13 @@ class ScreenshotCapturer {
     } finally {
       // Clean up temp file
       try {
-        if (tempFile != null && tempFile.existsSync()) {
+        if (!keepTempScreenshots && tempFile != null && tempFile.existsSync()) {
           await tempFile.delete();
+        } else if (keepTempScreenshots &&
+            tempFile != null &&
+            tempFile.existsSync()) {
+          _logger
+              .info('Keeping temp screenshot for debugging: ${tempFile.path}');
         }
       } catch (e) {
         _logger.fine('Failed to delete temp file: $e');
@@ -146,7 +159,8 @@ class ScreenshotCapturer {
       final geometry = config.cropGeometry;
 
       // Verify crop bounds
-      if (geometry.xOffset + geometry.width > image.width || geometry.yOffset + geometry.height > image.height) {
+      if (geometry.xOffset + geometry.width > image.width ||
+          geometry.yOffset + geometry.height > image.height) {
         _logger.warning(
           'Crop geometry exceeds image bounds. Image: ${image.width}x${image.height}, '
           'Crop: ${geometry.width}x${geometry.height}+${geometry.xOffset}+${geometry.yOffset}',
@@ -165,8 +179,12 @@ class ScreenshotCapturer {
         image,
         x: geometry.xOffset,
         y: geometry.yOffset,
-        width: geometry.width > image.width - geometry.xOffset ? image.width - geometry.xOffset : geometry.width,
-        height: geometry.height > image.height - geometry.yOffset ? image.height - geometry.yOffset : geometry.height,
+        width: geometry.width > image.width - geometry.xOffset
+            ? image.width - geometry.xOffset
+            : geometry.width,
+        height: geometry.height > image.height - geometry.yOffset
+            ? image.height - geometry.yOffset
+            : geometry.height,
       );
       if (config.cornerRadius > 0) {
         // RGB captures have no alpha channel; setPixelRgba alpha is ignored and corners look black.
@@ -203,7 +221,10 @@ class ScreenshotCapturer {
   }
 
   void _applyRoundedCorners(img.Image image, int requestedRadius) {
-    final radius = requestedRadius.clamp(0, image.width ~/ 2).clamp(0, image.height ~/ 2).toInt();
+    final radius = requestedRadius
+        .clamp(0, image.width ~/ 2)
+        .clamp(0, image.height ~/ 2)
+        .toInt();
     if (radius == 0) {
       return;
     }

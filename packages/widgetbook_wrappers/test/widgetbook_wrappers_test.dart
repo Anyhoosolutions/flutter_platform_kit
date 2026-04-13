@@ -31,6 +31,28 @@ void main() {
       );
       expect(config.resolveInitialDeviceLabel(), 'B');
     });
+
+    test('copyWith overrides selected fields', () {
+      final base = WidgetbookPhoneFrameConfig.commonPhones();
+      final next = base.copyWith(deviceKnobLabel: 'Handset', showFrame: false);
+      expect(next.deviceKnobLabel, 'Handset');
+      expect(next.showFrame, isFalse);
+      expect(next.devices, base.devices);
+      expect(next.orientationKnobLabel, base.orientationKnobLabel);
+    });
+
+    test('copyWith can set initialDeviceLabel to null', () {
+      final base = WidgetbookPhoneFrameConfig(
+        devices: [
+          WidgetbookDeviceOption(device: Devices.ios.iPhoneSE, label: 'A'),
+          WidgetbookDeviceOption(device: Devices.ios.iPhone13, label: 'B'),
+        ],
+        initialDeviceLabel: 'B',
+      );
+      final cleared = base.copyWith(initialDeviceLabel: null);
+      expect(cleared.initialDeviceLabel, isNull);
+      expect(cleared.resolveInitialDeviceLabel(), 'A');
+    });
   });
 
   group('WidgetbookThemeConfig', () {
