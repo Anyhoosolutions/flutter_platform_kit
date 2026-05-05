@@ -166,16 +166,30 @@ class FirebaseInitializer {
 
     try {
       _firestore = FirebaseFirestore.instance;
-      if (_isEmulatorEnabled()) {
+      final emulatorOn = _isEmulatorEnabled();
+      if (emulatorOn) {
         final host = _getHost();
         if (host != null) {
           _firestore!.useFirestoreEmulator(host, emulatorConfig.firestorePort);
           _log.info(
             '!! Successfully configured Firestore emulator with host: $host, port: ${emulatorConfig.firestorePort}',
           );
+          debugPrint(
+            'FIRESTORE_TRANSPORT: emulator host=$host port=${emulatorConfig.firestorePort} '
+            'projectId=${Firebase.app().options.projectId}',
+          );
         } else {
           _log.warning('!! Firestore emulator was enabled but host is null; Firestore will use production');
+          debugPrint(
+            'FIRESTORE_TRANSPORT: production (emulator flag on but host was null) '
+            'projectId=${Firebase.app().options.projectId}',
+          );
         }
+      } else {
+        debugPrint(
+          'FIRESTORE_TRANSPORT: production (useFirestoreEmulator not called) '
+          'projectId=${Firebase.app().options.projectId}',
+        );
       }
       _log.info('!! Firestore configured: ${_firestore!.settings}');
     } catch (e, stackTrace) {
