@@ -1,0 +1,18 @@
+name: golden_screenshots
+description: Run flutter test with golden-related dart-defines and optionally collect PNGs from goldens/ trees.
+version: 0.1.0
+homepage: https://github.com/anyhoosolutions/flutter_platform_kit/tree/main/tools/golden_screenshots
+repository: https://github.com/anyhoosolutions/flutter_platform_kit
+environment:
+  sdk: ^3.11.1
+
+executables:
+  golden_screenshots: golden_screenshots
+
+dependencies:
+  args: ^2.5.0
+  path: ^1.9.0
+
+dev_dependencies:
+  test: ^1.25.2
+  lints: ^4.0.0
