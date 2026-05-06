@@ -1,5 +1,5 @@
-import 'package:golden_screenshots/golden_screenshots.dart';
-import 'package:test/test.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:screenshot_kit/screenshot_kit.dart';
 
 void main() {
   test('buildFlutterTestArgs injects defines and update flag', () {
@@ -16,10 +16,10 @@ void main() {
       [
         'test',
         'test/smoke_test.dart',
-        '--dart-define=$goldenLogicalWidth=390',
-        '--dart-define=$goldenLogicalHeight=844',
-        '--dart-define=$goldenBrightness=dark',
-        '--dart-define=$goldenDevicePixelRatio=2.0',
+        '--dart-define=${ScreenshotDefineKeys.logicalWidth}=390',
+        '--dart-define=${ScreenshotDefineKeys.logicalHeight}=844',
+        '--dart-define=${ScreenshotDefineKeys.brightness}=dark',
+        '--dart-define=${ScreenshotDefineKeys.devicePixelRatio}=2.0',
         '--dart-define=FOO=bar',
         '--update-goldens',
       ],

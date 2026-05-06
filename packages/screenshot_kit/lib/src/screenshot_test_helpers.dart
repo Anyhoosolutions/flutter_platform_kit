@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'golden_run_config.dart';
+import 'screenshot_surface_config.dart';
 
-/// Forces surface size, DPR, and platform brightness for stable goldens.
-///
-/// Call once per test before pumping widgets that depend on layout or theme.
-Future<void> configureGoldenSurface(
+/// Sets surface size, DPR, and platform brightness before you pump widgets.
+Future<void> prepareScreenshotSurface(
   WidgetTester tester,
-  GoldenRunConfig config,
+  ScreenshotSurfaceConfig config,
 ) async {
   final binding = tester.binding;
 
@@ -21,13 +19,10 @@ Future<void> configureGoldenSurface(
   });
 }
 
-/// Minimal app shell for golden subjects — [ThemeMode] follows [config].
-///
-/// Override [light] / [dark] when your design system themes differ from
-/// Material defaults.
-Widget goldenAppHost({
+/// Minimal [MaterialApp] shell — [ThemeMode] follows [config].
+Widget screenshotAppShell({
   required Widget child,
-  required GoldenRunConfig config,
+  required ScreenshotSurfaceConfig config,
   ThemeData? light,
   ThemeData? dark,
 }) {

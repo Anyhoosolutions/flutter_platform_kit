@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:args/args.dart';
-import 'package:golden_screenshots/golden_screenshots.dart';
+import 'package:screenshot_kit/screenshot_cli.dart';
 
 Future<void> main(List<String> arguments) async {
   final parser = ArgParser()
@@ -13,20 +13,20 @@ Future<void> main(List<String> arguments) async {
     )
     ..addOption(
       'width',
-      help: 'Sets --dart-define=$goldenLogicalWidth=<int>',
+      help: 'Sets --dart-define=${ScreenshotDefineKeys.logicalWidth}=<int>',
     )
     ..addOption(
       'height',
-      help: 'Sets --dart-define=$goldenLogicalHeight=<int>',
+      help: 'Sets --dart-define=${ScreenshotDefineKeys.logicalHeight}=<int>',
     )
     ..addOption(
       'brightness',
-      help: 'Sets --dart-define=$goldenBrightness=light|dark',
+      help: 'Sets --dart-define=${ScreenshotDefineKeys.brightness}=light|dark',
       allowed: ['light', 'dark'],
     )
     ..addOption(
       'device-pixel-ratio',
-      help: 'Sets --dart-define=$goldenDevicePixelRatio=<double>',
+      help: 'Sets --dart-define=${ScreenshotDefineKeys.devicePixelRatio}=<double>',
     )
     ..addMultiOption(
       'dart-define',
@@ -106,7 +106,7 @@ Future<void> main(List<String> arguments) async {
   final goldensRoot =
       goldensRootPath != null && goldensRootPath.isNotEmpty ? Directory(goldensRootPath) : null;
 
-  final result = await runGoldenScreenshotCli(
+  final result = await runScreenshotKitCli(
     packageDir: packageDir,
     flutterTestArgs: flutterArgs,
     collect: collect,
@@ -121,10 +121,10 @@ Future<void> main(List<String> arguments) async {
 }
 
 void _printUsage(ArgParser parser) {
-  stdout.writeln('Usage: golden_screenshots [options] [flutter test arguments...]');
+  stdout.writeln('Usage: screenshot_kit [options] [flutter test arguments...]');
   stdout.writeln('');
   stdout.writeln(
-    'Runs "flutter test" with optional dart-defines for golden_test_wrappers.',
+    'Runs flutter test with optional dart-defines for screenshot_kit tests.',
   );
   stdout.writeln('');
   stdout.writeln(parser.usage);

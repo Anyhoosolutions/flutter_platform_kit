@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:golden_test_wrappers/golden_test_wrappers.dart';
+import 'package:screenshot_kit/screenshot_kit.dart';
 
 void main() {
   testWidgets('Golden smoke tile', (WidgetTester tester) async {
-    final config = GoldenRunConfig.fromEnvironment();
-    await configureGoldenSurface(tester, config);
+    final config = ScreenshotSurfaceConfig.fromEnvironment();
+    await prepareScreenshotSurface(tester, config);
 
     await tester.pumpWidget(
-      goldenAppHost(
+      screenshotAppShell(
         config: config,
         child: RepaintBoundary(
           key: const Key('golden_smoke'),

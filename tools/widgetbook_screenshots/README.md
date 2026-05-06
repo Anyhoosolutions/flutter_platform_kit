@@ -120,6 +120,10 @@ dart analyze
 dart test
 ```
 
+## Related: Flutter test goldens
+
+For **widget test** / `matchesGoldenFile` flows (not Widgetbook in a browser), see the shared [`packages/screenshot_kit`](../../packages/screenshot_kit) package and its `dart run screenshot_kit` CLI.
+
 ## License
 
 See repository `LICENSE`.

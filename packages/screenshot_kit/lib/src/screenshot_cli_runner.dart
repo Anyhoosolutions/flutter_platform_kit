@@ -2,17 +2,17 @@ import 'dart:io';
 
 import 'package:path/path.dart' as p;
 
-import 'define_keys.dart';
-import 'golden_collector.dart';
+import 'screenshot_define_keys.dart';
+import 'screenshot_png_collector.dart';
 
-/// Result of a [runGoldenScreenshotCli] invocation.
-class GoldenScreenshotResult {
-  const GoldenScreenshotResult({required this.exitCode});
+/// Result of [runScreenshotKitCli].
+class ScreenshotCliResult {
+  const ScreenshotCliResult({required this.exitCode});
 
   final int exitCode;
 }
 
-/// Expands [args] (e.g. from [ArgParser]) into a [Process] for `flutter test`.
+/// Builds argv for `flutter test` with `--dart-define` entries matching [ScreenshotDefineKeys].
 List<String> buildFlutterTestArgs({
   required List<String> testArgs,
   int? width,
@@ -25,16 +25,16 @@ List<String> buildFlutterTestArgs({
   final out = <String>['test', ...testArgs];
 
   if (width != null) {
-    out.add('--dart-define=$goldenLogicalWidth=$width');
+    out.add('--dart-define=${ScreenshotDefineKeys.logicalWidth}=$width');
   }
   if (height != null) {
-    out.add('--dart-define=$goldenLogicalHeight=$height');
+    out.add('--dart-define=${ScreenshotDefineKeys.logicalHeight}=$height');
   }
   if (brightness != null && brightness.isNotEmpty) {
-    out.add('--dart-define=$goldenBrightness=$brightness');
+    out.add('--dart-define=${ScreenshotDefineKeys.brightness}=$brightness');
   }
   if (devicePixelRatio != null) {
-    out.add('--dart-define=$goldenDevicePixelRatio=$devicePixelRatio');
+    out.add('--dart-define=${ScreenshotDefineKeys.devicePixelRatio}=$devicePixelRatio');
   }
   for (final def in dartDefines) {
     if (def.isEmpty) continue;
@@ -47,8 +47,8 @@ List<String> buildFlutterTestArgs({
   return out;
 }
 
-/// Runs `flutter test` and optionally collects PNGs from `**/goldens/**/*.png`.
-Future<GoldenScreenshotResult> runGoldenScreenshotCli({
+/// Runs `flutter test` and optionally collects PNGs under `goldens/` directories.
+Future<ScreenshotCliResult> runScreenshotKitCli({
   required Directory packageDir,
   required List<String> flutterTestArgs,
   bool collect = false,
@@ -66,22 +66,22 @@ Future<GoldenScreenshotResult> runGoldenScreenshotCli({
   final exitCode = await process.exitCode;
 
   if (exitCode != 0 || !collect) {
-    return GoldenScreenshotResult(exitCode: exitCode);
+    return ScreenshotCliResult(exitCode: exitCode);
   }
 
   if (outputDir == null) {
     stderr.writeln('error: --collect requires --output-dir');
-    return GoldenScreenshotResult(exitCode: 2);
+    return ScreenshotCliResult(exitCode: 2);
   }
 
   final sourceRoot = goldensRoot ?? packageDir;
-  collectGoldenPngs(
+  collectScreenshotPngs(
     sourceRoot: sourceRoot,
     outputDir: outputDir,
     flat: flat,
   );
 
-  return GoldenScreenshotResult(exitCode: exitCode);
+  return ScreenshotCliResult(exitCode: exitCode);
 }
 
 String _resolveFlutterExecutable() {

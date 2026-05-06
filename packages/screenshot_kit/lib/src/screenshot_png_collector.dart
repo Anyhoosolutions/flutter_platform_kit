@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:path/path.dart' as p;
 
 /// Lists PNG files under any directory segment named `goldens`.
-Iterable<File> findGoldenPngs(Directory root) sync* {
+Iterable<File> findScreenshotPngs(Directory root) sync* {
   if (!root.existsSync()) {
     return;
   }
@@ -18,17 +18,15 @@ Iterable<File> findGoldenPngs(Directory root) sync* {
   }
 }
 
-/// Copies golden PNGs into [outputDir].
-///
-/// When [flat] is true, uses basename only; duplicate names throw [StateError].
-void collectGoldenPngs({
+/// Copies PNGs from `**/goldens/**/*.png` under [sourceRoot] into [outputDir].
+void collectScreenshotPngs({
   required Directory sourceRoot,
   required Directory outputDir,
   required bool flat,
 }) {
   outputDir.createSync(recursive: true);
   final usedBasenames = <String>{};
-  for (final file in findGoldenPngs(sourceRoot)) {
+  for (final file in findScreenshotPngs(sourceRoot)) {
     late final String destPath;
     if (flat) {
       final name = p.basename(file.path);

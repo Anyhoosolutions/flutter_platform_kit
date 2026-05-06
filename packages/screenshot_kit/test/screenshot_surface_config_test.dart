@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:golden_test_wrappers/golden_test_wrappers.dart';
+import 'package:screenshot_kit/screenshot_kit.dart';
 
 void main() {
-  group('GoldenRunConfig.fromDartDefines', () {
+  group('ScreenshotSurfaceConfig.fromDartDefines', () {
     test('parses light and dark', () {
-      final light = GoldenRunConfig.fromDartDefines(
+      final light = ScreenshotSurfaceConfig.fromDartDefines(
         logicalWidth: 400,
         logicalHeight: 600,
         brightnessName: 'light',
@@ -13,7 +13,7 @@ void main() {
       expect(light.brightness, Brightness.light);
       expect(light.themeMode, ThemeMode.light);
 
-      final dark = GoldenRunConfig.fromDartDefines(
+      final dark = ScreenshotSurfaceConfig.fromDartDefines(
         logicalWidth: 400,
         logicalHeight: 600,
         brightnessName: 'dark',
@@ -23,7 +23,7 @@ void main() {
     });
 
     test('defaults unknown brightness to light', () {
-      final c = GoldenRunConfig.fromDartDefines(
+      final c = ScreenshotSurfaceConfig.fromDartDefines(
         logicalWidth: 1,
         logicalHeight: 1,
         brightnessName: 'unknown',
