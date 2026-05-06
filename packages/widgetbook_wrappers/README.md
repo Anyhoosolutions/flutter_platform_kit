@@ -1,10 +1,12 @@
 # widgetbook_wrappers
 
-Helpers for [Widgetbook](https://www.widgetbook.io/) use cases: phone [DeviceFrame](https://pub.dev/packages/device_frame_plus), theme/orientation knobs, and a pluggable wrapper so apps can inject Bloc/repository/routing **outside** `MaterialApp`.
+Simple, script-friendly wrappers for Widgetbook stories.
+
+The API is centered around a single list of `WidgetbookStoryDefinition` values.
+Each story includes machine-readable metadata (`id`, `type`, `tags`, `group`) so a
+third-party repo can discover what to screenshot by reading source code.
 
 ## Setup
-
-Add the package (path, git, or published):
 
 ```yaml
 dependencies:
@@ -12,74 +14,96 @@ dependencies:
     path: ../flutter_platform_kit/packages/widgetbook_wrappers
 ```
 
-Use a supported `widgetbook` range (see this package's `pubspec.yaml`).
-
-## Usage
-
-1. Create a [`WidgetbookThemeConfig`](lib/src/widgetbook_theme_config.dart) with your app themes.
-2. Create a [`WidgetbookPhoneFrameConfig`](lib/src/widgetbook_phone_frame_config.dart) with the devices you want in the dropdown, or use [`WidgetbookPhoneFrameConfig.commonPhones()`](lib/src/widgetbook_phone_frame_config.dart).
-3. Implement [`WidgetbookStoryWrapper`](lib/src/widgetbook_story_wrapper.dart) once per app (e.g. `MultiBlocProvider` / `MultiRepositoryProvider` around the shell output).
-4. Build a [`WidgetbookStoryShell`](lib/src/widgetbook_story_shell.dart) and call `wrapPhoneStory` or `wrapSimpleStory` from your use-case builder.
-
-Example:
+## Consumer API (repo using this package)
 
 ```dart
-final shell = WidgetbookStoryShell(
+import 'package:flutter/material.dart';
+import 'package:widgetbook/widgetbook.dart';
+import 'package:widgetbook_wrappers/widgetbook_wrappers.dart';
+
+final stories = <WidgetbookStoryDefinition>[
+  WidgetbookStoryDefinition.phone(
+    id: 'home.page',
+    name: 'HomePage',
+    tags: ['page', 'smoke'],
+    group: 'home',
+    builder: (context, runtime) => const HomePage(),
+  ),
+  WidgetbookStoryDefinition.widget(
+    id: 'buttons.primary',
+    name: 'PrimaryButton',
+    tags: ['widget', 'ui'],
+    group: 'design_system',
+    builder: (context, runtime) => const PrimaryButton(),
+  ),
+  WidgetbookStoryDefinition.designSystem(
+    id: 'design-system.colors',
+    name: 'DesignSystemColorsPage',
+    tags: ['design-system'],
+    group: 'design_system',
+    builder: (context, runtime) => const DesignSystemColorsPage(),
+  ),
+  WidgetbookStoryDefinition.custom(
+    id: 'checkout.flow',
+    name: 'CheckoutFlow',
+    customTypeLabel: 'app-flow',
+    tags: ['custom', 'checkout'],
+    builder: (context, runtime) => const CheckoutFlowPreview(),
+  ),
+];
+
+final renderer = WidgetbookStoryRenderer(
   theme: WidgetbookThemeConfig(
     light: ThemeData.light(),
     dark: ThemeData.dark(),
   ),
-  phone: WidgetbookPhoneFrameConfig.commonPhones(),
-  wrapper: MyAppWidgetbookWrapper(),
+  phone: WidgetbookPhoneFrameConfig.commonDevices(),
+  appHostBuilder: (context, child, runtime) {
+    return MaterialApp.router(
+      debugShowCheckedModeBanner: false,
+      routerConfig: buildWidgetbookRouter(child),
+      theme: ThemeData.light(),
+      darkTheme: ThemeData.dark(),
+      themeMode: runtime.themeMode,
+    );
+  },
+  dependencyWrapper: (context, child, runtime) {
+    return AppDependenciesWidget(child: child);
+  },
+  dependencies: WidgetbookDependencyRegistry(
+    repositories: [
+      WidgetbookRepositorySpec<MyRepo>(
+        createValue: (context, story, dependencies) => FakeMyRepo(),
+      ),
+    ],
+    providers: [
+      WidgetbookProviderSpec<MyBloc>(
+        createValue: (context, story, dependencies) {
+          final repo = dependencies[MyRepo] as MyRepo;
+          return MyBloc(repo);
+        },
+        wrapValue: (child, bloc) => MyBlocProvider(bloc: bloc, child: child),
+      ),
+    ],
+  ),
 );
 
-@widgetbook.UseCase(...)
-Widget buildMyScreen(BuildContext context) {
-  return shell.wrapPhoneStory(context, const MyScreen());
+@UseCase(name: 'HomePage', type: HomePage)
+Widget homePageUseCase(BuildContext context) {
+  final story = stories.firstWhere((s) => s.id == 'home.page');
+  return renderer.build(context, story);
 }
 ```
 
-Example wrapper (your app supplies real cubits; this only shows shape):
+## Discovery for screenshot tooling
+
+Metadata is available from source and at runtime:
 
 ```dart
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:widgetbook_wrappers/widgetbook_wrappers.dart';
-
-class MyAppWidgetbookWrapper extends WidgetbookStoryWrapper {
-  const MyAppWidgetbookWrapper();
-
-  @override
-  Widget wrap(BuildContext context, Widget child) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider<SettingsCubit>(
-          create: (_) => SettingsCubit.forWidgetbook(),
-        ),
-        BlocProvider<TodosCubit>(
-          create: (_) => TodosCubit.forWidgetbook(),
-        ),
-      ],
-      child: child,
-    );
-  }
-}
+final catalog = stories.toCatalogJson();
 ```
 
-`child` is the framed `MaterialApp` subtree from [`WidgetbookStoryShell.wrapPhoneStory`](lib/src/widgetbook_story_shell.dart), so providers wrap the whole story shell output. Replace `SettingsCubit` / `TodosCubit` and `forWidgetbook()` with whatever you use for mocks or fakes in Widgetbook.
-
-`wrapSimpleStory` uses a padded `Scaffold` body without a device frame (good for small components).
-
-### Wrapper placement and GoRouter
-
-[`WidgetbookStoryShell.wrapPhoneStory`](lib/src/widgetbook_story_shell.dart) builds `DeviceFrame` → `MaterialApp` → `home: your story`. The wrapper receives that **whole** subtree so you can place providers **outside** `MaterialApp`, consistent with many Flutter apps.
-
-If you need `MaterialApp.router` and GoRouter, implement the wrapper so it returns your router shell **instead** of only wrapping with providers: for example, your wrapper can replace the inner `MaterialApp` by building `MaterialApp.router` yourself and passing the story as the initial route child—but that duplicates shell logic. A practical approach is to keep the story as a normal widget under `MaterialApp(home: …)` and only add GoRouter when the widget under test requires it (e.g. a small `MaterialApp.router` **inside** the story). Prefer the smallest router scope that satisfies the widget.
-
-## Exports
-
-The library also exports `DeviceInfo`, `Devices`, and `DeviceFrame` from `device_frame_plus` for configuring [`WidgetbookDeviceOption`](lib/src/widgetbook_device_option.dart).
-
-## Additional information
-
-Part of [flutter_platform_kit](https://anyhoosolutions.web.app/documentation/flutter_platform_kit).
+This is intended for external screenshot runners to determine:
+- which stories exist
+- which type they are (`phone`, `widget`, `designSystem`, `custom`)
+- tags/group filters for batch screenshot runs

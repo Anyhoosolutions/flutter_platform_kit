@@ -3,6 +3,7 @@ import 'package:image/image.dart' as img;
 import 'package:logging/logging.dart';
 import 'package:path/path.dart' as path;
 import 'package:widgetbook_screenshots/src/config.dart';
+import 'package:widgetbook_screenshots/src/image_utils.dart';
 
 enum CaptureResult {
   success,
@@ -12,20 +13,15 @@ enum CaptureResult {
 
 class ScreenshotCapturer {
   final Logger _logger = Logger('ScreenshotCapturer');
+  final ImageUtils _imageUtils = ImageUtils();
   final Config config;
   final bool skipExisting;
-  final bool keepTempScreenshots;
 
-  ScreenshotCapturer(
-    this.config, {
-    this.skipExisting = false,
-    this.keepTempScreenshots = true,
-  });
+  ScreenshotCapturer(this.config, {this.skipExisting = false});
 
   /// Captures screenshots for all screens using Playwright CLI
   Future<bool> captureAll() async {
-    _logger.info(
-        'Starting screenshot capture for ${config.screens.length} screens');
+    _logger.info('Starting screenshot capture for ${config.screens.length} screens');
 
     // Check if Playwright is available
     if (!await _isPlaywrightAvailable()) {
@@ -59,8 +55,7 @@ class ScreenshotCapturer {
       _logger.info(
           'Captured $successCount/${config.screens.length} screenshots ($skippedCount skipped, ${successCount - skippedCount} new)');
     } else {
-      _logger
-          .info('Captured $successCount/${config.screens.length} screenshots');
+      _logger.info('Captured $successCount/${config.screens.length} screenshots');
     }
     return successCount == config.screens.length;
   }
@@ -76,20 +71,19 @@ class ScreenshotCapturer {
       if (skipExisting) {
         final outputFile = File(outputPath);
         if (outputFile.existsSync()) {
-          _logger.info(
-              '⏭️  Skipping ${screen.name} (file already exists: $filename)');
+          _logger.info('⏭️  Skipping ${screen.name} (file already exists: $filename)');
           return CaptureResult.skipped;
         }
       }
 
       _logger.info('Capturing screenshot for ${screen.name}...');
-      _logger.fine('Screenshot URL: $url');
-      _logger.fine('Output path: $outputPath');
+      _logger.fine('  URL: $url');
+      _logger.fine('  Output: $outputPath');
 
       // Create temp file for Playwright to save to
       final tempDir = Directory.systemTemp;
-      tempFile = File(path.join(tempDir.path,
-          'widgetbook_screenshot_${screen.name}_${DateTime.now().millisecondsSinceEpoch}.png'));
+      tempFile = File(
+          path.join(tempDir.path, 'widgetbook_screenshot_${screen.name}_${DateTime.now().millisecondsSinceEpoch}.png'));
 
       // Use Playwright CLI to capture screenshot to temp file
       // Note: Omitting --full-page means we capture only the viewport (default behavior)
@@ -132,13 +126,8 @@ class ScreenshotCapturer {
     } finally {
       // Clean up temp file
       try {
-        if (!keepTempScreenshots && tempFile != null && tempFile.existsSync()) {
+        if (tempFile != null && tempFile.existsSync()) {
           await tempFile.delete();
-        } else if (keepTempScreenshots &&
-            tempFile != null &&
-            tempFile.existsSync()) {
-          _logger
-              .info('Keeping temp screenshot for debugging: ${tempFile.path}');
         }
       } catch (e) {
         _logger.fine('Failed to delete temp file: $e');
@@ -159,8 +148,7 @@ class ScreenshotCapturer {
       final geometry = config.cropGeometry;
 
       // Verify crop bounds
-      if (geometry.xOffset + geometry.width > image.width ||
-          geometry.yOffset + geometry.height > image.height) {
+      if (geometry.xOffset + geometry.width > image.width || geometry.yOffset + geometry.height > image.height) {
         _logger.warning(
           'Crop geometry exceeds image bounds. Image: ${image.width}x${image.height}, '
           'Crop: ${geometry.width}x${geometry.height}+${geometry.xOffset}+${geometry.yOffset}',
@@ -175,29 +163,31 @@ class ScreenshotCapturer {
       }
 
       // Crop the image
-      var cropped = img.copyCrop(
+      final cropped = img.copyCrop(
         image,
         x: geometry.xOffset,
         y: geometry.yOffset,
-        width: geometry.width > image.width - geometry.xOffset
-            ? image.width - geometry.xOffset
-            : geometry.width,
-        height: geometry.height > image.height - geometry.yOffset
-            ? image.height - geometry.yOffset
-            : geometry.height,
+        width: geometry.width > image.width - geometry.xOffset ? image.width - geometry.xOffset : geometry.width,
+        height: geometry.height > image.height - geometry.yOffset ? image.height - geometry.yOffset : geometry.height,
       );
+
+      // Optionally remove rounded corners by filling them with the image edge color.
+      var processed = cropped;
       if (config.cornerRadius > 0) {
-        // RGB captures have no alpha channel; setPixelRgba alpha is ignored and corners look black.
-        if (!cropped.hasAlpha) {
-          cropped = cropped.convert(numChannels: 4, alpha: 255);
-        }
-        _applyRoundedCorners(cropped, config.cornerRadius);
+        final samplePixel = cropped.getPixel(0, 0);
+        processed = _imageUtils.removeRoundedCorners(
+          cropped,
+          config.cornerRadius,
+          samplePixel.r.toInt(),
+          samplePixel.g.toInt(),
+          samplePixel.b.toInt(),
+        );
       }
 
       // Save the cropped image
       final outputFile = File(outputPath);
       outputFile.parent.createSync(recursive: true);
-      final pngBytes = img.encodePng(cropped);
+      final pngBytes = img.encodePng(processed);
       await outputFile.writeAsBytes(pngBytes);
 
       return true;
@@ -217,33 +207,6 @@ class ScreenshotCapturer {
       return result.exitCode == 0;
     } catch (e) {
       return false;
-    }
-  }
-
-  void _applyRoundedCorners(img.Image image, int requestedRadius) {
-    final radius = requestedRadius
-        .clamp(0, image.width ~/ 2)
-        .clamp(0, image.height ~/ 2)
-        .toInt();
-    if (radius == 0) {
-      return;
-    }
-
-    final maxX = image.width - 1;
-    final maxY = image.height - 1;
-    final rr = radius * radius;
-
-    for (var y = 0; y < radius; y++) {
-      for (var x = 0; x < radius; x++) {
-        final dx = radius - 1 - x;
-        final dy = radius - 1 - y;
-        if ((dx * dx) + (dy * dy) >= rr) {
-          image.setPixelRgba(x, y, 0, 0, 0, 0);
-          image.setPixelRgba(maxX - x, y, 0, 0, 0, 0);
-          image.setPixelRgba(x, maxY - y, 0, 0, 0, 0);
-          image.setPixelRgba(maxX - x, maxY - y, 0, 0, 0, 0);
-        }
-      }
     }
   }
 }
