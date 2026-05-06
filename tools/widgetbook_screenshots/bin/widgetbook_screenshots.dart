@@ -178,13 +178,9 @@ void _printUsageAndExit(ArgParser parser, {String? error}) {
 
 Screen _screenFromPath(String storyPath) {
   final trimmedPath = storyPath.trim();
-  final withoutLeadingSlash = trimmedPath.startsWith('/')
-      ? trimmedPath.substring(1)
-      : trimmedPath;
-  final slug = withoutLeadingSlash
-      .replaceAll(RegExp(r'[^a-zA-Z0-9]+'), '_')
-      .replaceAll(RegExp(r'^_+|_+$'), '')
-      .toLowerCase();
+  final withoutLeadingSlash = trimmedPath.startsWith('/') ? trimmedPath.substring(1) : trimmedPath;
+  final slug =
+      withoutLeadingSlash.replaceAll(RegExp(r'[^a-zA-Z0-9]+'), '_').replaceAll(RegExp(r'^_+|_+$'), '').toLowerCase();
   final safeSlug = slug.isEmpty ? 'story' : slug;
 
   return Screen(

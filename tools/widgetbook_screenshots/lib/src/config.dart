@@ -58,6 +58,9 @@ class Config {
   final String outputDir;
   final List<Screen> screens;
   final CropGeometry cropGeometry;
+  final String? deviceName;
+  final String? orientation;
+  final String? themeMode;
   final int cornerRadius;
   final bool darkMode;
 
@@ -66,6 +69,9 @@ class Config {
     required this.outputDir,
     required this.screens,
     required this.cropGeometry,
+    this.deviceName,
+    this.orientation,
+    this.themeMode,
     this.cornerRadius = 0,
     this.darkMode = false,
   });
@@ -84,6 +90,9 @@ class Config {
       outputDir: json['outputDir'] as String? ?? './screenshots',
       screens: (json['screens'] as List<dynamic>).map((e) => Screen.fromJson(e as Map<String, dynamic>)).toList(),
       cropGeometry: CropGeometry.fromJson(json['cropGeometry'] as Map<String, dynamic>?),
+      deviceName: json['device'] as String?,
+      orientation: json['orientation'] as String?,
+      themeMode: json['themeMode'] as String?,
       cornerRadius: json['cornerRadius'] as int? ?? 0,
       darkMode: darkMode,
     );
@@ -94,9 +103,23 @@ class Config {
     final path = screen.path.startsWith('/') ? screen.path.substring(1) : screen.path;
     var url = '$baseUrl/#/?path=$path';
 
-    // Append dark mode knobs if dark mode is enabled
-    if (darkMode) {
-      url += '&knobs={Theme%20mode:dark}';
+    final knobs = <String, String>{};
+    if (deviceName != null && deviceName!.isNotEmpty) {
+      knobs['Device'] = deviceName!;
+    }
+    if (orientation != null && orientation!.isNotEmpty) {
+      knobs['Orientation'] = orientation!;
+    }
+    if (themeMode != null && themeMode!.isNotEmpty) {
+      knobs['Theme mode'] = themeMode!;
+    } else if (darkMode) {
+      knobs['Theme mode'] = 'dark';
+    }
+
+    if (knobs.isNotEmpty) {
+      final knobsRaw =
+          '{${knobs.entries.map((entry) => '${entry.key}:${entry.value}').join(',')}}';
+      url += '&knobs=${Uri.encodeQueryComponent(knobsRaw)}';
     }
 
     return url;
