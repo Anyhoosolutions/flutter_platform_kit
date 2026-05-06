@@ -59,6 +59,10 @@ flutter test
 flutter test --update-goldens test/my_test.dart
 ```
 
+**Important:** Arguments after `flutter test` must be **Dart test paths** (`*.dart`), not PNG paths under `goldens/`. The runner reads those files as source code. Updating goldens uses `--update-goldens` while still pointing at the **test file** — Flutter then refreshes whatever `matchesGoldenFile('goldens/....png')` references.
+
+If you see `Failed to decode data using encoding 'utf-8'` for a `.png`, you accidentally passed the image instead of the test (for example use `test/example_smoke_golden_test.dart`, not `test/goldens/golden_smoke_tile.png`).
+
 With defines:
 
 ```bash
