@@ -58,6 +58,7 @@ class Config {
   final String outputDir;
   final List<Screen> screens;
   final CropGeometry cropGeometry;
+  final int cornerRadius;
   final bool darkMode;
 
   Config({
@@ -65,6 +66,7 @@ class Config {
     required this.outputDir,
     required this.screens,
     required this.cropGeometry,
+    this.cornerRadius = 0,
     this.darkMode = false,
   });
 
@@ -82,6 +84,7 @@ class Config {
       outputDir: json['outputDir'] as String? ?? './screenshots',
       screens: (json['screens'] as List<dynamic>).map((e) => Screen.fromJson(e as Map<String, dynamic>)).toList(),
       cropGeometry: CropGeometry.fromJson(json['cropGeometry'] as Map<String, dynamic>?),
+      cornerRadius: json['cornerRadius'] as int? ?? 0,
       darkMode: darkMode,
     );
   }

@@ -3,6 +3,7 @@ import 'package:image/image.dart' as img;
 import 'package:logging/logging.dart';
 import 'package:path/path.dart' as path;
 import 'package:widgetbook_screenshots/src/config.dart';
+import 'package:widgetbook_screenshots/src/image_utils.dart';
 
 enum CaptureResult {
   success,
@@ -12,6 +13,7 @@ enum CaptureResult {
 
 class ScreenshotCapturer {
   final Logger _logger = Logger('ScreenshotCapturer');
+  final ImageUtils _imageUtils = ImageUtils();
   final Config config;
   final bool skipExisting;
 
@@ -169,10 +171,23 @@ class ScreenshotCapturer {
         height: geometry.height > image.height - geometry.yOffset ? image.height - geometry.yOffset : geometry.height,
       );
 
+      // Optionally remove rounded corners by filling them with the image edge color.
+      var processed = cropped;
+      if (config.cornerRadius > 0) {
+        final samplePixel = cropped.getPixel(0, 0);
+        processed = _imageUtils.removeRoundedCorners(
+          cropped,
+          config.cornerRadius,
+          samplePixel.r.toInt(),
+          samplePixel.g.toInt(),
+          samplePixel.b.toInt(),
+        );
+      }
+
       // Save the cropped image
       final outputFile = File(outputPath);
       outputFile.parent.createSync(recursive: true);
-      final pngBytes = img.encodePng(cropped);
+      final pngBytes = img.encodePng(processed);
       await outputFile.writeAsBytes(pngBytes);
 
       return true;
