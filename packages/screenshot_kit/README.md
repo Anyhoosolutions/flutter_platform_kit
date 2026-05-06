@@ -77,15 +77,21 @@ Add a file such as **`test/my_widget_golden_test.dart`** (name must end with **`
 ```dart
 import 'package:alchemist/alchemist.dart';
 import 'package:flutter/material.dart';
+import 'package:screenshot_kit/screenshot_kit.dart';
 import 'package:your_app/my_widget.dart';
 
 void main() {
+  final config = ScreenshotSurfaceConfig.fromEnvironment();
+
   goldenTest(
     'My widget baseline',
     fileName: 'my_widget_golden',
     builder: () => GoldenTestGroup(
-      // Use width *and* height so widgets like Scaffold get bounded constraints.
-      scenarioConstraints: const BoxConstraints.tightFor(width: 320, height: 640),
+      // Use width + height from SCREENSHOT_LOGICAL_* defines.
+      scenarioConstraints: BoxConstraints.tightFor(
+        width: config.logicalWidth.toDouble(),
+        height: config.logicalHeight.toDouble(),
+      ),
       children: [
         GoldenTestScenario(
           name: 'default',
@@ -120,10 +126,10 @@ Add **one** **`--dart-define=KEY=value`** per flag. Values are **strings** at co
 | Define | Values | If omitted | Applies to |
 |--------|--------|------------|------------|
 | **`SCREENSHOT_ALCHEMIST_OBSCURE_TEXT`** | **`true`** or **`false`** (lowercase) | same as **`true`** (masked CI text) | **Alchemist CI goldens** via Step 4 |
-| `SCREENSHOT_LOGICAL_WIDTH` | integer `> 0` | `390` | **`prepareScreenshotSurface`** / **`screenshotAppShell`** only |
+| `SCREENSHOT_LOGICAL_WIDTH` | integer `> 0` | `390` | **Alchemist scenario size** (Step 5) + `prepareScreenshotSurface` / `screenshotAppShell` |
 | `SCREENSHOT_LOGICAL_HEIGHT` | integer `> 0` | `844` | same |
-| `SCREENSHOT_BRIGHTNESS` | `light` or `dark` (case-insensitive) | `light` | same |
-| `SCREENSHOT_DEVICE_PIXEL_RATIO` | e.g. `1`, `2`, `2.5` | `1.0` | same |
+| `SCREENSHOT_BRIGHTNESS` | `light` or `dark` (case-insensitive) | `light` | `prepareScreenshotSurface` / `screenshotAppShell` |
+| `SCREENSHOT_DEVICE_PIXEL_RATIO` | e.g. `1`, `2`, `2.5` | `1.0` | `prepareScreenshotSurface` / `screenshotAppShell` |
 
 **Readable vs masked text on CI**
 
