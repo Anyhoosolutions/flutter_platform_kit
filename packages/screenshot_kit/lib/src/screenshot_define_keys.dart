@@ -1,4 +1,4 @@
-/// Compile-time keys for `--dart-define` — keep aligned with [buildFlutterTestArgs].
+/// Compile-time keys for `flutter test --dart-define=...`.
 abstract final class ScreenshotDefineKeys {
   ScreenshotDefineKeys._();
 

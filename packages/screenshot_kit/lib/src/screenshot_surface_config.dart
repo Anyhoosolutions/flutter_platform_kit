@@ -5,7 +5,7 @@ import 'screenshot_define_keys.dart';
 /// Parsed `--dart-define` values for screenshot / golden tests (viewport, theme, DPR).
 ///
 /// Use [ScreenshotSurfaceConfig.fromEnvironment] in tests built with optional
-/// defines from CI or `dart run screenshot_kit`.
+/// `flutter test --dart-define=...` flags.
 class ScreenshotSurfaceConfig {
   const ScreenshotSurfaceConfig({
     required this.logicalWidth,

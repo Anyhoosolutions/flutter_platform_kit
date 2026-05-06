@@ -50,6 +50,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
+  alchemist: ^0.14.0
   screenshot_kit:
     path: ../packages/screenshot_kit
   freezed: ^3.2.3

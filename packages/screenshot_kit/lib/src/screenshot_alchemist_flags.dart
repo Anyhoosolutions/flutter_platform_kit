@@ -1,17 +1,16 @@
 import 'screenshot_define_keys.dart';
 
 /// Compile-time helpers for wiring [Alchemist](https://pub.dev/packages/alchemist)
-/// beside `screenshot_kit` (optional — this package does not depend on Alchemist).
+/// `CiGoldensConfig.obscureText` to [ScreenshotDefineKeys.alchemistObscureCiText].
+///
+/// This package does **not** add a dependency on Alchemist — add it in your app’s
+/// `pubspec.yaml`.
 abstract final class ScreenshotAlchemistFlags {
   ScreenshotAlchemistFlags._();
 
-  /// Maps to [CiGoldensConfig.obscureText]: when `false`, CI golden PNGs keep normal
-  /// glyphs (readable text).
+  /// **`true`** / **`false`** from [ScreenshotDefineKeys.alchemistObscureCiText].
   ///
-  /// Default `true` matches Alchemist’s typical CI defaults.
-  ///
-  /// Toggle from the shell:
-  /// `flutter test --dart-define=SCREENSHOT_ALCHEMIST_OBSCURE_TEXT=false`.
+  /// Omitted compile-time ⇒ **`true`** (obscured CI glyphs).
   static bool get ciObscureText => bool.fromEnvironment(
         ScreenshotDefineKeys.alchemistObscureCiText,
         defaultValue: true,

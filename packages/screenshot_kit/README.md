@@ -1,217 +1,193 @@
 # screenshot_kit
 
-Shared helpers for **Flutter test** screenshots (golden PNGs): one set of **`--dart-define`** keys for viewport and theme, an optional **`screenshot_kit`** CLI (`flutter test` + collect PNGs under `**/goldens/`), and a hook for **[Alchemist](https://pub.dev/packages/alchemist)** `obscureText`.
+**Golden screenshots** with **[Alchemist](https://pub.dev/packages/alchemist)**, **`flutter test`**, and shared **`--dart-define`** flags. There is **no** separate `dart run …` tool—only the normal test runner.
+
+Follow the steps in order.
 
 ---
 
-## Quickstart — one golden PNG (vanilla Flutter, no Alchemist)
+### Step 1 — Dependencies
 
-Follow these steps in **any Flutter app**.
-
-A working copy of **Step 3** lives in this repo at [`example_app/test/my_button_screenshot_test.dart`](../../example_app/test/my_button_screenshot_test.dart) (adjust the `screenshot_kit` path in that app’s `pubspec.yaml`).
-
-### Step 1 — Depend on `screenshot_kit`
-
-In `pubspec.yaml`:
+In **`pubspec.yaml`**:
 
 ```yaml
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  alchemist: ^0.14.0 # pin to your project standard
   screenshot_kit:
-    path: ../flutter_platform_kit/packages/screenshot_kit   # adjust path / use git deps
+    path: ../packages/screenshot_kit # or pub.dev / git
 ```
 
-Run:
+---
+
+### Step 2 — Fetch packages
 
 ```bash
 flutter pub get
 ```
 
-### Step 2 — Where files live
+---
 
-Golden paths are **relative to your test file’s folder**, not the project root.
+### Step 3 — (Optional) `dart_test.yaml` tag
 
-Example layout:
+At the **project root**, declaring Alchemist’s **`golden`** tag avoids analyzer/tooling noise:
 
-| Path | Purpose |
-|------|---------|
-| `test/my_button_screenshot_test.dart` | Your test |
-| `test/goldens/my_button.png` | Written by `--update-goldens` |
-
-In code you use:
-
-```dart
-matchesGoldenFile('goldens/my_button.png');
+```yaml
+tags:
+  golden:
 ```
 
-Flutter creates **`test/goldens/my_button.png`** when the test file is `test/my_button_screenshot_test.dart`.
-
-### Step 3 — Paste a minimal test
-
-Create `test/my_button_screenshot_test.dart`:
-
-```dart
-import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
-import 'package:screenshot_kit/screenshot_kit.dart';
-
-void main() {
-  testWidgets('MyButton snapshot', (WidgetTester tester) async {
-    final config = ScreenshotSurfaceConfig.fromEnvironment();
-    await prepareScreenshotSurface(tester, config);
-
-    await tester.pumpWidget(
-      screenshotAppShell(
-        config: config,
-        child: RepaintBoundary(
-          key: const Key('screenshot_subject'),
-          child: FilledButton(
-            onPressed: () {},
-            child: const Text('Save'),
-          ),
-        ),
-      ),
-    );
-    await tester.pumpAndSettle();
-
-    await expectLater(
-      find.byKey(const Key('screenshot_subject')),
-      matchesGoldenFile('goldens/my_button.png'),
-    );
-  });
-}
-```
-
-- **`RepaintBoundary`** + a **`Key`** isolate what gets rasterised.
-- **`prepareScreenshotSurface`** applies width/height/brightness/DPR from defines (see table below).
-- **`screenshotAppShell`** wraps a **`MaterialApp`** with the right **`ThemeMode`**.
-
-### Step 4 — Generate the PNG once
-
-Always pass the **`.dart`** test path (never the `.png`):
-
-```bash
-flutter test --update-goldens test/my_button_screenshot_test.dart
-```
-
-This creates `test/goldens/my_button.png`.
-
-### Step 5 — Verify (CI-style)
-
-Without updating files:
-
-```bash
-flutter test test/my_button_screenshot_test.dart
-```
-
-Commit both the **`test/**/*.dart`** and **`test/**/goldens/*.png`** files.
-
-### Step 6 (optional) — Same golden at another size/theme
-
-Rebuild with defines (sizes must stay in sync with **`prepareScreenshotSurface`**):
-
-```bash
-flutter test --update-goldens \
-  --dart-define=SCREENSHOT_LOGICAL_WIDTH=834 \
-  --dart-define=SCREENSHOT_LOGICAL_HEIGHT=1194 \
-  --dart-define=SCREENSHOT_BRIGHTNESS=dark \
-  test/my_button_screenshot_test.dart
-```
-
-Or use this package’s CLI (from the **`screenshot_kit`** package folder, or [`dart pub global activate`](https://dart.dev/tools/pub/cmd/pub-global)):
-
-```bash
-dart run screenshot_kit \
-  --directory . \
-  --width 834 --height 1194 --brightness dark \
-  --update-goldens \
-  test/my_button_screenshot_test.dart
-```
-
-Collect copies of PNGs after a successful run:
-
-```bash
-dart run screenshot_kit \
-  --directory . \
-  --collect --output-dir ./dist/screenshots \
-  test/my_button_screenshot_test.dart
-```
+Example: **`example_app/dart_test.yaml`**.
 
 ---
 
-## **`--dart-define` keys**
+### Step 4 — Wire defines into Alchemist
 
-| Key | Meaning | Default |
-|-----|---------|---------|
-| `SCREENSHOT_LOGICAL_WIDTH` | Logical width (px) | `390` |
-| `SCREENSHOT_LOGICAL_HEIGHT` | Logical height (px) | `844` |
-| `SCREENSHOT_BRIGHTNESS` | `light` or `dark` | `light` |
-| `SCREENSHOT_DEVICE_PIXEL_RATIO` | DPR | `1.0` |
-| `SCREENSHOT_ALCHEMIST_OBSCURE_TEXT` | Alchemist [CiGoldensConfig.obscureText](https://pub.dev/documentation/alchemist/latest/alchemist/CiGoldensConfig-class.html): `false` ⇒ readable glyphs in CI goldens | `true` |
-
----
-
-## Optional — Alchemist + readable CI text
-
-`screenshot_kit` does **not** depend on Alchemist. Add **`alchemist`** to **`dev_dependencies`**, then in **`test/flutter_test_config.dart`**:
+Create **`test/flutter_test_config.dart`** (merge with an existing file if you already have one):
 
 ```dart
 import 'dart:async';
 
 import 'package:alchemist/alchemist.dart';
-import 'package:flutter_test/flutter_test.dart';
 import 'package:screenshot_kit/screenshot_kit.dart';
 
 Future<void> testExecutable(FutureOr<void> Function() testMain) async {
-  return AlchemistConfig.runWithConfig(
+  await AlchemistConfig.runWithConfig(
     config: AlchemistConfig(
       ciGoldensConfig: CiGoldensConfig(
         obscureText: ScreenshotAlchemistFlags.ciObscureText,
       ),
     ),
-    run: testMain,
+    run: () async {
+      await testMain();
+    },
   );
 }
 ```
 
-Readable CI glyphs:
+**`ScreenshotAlchemistFlags.ciObscureText`** reads **`SCREENSHOT_ALCHEMIST_OBSCURE_TEXT`**. If you **omit** that define, it behaves like **`true`** (masked CI text, Alchemist’s usual default).
 
-```bash
-flutter test --dart-define=SCREENSHOT_ALCHEMIST_OBSCURE_TEXT=false
+---
+
+### Step 5 — Write a golden test
+
+Add a file such as **`test/my_widget_golden_test.dart`** (name must end with **`_test.dart`**).
+
+```dart
+import 'package:alchemist/alchemist.dart';
+import 'package:flutter/material.dart';
+import 'package:your_app/my_widget.dart';
+
+void main() {
+  goldenTest(
+    'My widget baseline',
+    fileName: 'my_widget_golden',
+    builder: () => GoldenTestGroup(
+      // Use width *and* height so widgets like Scaffold get bounded constraints.
+      scenarioConstraints: const BoxConstraints.tightFor(width: 320, height: 640),
+      children: [
+        GoldenTestScenario(
+          name: 'default',
+          child: const MyWidget(),
+        ),
+      ],
+    ),
+  );
+}
 ```
 
-CLI shorthand:
+Copy-paste references in this repo: **`example_app/test/alchemist_readable_label_test.dart`**, **`example_app/test/error_page_demo_page_test.dart`**.
+
+---
+
+### Step 6 — Know where PNGs are stored
+
+Next to the test file, Alchemist writes:
+
+**`test/goldens/<environment>/<fileName>.png`**
+
+Examples: **`goldens/ci/…`**, **`goldens/macos/…`** (host folder name varies). **`fileName`** is the **`goldenTest(..., fileName: 'slug')`** value—**no** `.png` suffix.
+
+Always pass **`flutter test`** a **`.dart`** path, never a **`.png`**.
+
+---
+
+### Step 7 — Choose your `--dart-define` flags
+
+Add **one** **`--dart-define=KEY=value`** per flag. Values are **strings** at compile time (`fromEnvironment`).
+
+| Define | Values | If omitted | Applies to |
+|--------|--------|------------|------------|
+| **`SCREENSHOT_ALCHEMIST_OBSCURE_TEXT`** | **`true`** or **`false`** (lowercase) | same as **`true`** (masked CI text) | **Alchemist CI goldens** via Step 4 |
+| `SCREENSHOT_LOGICAL_WIDTH` | integer `> 0` | `390` | **`prepareScreenshotSurface`** / **`screenshotAppShell`** only |
+| `SCREENSHOT_LOGICAL_HEIGHT` | integer `> 0` | `844` | same |
+| `SCREENSHOT_BRIGHTNESS` | `light` or `dark` (case-insensitive) | `light` | same |
+| `SCREENSHOT_DEVICE_PIXEL_RATIO` | e.g. `1`, `2`, `2.5` | `1.0` | same |
+
+**Readable vs masked text on CI**
+
+- **`--dart-define=SCREENSHOT_ALCHEMIST_OBSCURE_TEXT=true`** — CI goldens use masked glyphs (stable across machines).
+- **`--dart-define=SCREENSHOT_ALCHEMIST_OBSCURE_TEXT=false`** — CI goldens show real text (easier to review; can drift with OS/renderer).
+
+**Rule:** use the **same** `SCREENSHOT_*` flags for **`flutter test --update-goldens`** as for normal **`flutter test`**. If you change flags, regenerate and commit new PNGs.
+
+Example with several flags:
 
 ```bash
-dart run screenshot_kit --readable-alchemist-ci-text ...
+flutter test \
+  --dart-define=SCREENSHOT_LOGICAL_WIDTH=834 \
+  --dart-define=SCREENSHOT_LOGICAL_HEIGHT=1194 \
+  --dart-define=SCREENSHOT_BRIGHTNESS=dark \
+  --dart-define=SCREENSHOT_DEVICE_PIXEL_RATIO=2 \
+  --dart-define=SCREENSHOT_ALCHEMIST_OBSCURE_TEXT=false \
+  test/my_widget_golden_test.dart
 ```
 
-**Vanilla tests** (`matchesGoldenFile` only) ignore `SCREENSHOT_ALCHEMIST_OBSCURE_TEXT`.
+This repo’s **`example_app`** commits **readable** CI goldens, so its checks use **`SCREENSHOT_ALCHEMIST_OBSCURE_TEXT=false`**.
+
+---
+
+### Step 8 — Generate or refresh goldens
+
+```bash
+flutter test \
+  --dart-define=SCREENSHOT_ALCHEMIST_OBSCURE_TEXT=false \
+  test/my_widget_golden_test.dart \
+  --update-goldens
+```
+
+Adjust defines to match what you chose in Step 7, then commit the updated **`test/goldens/**`** files.
+
+---
+
+### Step 9 — Run tests (compare goldens)
+
+Same command as Step 8 **without** **`--update-goldens`**:
+
+```bash
+flutter test \
+  --dart-define=SCREENSHOT_ALCHEMIST_OBSCURE_TEXT=false \
+  test/my_widget_golden_test.dart
+```
 
 ---
 
 ## Common mistakes
 
-**Passing a `.png` to `flutter test`** — Arguments must be **`*.dart`**. Use:
-
-`flutter test --update-goldens test/my_button_screenshot_test.dart`
-
-Not `flutter test … test/goldens/my_button.png`.
-
-If you see **“Failed to decode data using encoding 'utf-8'”** on a PNG path, you pointed the runner at an image instead of a test file.
-
-**Readable vs blocked-out text**
-
-- Vanilla **`matchesGoldenFile`**: no masking; fix theme/contrast if text disappears.
-- **Alchemist CI goldens**: use `SCREENSHOT_ALCHEMIST_OBSCURE_TEXT=false` and the config above (or prefer platform goldens). Disabling obscure text increases **OS-dependent** drift.
+- **`flutter test some_image.png`** — use a **`.dart`** test path only.
+- **Golden mismatch after changing defines** — re-run Step 8 with the new flags and commit PNGs.
+- **`SCREENSHOT_ALCHEMIST_OBSCURE_TEXT` seems ignored** — missing Step 4, or no **`goldenTest`** / Alchemist usage.
+- **`Scaffold` / infinite height errors** — set **both** width and height in **`scenarioConstraints`** (see Step 5).
 
 ---
 
-## Implementation notes
+## Package exports
 
-- **CLI VM entrypoint**: [`screenshot_cli.dart`](lib/screenshot_cli.dart) (no Flutter imports) — use `dart run screenshot_kit`; full API — [`screenshot_kit.dart`](lib/screenshot_kit.dart).
+**`package:screenshot_kit/screenshot_kit.dart`** exposes **`ScreenshotSurfaceConfig`**, **`ScreenshotDefineKeys`**, **`ScreenshotAlchemistFlags`**, **`prepareScreenshotSurface`**, and **`screenshotAppShell`**. Use the surface helpers only in tests where you layout with those APIs; the steps above rely on **Alchemist** for goldens.
+
+---
 
 ## CI
 
-Pin the **Flutter SDK** channel/version if snapshots must match across machines; golden pixels vary by renderer and OS.
+Pin the **Flutter SDK** version so golden pixels stay comparable across runners.

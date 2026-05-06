@@ -1,5 +1,5 @@
 name: screenshot_kit
-description: Shared Flutter test surface sizing, themes, and optional CLI to run flutter test and collect goldens PNGs.
+description: Shared Flutter test surface sizing, theme, and dart-define keys for screenshots and Alchemist CI goldens.
 version: 0.1.0
 homepage: https://anyhoosolutions.web.app/documentation/flutter_platform_kit
 publish_to: none
@@ -9,18 +9,13 @@ environment:
   flutter: ">=1.17.0"
 
 dependencies:
-  args: ^2.5.0
   flutter:
     sdk: flutter
   flutter_test:
     sdk: flutter
-  path: ^1.9.0
 
 dev_dependencies:
   flutter_lints: ^6.0.0
-
-executables:
-  screenshot_kit: screenshot_kit
 
 flutter:
   uses-material-design: true
