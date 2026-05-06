@@ -18,11 +18,11 @@ class ScreenshotSurfaceConfig {
 
   factory ScreenshotSurfaceConfig.fromEnvironment() {
     return ScreenshotSurfaceConfig.fromDartDefines(
-      logicalWidth: int.fromEnvironment(
+      logicalWidth: const int.fromEnvironment(
         ScreenshotDefineKeys.logicalWidth,
         defaultValue: _defaultLogicalWidth,
       ),
-      logicalHeight: int.fromEnvironment(
+      logicalHeight: const int.fromEnvironment(
         ScreenshotDefineKeys.logicalHeight,
         defaultValue: _defaultLogicalHeight,
       ),

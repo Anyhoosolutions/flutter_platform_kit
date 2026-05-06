@@ -11,7 +11,7 @@ abstract final class ScreenshotAlchemistFlags {
   /// **`true`** / **`false`** from [ScreenshotDefineKeys.alchemistObscureCiText].
   ///
   /// Omitted compile-time ⇒ **`true`** (obscured CI glyphs).
-  static bool get ciObscureText => bool.fromEnvironment(
+  static bool get ciObscureText => const bool.fromEnvironment(
         ScreenshotDefineKeys.alchemistObscureCiText,
         defaultValue: true,
       );
