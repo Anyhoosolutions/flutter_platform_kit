@@ -70,32 +70,35 @@ Future<void> testExecutable(FutureOr<void> Function() testMain) async {
 
 ---
 
-### Step 5 — Write a golden test
+### Step 5 — Add a shared test helper (recommended)
 
-Add a file such as **`test/my_widget_golden_test.dart`** (name must end with **`_test.dart`**).
+Create **`test/support/golden_test_helpers.dart`**:
 
 ```dart
 import 'package:alchemist/alchemist.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:screenshot_kit/screenshot_kit.dart';
-import 'package:your_app/my_widget.dart';
 
-void main() {
+void appGoldenTest({
+  required String description,
+  required String fileName,
+  required Widget child,
+  String scenarioName = 'default',
+}) {
   final config = ScreenshotSurfaceConfig.fromEnvironment();
 
   goldenTest(
-    'My widget baseline',
-    fileName: 'my_widget_golden',
+    description,
+    fileName: fileName,
     builder: () => GoldenTestGroup(
-      // Use width + height from SCREENSHOT_LOGICAL_* defines.
       scenarioConstraints: BoxConstraints.tightFor(
         width: config.logicalWidth.toDouble(),
         height: config.logicalHeight.toDouble(),
       ),
       children: [
         GoldenTestScenario(
-          name: 'default',
-          child: const MyWidget(),
+          name: scenarioName,
+          child: child,
         ),
       ],
     ),
@@ -103,11 +106,33 @@ void main() {
 }
 ```
 
-Copy-paste references in this repo: **`example_app/test/alchemist_readable_label_test.dart`**, **`example_app/test/error_page_demo_page_test.dart`**.
+This keeps the builder/constraints wiring in one place.
 
 ---
 
-### Step 6 — Know where PNGs are stored
+### Step 6 — Write a golden test
+
+Add a file such as **`test/my_widget_golden_test.dart`** (name must end with **`_test.dart`**):
+
+```dart
+import 'support/golden_test_helpers.dart';
+import 'package:your_app/my_widget.dart';
+
+void main() {
+  appGoldenTest(
+    description: 'My widget baseline',
+    fileName: 'my_widget_golden',
+    scenarioName: 'default',
+    child: const MyWidget(),
+  );
+}
+```
+
+Copy-paste references in this repo: **`example_app/test/alchemist_readable_label_test.dart`**, **`example_app/test/error_page_demo_page_test.dart`**, **`example_app/test/support/golden_test_helpers.dart`**.
+
+---
+
+### Step 7 — Know where PNGs are stored
 
 Next to the test file, Alchemist writes:
 
@@ -119,7 +144,7 @@ Always pass **`flutter test`** a **`.dart`** path, never a **`.png`**.
 
 ---
 
-### Step 7 — Choose your `--dart-define` flags
+### Step 8 — Choose your `--dart-define` flags
 
 Add **one** **`--dart-define=KEY=value`** per flag. Values are **strings** at compile time (`fromEnvironment`).
 
@@ -154,7 +179,7 @@ This repo’s **`example_app`** commits **readable** CI goldens, so its checks u
 
 ---
 
-### Step 8 — Generate or refresh goldens
+### Step 9 — Generate or refresh goldens
 
 ```bash
 flutter test \
@@ -163,13 +188,13 @@ flutter test \
   --update-goldens
 ```
 
-Adjust defines to match what you chose in Step 7, then commit the updated **`test/goldens/**`** files.
+Adjust defines to match what you chose in Step 8, then commit the updated **`test/goldens/**`** files.
 
 ---
 
-### Step 9 — Run tests (compare goldens)
+### Step 10 — Run tests (compare goldens)
 
-Same command as Step 8 **without** **`--update-goldens`**:
+Same command as Step 9 **without** **`--update-goldens`**:
 
 ```bash
 flutter test \
@@ -182,7 +207,7 @@ flutter test \
 ## Common mistakes
 
 - **`flutter test some_image.png`** — use a **`.dart`** test path only.
-- **Golden mismatch after changing defines** — re-run Step 8 with the new flags and commit PNGs.
+- **Golden mismatch after changing defines** — re-run Step 9 with the new flags and commit PNGs.
 - **`SCREENSHOT_ALCHEMIST_OBSCURE_TEXT` seems ignored** — missing Step 4, or no **`goldenTest`** / Alchemist usage.
 - **`Scaffold` / infinite height errors** — set **both** width and height in **`scenarioConstraints`** (see Step 5).
 
