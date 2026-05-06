@@ -84,29 +84,43 @@ void appGoldenTest({
   required String fileName,
   required Widget child,
   String scenarioName = 'default',
+  bool showScenarioLabel = false,
 }) {
   final config = ScreenshotSurfaceConfig.fromEnvironment();
 
   goldenTest(
     description,
     fileName: fileName,
-    builder: () => GoldenTestGroup(
-      scenarioConstraints: BoxConstraints.tightFor(
+    builder: () {
+      final constrainedChild = SizedBox(
         width: config.logicalWidth.toDouble(),
         height: config.logicalHeight.toDouble(),
-      ),
-      children: [
-        GoldenTestScenario(
-          name: scenarioName,
-          child: child,
+        child: child,
+      );
+
+      if (!showScenarioLabel) {
+        return constrainedChild;
+      }
+
+      return GoldenTestGroup(
+        scenarioConstraints: BoxConstraints.tightFor(
+          width: config.logicalWidth.toDouble(),
+          height: config.logicalHeight.toDouble(),
         ),
-      ],
-    ),
+        children: [
+          GoldenTestScenario(
+            name: scenarioName,
+            child: child,
+          ),
+        ],
+      );
+    },
   );
 }
 ```
 
 This keeps the builder/constraints wiring in one place.
+By default, this version renders only the widget (no scenario-name header in the PNG). Set `showScenarioLabel: true` when you want the Alchemist label row.
 
 ---
 
@@ -115,9 +129,11 @@ This keeps the builder/constraints wiring in one place.
 Add a file such as **`test/my_widget_golden_test.dart`** (name must end with **`_test.dart`**):
 
 ```dart
+import 'package:flutter_test/flutter_test.dart';
 import 'support/golden_test_helpers.dart';
 import 'package:your_app/my_widget.dart';
 
+@Tags(['golden'])
 void main() {
   appGoldenTest(
     description: 'My widget baseline',
