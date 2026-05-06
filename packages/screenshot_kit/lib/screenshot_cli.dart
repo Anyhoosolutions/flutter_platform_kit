@@ -2,6 +2,7 @@
 /// does not compile `dart:ui`.
 library;
 
+export 'src/screenshot_alchemist_flags.dart';
 export 'src/screenshot_define_keys.dart';
 export 'src/screenshot_png_collector.dart';
 export 'src/screenshot_cli_runner.dart';

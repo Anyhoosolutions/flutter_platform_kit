@@ -39,6 +39,12 @@ Future<void> main(List<String> arguments) async {
       defaultsTo: false,
     )
     ..addFlag(
+      'readable-alchemist-ci-text',
+      help:
+          'Sets --dart-define=${ScreenshotDefineKeys.alchemistObscureCiText}=false (wire Alchemist; see screenshot_kit README)',
+      defaultsTo: false,
+    )
+    ..addFlag(
       'collect',
       help: 'After success, copy PNGs from **/goldens/**/*.png under --goldens-root or package',
       defaultsTo: false,
@@ -98,6 +104,7 @@ Future<void> main(List<String> arguments) async {
     height: height,
     brightness: brightness,
     devicePixelRatio: dpr,
+    readableAlchemistCiGoldens: results['readable-alchemist-ci-text'] as bool,
     dartDefines: dartDefines,
     updateGoldens: results['update-goldens'] as bool,
   );

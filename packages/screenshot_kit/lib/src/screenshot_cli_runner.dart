@@ -19,6 +19,9 @@ List<String> buildFlutterTestArgs({
   int? height,
   String? brightness,
   double? devicePixelRatio,
+  /// When `true`, emits `--dart-define=SCREENSHOT_ALCHEMIST_OBSCURE_TEXT=false`
+  /// (readable text in Alchemist CI goldens — mirrors CLI `--readable-alchemist-ci-text`).
+  bool readableAlchemistCiGoldens = false,
   List<String> dartDefines = const [],
   bool updateGoldens = false,
 }) {
@@ -35,6 +38,11 @@ List<String> buildFlutterTestArgs({
   }
   if (devicePixelRatio != null) {
     out.add('--dart-define=${ScreenshotDefineKeys.devicePixelRatio}=$devicePixelRatio');
+  }
+  if (readableAlchemistCiGoldens) {
+    out.add(
+      '--dart-define=${ScreenshotDefineKeys.alchemistObscureCiText}=false',
+    );
   }
   for (final def in dartDefines) {
     if (def.isEmpty) continue;
