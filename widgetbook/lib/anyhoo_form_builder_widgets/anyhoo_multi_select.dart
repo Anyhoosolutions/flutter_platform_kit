@@ -2,6 +2,7 @@
 
 import 'package:anyhoo_form_builder_widgets/anyhoo_form_builder_widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:widgetbook/widgetbook.dart';
 import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
 import 'package:widgetbook_workspace/helpers/wrap_in_mocks_helper.dart';
 
@@ -12,12 +13,16 @@ Widget buildFlatAddNew(BuildContext context) {
 
 @widgetbook.UseCase(name: 'Sectioned', type: AnyhooMultiSelect, path: 'anyhoo_form_builder_widgets')
 Widget buildSectioned(BuildContext context) {
-  const style = AnyhooMultiSelectStyle(
+  final showCloseButton = context.knobs.boolean(label: 'Show close button', initialValue: true);
+  final showSearch = context.knobs.boolean(label: 'Show search', initialValue: true);
+
+  final style = AnyhooMultiSelectStyle(
     sectionHeaderBackgroundColor: Color(0xFFFF9800),
     sectionHeaderStyle: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF1A1A2E), fontSize: 14),
     overlayBackgroundColor: Color(0xFFFF9800),
     checkboxActiveColor: Color(0xFF3E2723),
     itemTextStyle: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF1A1A2E)),
+    closeOverlayButtonLabel: showCloseButton ? 'Close' : null,
   );
 
   return WrapInMocksHelper().wrapInMocks(
@@ -33,7 +38,7 @@ Widget buildSectioned(BuildContext context) {
             AnyhooMultiSelectSection(title: 'Pets', items: ['Dog', 'Cat', 'Bird']),
             AnyhooMultiSelectSection(title: 'Farm Animals', items: ['Cow', 'Pig', 'Chicken']),
           ],
-          searchEnabled: true,
+          searchEnabled: showSearch,
           style: style,
           onChanged: (_) {},
         ),
@@ -50,19 +55,23 @@ class _FlatAddNewDemo extends StatefulWidget {
 class _FlatAddNewDemoState extends State<_FlatAddNewDemo> {
   List<String> _value = ['Third', 'Second'];
 
-  static const _earthyStyle = AnyhooMultiSelectStyle(
-    chipBackgroundColor: Color(0xFF5D4037),
-    chipLabelStyle: TextStyle(color: Colors.white),
-    chipDeleteIconColor: Colors.white,
-    overlayBackgroundColor: Color(0xFFE8DCC8),
-    itemTextStyle: TextStyle(color: Color(0xFF558B2F)),
-    checkboxActiveColor: Color(0xFF5D4037),
-    closeOverlayButtonLabel: 'Close',
-    searchHintText: 'Search or add new...',
-  );
-
   @override
   Widget build(BuildContext context) {
+    final showCloseButton = context.knobs.boolean(label: 'Show close button', initialValue: true);
+    final showSearch = context.knobs.boolean(label: 'Show search', initialValue: true);
+    final allowAddNew = context.knobs.boolean(label: 'Allow add new', initialValue: true);
+
+    final earthyStyle = AnyhooMultiSelectStyle(
+      chipBackgroundColor: Color(0xFF5D4037),
+      chipLabelStyle: TextStyle(color: Colors.white),
+      chipDeleteIconColor: Colors.white,
+      overlayBackgroundColor: Color(0xFFE8DCC8),
+      itemTextStyle: TextStyle(color: Color(0xFF558B2F)),
+      checkboxActiveColor: Color(0xFF5D4037),
+      closeOverlayButtonLabel: showCloseButton ? 'Close' : null,
+      searchHintText: allowAddNew ? 'Search or add new...' : 'Search...',
+    );
+
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -71,8 +80,9 @@ class _FlatAddNewDemoState extends State<_FlatAddNewDemo> {
           labelBuilder: (item) => item,
           value: _value,
           items: const ['First', 'Second', 'Third'],
-          allowAddNew: true,
-          style: _earthyStyle,
+          allowAddNew: allowAddNew,
+          searchEnabled: showSearch,
+          style: earthyStyle,
           onChanged: (v) => setState(() => _value = v),
         ),
       ),
