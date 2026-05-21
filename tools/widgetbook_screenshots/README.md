@@ -120,6 +120,10 @@ dart analyze
 dart test
 ```
 
+## Related: Flutter test goldens
+
+For **Flutter test** screenshot / golden workflows (not Widgetbook in a browser), see [`packages/screenshot_kit`](../../packages/screenshot_kit): `flutter test`, `matchesGoldenFile` or Alchemist, and documented `--dart-define` flags.
+
 ## License
 
 See repository `LICENSE`.
