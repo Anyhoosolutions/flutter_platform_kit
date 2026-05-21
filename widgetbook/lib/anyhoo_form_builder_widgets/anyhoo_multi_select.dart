@@ -57,7 +57,7 @@ class _FlatAddNewDemoState extends State<_FlatAddNewDemo> {
     overlayBackgroundColor: Color(0xFFE8DCC8),
     itemTextStyle: TextStyle(color: Color(0xFF558B2F)),
     checkboxActiveColor: Color(0xFF5D4037),
-    closeOverlayButtonLabel: 'Save',
+    closeOverlayButtonLabel: 'Close',
     searchHintText: 'Search or add new...',
   );
 

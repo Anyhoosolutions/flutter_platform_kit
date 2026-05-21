@@ -233,32 +233,35 @@ class _AnyhooMultiSelectState<T> extends State<AnyhooMultiSelect<T>> {
     );
   }
 
+  Widget _buildOptionsList(List<Widget> children) {
+    return SingleChildScrollView(
+      physics: const ClampingScrollPhysics(),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: children,
+      ),
+    );
+  }
+
   Widget _buildFlatList(AnyhooMultiSelectStyle style) {
     final filtered = _filteredFlatItems();
     final showAdd = _canShowAddRow(filtered);
-    final count = filtered.length + (showAdd ? 1 : 0);
-
-    return ListView.builder(
-      padding: EdgeInsets.zero,
-      itemCount: count,
-      itemBuilder: (context, index) {
-        if (showAdd && index == filtered.length) {
-          final query = _searchController.text.trim();
-          return ListTile(
-            title: Text('Add "$query"', style: style.itemTextStyle),
-            onTap: () => _addNewItem(query),
-          );
-        }
-        return _buildCheckboxRow(filtered[index], style);
-      },
-    );
+    final children = <Widget>[
+      for (var i = 0; i < filtered.length; i++) _buildCheckboxRow(filtered[i], style),
+      if (showAdd)
+        ListTile(
+          title: Text('Add "${_searchController.text.trim()}"', style: style.itemTextStyle),
+          onTap: () => _addNewItem(_searchController.text.trim()),
+        ),
+    ];
+    return _buildOptionsList(children);
   }
 
   Widget _buildSectionedList(AnyhooMultiSelectStyle style) {
     final sections = _filteredSections();
-    return ListView(
-      padding: EdgeInsets.zero,
-      children: [
+    return _buildOptionsList(
+      [
         for (final section in sections) ...[
           Container(
             width: double.infinity,
