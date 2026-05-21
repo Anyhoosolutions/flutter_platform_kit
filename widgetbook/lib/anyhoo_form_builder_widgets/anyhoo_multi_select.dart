@@ -11,6 +11,11 @@ Widget buildFlatAddNew(BuildContext context) {
   return WrapInMocksHelper().wrapInMocks(context, _FlatAddNewDemo());
 }
 
+@widgetbook.UseCase(name: 'Single selection', type: AnyhooMultiSelect, path: 'anyhoo_form_builder_widgets')
+Widget buildSingleSelection(BuildContext context) {
+  return WrapInMocksHelper().wrapInMocks(context, _SingleSelectionDemo());
+}
+
 @widgetbook.UseCase(name: 'Sectioned', type: AnyhooMultiSelect, path: 'anyhoo_form_builder_widgets')
 Widget buildSectioned(BuildContext context) {
   final showCloseButton = context.knobs.boolean(label: 'Show close button', initialValue: true);
@@ -91,6 +96,43 @@ class _FlatAddNewDemoState extends State<_FlatAddNewDemo> {
               ? AnyhooMultiSelectValueDisplay.commaSeparated
               : AnyhooMultiSelectValueDisplay.chips,
           style: earthyStyle,
+          onChanged: (v) => setState(() => _value = v),
+        ),
+      ),
+    );
+  }
+}
+
+class _SingleSelectionDemo extends StatefulWidget {
+  @override
+  State<_SingleSelectionDemo> createState() => _SingleSelectionDemoState();
+}
+
+class _SingleSelectionDemoState extends State<_SingleSelectionDemo> {
+  List<String> _value = const ['Cat'];
+
+  @override
+  Widget build(BuildContext context) {
+    final showSearch = context.knobs.boolean(label: 'Show search', initialValue: true);
+    final sectioned = context.knobs.boolean(label: 'Sectioned', initialValue: false);
+
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: AnyhooMultiSelect<String>(
+          label: sectioned ? 'Animal' : 'Option',
+          labelBuilder: (item) => item,
+          value: _value,
+          singleSelection: true,
+          emptySelectionHint: 'Select an item...',
+          searchEnabled: showSearch,
+          items: sectioned ? null : const ['First', 'Second', 'Third'],
+          sections: sectioned
+              ? const [
+                  AnyhooMultiSelectSection(title: 'Pets', items: ['Dog', 'Cat', 'Bird']),
+                  AnyhooMultiSelectSection(title: 'Farm Animals', items: ['Cow', 'Pig', 'Chicken']),
+                ]
+              : null,
           onChanged: (v) => setState(() => _value = v),
         ),
       ),

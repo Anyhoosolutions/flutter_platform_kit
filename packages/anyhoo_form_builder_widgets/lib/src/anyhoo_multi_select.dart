@@ -25,6 +25,7 @@ class AnyhooMultiSelect<T> extends StatefulWidget {
     this.commaSeparatedMaxLines = 2,
     this.maxWidth = 280,
     this.maxVisibleOptions = 5,
+    this.singleSelection = false,
   }) : assert(items != null || sections != null, 'Provide either items or sections'),
        assert(items == null || sections == null, 'Provide only one of items or sections'),
        assert(!allowAddNew || sections == null, 'allowAddNew requires flat items mode');
@@ -59,6 +60,10 @@ class AnyhooMultiSelect<T> extends StatefulWidget {
   /// Max option rows shown before the list scrolls.
   final int maxVisibleOptions;
 
+  /// When true, only one item can be selected. Options use list tiles (no checkboxes),
+  /// the overlay closes on selection, and the field shows plain text instead of chips.
+  final bool singleSelection;
+
   @override
   State<AnyhooMultiSelect<T>> createState() => _AnyhooMultiSelectState<T>();
 }
@@ -82,7 +87,8 @@ class _AnyhooMultiSelectState<T> extends State<AnyhooMultiSelect<T>> {
   @override
   void initState() {
     super.initState();
-    _selected = List<T>.from(widget.value);
+    _assertSingleSelectionValue(widget.value);
+    _selected = _normalizedSelection(widget.value);
     _searchController.addListener(_onSearchChanged);
   }
 
@@ -90,7 +96,8 @@ class _AnyhooMultiSelectState<T> extends State<AnyhooMultiSelect<T>> {
   void didUpdateWidget(covariant AnyhooMultiSelect<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (!_listEquals(oldWidget.value, widget.value)) {
-      _selected = List<T>.from(widget.value);
+      _assertSingleSelectionValue(widget.value);
+      _selected = _normalizedSelection(widget.value);
     }
   }
 
@@ -137,14 +144,32 @@ class _AnyhooMultiSelectState<T> extends State<AnyhooMultiSelect<T>> {
     _searchController.clear();
   }
 
+  void _assertSingleSelectionValue(List<T> value) {
+    assert(
+      !widget.singleSelection || value.length <= 1,
+      'When singleSelection is true, value must contain at most one item',
+    );
+  }
+
+  List<T> _normalizedSelection(List<T> value) {
+    if (!widget.singleSelection || value.length <= 1) {
+      return List<T>.from(value);
+    }
+    return [value.first];
+  }
+
   void _updateSelection(List<T> next) {
+    _assertSingleSelectionValue(next);
     setState(() => _selected = next);
-    print('updateSelection: $next');
     widget.onChanged(List<T>.from(next));
   }
 
+  void _selectSingleItem(T item) {
+    _updateSelection([item]);
+    _closeOverlay();
+  }
+
   void _toggleItem(T item, bool? checked) {
-    print('toggleItem: $item, $checked');
     final next = List<T>.from(_selected);
     if (checked == true) {
       if (!next.contains(item)) next.add(item);
@@ -204,9 +229,13 @@ class _AnyhooMultiSelectState<T> extends State<AnyhooMultiSelect<T>> {
         _customItems.add(newItem);
       }
     }
+    _searchController.clear();
+    if (widget.singleSelection) {
+      _selectSingleItem(newItem);
+      return;
+    }
     final next = List<T>.from(_selected);
     if (!next.contains(newItem)) next.add(newItem);
-    _searchController.clear();
     _updateSelection(next);
   }
 
@@ -235,6 +264,15 @@ class _AnyhooMultiSelectState<T> extends State<AnyhooMultiSelect<T>> {
   Widget _buildSelectedDisplay(AnyhooMultiSelectStyle style) {
     if (_selected.isEmpty) {
       return Text(widget.emptySelectionHint, style: style.emptySelectionTextStyle);
+    }
+
+    if (widget.singleSelection) {
+      return Text(
+        widget.labelBuilder(_selected.first),
+        style: style.selectedTextStyle,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      );
     }
 
     if (widget.valueDisplay == AnyhooMultiSelectValueDisplay.commaSeparated) {
@@ -275,15 +313,24 @@ class _AnyhooMultiSelectState<T> extends State<AnyhooMultiSelect<T>> {
     );
   }
 
-  Widget _buildCheckboxRow(T item, AnyhooMultiSelectStyle style) {
+  Widget _buildOptionRow(T item, AnyhooMultiSelectStyle style) {
+    if (widget.singleSelection) {
+      final selected = _selected.contains(item);
+      return ListTile(
+        title: Text(
+          widget.labelBuilder(item),
+          style: selected ? style.selectedTextStyle : style.itemTextStyle,
+        ),
+        selected: selected,
+        onTap: () => _selectSingleItem(item),
+      );
+    }
+
     return CheckboxListTile(
       title: Text(widget.labelBuilder(item), style: style.itemTextStyle),
       value: _selected.contains(item),
       activeColor: style.checkboxActiveColor,
-      onChanged: (checked) {
-        print('checked: $checked');
-        _toggleItem(item, checked);
-      },
+      onChanged: (checked) => _toggleItem(item, checked),
     );
   }
 
@@ -323,7 +370,7 @@ class _AnyhooMultiSelectState<T> extends State<AnyhooMultiSelect<T>> {
     final filtered = _filteredFlatItems();
     final showAdd = _canShowAddRow(filtered);
     final children = <Widget>[
-      for (var i = 0; i < filtered.length; i++) _buildCheckboxRow(filtered[i], style),
+      for (var i = 0; i < filtered.length; i++) _buildOptionRow(filtered[i], style),
       if (showAdd)
         ListTile(
           title: Text('Add "${_searchController.text.trim()}"', style: style.itemTextStyle),
@@ -351,7 +398,7 @@ class _AnyhooMultiSelectState<T> extends State<AnyhooMultiSelect<T>> {
           padding: style.sectionHeaderPadding,
           child: Text(section.title, style: style.sectionHeaderStyle),
         ),
-        for (final item in section.items) _buildCheckboxRow(item, style),
+        for (final item in section.items) _buildOptionRow(item, style),
       ],
     ], maxHeight: maxHeight);
   }
@@ -366,7 +413,7 @@ class _AnyhooMultiSelectState<T> extends State<AnyhooMultiSelect<T>> {
     Widget? footer;
     if (style.overlayFooter != null) {
       footer = style.overlayFooter;
-    } else if (style.closeOverlayButtonLabel != null) {
+    } else if (!widget.singleSelection && style.closeOverlayButtonLabel != null) {
       footer = Center(
         child: TextButton(onPressed: _closeOverlay, child: Text(style.closeOverlayButtonLabel!)),
       );

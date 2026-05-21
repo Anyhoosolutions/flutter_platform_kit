@@ -25,6 +25,7 @@ class AnyhooFormBuilderMultiSelect<T extends Object> extends StatelessWidget {
     this.valueSeparator = ', ',
     this.commaSeparatedMaxLines = 2,
     this.maxVisibleChips = 3,
+    this.singleSelection = false,
   }) : assert(items != null || sections != null, 'Provide either items or sections'),
        assert(items == null || sections == null, 'Provide only one of items or sections'),
        assert(!allowAddNew || sections == null, 'allowAddNew requires flat items mode');
@@ -46,6 +47,7 @@ class AnyhooFormBuilderMultiSelect<T extends Object> extends StatelessWidget {
   final String valueSeparator;
   final int commaSeparatedMaxLines;
   final int maxVisibleChips;
+  final bool singleSelection;
 
   @override
   Widget build(BuildContext context) {
@@ -72,6 +74,7 @@ class AnyhooFormBuilderMultiSelect<T extends Object> extends StatelessWidget {
           valueSeparator: valueSeparator,
           commaSeparatedMaxLines: commaSeparatedMaxLines,
           maxVisibleChips: maxVisibleChips,
+          singleSelection: singleSelection,
         );
       },
     );
