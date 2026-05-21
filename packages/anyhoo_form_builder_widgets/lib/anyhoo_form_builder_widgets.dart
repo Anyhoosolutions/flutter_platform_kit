@@ -5,7 +5,5 @@
 library anyhoo_form_builder_widgets;
 
 export 'src/anyhoo_form_builder_multi_select.dart';
-export 'src/anyhoo_multi_select.dart';
-export 'src/anyhoo_multi_select_section.dart';
-export 'src/anyhoo_multi_select_style.dart';
-export 'src/anyhoo_multi_select_value_display.dart';
+export 'src/anyhoo_multi_select_searchable.dart';
+export 'src/anyhoo_form_builder_multi_select_searchable.dart';
