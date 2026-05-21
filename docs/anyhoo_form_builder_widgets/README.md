@@ -48,7 +48,8 @@ from the package authors, and more.
 
 ### 0.0.1
 
-* AnyhooMultiSelectSearchable
+* AnyhooMultiSelect
 * AnyhooFormBuilderMultiSelect
-* AnyhooFormBuilderMultiSelectSearchable
+* AnyhooMultiSelectSection
+* AnyhooMultiSelectStyle
 
