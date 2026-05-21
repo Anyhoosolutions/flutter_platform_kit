@@ -23,6 +23,8 @@ class AnyhooMultiSelect<T> extends StatefulWidget {
     this.valueDisplay = AnyhooMultiSelectValueDisplay.chips,
     this.valueSeparator = ', ',
     this.commaSeparatedMaxLines = 2,
+    this.maxWidth = 280,
+    this.maxVisibleOptions = 5,
   }) : assert(items != null || sections != null, 'Provide either items or sections'),
        assert(items == null || sections == null, 'Provide only one of items or sections'),
        assert(!allowAddNew || sections == null, 'allowAddNew requires flat items mode');
@@ -51,6 +53,12 @@ class AnyhooMultiSelect<T> extends StatefulWidget {
   final String valueSeparator;
   final int commaSeparatedMaxLines;
 
+  /// Max width when the parent does not provide a finite constraint (e.g. in a [Row]).
+  final double maxWidth;
+
+  /// Max option rows shown before the list scrolls.
+  final int maxVisibleOptions;
+
   @override
   State<AnyhooMultiSelect<T>> createState() => _AnyhooMultiSelectState<T>();
 }
@@ -58,11 +66,12 @@ class AnyhooMultiSelect<T> extends StatefulWidget {
 class _AnyhooMultiSelectState<T> extends State<AnyhooMultiSelect<T>> {
   final TextEditingController _searchController = TextEditingController();
   final LayerLink _layerLink = LayerLink();
+  final OverlayPortalController _overlayController = OverlayPortalController();
   final GlobalKey _triggerKey = GlobalKey();
+  final Object _tapRegionGroup = Object();
 
   late List<T> _selected;
   final List<T> _customItems = [];
-  bool _overlayVisible = false;
   double _triggerWidth = 0;
   double _triggerHeight = 0;
 
@@ -114,26 +123,28 @@ class _AnyhooMultiSelectState<T> extends State<AnyhooMultiSelect<T>> {
   }
 
   void _toggleOverlay() {
-    setState(() => _overlayVisible = !_overlayVisible);
-    if (_overlayVisible) {
+    if (_overlayController.isShowing) {
+      _closeOverlay();
+    } else {
+      _overlayController.show();
       WidgetsBinding.instance.addPostFrameCallback((_) => _measureTrigger());
     }
   }
 
   void _closeOverlay() {
-    if (!_overlayVisible) return;
-    setState(() {
-      _overlayVisible = false;
-      _searchController.clear();
-    });
+    if (!_overlayController.isShowing) return;
+    _overlayController.hide();
+    _searchController.clear();
   }
 
   void _updateSelection(List<T> next) {
     setState(() => _selected = next);
+    print('updateSelection: $next');
     widget.onChanged(List<T>.from(next));
   }
 
   void _toggleItem(T item, bool? checked) {
+    print('toggleItem: $item, $checked');
     final next = List<T>.from(_selected);
     if (checked == true) {
       if (!next.contains(item)) next.add(item);
@@ -168,10 +179,7 @@ class _AnyhooMultiSelectState<T> extends State<AnyhooMultiSelect<T>> {
         if (section.title.toLowerCase().contains(q))
           section
         else
-          AnyhooMultiSelectSection<T>(
-            title: section.title,
-            items: section.items.where(_matchesSearch).toList(),
-          ),
+          AnyhooMultiSelectSection<T>(title: section.title, items: section.items.where(_matchesSearch).toList()),
     ].where((s) => s.items.isNotEmpty).toList();
   }
 
@@ -272,22 +280,46 @@ class _AnyhooMultiSelectState<T> extends State<AnyhooMultiSelect<T>> {
       title: Text(widget.labelBuilder(item), style: style.itemTextStyle),
       value: _selected.contains(item),
       activeColor: style.checkboxActiveColor,
-      onChanged: (checked) => _toggleItem(item, checked),
+      onChanged: (checked) {
+        print('checked: $checked');
+        _toggleItem(item, checked);
+      },
     );
   }
 
-  Widget _buildOptionsList(List<Widget> children) {
-    return SingleChildScrollView(
-      physics: const ClampingScrollPhysics(),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: children,
+  Widget _buildOptionsList(List<Widget> children, {required double maxHeight}) {
+    return ConstrainedBox(
+      constraints: BoxConstraints(maxHeight: maxHeight),
+      child: SingleChildScrollView(
+        physics: const ClampingScrollPhysics(),
+        child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: children),
       ),
     );
   }
 
-  Widget _buildFlatList(AnyhooMultiSelectStyle style) {
+  int _visibleOptionRowCount() {
+    if (_isFlat) {
+      final filtered = _filteredFlatItems();
+      return filtered.length + (_canShowAddRow(filtered) ? 1 : 0);
+    }
+
+    final sections = _filteredSections();
+    if (sections.isEmpty && _searchQuery().isNotEmpty) {
+      return 1;
+    }
+    return sections.fold<int>(0, (count, section) => count + 1 + section.items.length);
+  }
+
+  double _optionsListMaxHeight(AnyhooMultiSelectStyle style) {
+    final rowCount = _visibleOptionRowCount();
+    if (rowCount == 0) {
+      return 0;
+    }
+    final visibleRows = rowCount.clamp(1, widget.maxVisibleOptions);
+    return (visibleRows * kMinInteractiveDimension).clamp(0, style.overlayMaxHeight);
+  }
+
+  Widget _buildFlatList(AnyhooMultiSelectStyle style, {required double maxHeight}) {
     final filtered = _filteredFlatItems();
     final showAdd = _canShowAddRow(filtered);
     final children = <Widget>[
@@ -298,10 +330,10 @@ class _AnyhooMultiSelectState<T> extends State<AnyhooMultiSelect<T>> {
           onTap: () => _addNewItem(_searchController.text.trim()),
         ),
     ];
-    return _buildOptionsList(children);
+    return _buildOptionsList(children, maxHeight: maxHeight);
   }
 
-  Widget _buildSectionedList(AnyhooMultiSelectStyle style) {
+  Widget _buildSectionedList(AnyhooMultiSelectStyle style, {required double maxHeight}) {
     final sections = _filteredSections();
     if (sections.isEmpty && _searchQuery().isNotEmpty) {
       return _buildOptionsList([
@@ -309,26 +341,27 @@ class _AnyhooMultiSelectState<T> extends State<AnyhooMultiSelect<T>> {
           padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
           child: Text('No matches', style: style.itemTextStyle),
         ),
-      ]);
+      ], maxHeight: maxHeight);
     }
-    return _buildOptionsList(
-      [
-        for (final section in sections) ...[
-          Container(
-            width: double.infinity,
-            color: style.sectionHeaderBackgroundColor,
-            padding: style.sectionHeaderPadding,
-            child: Text(section.title, style: style.sectionHeaderStyle),
-          ),
-          for (final item in section.items) _buildCheckboxRow(item, style),
-        ],
+    return _buildOptionsList([
+      for (final section in sections) ...[
+        Container(
+          alignment: Alignment.centerLeft,
+          color: style.sectionHeaderBackgroundColor,
+          padding: style.sectionHeaderPadding,
+          child: Text(section.title, style: style.sectionHeaderStyle),
+        ),
+        for (final item in section.items) _buildCheckboxRow(item, style),
       ],
-    );
+    ], maxHeight: maxHeight);
   }
 
-  Widget _buildOverlay(AnyhooMultiSelectStyle style) {
+  Widget _buildOverlay(AnyhooMultiSelectStyle style, {required double width}) {
     final search = _buildSearchField(style);
-    final list = _isFlat ? _buildFlatList(style) : _buildSectionedList(style);
+    final listMaxHeight = _optionsListMaxHeight(style);
+    final list = _isFlat
+        ? _buildFlatList(style, maxHeight: listMaxHeight)
+        : _buildSectionedList(style, maxHeight: listMaxHeight);
 
     Widget? footer;
     if (style.overlayFooter != null) {
@@ -339,25 +372,20 @@ class _AnyhooMultiSelectState<T> extends State<AnyhooMultiSelect<T>> {
       );
     }
 
-    return Material(
-      elevation: style.overlayElevation,
-      color: style.overlayBackgroundColor,
-      borderRadius: style.overlayBorderRadius,
-      child: SizedBox(
-        width: _triggerWidth > 0 ? _triggerWidth : null,
+    return SizedBox(
+      width: width,
+      child: Material(
+        elevation: style.overlayElevation,
+        color: style.overlayBackgroundColor,
+        borderRadius: style.overlayBorderRadius,
+        clipBehavior: Clip.antiAlias,
         child: Padding(
           padding: style.overlayPadding,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               if (search != null) ...[search, const SizedBox(height: 8)],
-              ConstrainedBox(
-                constraints: BoxConstraints(maxHeight: style.overlayMaxHeight),
-                child: ClipRRect(
-                  borderRadius: style.overlayBorderRadius ?? BorderRadius.zero,
-                  child: list,
-                ),
-              ),
+              if (listMaxHeight > 0) list,
               if (footer != null) ...[const SizedBox(height: 8), footer],
             ],
           ),
@@ -375,35 +403,51 @@ class _AnyhooMultiSelectState<T> extends State<AnyhooMultiSelect<T>> {
       labelText: widget.label,
     );
 
-    return TapRegion(
-      onTapOutside: (_) => _closeOverlay(),
-      child: CompositedTransformTarget(
-        link: _layerLink,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            InkWell(
-              onTap: _toggleOverlay,
-              child: Semantics(
-                label: widget.semanticLabel,
-                child: InputDecorator(
-                  key: _triggerKey,
-                  decoration: fieldDecoration,
-                  child: _buildSelectedDisplay(style),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final fieldWidth = constraints.maxWidth.isFinite ? constraints.maxWidth : widget.maxWidth;
+        final overlayWidth = _triggerWidth > 0 ? _triggerWidth : fieldWidth;
+
+        return SizedBox(
+          width: fieldWidth,
+          child: TapRegion(
+            groupId: _tapRegionGroup,
+            onTapOutside: (_) => _closeOverlay(),
+            child: OverlayPortal(
+              controller: _overlayController,
+              overlayChildBuilder: (context) {
+                return TapRegion(
+                  groupId: _tapRegionGroup,
+                  child: CompositedTransformFollower(
+                    link: _layerLink,
+                    showWhenUnlinked: false,
+                    offset: Offset(0, _triggerHeight + 5),
+                    child: UnconstrainedBox(
+                      clipBehavior: Clip.hardEdge,
+                      alignment: Alignment.topLeft,
+                      child: _buildOverlay(style, width: overlayWidth),
+                    ),
+                  ),
+                );
+              },
+              child: CompositedTransformTarget(
+                link: _layerLink,
+                child: InkWell(
+                  onTap: _toggleOverlay,
+                  child: Semantics(
+                    label: widget.semanticLabel,
+                    child: InputDecorator(
+                      key: _triggerKey,
+                      decoration: fieldDecoration,
+                      child: _buildSelectedDisplay(style),
+                    ),
+                  ),
                 ),
               ),
             ),
-            if (_overlayVisible)
-              CompositedTransformFollower(
-                link: _layerLink,
-                showWhenUnlinked: false,
-                offset: Offset(0, _triggerHeight + 5),
-                child: _buildOverlay(style),
-              ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }
