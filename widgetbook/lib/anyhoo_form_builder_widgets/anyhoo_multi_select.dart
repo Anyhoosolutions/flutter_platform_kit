@@ -33,7 +33,7 @@ Widget buildSectioned(BuildContext context) {
             AnyhooMultiSelectSection(title: 'Pets', items: ['Dog', 'Cat', 'Bird']),
             AnyhooMultiSelectSection(title: 'Farm Animals', items: ['Cow', 'Pig', 'Chicken']),
           ],
-          searchEnabled: false,
+          searchEnabled: true,
           style: style,
           onChanged: (_) {},
         ),

@@ -158,7 +158,13 @@ class _AnyhooMultiSelectState<T> extends State<AnyhooMultiSelect<T>> {
     if (q.isEmpty) return sections;
     return [
       for (final section in sections)
-        AnyhooMultiSelectSection<T>(title: section.title, items: section.items.where(_matchesSearch).toList()),
+        if (section.title.toLowerCase().contains(q))
+          section
+        else
+          AnyhooMultiSelectSection<T>(
+            title: section.title,
+            items: section.items.where(_matchesSearch).toList(),
+          ),
     ].where((s) => s.items.isNotEmpty).toList();
   }
 
@@ -260,6 +266,14 @@ class _AnyhooMultiSelectState<T> extends State<AnyhooMultiSelect<T>> {
 
   Widget _buildSectionedList(AnyhooMultiSelectStyle style) {
     final sections = _filteredSections();
+    if (sections.isEmpty && _searchQuery().isNotEmpty) {
+      return _buildOptionsList([
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+          child: Text('No matches', style: style.itemTextStyle),
+        ),
+      ]);
+    }
     return _buildOptionsList(
       [
         for (final section in sections) ...[
