@@ -22,6 +22,7 @@ class AnyhooMultiSelectStyle {
     this.overlayMaxHeight = 240,
     this.overlayFooter,
     this.closeOverlayButtonLabel,
+    this.selectedTextStyle,
   });
 
   final Color? chipBackgroundColor;
@@ -43,6 +44,7 @@ class AnyhooMultiSelectStyle {
   final double overlayMaxHeight;
   final Widget? overlayFooter;
   final String? closeOverlayButtonLabel;
+  final TextStyle? selectedTextStyle;
 
   static AnyhooMultiSelectStyle fromTheme(BuildContext context) {
     final theme = Theme.of(context);
@@ -60,6 +62,7 @@ class AnyhooMultiSelectStyle {
       ),
       itemTextStyle: theme.textTheme.bodyLarge,
       checkboxActiveColor: colorScheme.primary,
+      selectedTextStyle: theme.textTheme.bodyLarge?.copyWith(color: colorScheme.onSurface),
     );
   }
 
@@ -85,6 +88,7 @@ class AnyhooMultiSelectStyle {
       overlayMaxHeight: other.overlayMaxHeight,
       overlayFooter: other.overlayFooter ?? overlayFooter,
       closeOverlayButtonLabel: other.closeOverlayButtonLabel ?? closeOverlayButtonLabel,
+      selectedTextStyle: other.selectedTextStyle ?? selectedTextStyle,
     );
   }
 }

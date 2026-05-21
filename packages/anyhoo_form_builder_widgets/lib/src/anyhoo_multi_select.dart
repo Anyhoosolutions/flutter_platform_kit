@@ -1,5 +1,6 @@
 import 'package:anyhoo_form_builder_widgets/src/anyhoo_multi_select_section.dart';
 import 'package:anyhoo_form_builder_widgets/src/anyhoo_multi_select_style.dart';
+import 'package:anyhoo_form_builder_widgets/src/anyhoo_multi_select_value_display.dart';
 import 'package:flutter/material.dart';
 
 /// Multi-select field with optional search, sections, add-new (flat only), and styling.
@@ -19,6 +20,9 @@ class AnyhooMultiSelect<T> extends StatefulWidget {
     this.emptySelectionHint = 'Select items...',
     this.maxVisibleChips = 3,
     this.createItem,
+    this.valueDisplay = AnyhooMultiSelectValueDisplay.chips,
+    this.valueSeparator = ', ',
+    this.commaSeparatedMaxLines = 2,
   }) : assert(items != null || sections != null, 'Provide either items or sections'),
        assert(items == null || sections == null, 'Provide only one of items or sections'),
        assert(!allowAddNew || sections == null, 'allowAddNew requires flat items mode');
@@ -43,6 +47,9 @@ class AnyhooMultiSelect<T> extends StatefulWidget {
   final String? semanticLabel;
   final String emptySelectionHint;
   final int maxVisibleChips;
+  final AnyhooMultiSelectValueDisplay valueDisplay;
+  final String valueSeparator;
+  final int commaSeparatedMaxLines;
 
   @override
   State<AnyhooMultiSelect<T>> createState() => _AnyhooMultiSelectState<T>();
@@ -197,9 +204,18 @@ class _AnyhooMultiSelectState<T> extends State<AnyhooMultiSelect<T>> {
 
   T _defaultCreateItem(String label) => label as T;
 
-  List<Widget> _buildChips(AnyhooMultiSelectStyle style) {
+  Widget _buildSelectedDisplay(AnyhooMultiSelectStyle style) {
     if (_selected.isEmpty) {
-      return [Text(widget.emptySelectionHint, style: style.emptySelectionTextStyle)];
+      return Text(widget.emptySelectionHint, style: style.emptySelectionTextStyle);
+    }
+
+    if (widget.valueDisplay == AnyhooMultiSelectValueDisplay.commaSeparated) {
+      return Text(
+        _selected.map(widget.labelBuilder).join(widget.valueSeparator),
+        style: style.selectedTextStyle,
+        maxLines: widget.commaSeparatedMaxLines,
+        overflow: TextOverflow.ellipsis,
+      );
     }
 
     final max = widget.maxVisibleChips;
@@ -216,7 +232,8 @@ class _AnyhooMultiSelectState<T> extends State<AnyhooMultiSelect<T>> {
     if (_selected.length > max) {
       chips.add(Chip(label: Text('+${_selected.length - max} more')));
     }
-    return chips;
+
+    return Wrap(spacing: 8, runSpacing: 4, children: chips);
   }
 
   Widget? _buildSearchField(AnyhooMultiSelectStyle style) {
@@ -353,7 +370,7 @@ class _AnyhooMultiSelectState<T> extends State<AnyhooMultiSelect<T>> {
                 child: InputDecorator(
                   key: _triggerKey,
                   decoration: fieldDecoration,
-                  child: Wrap(spacing: 8, runSpacing: 4, children: _buildChips(style)),
+                  child: _buildSelectedDisplay(style),
                 ),
               ),
             ),

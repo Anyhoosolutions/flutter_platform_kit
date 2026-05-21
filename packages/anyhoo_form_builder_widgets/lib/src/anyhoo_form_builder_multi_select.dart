@@ -1,6 +1,7 @@
 import 'package:anyhoo_form_builder_widgets/src/anyhoo_multi_select.dart';
 import 'package:anyhoo_form_builder_widgets/src/anyhoo_multi_select_section.dart';
 import 'package:anyhoo_form_builder_widgets/src/anyhoo_multi_select_style.dart';
+import 'package:anyhoo_form_builder_widgets/src/anyhoo_multi_select_value_display.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 
@@ -20,6 +21,10 @@ class AnyhooFormBuilderMultiSelect<T extends Object> extends StatelessWidget {
     this.semanticLabel,
     this.emptySelectionHint = 'Select items...',
     this.validator,
+    this.valueDisplay = AnyhooMultiSelectValueDisplay.chips,
+    this.valueSeparator = ', ',
+    this.commaSeparatedMaxLines = 2,
+    this.maxVisibleChips = 3,
   }) : assert(items != null || sections != null, 'Provide either items or sections'),
        assert(items == null || sections == null, 'Provide only one of items or sections'),
        assert(!allowAddNew || sections == null, 'allowAddNew requires flat items mode');
@@ -37,6 +42,10 @@ class AnyhooFormBuilderMultiSelect<T extends Object> extends StatelessWidget {
   final String? semanticLabel;
   final String emptySelectionHint;
   final FormFieldValidator<List<T>>? validator;
+  final AnyhooMultiSelectValueDisplay valueDisplay;
+  final String valueSeparator;
+  final int commaSeparatedMaxLines;
+  final int maxVisibleChips;
 
   @override
   Widget build(BuildContext context) {
@@ -59,6 +68,10 @@ class AnyhooFormBuilderMultiSelect<T extends Object> extends StatelessWidget {
           label: label,
           semanticLabel: semanticLabel,
           emptySelectionHint: emptySelectionHint,
+          valueDisplay: valueDisplay,
+          valueSeparator: valueSeparator,
+          commaSeparatedMaxLines: commaSeparatedMaxLines,
+          maxVisibleChips: maxVisibleChips,
         );
       },
     );

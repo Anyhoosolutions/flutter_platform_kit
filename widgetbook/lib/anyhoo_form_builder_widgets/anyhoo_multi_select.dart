@@ -15,6 +15,7 @@ Widget buildFlatAddNew(BuildContext context) {
 Widget buildSectioned(BuildContext context) {
   final showCloseButton = context.knobs.boolean(label: 'Show close button', initialValue: true);
   final showSearch = context.knobs.boolean(label: 'Show search', initialValue: true);
+  final useCommaSeparated = context.knobs.boolean(label: 'Comma separated display', initialValue: false);
 
   final style = AnyhooMultiSelectStyle(
     sectionHeaderBackgroundColor: Color(0xFFFF9800),
@@ -39,6 +40,9 @@ Widget buildSectioned(BuildContext context) {
             AnyhooMultiSelectSection(title: 'Farm Animals', items: ['Cow', 'Pig', 'Chicken']),
           ],
           searchEnabled: showSearch,
+          valueDisplay: useCommaSeparated
+              ? AnyhooMultiSelectValueDisplay.commaSeparated
+              : AnyhooMultiSelectValueDisplay.chips,
           style: style,
           onChanged: (_) {},
         ),
@@ -60,6 +64,7 @@ class _FlatAddNewDemoState extends State<_FlatAddNewDemo> {
     final showCloseButton = context.knobs.boolean(label: 'Show close button', initialValue: true);
     final showSearch = context.knobs.boolean(label: 'Show search', initialValue: true);
     final allowAddNew = context.knobs.boolean(label: 'Allow add new', initialValue: true);
+    final useCommaSeparated = context.knobs.boolean(label: 'Comma separated display', initialValue: false);
 
     final earthyStyle = AnyhooMultiSelectStyle(
       chipBackgroundColor: Color(0xFF5D4037),
@@ -82,6 +87,9 @@ class _FlatAddNewDemoState extends State<_FlatAddNewDemo> {
           items: const ['First', 'Second', 'Third'],
           allowAddNew: allowAddNew,
           searchEnabled: showSearch,
+          valueDisplay: useCommaSeparated
+              ? AnyhooMultiSelectValueDisplay.commaSeparated
+              : AnyhooMultiSelectValueDisplay.chips,
           style: earthyStyle,
           onChanged: (v) => setState(() => _value = v),
         ),
