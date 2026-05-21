@@ -204,6 +204,26 @@ class _AnyhooMultiSelectState<T> extends State<AnyhooMultiSelect<T>> {
 
   T _defaultCreateItem(String label) => label as T;
 
+  /// Selected values in catalog order (flat [items] or [sections], then any extras).
+  List<T> _selectedInItemOrder() {
+    final ordered = <T>[];
+    if (_isFlat) {
+      for (final item in _allFlatItems) {
+        if (_selected.contains(item)) ordered.add(item);
+      }
+    } else {
+      for (final section in widget.sections!) {
+        for (final item in section.items) {
+          if (_selected.contains(item)) ordered.add(item);
+        }
+      }
+    }
+    for (final item in _selected) {
+      if (!ordered.contains(item)) ordered.add(item);
+    }
+    return ordered;
+  }
+
   Widget _buildSelectedDisplay(AnyhooMultiSelectStyle style) {
     if (_selected.isEmpty) {
       return Text(widget.emptySelectionHint, style: style.emptySelectionTextStyle);
@@ -211,7 +231,7 @@ class _AnyhooMultiSelectState<T> extends State<AnyhooMultiSelect<T>> {
 
     if (widget.valueDisplay == AnyhooMultiSelectValueDisplay.commaSeparated) {
       return Text(
-        _selected.map(widget.labelBuilder).join(widget.valueSeparator),
+        _selectedInItemOrder().map(widget.labelBuilder).join(widget.valueSeparator),
         style: style.selectedTextStyle,
         maxLines: widget.commaSeparatedMaxLines,
         overflow: TextOverflow.ellipsis,
