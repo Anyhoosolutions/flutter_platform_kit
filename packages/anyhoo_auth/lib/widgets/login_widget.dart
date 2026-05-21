@@ -14,13 +14,21 @@ import 'package:form_builder_validators/form_builder_validators.dart';
 
 class LoginWidget<T extends AnyhooUser> extends StatefulWidget {
   const LoginWidget(
-      {super.key, required this.title, this.assetLogoPath, this.cubit, LoginWidgetSettings? loginWidgetSettings})
+      {super.key,
+      required this.title,
+      this.assetLogoPath,
+      this.cubit,
+      LoginWidgetSettings? loginWidgetSettings,
+      this.initialEmail,
+      this.initialPassword})
       : _loginWidgetSettings = loginWidgetSettings ?? const LoginWidgetSettings();
 
   final String title;
   final String? assetLogoPath;
   final AnyhooAuthCubit<T>? cubit;
   final LoginWidgetSettings _loginWidgetSettings;
+  final String? initialEmail;
+  final String? initialPassword;
 
   @override
   State<LoginWidget> createState() => _LoginWidgetState();
@@ -309,6 +317,7 @@ class _LoginWidgetState<T extends AnyhooUser> extends State<LoginWidget<T>> {
         child: Column(
           children: [
             FormBuilderTextField(
+              initialValue: widget.initialEmail,
               key: const Key('login_widget_email_input'),
               name: 'email',
               decoration: const InputDecoration(
@@ -323,6 +332,7 @@ class _LoginWidgetState<T extends AnyhooUser> extends State<LoginWidget<T>> {
             ),
             const SizedBox(height: 16),
             FormBuilderTextField(
+              initialValue: widget.initialPassword,
               key: const Key('login_widget_password_input'),
               name: 'password',
               decoration: InputDecoration(

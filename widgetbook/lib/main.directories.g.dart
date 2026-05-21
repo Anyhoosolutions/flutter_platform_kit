@@ -27,10 +27,8 @@ import 'package:widgetbook_workspace/anyhoo_firebase/firebase_analytics_page.dar
     as _widgetbook_workspace_anyhoo_firebase_firebase_analytics_page;
 import 'package:widgetbook_workspace/anyhoo_form_builder_widgets/anyhoo_form_builder_multi_select.dart'
     as _widgetbook_workspace_anyhoo_form_builder_widgets_anyhoo_form_builder_multi_select;
-import 'package:widgetbook_workspace/anyhoo_form_builder_widgets/anyhoo_form_builder_multi_select_searchable.dart'
-    as _widgetbook_workspace_anyhoo_form_builder_widgets_anyhoo_form_builder_multi_select_searchable;
-import 'package:widgetbook_workspace/anyhoo_form_builder_widgets/anyhoo_multi_select_searchable.dart'
-    as _widgetbook_workspace_anyhoo_form_builder_widgets_anyhoo_multi_select_searchable;
+import 'package:widgetbook_workspace/anyhoo_form_builder_widgets/anyhoo_multi_select.dart'
+    as _widgetbook_workspace_anyhoo_form_builder_widgets_anyhoo_multi_select;
 import 'package:widgetbook_workspace/anyhoo_image_selector/image_selector_widget.dart'
     as _widgetbook_workspace_anyhoo_image_selector_image_selector_widget;
 import 'package:widgetbook_workspace/anyhoo_search_bar/anyhoo_search_bar.dart'
@@ -133,7 +131,7 @@ final directories = <_widgetbook.WidgetbookNode>[
         name: 'AnyhooFormBuilderMultiSelect',
         useCases: [
           _widgetbook.WidgetbookUseCase(
-            name: 'Default',
+            name: 'Flat',
             builder:
                 _widgetbook_workspace_anyhoo_form_builder_widgets_anyhoo_form_builder_multi_select
                     .build,
@@ -141,24 +139,19 @@ final directories = <_widgetbook.WidgetbookNode>[
         ],
       ),
       _widgetbook.WidgetbookComponent(
-        name: 'AnyhooFormBuilderMultiSelectSearchable',
+        name: 'AnyhooMultiSelect',
         useCases: [
           _widgetbook.WidgetbookUseCase(
-            name: 'Default',
+            name: 'Flat with add new',
             builder:
-                _widgetbook_workspace_anyhoo_form_builder_widgets_anyhoo_form_builder_multi_select_searchable
-                    .build,
+                _widgetbook_workspace_anyhoo_form_builder_widgets_anyhoo_multi_select
+                    .buildFlatAddNew,
           ),
-        ],
-      ),
-      _widgetbook.WidgetbookComponent(
-        name: 'AnyhooMultiSelectSearchable',
-        useCases: [
           _widgetbook.WidgetbookUseCase(
-            name: 'Default',
+            name: 'Sectioned',
             builder:
-                _widgetbook_workspace_anyhoo_form_builder_widgets_anyhoo_multi_select_searchable
-                    .build,
+                _widgetbook_workspace_anyhoo_form_builder_widgets_anyhoo_multi_select
+                    .buildSectioned,
           ),
         ],
       ),

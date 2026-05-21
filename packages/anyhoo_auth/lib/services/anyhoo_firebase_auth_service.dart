@@ -101,21 +101,23 @@ class AnyhooFirebaseAuthService<T extends AnyhooUser> implements AnyhooAuthServi
 
       if (kIsWeb) {
         _log.info('Platform: Web');
-        // For web, check if we're returning from a redirect
-        final redirectResult = await _firebaseAuth.getRedirectResult();
-        if (redirectResult.user != null) {
-          // User just returned from redirect, use that result
-          _log.info('Google Sign-In successful (user): ${redirectResult.user?.displayName}');
-          return;
-        }
-
-        // Otherwise, initiate a new sign-in with redirect
-        _log.info('Initiating Google Sign-In redirect...');
+        // Use signInWithPopup on web. signInWithRedirect requires
+        // getRedirectResult() to be invoked on the next page load to consume
+        // the pending redirect, which we don't currently do — that flow
+        // strands the user back on the login page after a successful Google
+        // sign-in. Popup keeps the user in our origin and authStateChanges
+        // fires automatically when it completes.
         final googleProvider = firebase_auth.GoogleAuthProvider();
-        await _firebaseAuth.signInWithRedirect(googleProvider);
-        // The redirect will happen, and when the user returns,
-        // getRedirectResult() will be called again on the next page load
-        throw Exception('Google Sign-In redirect initiated. Please complete sign-in in the popup/redirect.');
+        _log.info('Initiating Google Sign-In popup...');
+        try {
+          final userCredential = await _firebaseAuth.signInWithPopup(googleProvider);
+          _log.info('✓ Google Sign-In popup completed. User ID: ${userCredential.user?.uid ?? 'null'}');
+        } on firebase_auth.FirebaseAuthException catch (e, stackTrace) {
+          _log.severe('FirebaseAuthException during signInWithPopup: code=${e.code} message=${e.message}', e, stackTrace);
+          SentryHelper.captureException(e, stackTrace: stackTrace, fatal: false);
+          rethrow;
+        }
+        return;
       } else {
         _log.info('Platform: Mobile (iOS/Android)');
         // For mobile platforms (iOS/Android), use google_sign_in package
