@@ -21,6 +21,7 @@ class AnyhooMultiSelect<T> extends StatefulWidget {
     this.maxVisibleChips = 3,
     this.createItem,
     this.valueDisplay = AnyhooMultiSelectValueDisplay.chips,
+    this.valueTextBuilder,
     this.valueSeparator = ', ',
     this.commaSeparatedMaxLines = 2,
     this.maxWidth = 280,
@@ -28,7 +29,11 @@ class AnyhooMultiSelect<T> extends StatefulWidget {
     this.singleSelection = false,
   }) : assert(items != null || sections != null, 'Provide either items or sections'),
        assert(items == null || sections == null, 'Provide only one of items or sections'),
-       assert(!allowAddNew || sections == null, 'allowAddNew requires flat items mode');
+       assert(!allowAddNew || sections == null, 'allowAddNew requires flat items mode'),
+       assert(
+         valueDisplay != AnyhooMultiSelectValueDisplay.custom || valueTextBuilder != null,
+         'valueTextBuilder is required when valueDisplay is custom',
+       );
 
   /// Builds a new value when the user adds an entry (required for non-[String] [T] when [allowAddNew] is true).
   final T Function(String label)? createItem;
@@ -51,6 +56,7 @@ class AnyhooMultiSelect<T> extends StatefulWidget {
   final String emptySelectionHint;
   final int maxVisibleChips;
   final AnyhooMultiSelectValueDisplay valueDisplay;
+  final AnyhooMultiSelectValueTextBuilder<T>? valueTextBuilder;
   final String valueSeparator;
   final int commaSeparatedMaxLines;
 
@@ -83,6 +89,11 @@ class _AnyhooMultiSelectState<T> extends State<AnyhooMultiSelect<T>> {
   bool get _isFlat => widget.items != null;
 
   List<T> get _allFlatItems => [...?widget.items, ..._customItems];
+
+  List<T> _allCatalogItems() {
+    if (_isFlat) return _allFlatItems;
+    return widget.sections!.expand((section) => section.items).toList();
+  }
 
   @override
   void initState() {
@@ -278,6 +289,15 @@ class _AnyhooMultiSelectState<T> extends State<AnyhooMultiSelect<T>> {
     if (widget.valueDisplay == AnyhooMultiSelectValueDisplay.commaSeparated) {
       return Text(
         _selectedInItemOrder().map(widget.labelBuilder).join(widget.valueSeparator),
+        style: style.selectedTextStyle,
+        maxLines: widget.commaSeparatedMaxLines,
+        overflow: TextOverflow.ellipsis,
+      );
+    }
+
+    if (widget.valueDisplay == AnyhooMultiSelectValueDisplay.custom) {
+      return Text(
+        widget.valueTextBuilder!(_selectedInItemOrder(), _allCatalogItems(), widget.labelBuilder),
         style: style.selectedTextStyle,
         maxLines: widget.commaSeparatedMaxLines,
         overflow: TextOverflow.ellipsis,

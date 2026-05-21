@@ -18,42 +18,67 @@ Widget buildSingleSelection(BuildContext context) {
 
 @widgetbook.UseCase(name: 'Sectioned', type: AnyhooMultiSelect, path: 'anyhoo_form_builder_widgets')
 Widget buildSectioned(BuildContext context) {
-  final showCloseButton = context.knobs.boolean(label: 'Show close button', initialValue: true);
-  final showSearch = context.knobs.boolean(label: 'Show search', initialValue: true);
-  final useCommaSeparated = context.knobs.boolean(label: 'Comma separated display', initialValue: false);
+  return WrapInMocksHelper().wrapInMocks(context, _SectionedDemo());
+}
 
-  final style = AnyhooMultiSelectStyle(
-    sectionHeaderBackgroundColor: Color(0xFFFF9800),
-    sectionHeaderStyle: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF1A1A2E), fontSize: 14),
-    overlayBackgroundColor: Color(0xFFFF9800),
-    checkboxActiveColor: Color(0xFF3E2723),
-    itemTextStyle: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF1A1A2E)),
-    closeOverlayButtonLabel: showCloseButton ? 'Close' : null,
-  );
+class _SectionedDemo extends StatefulWidget {
+  @override
+  State<_SectionedDemo> createState() => _SectionedDemoState();
+}
 
-  return WrapInMocksHelper().wrapInMocks(
-    context,
-    Center(
+class _SectionedDemoState extends State<_SectionedDemo> {
+  static const _sections = [
+    AnyhooMultiSelectSection(title: 'Pets', items: ['Dog', 'Cat', 'Bird']),
+    AnyhooMultiSelectSection(title: 'Farm Animals', items: ['Cow', 'Pig', 'Chicken']),
+  ];
+
+  List<String> _value = const ['Dog', 'Cat', 'Bird', 'Cow', 'Pig', 'Chicken'];
+
+  @override
+  Widget build(BuildContext context) {
+    final showCloseButton = context.knobs.boolean(label: 'Show close button', initialValue: true);
+    final showSearch = context.knobs.boolean(label: 'Show search', initialValue: true);
+    final displayMode = context.knobs.list(
+      label: 'Value display',
+      options: ['chips', 'commaSeparated', 'custom'],
+      initialOption: 'custom',
+    );
+
+    final style = AnyhooMultiSelectStyle(
+      sectionHeaderBackgroundColor: Color(0xFFFF9800),
+      sectionHeaderStyle: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF1A1A2E), fontSize: 14),
+      overlayBackgroundColor: Color(0xFFFF9800),
+      checkboxActiveColor: Color(0xFF3E2723),
+      itemTextStyle: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF1A1A2E)),
+      closeOverlayButtonLabel: showCloseButton ? 'Close' : null,
+    );
+
+    return Center(
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: AnyhooMultiSelect<String>(
           label: 'Animals',
           labelBuilder: (item) => item,
-          value: const ['Cat', 'Pig'],
-          sections: const [
-            AnyhooMultiSelectSection(title: 'Pets', items: ['Dog', 'Cat', 'Bird']),
-            AnyhooMultiSelectSection(title: 'Farm Animals', items: ['Cow', 'Pig', 'Chicken']),
-          ],
+          value: _value,
+          sections: _sections,
           searchEnabled: showSearch,
-          valueDisplay: useCommaSeparated
-              ? AnyhooMultiSelectValueDisplay.commaSeparated
-              : AnyhooMultiSelectValueDisplay.chips,
+          valueDisplay: switch (displayMode) {
+            'commaSeparated' => AnyhooMultiSelectValueDisplay.commaSeparated,
+            'custom' => AnyhooMultiSelectValueDisplay.custom,
+            _ => AnyhooMultiSelectValueDisplay.chips,
+          },
+          valueTextBuilder: displayMode == 'custom'
+              ? (selected, allItems, labelBuilder) {
+                  if (selected.length == allItems.length) return 'All';
+                  return selected.map(labelBuilder).join(', ');
+                }
+              : null,
           style: style,
-          onChanged: (_) {},
+          onChanged: (v) => setState(() => _value = v),
         ),
       ),
-    ),
-  );
+    );
+  }
 }
 
 class _FlatAddNewDemo extends StatefulWidget {
