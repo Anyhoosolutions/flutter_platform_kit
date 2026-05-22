@@ -22,12 +22,18 @@ class AnyhooFormBuilderMultiSelect<T extends Object> extends StatelessWidget {
     this.emptySelectionHint = 'Select items...',
     this.validator,
     this.valueDisplay = AnyhooMultiSelectValueDisplay.chips,
+    this.valueTextBuilder,
     this.valueSeparator = ', ',
     this.commaSeparatedMaxLines = 2,
     this.maxVisibleChips = 3,
+    this.singleSelection = false,
   }) : assert(items != null || sections != null, 'Provide either items or sections'),
        assert(items == null || sections == null, 'Provide only one of items or sections'),
-       assert(!allowAddNew || sections == null, 'allowAddNew requires flat items mode');
+       assert(!allowAddNew || sections == null, 'allowAddNew requires flat items mode'),
+       assert(
+         valueDisplay != AnyhooMultiSelectValueDisplay.custom || valueTextBuilder != null,
+         'valueTextBuilder is required when valueDisplay is custom',
+       );
 
   final String name;
   final String Function(T item) labelBuilder;
@@ -43,9 +49,11 @@ class AnyhooFormBuilderMultiSelect<T extends Object> extends StatelessWidget {
   final String emptySelectionHint;
   final FormFieldValidator<List<T>>? validator;
   final AnyhooMultiSelectValueDisplay valueDisplay;
+  final AnyhooMultiSelectValueTextBuilder<T>? valueTextBuilder;
   final String valueSeparator;
   final int commaSeparatedMaxLines;
   final int maxVisibleChips;
+  final bool singleSelection;
 
   @override
   Widget build(BuildContext context) {
@@ -69,9 +77,11 @@ class AnyhooFormBuilderMultiSelect<T extends Object> extends StatelessWidget {
           semanticLabel: semanticLabel,
           emptySelectionHint: emptySelectionHint,
           valueDisplay: valueDisplay,
+          valueTextBuilder: valueTextBuilder,
           valueSeparator: valueSeparator,
           commaSeparatedMaxLines: commaSeparatedMaxLines,
           maxVisibleChips: maxVisibleChips,
+          singleSelection: singleSelection,
         );
       },
     );

@@ -6,7 +6,7 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
 import 'package:widgetbook_workspace/helpers/wrap_in_mocks_helper.dart';
 
-@widgetbook.UseCase(name: 'Default', type: AnyhooFormBuilderMultiSelect, path: 'anyhoo_form_builder_widgets')
+@widgetbook.UseCase(name: 'Flat', type: AnyhooFormBuilderMultiSelect, path: 'anyhoo_form_builder_widgets')
 Widget build(BuildContext context) {
   final formKey = GlobalKey<FormBuilderState>();
 
@@ -17,17 +17,14 @@ Widget build(BuildContext context) {
         key: formKey,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             AnyhooFormBuilderMultiSelect<String>(
-              formFieldKey: 'number',
-              items: ['First', 'Second', 'Third'],
-              labelExtractor: (Object item) {
-                return item.toString();
-              },
-              hintText: 'Select a string',
-              itemTypeText: 'Number',
-              initialValue: ['Third', 'Second'],
+              name: 'strings',
+              items: const ['First', 'Second', 'Third'],
+              labelBuilder: (item) => item,
+              label: 'Select a string',
+              initialValue: const ['Third', 'Second'],
+              allowAddNew: true,
             ),
             ElevatedButton(
               onPressed: () {
@@ -35,7 +32,7 @@ Widget build(BuildContext context) {
                 // ignore: avoid_print
                 print(formKey.currentState?.value);
               },
-              child: Text('Save'),
+              child: const Text('Save form'),
             ),
           ],
         ),
