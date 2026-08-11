@@ -1,6 +1,5 @@
+import 'package:anyhoo_extension_methods/anyhoo_extensions_methods.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:anyhoo_extensions_methods/anyhoo_extensions_methods.dart';
 
 void main() {
   test('groupBy', () {

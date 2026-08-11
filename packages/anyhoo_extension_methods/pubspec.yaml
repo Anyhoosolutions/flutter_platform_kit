@@ -1,7 +1,9 @@
-name: anyhoo_extensions_methods
-description: "A new Flutter package project."
+name: anyhoo_extension_methods
+description: "A collection of extension methods for the Anyhoo platform."
 version: 0.0.1
 homepage:
+
+resolution: workspace
 
 environment:
   sdk: ^3.12.0
