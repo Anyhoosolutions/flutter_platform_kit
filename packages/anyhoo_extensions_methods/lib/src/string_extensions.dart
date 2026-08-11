@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'package:crypto/crypto.dart';
+
 extension StringExtension on String {
   // Validators
   bool get isValidEmail {
@@ -80,6 +83,12 @@ extension StringExtension on String {
       return int.parse('0x$hexColor');
     }
     return null;
+  }
+
+  String stringHash() {
+    var bytes = utf8.encode(this); // data being hashed
+    var digest = sha1.convert(bytes);
+    return digest.toString();
   }
 }
 
