@@ -1,4 +1,5 @@
 name: widgetbook_wrappers
+resolution: workspace
 description: "Simple, script-friendly wrappers for Widgetbook stories."
 version: 0.1.0
 publish_to: none

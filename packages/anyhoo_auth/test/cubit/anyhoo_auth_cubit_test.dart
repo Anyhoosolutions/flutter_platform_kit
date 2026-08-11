@@ -25,16 +25,18 @@ class SimpleAnyhooEnhanceUserService extends AnyhooEnhanceUserService<TestUser> 
 
   @override
   Future<Map<String, dynamic>> enhanceUser(Map<String, dynamic> user) async {
-    if (_enhanceUserCallback != null) {
-      return _enhanceUserCallback!(user);
+    final enhanceUserCallback = _enhanceUserCallback;
+    if (enhanceUserCallback != null) {
+      return enhanceUserCallback(user);
     }
     return user;
   }
 
   @override
   Future<TestUser> saveUser(TestUser user) async {
-    if (_saveUserCallback != null) {
-      return _saveUserCallback!(user);
+    final saveUserCallback = _saveUserCallback;
+    if (saveUserCallback != null) {
+      return saveUserCallback(user);
     }
     return user;
   }

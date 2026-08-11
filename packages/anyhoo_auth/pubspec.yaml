@@ -1,11 +1,12 @@
 name: anyhoo_auth
+resolution: workspace
 description: A flexible authentication package that supports custom user models using generics.
 version: 0.0.32
 publish_to: none
 homepage: https://anyhoosolutions.web.app/documentation/flutter_platform_kit
 
 environment:
-  sdk: ">=3.0.0 <4.0.0"
+  sdk: ^3.6.0
   flutter: ">=3.10.0"
 
 dependencies:

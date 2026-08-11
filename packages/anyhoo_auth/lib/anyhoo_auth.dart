@@ -2,7 +2,7 @@
 ///
 /// A flexible authentication package that supports custom user models.
 /// Use generics to specify your app's user type.
-library anyhoo_auth;
+library;
 
 export 'cubit/anyhoo_auth_cubit.dart';
 export 'cubit/anyhoo_auth_state.dart';
