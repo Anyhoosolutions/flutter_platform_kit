@@ -1,4 +1,4 @@
-import 'package:anyhoo_extension_methods/anyhoo_extensions_methods.dart';
+import 'package:anyhoo_extension_methods/anyhoo_extension_methods.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
