@@ -35,6 +35,10 @@ dependencies:
     path: ../packages/anyhoo_logging
   anyhoo_map:
     path: ../packages/anyhoo_map
+  anyhoo_widget_extension_methods:
+    path: ../packages/anyhoo_widget_extension_methods
+  anyhoo_extensions_methods:
+    path: ../packages/anyhoo_extensions_methods
 
   # Required dependencies
   flutter_bloc: ^9.1.0

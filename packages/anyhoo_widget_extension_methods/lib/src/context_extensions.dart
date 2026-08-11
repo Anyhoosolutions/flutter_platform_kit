@@ -1,9 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-
-import '../theme/color_schemes.dart';
-import '../theme/theme.dart';
-import '../shared/enums/snack_bar_type.dart';
 
 extension ContextExtension on BuildContext {
   // ── Theme shortcuts ──────────────────────────────────────────────────────
@@ -12,13 +7,6 @@ extension ContextExtension on BuildContext {
   TextTheme get textTheme => theme.textTheme;
   ColorScheme get colors => theme.colorScheme;
   bool get isDarkMode => theme.brightness == Brightness.dark;
-
-  /// Semantic/custom colors (success, warning, info).
-  AppColorsExtension get appColors =>
-      theme.extension<AppColorsExtension>() ?? (isDarkMode ? AppPalettes.dark : AppPalettes.light);
-
-  /// Design tokens (spacing, border radii, elevation defaults).
-  AppDesignTokens get designTokens => theme.extension<AppDesignTokens>() ?? AppDesignTokens.fallback;
 
   // ── MediaQuery shortcuts ─────────────────────────────────────────────────
   Size get mediaQuerySize => MediaQuery.sizeOf(this);
@@ -45,9 +33,11 @@ extension ContextExtension on BuildContext {
   }
 
   void showSuccessSnackBar(String message) {
+    final defaultSuccessColor = Colors.red;
+
     ScaffoldMessenger.of(this)
       ..clearSnackBars()
-      ..showSnackBar(SnackBar(content: Text(message), backgroundColor: appColors.success));
+      ..showSnackBar(SnackBar(content: Text(message), backgroundColor: defaultSuccessColor));
   }
 
   void showErrorSnackBar(String message) {
@@ -83,24 +73,33 @@ extension ContextExtension on BuildContext {
     SnackBarType type = SnackBarType.info,
     Duration duration = const Duration(seconds: 3),
   }) {
+    final defaultSuccessColor = Colors.red;
+    final defaultWarningColor = Colors.yellow;
+    final defaultErrorColor = Colors.red;
+    final defaultInfoColor = Colors.blue;
+
     final bg = switch (type) {
-      SnackBarType.success => appColors.success,
-      SnackBarType.warning => appColors.warning,
-      SnackBarType.error => colors.error,
-      SnackBarType.info => colors.inverseSurface,
+      SnackBarType.success => defaultSuccessColor,
+      SnackBarType.warning => defaultWarningColor,
+      SnackBarType.error => defaultErrorColor,
+      SnackBarType.info => defaultInfoColor,
     };
     ScaffoldMessenger.of(this)
       ..clearSnackBars()
       ..showSnackBar(SnackBar(content: Text(message), backgroundColor: bg, duration: duration));
   }
+}
 
-  // ── Routing shortcuts ────────────────────────────────────────────────────
-  String get currentRoute {
-    final router = GoRouter.of(this);
-    final RouteMatch lastMatch = router.routerDelegate.currentConfiguration.last;
-    final RouteMatchList matchList = lastMatch is ImperativeRouteMatch
-        ? lastMatch.matches
-        : router.routerDelegate.currentConfiguration;
-    return matchList.uri.toString();
-  }
+enum SnackBarType {
+  /// Neutral informational message.
+  info,
+
+  /// Operation succeeded.
+  success,
+
+  /// Non-blocking warning the user should notice.
+  warning,
+
+  /// Something went wrong.
+  error,
 }
