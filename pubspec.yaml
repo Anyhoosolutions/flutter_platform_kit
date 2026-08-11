@@ -26,7 +26,6 @@ workspace:
   - widgetbook
   - tools/sentry_cli
   - tools/widgetbook_screenshots
-  - scripts/toc_generator
 
 dev_dependencies:
   melos: ^7.0.0
