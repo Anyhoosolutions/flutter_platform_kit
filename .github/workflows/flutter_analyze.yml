@@ -75,7 +75,7 @@ jobs:
         run: dart pub get && dart run melos bootstrap
 
       - name: Analyze all packages
-        run: dart run melos run analyze
+        run: dart pub get && dart run melos run analyze
 
       - name: Test packages with a test directory
-        run: dart run melos run test
+        run: dart pub get && dart run melos run test

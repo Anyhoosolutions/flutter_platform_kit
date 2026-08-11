@@ -1,9 +1,10 @@
+import 'dart:convert';
+import 'package:crypto/crypto.dart';
+
 extension StringExtension on String {
   // Validators
   bool get isValidEmail {
-    return RegExp(
-      r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9]+\.[a-zA-Z]+",
-    ).hasMatch(this);
+    return RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(this);
   }
 
   bool get isValidPhoneNumber {
@@ -82,6 +83,38 @@ extension StringExtension on String {
       return int.parse('0x$hexColor');
     }
     return null;
+  }
+
+  String stringHash() {
+    var bytes = utf8.encode(this); // data being hashed
+    var digest = sha1.convert(bytes);
+    return digest.toString();
+  }
+
+  String stripRight(String suffix) {
+    while (true) {
+      if (endsWith(suffix)) {
+        return substring(0, length - suffix.length);
+      }
+      return this;
+    }
+  }
+
+  String repeat(int n) {
+    return List.generate(n, (index) => this).join();
+  }
+
+  String substringSafe(int start, int end) {
+    if (start < 0) {
+      start = 0;
+    }
+    if (end > length) {
+      end = length;
+    }
+    if (start > end) {
+      return '';
+    }
+    return substring(start, end);
   }
 }
 

@@ -9,6 +9,7 @@ workspace:
   - packages/anyhoo_app_bar
   - packages/anyhoo_auth
   - packages/anyhoo_core
+  - packages/anyhoo_extension_methods
   - packages/anyhoo_firebase
   - packages/anyhoo_form_builder_widgets
   - packages/anyhoo_image_selector
@@ -19,6 +20,7 @@ workspace:
   - packages/anyhoo_search_bar
   - packages/anyhoo_shimmer
   - packages/screenshot_kit
+  - packages/anyhoo_widget_extension_methods
   - packages/widgetbook_wrappers
   - example_app
   - widgetbook
@@ -31,7 +33,6 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
-
 
 melos:
   categories:

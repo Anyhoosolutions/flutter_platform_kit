@@ -1,5 +1,5 @@
-import 'package:anyhoo_core/extensions/anyhoo_string_extensions.dart';
 import 'package:anyhoo_core/models/arguments.dart';
+import 'package:anyhoo_extension_methods/anyhoo_extension_methods.dart';
 import 'package:flutter/material.dart';
 
 class ArgumentsDemoPage extends StatelessWidget {

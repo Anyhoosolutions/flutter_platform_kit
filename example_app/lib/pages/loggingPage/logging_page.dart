@@ -1,4 +1,4 @@
-import 'package:anyhoo_core/extensions/anyhoo_string_extensions.dart';
+import 'package:anyhoo_extension_methods/anyhoo_extension_methods.dart';
 import 'package:anyhoo_logging/anyhoo_logging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

@@ -7,8 +7,4 @@ extension NumExtension on num {
 
   // BorderRadius helpers
   BorderRadius get radius => BorderRadius.circular(toDouble());
-
-  // Duration helpers
-  Duration get ms => Duration(milliseconds: toInt());
-  Duration get seconds => Duration(seconds: toInt());
 }
