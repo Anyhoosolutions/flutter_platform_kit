@@ -23,6 +23,8 @@ import 'package:widgetbook_workspace/anyhoo_core/error_page.dart'
     as _widgetbook_workspace_anyhoo_core_error_page;
 import 'package:widgetbook_workspace/anyhoo_core/waiting_page.dart'
     as _widgetbook_workspace_anyhoo_core_waiting_page;
+import 'package:widgetbook_workspace/anyhoo_design_system/anyhoo_round_button.dart'
+    as _widgetbook_workspace_anyhoo_design_system_anyhoo_round_button;
 import 'package:widgetbook_workspace/anyhoo_firebase/firebase_analytics_page.dart'
     as _widgetbook_workspace_anyhoo_firebase_firebase_analytics_page;
 import 'package:widgetbook_workspace/anyhoo_form_builder_widgets/anyhoo_form_builder_multi_select.dart'
@@ -65,7 +67,7 @@ final directories = <_widgetbook.WidgetbookNode>[
     name: 'anyhoo_auth',
     children: [
       _widgetbook.WidgetbookComponent(
-        name: 'LoginWidget',
+        name: 'LoginWidget<AnyhooUser>',
         useCases: [
           _widgetbook.WidgetbookUseCase(
             name: 'LoginWidget',
@@ -109,6 +111,22 @@ final directories = <_widgetbook.WidgetbookNode>[
     ],
   ),
   _widgetbook.WidgetbookFolder(
+    name: 'anyhoo_design_system',
+    children: [
+      _widgetbook.WidgetbookComponent(
+        name: 'AnyhooRoundButton',
+        useCases: [
+          _widgetbook.WidgetbookUseCase(
+            name: 'Default',
+            builder:
+                _widgetbook_workspace_anyhoo_design_system_anyhoo_round_button
+                    .buildAnyhooRoundButton,
+          ),
+        ],
+      ),
+    ],
+  ),
+  _widgetbook.WidgetbookFolder(
     name: 'anyhoo_firebase',
     children: [
       _widgetbook.WidgetbookComponent(
@@ -128,7 +146,7 @@ final directories = <_widgetbook.WidgetbookNode>[
     name: 'anyhoo_form_builder_widgets',
     children: [
       _widgetbook.WidgetbookComponent(
-        name: 'AnyhooFormBuilderMultiSelect',
+        name: 'AnyhooFormBuilderMultiSelect<Object>',
         useCases: [
           _widgetbook.WidgetbookUseCase(
             name: 'Flat',
@@ -152,6 +170,12 @@ final directories = <_widgetbook.WidgetbookNode>[
             builder:
                 _widgetbook_workspace_anyhoo_form_builder_widgets_anyhoo_multi_select
                     .buildSectioned,
+          ),
+          _widgetbook.WidgetbookUseCase(
+            name: 'Single selection',
+            builder:
+                _widgetbook_workspace_anyhoo_form_builder_widgets_anyhoo_multi_select
+                    .buildSingleSelection,
           ),
         ],
       ),

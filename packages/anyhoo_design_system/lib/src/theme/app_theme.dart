@@ -5,18 +5,18 @@ import 'colors/default_app_colors.dart';
 
 /// Configurable ThemeData factory for Anyhoo applications.
 class AnyhooTheme {
-  static ThemeData light({AppColors? colors, List<ThemeExtension<dynamic>>? extraExtensions}) {
+  static ThemeData light({AppColors? colors, List<ThemeExtension>? extraExtensions}) {
     return _build(brightness: Brightness.light, colors: colors ?? defaultLightColors, extraExtensions: extraExtensions);
   }
 
-  static ThemeData dark({AppColors? colors, List<ThemeExtension<dynamic>>? extraExtensions}) {
+  static ThemeData dark({AppColors? colors, List<ThemeExtension>? extraExtensions}) {
     return _build(brightness: Brightness.dark, colors: colors ?? defaultDarkColors, extraExtensions: extraExtensions);
   }
 
   static ThemeData _build({
     required Brightness brightness,
     required AppColors colors,
-    List<ThemeExtension<dynamic>>? extraExtensions,
+    List<ThemeExtension>? extraExtensions,
   }) {
     final surface = colors.surface;
     final accent = colors.accent;
@@ -25,7 +25,10 @@ class AnyhooTheme {
       useMaterial3: true,
       brightness: brightness,
       scaffoldBackgroundColor: surface.scaffoldBackground,
-      extensions: <ThemeExtension<dynamic>>[colors, ...?extraExtensions],
+      extensions: [
+        colors,
+        ...?extraExtensions,
+      ],
       appBarTheme: AppBarTheme(
         backgroundColor: surface.scaffoldBackground,
         foregroundColor: surface.primaryText,
