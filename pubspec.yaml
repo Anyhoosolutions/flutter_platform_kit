@@ -29,6 +29,10 @@ workspace:
 dev_dependencies:
   melos: ^7.0.0
 
+flutter:
+  uses-material-design: true
+
+
 melos:
   categories:
     libs:
