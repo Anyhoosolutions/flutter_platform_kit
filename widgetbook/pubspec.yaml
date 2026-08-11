@@ -1,4 +1,5 @@
 name: widgetbook_workspace
+resolution: workspace
 description: "A workspace for widgetbook apps."
 publish_to: "none"
 version: 0.0.2

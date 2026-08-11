@@ -1,4 +1,5 @@
 name: anyhoo_app_bar
+resolution: workspace
 description: "A new Flutter package project."
 version: 0.0.8
 homepage: https://anyhoosolutions.web.app/documentation/flutter_platform_kit

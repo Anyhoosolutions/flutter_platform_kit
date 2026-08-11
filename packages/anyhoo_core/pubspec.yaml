@@ -1,4 +1,5 @@
 name: anyhoo_core
+resolution: workspace
 description: Shared models and interfaces used across Anyhoo packages.
 version: 0.0.15
 publish_to: none

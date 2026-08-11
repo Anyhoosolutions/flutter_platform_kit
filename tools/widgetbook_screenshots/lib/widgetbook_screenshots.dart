@@ -1,4 +1,4 @@
-library widgetbook_screenshots;
+library;
 
 export 'src/config.dart';
 export 'src/screenshot_capturer.dart';

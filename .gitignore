@@ -1,7 +1,9 @@
 # Dart/Flutter
 .dart_tool/
 build/
-*.lock
+# Per-package lockfiles are unused with pub workspaces; keep the root lock.
+**/pubspec.lock
+!/pubspec.lock
 
 # IDE
 .idea/

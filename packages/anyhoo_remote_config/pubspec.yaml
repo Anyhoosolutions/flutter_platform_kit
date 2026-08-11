@@ -1,4 +1,5 @@
 name: anyhoo_remote_config
+resolution: workspace
 description: "A package for managing remote config in a Flutter app."
 version: 0.0.3
 homepage: https://github.com/anyhoosolutions/flutter_platform_kit/tree/main/packages/anyhoo_remote_config

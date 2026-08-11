@@ -120,8 +120,11 @@ jobs:
         with:
           path: |
             ~/.pub-cache
-            **/.dart_tool
-          key: ${{ runner.os }}-flutter-${{ hashFiles('**/pubspec.yaml') }}
+            .dart_tool
+          key: ${{ runner.os }}-flutter-${{ hashFiles('pubspec.yaml', 'pubspec.lock', '**/pubspec.yaml') }}
+
+      - name: Bootstrap workspace
+        run: dart pub get && dart run melos bootstrap
 
       - name: Load config and run unit tests
         run: |
@@ -134,7 +137,7 @@ jobs:
                 test_dir="$package/test"
                 if [ -d "$test_dir" ] && [ -n "$(find "$test_dir" -name '*_test.dart' -type f 2>/dev/null)" ]; then
                   echo "Running tests for $package"
-                  (cd "$package" && flutter pub get && $CMD)
+                  (cd "$package" && $CMD)
                   echo "Tests passed for $package"
                 else
                   echo "Skipping $package (no test files)"
@@ -167,13 +170,8 @@ jobs:
           flutter-version: ${{ steps.flutter-config.outputs.version }}
           channel: ${{ steps.flutter-config.outputs.channel }}
 
-      - name: Get dependencies
-        run: |
-          APP_DIR=$(jq -r '.patrol_integration_tests.app_directory // "."' .github/tests-config.json)
-          for pkg in packages/*/ tools/*/ 2>/dev/null; do
-            [ -f "$pkg/pubspec.yaml" ] && (cd "$pkg" && flutter pub get) || true
-          done
-          (cd "$APP_DIR" && flutter pub get)
+      - name: Bootstrap workspace
+        run: dart pub get && dart run melos bootstrap
 
       - name: Generate firebase_options.dart
         run: |
