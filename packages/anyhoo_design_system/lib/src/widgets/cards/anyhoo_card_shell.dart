@@ -9,12 +9,14 @@ class AnyhooCardShell extends StatelessWidget {
     this.padding,
     this.clipBehavior = Clip.antiAlias,
     this.backgroundColor,
+    this.backgroundImageUrl,
   });
 
   final Widget child;
   final EdgeInsetsGeometry? padding;
   final Clip clipBehavior;
   final Color? backgroundColor;
+  final String? backgroundImageUrl;
 
   static const level1Shadow = [BoxShadow(color: Color(0x0D000000), offset: Offset(0, 2), blurRadius: 4)];
 
@@ -25,6 +27,9 @@ class AnyhooCardShell extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: backgroundColor ?? surface.cardBackground,
+        image: backgroundImageUrl != null
+            ? DecorationImage(image: NetworkImage(backgroundImageUrl!), fit: BoxFit.cover)
+            : null,
         borderRadius: BorderRadius.circular(DesignTokens.radiusXl),
         border: Border.all(color: surface.cardBorder.withValues(alpha: 0.3)),
         boxShadow: level1Shadow,

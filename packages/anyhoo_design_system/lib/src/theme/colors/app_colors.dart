@@ -18,6 +18,10 @@ class SurfaceColors extends ThemeExtension<SurfaceColors> with _$SurfaceColorsTa
     required this.containerHighest,
     required this.containerLowest,
     required this.outline,
+    required this.secondaryContainer,
+    required this.onSecondaryContainer,
+    required this.inverseSurface,
+    required this.inverseOnSurface,
     required this.topBarBackground,
     required this.topBarText,
     required this.bottomBarBackground,
@@ -46,6 +50,14 @@ class SurfaceColors extends ThemeExtension<SurfaceColors> with _$SurfaceColorsTa
   final Color containerLowest;
   @override
   final Color outline;
+  @override
+  final Color secondaryContainer;
+  @override
+  final Color onSecondaryContainer;
+  @override
+  final Color inverseSurface;
+  @override
+  final Color inverseOnSurface;
   @override
   final Color topBarBackground;
   @override
@@ -98,6 +110,7 @@ class AccentColors extends ThemeExtension<AccentColors> with _$AccentColorsTailo
     required this.primaryContainer,
     required this.onPrimaryContainer,
     required this.headline,
+    required this.inversePrimary,
   });
 
   @override
@@ -114,6 +127,8 @@ class AccentColors extends ThemeExtension<AccentColors> with _$AccentColorsTailo
   final Color onPrimaryContainer;
   @override
   final Color headline;
+  @override
+  final Color inversePrimary;
 }
 
 @immutable

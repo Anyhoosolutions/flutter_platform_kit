@@ -21,6 +21,10 @@ mixin _$SurfaceColorsTailorMixin on ThemeExtension<SurfaceColors> {
   Color get containerHighest;
   Color get containerLowest;
   Color get outline;
+  Color get secondaryContainer;
+  Color get onSecondaryContainer;
+  Color get inverseSurface;
+  Color get inverseOnSurface;
   Color get topBarBackground;
   Color get topBarText;
   Color get bottomBarBackground;
@@ -39,6 +43,10 @@ mixin _$SurfaceColorsTailorMixin on ThemeExtension<SurfaceColors> {
     Color? containerHighest,
     Color? containerLowest,
     Color? outline,
+    Color? secondaryContainer,
+    Color? onSecondaryContainer,
+    Color? inverseSurface,
+    Color? inverseOnSurface,
     Color? topBarBackground,
     Color? topBarText,
     Color? bottomBarBackground,
@@ -57,6 +65,10 @@ mixin _$SurfaceColorsTailorMixin on ThemeExtension<SurfaceColors> {
       containerHighest: containerHighest ?? this.containerHighest,
       containerLowest: containerLowest ?? this.containerLowest,
       outline: outline ?? this.outline,
+      secondaryContainer: secondaryContainer ?? this.secondaryContainer,
+      onSecondaryContainer: onSecondaryContainer ?? this.onSecondaryContainer,
+      inverseSurface: inverseSurface ?? this.inverseSurface,
+      inverseOnSurface: inverseOnSurface ?? this.inverseOnSurface,
       topBarBackground: topBarBackground ?? this.topBarBackground,
       topBarText: topBarText ?? this.topBarText,
       bottomBarBackground: bottomBarBackground ?? this.bottomBarBackground,
@@ -91,6 +103,22 @@ mixin _$SurfaceColorsTailorMixin on ThemeExtension<SurfaceColors> {
       )!,
       containerLowest: Color.lerp(containerLowest, other.containerLowest, t)!,
       outline: Color.lerp(outline, other.outline, t)!,
+      secondaryContainer: Color.lerp(
+        secondaryContainer,
+        other.secondaryContainer,
+        t,
+      )!,
+      onSecondaryContainer: Color.lerp(
+        onSecondaryContainer,
+        other.onSecondaryContainer,
+        t,
+      )!,
+      inverseSurface: Color.lerp(inverseSurface, other.inverseSurface, t)!,
+      inverseOnSurface: Color.lerp(
+        inverseOnSurface,
+        other.inverseOnSurface,
+        t,
+      )!,
       topBarBackground: Color.lerp(
         topBarBackground,
         other.topBarBackground,
@@ -157,6 +185,22 @@ mixin _$SurfaceColorsTailorMixin on ThemeExtension<SurfaceColors> {
             ) &&
             const DeepCollectionEquality().equals(outline, other.outline) &&
             const DeepCollectionEquality().equals(
+              secondaryContainer,
+              other.secondaryContainer,
+            ) &&
+            const DeepCollectionEquality().equals(
+              onSecondaryContainer,
+              other.onSecondaryContainer,
+            ) &&
+            const DeepCollectionEquality().equals(
+              inverseSurface,
+              other.inverseSurface,
+            ) &&
+            const DeepCollectionEquality().equals(
+              inverseOnSurface,
+              other.inverseOnSurface,
+            ) &&
+            const DeepCollectionEquality().equals(
               topBarBackground,
               other.topBarBackground,
             ) &&
@@ -189,6 +233,10 @@ mixin _$SurfaceColorsTailorMixin on ThemeExtension<SurfaceColors> {
       const DeepCollectionEquality().hash(containerHighest),
       const DeepCollectionEquality().hash(containerLowest),
       const DeepCollectionEquality().hash(outline),
+      const DeepCollectionEquality().hash(secondaryContainer),
+      const DeepCollectionEquality().hash(onSecondaryContainer),
+      const DeepCollectionEquality().hash(inverseSurface),
+      const DeepCollectionEquality().hash(inverseOnSurface),
       const DeepCollectionEquality().hash(topBarBackground),
       const DeepCollectionEquality().hash(topBarText),
       const DeepCollectionEquality().hash(bottomBarBackground),
@@ -308,6 +356,7 @@ mixin _$AccentColorsTailorMixin on ThemeExtension<AccentColors> {
   Color get primaryContainer;
   Color get onPrimaryContainer;
   Color get headline;
+  Color get inversePrimary;
 
   @override
   AccentColors copyWith({
@@ -318,6 +367,7 @@ mixin _$AccentColorsTailorMixin on ThemeExtension<AccentColors> {
     Color? primaryContainer,
     Color? onPrimaryContainer,
     Color? headline,
+    Color? inversePrimary,
   }) {
     return AccentColors(
       primaryFixed: primaryFixed ?? this.primaryFixed,
@@ -327,6 +377,7 @@ mixin _$AccentColorsTailorMixin on ThemeExtension<AccentColors> {
       primaryContainer: primaryContainer ?? this.primaryContainer,
       onPrimaryContainer: onPrimaryContainer ?? this.onPrimaryContainer,
       headline: headline ?? this.headline,
+      inversePrimary: inversePrimary ?? this.inversePrimary,
     );
   }
 
@@ -353,6 +404,7 @@ mixin _$AccentColorsTailorMixin on ThemeExtension<AccentColors> {
         t,
       )!,
       headline: Color.lerp(headline, other.headline, t)!,
+      inversePrimary: Color.lerp(inversePrimary, other.inversePrimary, t)!,
     );
   }
 
@@ -385,7 +437,11 @@ mixin _$AccentColorsTailorMixin on ThemeExtension<AccentColors> {
               onPrimaryContainer,
               other.onPrimaryContainer,
             ) &&
-            const DeepCollectionEquality().equals(headline, other.headline));
+            const DeepCollectionEquality().equals(headline, other.headline) &&
+            const DeepCollectionEquality().equals(
+              inversePrimary,
+              other.inversePrimary,
+            ));
   }
 
   @override
@@ -399,6 +455,7 @@ mixin _$AccentColorsTailorMixin on ThemeExtension<AccentColors> {
       const DeepCollectionEquality().hash(primaryContainer),
       const DeepCollectionEquality().hash(onPrimaryContainer),
       const DeepCollectionEquality().hash(headline),
+      const DeepCollectionEquality().hash(inversePrimary),
     );
   }
 }

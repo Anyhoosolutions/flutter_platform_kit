@@ -29,6 +29,10 @@ import 'package:widgetbook_workspace/anyhoo_design_system/buttons/anyhoo_round_b
     as _widgetbook_workspace_anyhoo_design_system_buttons_anyhoo_round_button;
 import 'package:widgetbook_workspace/anyhoo_design_system/cards/anyhoo_cards_gallery.dart'
     as _widgetbook_workspace_anyhoo_design_system_cards_anyhoo_cards_gallery;
+import 'package:widgetbook_workspace/anyhoo_design_system/controls/anyhoo_controls_gallery.dart'
+    as _widgetbook_workspace_anyhoo_design_system_controls_anyhoo_controls_gallery;
+import 'package:widgetbook_workspace/anyhoo_design_system/feedback/anyhoo_feedback_gallery.dart'
+    as _widgetbook_workspace_anyhoo_design_system_feedback_anyhoo_feedback_gallery;
 import 'package:widgetbook_workspace/anyhoo_design_system/typography/anyhoo_typography_gallery.dart'
     as _widgetbook_workspace_anyhoo_design_system_typography_anyhoo_typography_gallery;
 import 'package:widgetbook_workspace/anyhoo_firebase/firebase_analytics_page.dart'
@@ -162,6 +166,38 @@ final directories = <_widgetbook.WidgetbookNode>[
                 builder:
                     _widgetbook_workspace_anyhoo_design_system_cards_anyhoo_cards_gallery
                         .buildAnyhooCardsGallery,
+              ),
+            ],
+          ),
+        ],
+      ),
+      _widgetbook.WidgetbookFolder(
+        name: 'controls',
+        children: [
+          _widgetbook.WidgetbookComponent(
+            name: 'AnyhooSwitch',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Gallery',
+                builder:
+                    _widgetbook_workspace_anyhoo_design_system_controls_anyhoo_controls_gallery
+                        .buildAnyhooControlsGallery,
+              ),
+            ],
+          ),
+        ],
+      ),
+      _widgetbook.WidgetbookFolder(
+        name: 'feedback',
+        children: [
+          _widgetbook.WidgetbookComponent(
+            name: 'AnyhooBanner',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Gallery',
+                builder:
+                    _widgetbook_workspace_anyhoo_design_system_feedback_anyhoo_feedback_gallery
+                        .buildAnyhooFeedbackGallery,
               ),
             ],
           ),

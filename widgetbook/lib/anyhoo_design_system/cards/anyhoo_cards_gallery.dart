@@ -18,6 +18,9 @@ class _AnyhooCardsGallery extends StatelessWidget {
   static const _mediaImageUrl =
       'https://lh3.googleusercontent.com/aida-public/AB6AXuBu61BqIudp21wkNQFibvZ0CJtT9yU83rsxYTIGm1tNLeT-NiciuqD9P8vfwvosR9wDpu9ItIN4vWKo7lXcxSf5a-BHlU3FxUgORvTfohM6LT9GHlmnNVUCwkm9BaagZhqi8bCSZuvLB7csK9AJkK7UvhZcJxJ56Z1iON75UIRinkYSVQWVGwTkO7nCL9Q0yb5_G6kKwpUl4gGDpyoYkXpP4xFk_Cxt2gfDLMjCviGuQie1iaIgTTpg';
 
+  static const _imageBackgroundImageUrl =
+      'https://lh3.googleusercontent.com/aida-public/AB6AXuDfU7mk3e3TamJfJqxV3o4f2o5ZU9VV7Rx34MeqD_qMUCsyWu8i9Uyugc0TsCCqJJrRmhWVye57OdcPsD5nqHgJQ8bhXh8sAbXR_EGLu0Mg8wGWBVaH29id0Uuv62wDmjVWBrbhONW6jp4Zrpgx7KWLW8itxDcRfvVDqzgnUCMudxrTgHSEmMLPoL9kFrDFOU-NEqSiya20UAZq_30zkVIXxeIN3A1HgeAKSKpI-XtufLxwrQJMJ4dv';
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -91,6 +94,15 @@ class _AnyhooCardsGallery extends StatelessWidget {
 
             'Metric card'.headline(size: HeadlineSize.small).pad(b: 4),
             const AnyhooMetricCard(label: 'Engagement', value: '84.2k', badgeLabel: '+12%'),
+            const SizedBox(height: DesignTokens.spacingLg),
+
+            'Image background card'.headline(size: HeadlineSize.small).pad(b: 4),
+            const AnyhooImageBackgroundCard(
+              title: 'Image Background Card',
+              height: 200,
+              backgroundImageUrl: _imageBackgroundImageUrl,
+              child: Text('This is a simple elevated card with standard padding.'),
+            ),
             const SizedBox(height: DesignTokens.spacingLg),
           ],
         ),

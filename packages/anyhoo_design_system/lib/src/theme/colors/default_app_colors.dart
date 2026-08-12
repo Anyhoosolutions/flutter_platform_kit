@@ -14,6 +14,7 @@ const defaultAccentColors = AccentColors(
   primaryContainer: DesignTokens.primaryContainer,
   onPrimaryContainer: DesignTokens.onPrimaryContainer,
   headline: DesignTokens.primary,
+  inversePrimary: DesignTokens.inversePrimary,
 );
 
 const defaultStatusColors = StatusColors(
@@ -36,6 +37,10 @@ const defaultLightColors = AppColors(
     containerHighest: Color(0xFFDAE2FD), // surface-container-highest
     containerLowest: Color(0xFFFFFFFF), // surface-container-lowest
     outline: Color(0xFF727785), // outline
+    secondaryContainer: DesignTokens.secondaryContainer,
+    onSecondaryContainer: DesignTokens.onSecondaryContainer,
+    inverseSurface: DesignTokens.inverseSurface,
+    inverseOnSurface: DesignTokens.inverseOnSurface,
     topBarBackground: Color(0xFFFAF8FF),
     topBarText: Color(0xFF131B2E),
     bottomBarBackground: Color(0xFFFAF8FF),
@@ -69,6 +74,10 @@ const defaultDarkColors = AppColors(
     containerHighest: Color(0xFF38485D), // on-secondary-fixed-variant
     containerLowest: Color(0xFF0A0E16),
     outline: Color(0xFF727785),
+    secondaryContainer: Color(0xFF38485D),
+    onSecondaryContainer: Color(0xFFB7C8E1),
+    inverseSurface: Color(0xFFEEF0FF),
+    inverseOnSurface: Color(0xFF283044),
     topBarBackground: DesignTokens.backgroundDark,
     topBarText: Color(0xFFEEF0FF),
     bottomBarBackground: DesignTokens.backgroundDark,
@@ -82,6 +91,7 @@ const defaultDarkColors = AppColors(
     primaryContainer: DesignTokens.primary,
     onPrimaryContainer: DesignTokens.onPrimaryContainer,
     headline: DesignTokens.primaryFixedDim,
+    inversePrimary: DesignTokens.primary,
   ),
   status: StatusColors(
     error: Color(0xFF93000a),

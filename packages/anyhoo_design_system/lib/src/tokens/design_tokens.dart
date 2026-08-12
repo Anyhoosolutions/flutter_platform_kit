@@ -31,4 +31,10 @@ abstract final class DesignTokens {
   static const primaryFixedDim = Color(0xFFADC6FF);
   static const onPrimaryFixedVariant = Color(0xFF004395);
   static const errorRed = Color(0xFFBA1A1A);
+  static const onError = Color(0xFFFFFFFF);
+  static const secondaryContainer = Color(0xFFD0E1FB);
+  static const onSecondaryContainer = Color(0xFF54647A);
+  static const inverseSurface = Color(0xFF283044);
+  static const inverseOnSurface = Color(0xFFEEF0FF);
+  static const inversePrimary = Color(0xFFADC6FF);
 }
