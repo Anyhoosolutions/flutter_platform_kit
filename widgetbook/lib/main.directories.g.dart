@@ -33,8 +33,18 @@ import 'package:widgetbook_workspace/anyhoo_design_system/chips/anyhoo_chips_gal
     as _widgetbook_workspace_anyhoo_design_system_chips_anyhoo_chips_gallery;
 import 'package:widgetbook_workspace/anyhoo_design_system/controls/anyhoo_controls_gallery.dart'
     as _widgetbook_workspace_anyhoo_design_system_controls_anyhoo_controls_gallery;
+import 'package:widgetbook_workspace/anyhoo_design_system/data/anyhoo_data_gallery.dart'
+    as _widgetbook_workspace_anyhoo_design_system_data_anyhoo_data_gallery;
 import 'package:widgetbook_workspace/anyhoo_design_system/feedback/anyhoo_feedback_gallery.dart'
     as _widgetbook_workspace_anyhoo_design_system_feedback_anyhoo_feedback_gallery;
+import 'package:widgetbook_workspace/anyhoo_design_system/forms/anyhoo_forms_gallery.dart'
+    as _widgetbook_workspace_anyhoo_design_system_forms_anyhoo_forms_gallery;
+import 'package:widgetbook_workspace/anyhoo_design_system/navigation/anyhoo_navigation_gallery.dart'
+    as _widgetbook_workspace_anyhoo_design_system_navigation_anyhoo_navigation_gallery;
+import 'package:widgetbook_workspace/anyhoo_design_system/screens/app_settings_screen.dart'
+    as _widgetbook_workspace_anyhoo_design_system_screens_app_settings_screen;
+import 'package:widgetbook_workspace/anyhoo_design_system/screens/executive_dashboard_screen.dart'
+    as _widgetbook_workspace_anyhoo_design_system_screens_executive_dashboard_screen;
 import 'package:widgetbook_workspace/anyhoo_design_system/typography/anyhoo_typography_gallery.dart'
     as _widgetbook_workspace_anyhoo_design_system_typography_anyhoo_typography_gallery;
 import 'package:widgetbook_workspace/anyhoo_firebase/firebase_analytics_page.dart'
@@ -206,6 +216,22 @@ final directories = <_widgetbook.WidgetbookNode>[
         ],
       ),
       _widgetbook.WidgetbookFolder(
+        name: 'data',
+        children: [
+          _widgetbook.WidgetbookComponent(
+            name: 'AnyhooDataTable',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Gallery',
+                builder:
+                    _widgetbook_workspace_anyhoo_design_system_data_anyhoo_data_gallery
+                        .buildAnyhooDataGallery,
+              ),
+            ],
+          ),
+        ],
+      ),
+      _widgetbook.WidgetbookFolder(
         name: 'feedback',
         children: [
           _widgetbook.WidgetbookComponent(
@@ -216,6 +242,65 @@ final directories = <_widgetbook.WidgetbookNode>[
                 builder:
                     _widgetbook_workspace_anyhoo_design_system_feedback_anyhoo_feedback_gallery
                         .buildAnyhooFeedbackGallery,
+              ),
+            ],
+          ),
+        ],
+      ),
+      _widgetbook.WidgetbookFolder(
+        name: 'forms',
+        children: [
+          _widgetbook.WidgetbookComponent(
+            name: 'AnyhooSearchField',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Gallery',
+                builder:
+                    _widgetbook_workspace_anyhoo_design_system_forms_anyhoo_forms_gallery
+                        .buildAnyhooFormsGallery,
+              ),
+            ],
+          ),
+        ],
+      ),
+      _widgetbook.WidgetbookFolder(
+        name: 'navigation',
+        children: [
+          _widgetbook.WidgetbookComponent(
+            name: 'AnyhooStepper',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Gallery',
+                builder:
+                    _widgetbook_workspace_anyhoo_design_system_navigation_anyhoo_navigation_gallery
+                        .buildAnyhooNavigationGallery,
+              ),
+            ],
+          ),
+        ],
+      ),
+      _widgetbook.WidgetbookFolder(
+        name: 'screens',
+        children: [
+          _widgetbook.WidgetbookComponent(
+            name: 'AnyhooList',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'App Settings',
+                builder:
+                    _widgetbook_workspace_anyhoo_design_system_screens_app_settings_screen
+                        .buildAppSettingsScreen,
+              ),
+            ],
+          ),
+          _widgetbook.WidgetbookComponent(
+            name: 'AnyhooMetricCard',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Executive Dashboard',
+                builder:
+                    _widgetbook_workspace_anyhoo_design_system_screens_executive_dashboard_screen
+                        .buildExecutiveDashboardScreen,
               ),
             ],
           ),

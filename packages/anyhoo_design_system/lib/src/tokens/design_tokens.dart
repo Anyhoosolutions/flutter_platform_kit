@@ -21,7 +21,7 @@ abstract final class DesignTokens {
 
   // Kinetic Logic fallback colors
   static const backgroundLight = Color(0xFFFAF8FF);
-  static const backgroundDark = Color(0xFF0F141F);
+  static const backgroundDark = Color(0xFF0B1326);
   static const primary = Color(0xFF0058BE);
   static const primaryContainer = Color(0xFF2170E4);
   static const onPrimary = Color(0xFFFFFFFF);

@@ -1,7 +1,7 @@
 import 'package:anyhoo_design_system/anyhoo_design_system.dart';
 import 'package:flutter/material.dart';
 
-enum AnyhooChipVariant { primary, error, surface }
+enum AnyhooChipVariant { primary, error, surface, secondary, neutral, alert }
 
 enum AnyhooChipShape { rounded, pill }
 
@@ -104,6 +104,18 @@ class AnyhooChip extends StatelessWidget {
       AnyhooChipVariant.surface => _ChipColors(
         background: surface.containerHigh,
         foreground: surface.secondaryText,
+      ),
+      AnyhooChipVariant.secondary => _ChipColors(
+        background: surface.secondaryContainer,
+        foreground: surface.onSecondaryContainer,
+      ),
+      AnyhooChipVariant.neutral => _ChipColors(
+        background: surface.containerHighest,
+        foreground: surface.secondaryText,
+      ),
+      AnyhooChipVariant.alert => _ChipColors(
+        background: status.errorContainer,
+        foreground: status.error,
       ),
     };
   }

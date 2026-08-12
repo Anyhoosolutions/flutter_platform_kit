@@ -44,5 +44,19 @@ export 'src/widgets/feedback/anyhoo_dialog.dart';
 export 'src/widgets/feedback/anyhoo_toast.dart';
 
 export 'src/widgets/chips/anyhoo_chip.dart';
+export 'src/widgets/chips/anyhoo_filter_chip.dart';
+
+export 'src/widgets/navigation/anyhoo_breadcrumb.dart';
+export 'src/widgets/navigation/anyhoo_stepper.dart';
+export 'src/widgets/navigation/anyhoo_expansion_panel.dart';
+export 'src/widgets/navigation/anyhoo_empty_state.dart';
+
+export 'src/widgets/forms/anyhoo_search_field.dart';
+export 'src/widgets/forms/anyhoo_segmented_control.dart';
+export 'src/widgets/forms/anyhoo_slider.dart';
+export 'src/widgets/forms/anyhoo_date_picker.dart';
+
+export 'src/widgets/data/anyhoo_data_table.dart';
+export 'src/widgets/data/anyhoo_notification_badge.dart';
 
 export 'src/widgets/typography/anyhoo_text.dart';

@@ -8,6 +8,8 @@ class AnyhooListItem extends StatelessWidget {
     required this.title,
     this.subtitle,
     this.leadingIcon,
+    this.leadingBackground,
+    this.leadingCircular = false,
     this.onTap,
     this.showChevron = true,
     this.trailing,
@@ -16,6 +18,13 @@ class AnyhooListItem extends StatelessWidget {
   final String title;
   final String? subtitle;
   final IconData? leadingIcon;
+
+  /// When set, wraps [leadingIcon] in a padded rounded-lg background box.
+  /// Icon color defaults to primary when this is non-null.
+  final Color? leadingBackground;
+
+  /// When true with [leadingBackground], uses a circular leading container.
+  final bool leadingCircular;
   final VoidCallback? onTap;
   final bool showChevron;
   final Widget? trailing;
@@ -23,6 +32,7 @@ class AnyhooListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final surface = context.surface;
+    final accent = context.accent;
 
     return InkWell(
       onTap: onTap,
@@ -33,7 +43,26 @@ class AnyhooListItem extends StatelessWidget {
           child: Row(
             children: [
               if (leadingIcon != null) ...[
-                Icon(leadingIcon, color: surface.secondaryText, size: 24),
+                if (leadingBackground != null)
+                  DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: leadingBackground,
+                      shape: leadingCircular ? BoxShape.circle : BoxShape.rectangle,
+                      borderRadius: leadingCircular
+                          ? null
+                          : BorderRadius.circular(DesignTokens.radiusMd),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(DesignTokens.spacingSm),
+                      child: Icon(
+                        leadingIcon,
+                        color: accent.primaryFixed,
+                        size: 24,
+                      ),
+                    ),
+                  )
+                else
+                  Icon(leadingIcon, color: surface.secondaryText, size: 24),
                 const SizedBox(width: DesignTokens.spacingMd),
               ],
               Expanded(
