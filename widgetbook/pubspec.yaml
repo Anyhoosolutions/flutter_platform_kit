@@ -10,6 +10,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
   widgetbook: ^3.20.0
   widgetbook_annotation: ^3.9.0
   mocktail: ^1.0.4
@@ -39,6 +41,10 @@ dependencies:
     path: ../packages/anyhoo_form_builder_widgets
   anyhoo_search_bar:
     path: ../packages/anyhoo_search_bar
+  anyhoo_design_system:
+    path: ../packages/anyhoo_design_system
+  anyhoo_widget_extension_methods:
+    path: ../packages/anyhoo_widget_extension_methods
 
 dev_dependencies:
   flutter_test:

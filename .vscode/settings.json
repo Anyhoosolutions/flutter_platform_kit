@@ -1,0 +1,7 @@
+{
+  "dart.analysisExcludedFolders": [
+    "build",
+    "example_app/build",
+    "widgetbook/build"
+  ]
+}

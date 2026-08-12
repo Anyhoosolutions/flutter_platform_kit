@@ -132,7 +132,7 @@ class FirestoreService {
 
   Future<void> updateDocument(String path, String id, Map<String, dynamic> data) async {
     try {
-      return firestore.collection(path).doc(id).update(data);
+      return await firestore.collection(path).doc(id).update(data);
     } catch (e, stackTrace) {
       SentryHelper.captureException(e, stackTrace: stackTrace, fatal: false);
       throw Exception('Failed to update document at $path $id: $e');

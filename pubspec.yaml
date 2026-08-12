@@ -9,6 +9,7 @@ workspace:
   - packages/anyhoo_app_bar
   - packages/anyhoo_auth
   - packages/anyhoo_core
+  - packages/anyhoo_design_system
   - packages/anyhoo_extension_methods
   - packages/anyhoo_firebase
   - packages/anyhoo_form_builder_widgets
@@ -26,10 +27,9 @@ workspace:
   - widgetbook
   - tools/sentry_cli
   - tools/widgetbook_screenshots
-  - scripts/toc_generator
 
 dev_dependencies:
-  melos: ^7.0.0
+  melos: ^8.0.0
 
 flutter:
   uses-material-design: true
@@ -48,16 +48,34 @@ melos:
   scripts:
     analyze:
       description: Run flutter analyze in all packages
-      run: melos exec --concurrency=1 -- flutter analyze
+      exec:
+        command: flutter analyze
+        concurrency: 1
 
     test:
       description: Run flutter test in lib and tool packages (excludes apps/goldens)
-      run: melos exec --concurrency=1 --fail-fast --dir-exists=test --category=libs --category=tools -- flutter test
+      exec:
+        command: flutter test
+        concurrency: 1
+        failFast: true
+      packageFilters:
+        dirExists: test
+        category:
+          - libs
+          - tools
 
     test:apps:
       description: Run flutter test in example_app and widgetbook
-      run: melos exec --concurrency=1 --fail-fast --dir-exists=test --category=apps -- flutter test
+      exec:
+        command: flutter test
+        concurrency: 1
+        failFast: true
+      packageFilters:
+        dirExists: test
+        category: apps
 
     clean:deep:
       description: Clean Flutter/Dart build artifacts across the workspace
-      run: melos exec --concurrency=1 -- flutter clean
+      exec:
+        command: flutter clean
+        concurrency: 1

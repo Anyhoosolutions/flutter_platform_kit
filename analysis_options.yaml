@@ -1,0 +1,8 @@
+# Workspace-root analyzer options. Package-level analysis_options.yaml files
+# still apply within each workspace package.
+analyzer:
+  exclude:
+    - build/**
+    - "**/build/**"
+    - example_app/build/**
+    - widgetbook/build/**
