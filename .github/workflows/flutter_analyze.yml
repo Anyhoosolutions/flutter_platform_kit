@@ -74,6 +74,9 @@ jobs:
       - name: Bootstrap workspace
         run: dart pub get && dart run melos bootstrap
 
+      - name: Generate firebase_options.dart
+        run: cp example_app/lib/firebase_options_emulator.dart example_app/lib/firebase_options.dart
+
       - name: Analyze all packages
         run: dart run melos run analyze
 
