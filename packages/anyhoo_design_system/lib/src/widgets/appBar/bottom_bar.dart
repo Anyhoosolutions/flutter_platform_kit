@@ -5,16 +5,16 @@ final List<NavigationDestination> appDestinations = [
   NavigationDestination(icon: Icon(Icons.settings), label: 'Settings'),
 ];
 
-class BottomBar extends StatelessWidget {
-  const BottomBar({
+class AnyhooBottomBar extends StatelessWidget {
+  const AnyhooBottomBar({
     super.key,
     required this.destinations,
     required this.selectedIndex,
     required this.onDestinationSelected,
   });
 
-  factory BottomBar.fromPath(String path) {
-    return BottomBar(
+  factory AnyhooBottomBar.fromPath(String path) {
+    return AnyhooBottomBar(
       destinations: appDestinations,
       selectedIndex: path.startsWith('/settings') ? 1 : 0,
       onDestinationSelected: (BuildContext context, int index) {

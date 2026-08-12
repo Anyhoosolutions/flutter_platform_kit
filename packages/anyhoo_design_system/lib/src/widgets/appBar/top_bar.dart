@@ -1,28 +1,29 @@
 import 'package:anyhoo_design_system/anyhoo_design_system.dart';
 import 'package:flutter/material.dart';
 
-class TopBar extends StatelessWidget implements PreferredSizeWidget {
-  const TopBar({
+enum _AvatarMenuAction { settings, profile, logout }
+
+class AnyhooTopBar extends StatelessWidget implements PreferredSizeWidget {
+  const AnyhooTopBar({
     super.key,
     this.topBarText,
     this.avatarUrl,
     this.onSettingsTap,
+    this.onProfileTap,
     this.showBackButton = false,
     this.onBackTap,
-    this.useAvatar = false,
-    this.onAvatarTap,
-    this.showLogoutButton = false,
+    this.logoAssetPath,
     this.onLogoutClick,
   });
 
+  final String? logoAssetPath;
   final String? topBarText;
   final String? avatarUrl;
   final VoidCallback? onSettingsTap;
+  final VoidCallback? onProfileTap;
   final bool showBackButton;
   final VoidCallback? onBackTap;
-  final bool useAvatar;
-  final VoidCallback? onAvatarTap;
-  final bool showLogoutButton;
+
   final VoidCallback? onLogoutClick;
 
   @override
@@ -31,12 +32,12 @@ class TopBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     final accent = context.accent;
-    final surface = context.surface;
+    final appBar = context.appBar;
 
     return Material(
       child: DecoratedBox(
         decoration: BoxDecoration(
-          border: Border(bottom: BorderSide(color: surface.cardBorder)),
+          border: Border(bottom: BorderSide(color: appBar.topBarBorder)),
         ),
         child: SafeArea(
           bottom: false,
@@ -52,32 +53,60 @@ class TopBar extends StatelessWidget implements PreferredSizeWidget {
                       onPressed: () {
                         onBack(context);
                       },
-                      icon: Icon(Icons.arrow_back, color: surface.secondaryText),
+                      icon: Icon(Icons.arrow_back, color: appBar.backButtonColor),
                     )
-                  else if (useAvatar)
-                    _Avatar(avatarUrl: avatarUrl, borderColor: accent.primaryFixed, onAvatarTap: onAvatarTap),
-
+                  else
+                    logoAssetPath != null ? Image.asset(logoAssetPath!) : SizedBox.shrink(),
                   Expanded(
                     child: Text(
                       topBarText ?? '',
                       textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                        color: accent.primaryFixed,
-                        fontStyle: FontStyle.italic,
-                        letterSpacing: -0.5,
+                      style: Theme.of(
+                        context,
+                      ).textTheme.headlineMedium?.copyWith(color: appBar.topBarText, letterSpacing: -0.5),
+                    ),
+                  ),
+
+                  PopupMenuButton<_AvatarMenuAction>(
+                    offset: const Offset(0, 48),
+                    onSelected: (action) {
+                      switch (action) {
+                        case _AvatarMenuAction.settings:
+                          onSettingsTap?.call();
+                        case _AvatarMenuAction.profile:
+                          onProfileTap?.call();
+                        case _AvatarMenuAction.logout:
+                          onLogoutClick?.call();
+                      }
+                    },
+                    itemBuilder: (context) => [
+                      const PopupMenuItem(
+                        value: _AvatarMenuAction.settings,
+                        child: ListTile(
+                          contentPadding: EdgeInsets.zero,
+                          leading: Icon(Icons.settings_outlined),
+                          title: Text('Settings'),
+                        ),
                       ),
-                    ),
+                      const PopupMenuItem(
+                        value: _AvatarMenuAction.profile,
+                        child: ListTile(
+                          contentPadding: EdgeInsets.zero,
+                          leading: Icon(Icons.person_outline),
+                          title: Text('Profile'),
+                        ),
+                      ),
+                      const PopupMenuItem(
+                        value: _AvatarMenuAction.logout,
+                        child: ListTile(
+                          contentPadding: EdgeInsets.zero,
+                          leading: Icon(Icons.logout),
+                          title: Text('Log out'),
+                        ),
+                      ),
+                    ],
+                    child: _Avatar(avatarUrl: avatarUrl, borderColor: accent.primaryFixed),
                   ),
-                  IconButton(
-                    onPressed: onSettingsTap,
-                    icon: Icon(Icons.settings_outlined, color: surface.secondaryText),
-                    selectedIcon: Icon(Icons.settings, color: accent.primaryFixed),
-                  ),
-                  if (showLogoutButton)
-                    IconButton(
-                      onPressed: onLogoutClick,
-                      icon: Icon(Icons.logout, color: surface.secondaryText),
-                    ),
                 ],
               ),
             ),
@@ -95,33 +124,27 @@ class TopBar extends StatelessWidget implements PreferredSizeWidget {
 }
 
 class _Avatar extends StatelessWidget {
-  const _Avatar({required this.borderColor, required this.onAvatarTap, this.avatarUrl});
+  const _Avatar({required this.borderColor, this.avatarUrl});
 
   final String? avatarUrl;
   final Color borderColor;
-  final VoidCallback? onAvatarTap;
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        onAvatarTap?.call();
-      },
-      child: Container(
-        width: 40,
-        height: 40,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          border: Border.all(color: borderColor),
-        ),
-        clipBehavior: Clip.antiAlias,
-        child: avatarUrl != null
-            ? Image.network(avatarUrl!, fit: BoxFit.cover)
-            : ColoredBox(
-                color: context.surface.containerHighest,
-                child: Icon(Icons.person, color: context.surface.secondaryText),
-              ),
+    return Container(
+      width: 40,
+      height: 40,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(color: borderColor),
       ),
+      clipBehavior: Clip.antiAlias,
+      child: avatarUrl != null
+          ? Image.network(avatarUrl!, fit: BoxFit.cover)
+          : ColoredBox(
+              color: context.surface.containerHighest,
+              child: Icon(Icons.person, color: context.surface.secondaryText),
+            ),
     );
   }
 }

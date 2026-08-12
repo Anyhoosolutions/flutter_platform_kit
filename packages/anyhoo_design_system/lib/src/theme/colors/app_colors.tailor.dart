@@ -21,6 +21,10 @@ mixin _$SurfaceColorsTailorMixin on ThemeExtension<SurfaceColors> {
   Color get containerHighest;
   Color get containerLowest;
   Color get outline;
+  Color get topBarBackground;
+  Color get topBarText;
+  Color get bottomBarBackground;
+  Color get bottomBarIconColors;
 
   @override
   SurfaceColors copyWith({
@@ -35,6 +39,10 @@ mixin _$SurfaceColorsTailorMixin on ThemeExtension<SurfaceColors> {
     Color? containerHighest,
     Color? containerLowest,
     Color? outline,
+    Color? topBarBackground,
+    Color? topBarText,
+    Color? bottomBarBackground,
+    Color? bottomBarIconColors,
   }) {
     return SurfaceColors(
       scaffoldBackground: scaffoldBackground ?? this.scaffoldBackground,
@@ -49,6 +57,10 @@ mixin _$SurfaceColorsTailorMixin on ThemeExtension<SurfaceColors> {
       containerHighest: containerHighest ?? this.containerHighest,
       containerLowest: containerLowest ?? this.containerLowest,
       outline: outline ?? this.outline,
+      topBarBackground: topBarBackground ?? this.topBarBackground,
+      topBarText: topBarText ?? this.topBarText,
+      bottomBarBackground: bottomBarBackground ?? this.bottomBarBackground,
+      bottomBarIconColors: bottomBarIconColors ?? this.bottomBarIconColors,
     );
   }
 
@@ -79,6 +91,22 @@ mixin _$SurfaceColorsTailorMixin on ThemeExtension<SurfaceColors> {
       )!,
       containerLowest: Color.lerp(containerLowest, other.containerLowest, t)!,
       outline: Color.lerp(outline, other.outline, t)!,
+      topBarBackground: Color.lerp(
+        topBarBackground,
+        other.topBarBackground,
+        t,
+      )!,
+      topBarText: Color.lerp(topBarText, other.topBarText, t)!,
+      bottomBarBackground: Color.lerp(
+        bottomBarBackground,
+        other.bottomBarBackground,
+        t,
+      )!,
+      bottomBarIconColors: Color.lerp(
+        bottomBarIconColors,
+        other.bottomBarIconColors,
+        t,
+      )!,
     );
   }
 
@@ -127,7 +155,23 @@ mixin _$SurfaceColorsTailorMixin on ThemeExtension<SurfaceColors> {
               containerLowest,
               other.containerLowest,
             ) &&
-            const DeepCollectionEquality().equals(outline, other.outline));
+            const DeepCollectionEquality().equals(outline, other.outline) &&
+            const DeepCollectionEquality().equals(
+              topBarBackground,
+              other.topBarBackground,
+            ) &&
+            const DeepCollectionEquality().equals(
+              topBarText,
+              other.topBarText,
+            ) &&
+            const DeepCollectionEquality().equals(
+              bottomBarBackground,
+              other.bottomBarBackground,
+            ) &&
+            const DeepCollectionEquality().equals(
+              bottomBarIconColors,
+              other.bottomBarIconColors,
+            ));
   }
 
   @override
@@ -145,6 +189,113 @@ mixin _$SurfaceColorsTailorMixin on ThemeExtension<SurfaceColors> {
       const DeepCollectionEquality().hash(containerHighest),
       const DeepCollectionEquality().hash(containerLowest),
       const DeepCollectionEquality().hash(outline),
+      const DeepCollectionEquality().hash(topBarBackground),
+      const DeepCollectionEquality().hash(topBarText),
+      const DeepCollectionEquality().hash(bottomBarBackground),
+      const DeepCollectionEquality().hash(bottomBarIconColors),
+    );
+  }
+}
+
+mixin _$AppBarColorsTailorMixin on ThemeExtension<AppBarColors> {
+  Color get topBarBackground;
+  Color get topBarBorder;
+  Color get topBarText;
+  Color get backButtonColor;
+  Color get iconColor;
+  Color get bottomBarBackground;
+  Color get bottomBarIconColors;
+
+  @override
+  AppBarColors copyWith({
+    Color? topBarBackground,
+    Color? topBarBorder,
+    Color? topBarText,
+    Color? backButtonColor,
+    Color? iconColor,
+    Color? bottomBarBackground,
+    Color? bottomBarIconColors,
+  }) {
+    return AppBarColors(
+      topBarBackground: topBarBackground ?? this.topBarBackground,
+      topBarBorder: topBarBorder ?? this.topBarBorder,
+      topBarText: topBarText ?? this.topBarText,
+      backButtonColor: backButtonColor ?? this.backButtonColor,
+      iconColor: iconColor ?? this.iconColor,
+      bottomBarBackground: bottomBarBackground ?? this.bottomBarBackground,
+      bottomBarIconColors: bottomBarIconColors ?? this.bottomBarIconColors,
+    );
+  }
+
+  @override
+  AppBarColors lerp(covariant ThemeExtension<AppBarColors>? other, double t) {
+    if (other is! AppBarColors) return this as AppBarColors;
+    return AppBarColors(
+      topBarBackground: Color.lerp(
+        topBarBackground,
+        other.topBarBackground,
+        t,
+      )!,
+      topBarBorder: Color.lerp(topBarBorder, other.topBarBorder, t)!,
+      topBarText: Color.lerp(topBarText, other.topBarText, t)!,
+      backButtonColor: Color.lerp(backButtonColor, other.backButtonColor, t)!,
+      iconColor: Color.lerp(iconColor, other.iconColor, t)!,
+      bottomBarBackground: Color.lerp(
+        bottomBarBackground,
+        other.bottomBarBackground,
+        t,
+      )!,
+      bottomBarIconColors: Color.lerp(
+        bottomBarIconColors,
+        other.bottomBarIconColors,
+        t,
+      )!,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is AppBarColors &&
+            const DeepCollectionEquality().equals(
+              topBarBackground,
+              other.topBarBackground,
+            ) &&
+            const DeepCollectionEquality().equals(
+              topBarBorder,
+              other.topBarBorder,
+            ) &&
+            const DeepCollectionEquality().equals(
+              topBarText,
+              other.topBarText,
+            ) &&
+            const DeepCollectionEquality().equals(
+              backButtonColor,
+              other.backButtonColor,
+            ) &&
+            const DeepCollectionEquality().equals(iconColor, other.iconColor) &&
+            const DeepCollectionEquality().equals(
+              bottomBarBackground,
+              other.bottomBarBackground,
+            ) &&
+            const DeepCollectionEquality().equals(
+              bottomBarIconColors,
+              other.bottomBarIconColors,
+            ));
+  }
+
+  @override
+  int get hashCode {
+    return Object.hash(
+      runtimeType.hashCode,
+      const DeepCollectionEquality().hash(topBarBackground),
+      const DeepCollectionEquality().hash(topBarBorder),
+      const DeepCollectionEquality().hash(topBarText),
+      const DeepCollectionEquality().hash(backButtonColor),
+      const DeepCollectionEquality().hash(iconColor),
+      const DeepCollectionEquality().hash(bottomBarBackground),
+      const DeepCollectionEquality().hash(bottomBarIconColors),
     );
   }
 }
@@ -345,6 +496,7 @@ mixin _$AppColorsTailorMixin on ThemeExtension<AppColors> {
   AccentColors get accent;
   StatusColors get status;
   ShimmerColors get shimmer;
+  AppBarColors get appBar;
 
   @override
   AppColors copyWith({
@@ -352,12 +504,14 @@ mixin _$AppColorsTailorMixin on ThemeExtension<AppColors> {
     AccentColors? accent,
     StatusColors? status,
     ShimmerColors? shimmer,
+    AppBarColors? appBar,
   }) {
     return AppColors(
       surface: surface ?? this.surface,
       accent: accent ?? this.accent,
       status: status ?? this.status,
       shimmer: shimmer ?? this.shimmer,
+      appBar: appBar ?? this.appBar,
     );
   }
 
@@ -369,6 +523,7 @@ mixin _$AppColorsTailorMixin on ThemeExtension<AppColors> {
       accent: accent.lerp(other.accent, t),
       status: status.lerp(other.status, t),
       shimmer: shimmer.lerp(other.shimmer, t),
+      appBar: appBar.lerp(other.appBar, t),
     );
   }
 
@@ -380,7 +535,8 @@ mixin _$AppColorsTailorMixin on ThemeExtension<AppColors> {
             const DeepCollectionEquality().equals(surface, other.surface) &&
             const DeepCollectionEquality().equals(accent, other.accent) &&
             const DeepCollectionEquality().equals(status, other.status) &&
-            const DeepCollectionEquality().equals(shimmer, other.shimmer));
+            const DeepCollectionEquality().equals(shimmer, other.shimmer) &&
+            const DeepCollectionEquality().equals(appBar, other.appBar));
   }
 
   @override
@@ -391,6 +547,7 @@ mixin _$AppColorsTailorMixin on ThemeExtension<AppColors> {
       const DeepCollectionEquality().hash(accent),
       const DeepCollectionEquality().hash(status),
       const DeepCollectionEquality().hash(shimmer),
+      const DeepCollectionEquality().hash(appBar),
     );
   }
 }
@@ -401,4 +558,5 @@ extension AppColorsBuildContextProps on BuildContext {
   AccentColors get accent => appColors.accent;
   StatusColors get status => appColors.status;
   ShimmerColors get shimmer => appColors.shimmer;
+  AppBarColors get appBar => appColors.appBar;
 }

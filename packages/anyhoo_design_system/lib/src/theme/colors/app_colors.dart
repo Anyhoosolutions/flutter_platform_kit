@@ -18,6 +18,10 @@ class SurfaceColors extends ThemeExtension<SurfaceColors> with _$SurfaceColorsTa
     required this.containerHighest,
     required this.containerLowest,
     required this.outline,
+    required this.topBarBackground,
+    required this.topBarText,
+    required this.bottomBarBackground,
+    required this.bottomBarIconColors,
   });
 
   @override
@@ -42,6 +46,45 @@ class SurfaceColors extends ThemeExtension<SurfaceColors> with _$SurfaceColorsTa
   final Color containerLowest;
   @override
   final Color outline;
+  @override
+  final Color topBarBackground;
+  @override
+  final Color topBarText;
+
+  @override
+  final Color bottomBarBackground;
+  @override
+  final Color bottomBarIconColors;
+}
+
+@immutable
+@TailorMixinComponent()
+class AppBarColors extends ThemeExtension<AppBarColors> with _$AppBarColorsTailorMixin {
+  const AppBarColors({
+    required this.topBarBackground,
+    required this.topBarBorder,
+    required this.topBarText,
+    required this.backButtonColor,
+    required this.iconColor,
+    required this.bottomBarBackground,
+    required this.bottomBarIconColors,
+  });
+
+  @override
+  final Color topBarBackground;
+  @override
+  final Color topBarBorder;
+  @override
+  final Color topBarText;
+  @override
+  final Color backButtonColor;
+  @override
+  final Color iconColor;
+
+  @override
+  final Color bottomBarBackground;
+  @override
+  final Color bottomBarIconColors;
 }
 
 @immutable
@@ -102,7 +145,13 @@ class ShimmerColors extends ThemeExtension<ShimmerColors> with _$ShimmerColorsTa
 @immutable
 @TailorMixin(themeGetter: ThemeGetter.onBuildContextProps)
 class AppColors extends ThemeExtension<AppColors> with _$AppColorsTailorMixin {
-  const AppColors({required this.surface, required this.accent, required this.status, required this.shimmer});
+  const AppColors({
+    required this.surface,
+    required this.accent,
+    required this.status,
+    required this.shimmer,
+    required this.appBar,
+  });
 
   @override
   final SurfaceColors surface;
@@ -112,4 +161,6 @@ class AppColors extends ThemeExtension<AppColors> with _$AppColorsTailorMixin {
   final StatusColors status;
   @override
   final ShimmerColors shimmer;
+  @override
+  final AppBarColors appBar;
 }

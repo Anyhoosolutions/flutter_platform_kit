@@ -12,3 +12,6 @@ export 'src/widgets/buttons/anyhoo_primary_button.dart';
 export 'src/widgets/buttons/anyhoo_remove_button.dart';
 export 'src/widgets/buttons/anyhoo_secondary_button.dart';
 export 'src/widgets/buttons/anyhoo_round_button.dart';
+
+export 'src/widgets/appBar/bottom_bar.dart';
+export 'src/widgets/appBar/top_bar.dart';

@@ -46,6 +46,19 @@ const slateSkyColors = AppColors(
     containerHighest: Color(0xFFCBD5E1),
     containerLowest: Color(0xFFFFFFFF),
     outline: Color(0xFF94A3B8),
+    topBarBackground: Color.fromARGB(255, 58, 132, 205),
+    topBarText: Color(0xFF0F172A),
+    bottomBarBackground: Color.fromARGB(255, 152, 198, 245),
+    bottomBarIconColors: Color(0xFF0F172A),
+  ),
+  appBar: AppBarColors(
+    topBarBackground: Color(0xFFF5F5F0),
+    topBarBorder: Color(0xFF8E9379),
+    topBarText: Color(0xFF111508),
+    backButtonColor: Color(0xFF111508),
+    iconColor: Color(0xFF111508),
+    bottomBarBackground: Color(0xFFF5F5F0),
+    bottomBarIconColors: Color(0xFF111508),
   ),
   accent: AccentColors(
     primaryFixed: Color(0xFF0284C7),
@@ -56,15 +69,8 @@ const slateSkyColors = AppColors(
     onPrimaryContainer: Color(0xFF0369A1),
     headline: Color(0xFF0F172A),
   ),
-  status: StatusColors(
-    error: Color(0xFFEF4444),
-    warning: Color(0xFFF59E0B),
-    success: Color(0xFF10B981),
-  ),
-  shimmer: ShimmerColors(
-    baseColor: Color(0xFFE2E8F0),
-    highlightColor: Color(0xFFF1F5F9),
-  ),
+  status: StatusColors(error: Color(0xFFEF4444), warning: Color(0xFFF59E0B), success: Color(0xFF10B981)),
+  shimmer: ShimmerColors(baseColor: Color(0xFFE2E8F0), highlightColor: Color(0xFFF1F5F9)),
 );
 
 const slateSkyDarkColors = AppColors(
@@ -80,6 +86,19 @@ const slateSkyDarkColors = AppColors(
     containerHighest: Color(0xFF475569),
     containerLowest: Color(0xFF020617),
     outline: Color(0xFF64748B),
+    topBarBackground: Color.fromARGB(255, 58, 132, 205),
+    topBarText: Color(0xFF0F172A),
+    bottomBarBackground: Color.fromARGB(255, 152, 198, 245),
+    bottomBarIconColors: Color(0xFF0F172A),
+  ),
+  appBar: AppBarColors(
+    topBarBackground: Color(0xFFF5F5F0),
+    topBarBorder: Color(0xFF8E9379),
+    topBarText: Color(0xFF111508),
+    backButtonColor: Color(0xFF111508),
+    iconColor: Color(0xFF111508),
+    bottomBarBackground: Color(0xFFF5F5F0),
+    bottomBarIconColors: Color(0xFF111508),
   ),
   accent: AccentColors(
     primaryFixed: Color(0xFF38BDF8),
@@ -90,15 +109,8 @@ const slateSkyDarkColors = AppColors(
     onPrimaryContainer: Color(0xFFE0F2FE),
     headline: Color(0xFFF8FAFC),
   ),
-  status: StatusColors(
-    error: Color(0xFFF87171),
-    warning: Color(0xFFFBBF24),
-    success: Color(0xFF34D399),
-  ),
-  shimmer: ShimmerColors(
-    baseColor: Color(0xFF1E293B),
-    highlightColor: Color(0xFF334155),
-  ),
+  status: StatusColors(error: Color(0xFFF87171), warning: Color(0xFFFBBF24), success: Color(0xFF34D399)),
+  shimmer: ShimmerColors(baseColor: Color(0xFF1E293B), highlightColor: Color(0xFF334155)),
 );
 
 /// Warm cream surfaces with a terracotta accent.
@@ -115,6 +127,19 @@ const warmTerracottaColors = AppColors(
     containerHighest: Color(0xFFD4C4B0),
     containerLowest: Color(0xFFFFFBF7),
     outline: Color(0xFFA89080),
+    topBarBackground: Color.fromARGB(255, 152, 198, 245),
+    topBarText: Color(0xFF0F172A),
+    bottomBarBackground: Color.fromARGB(255, 152, 198, 245),
+    bottomBarIconColors: Color(0xFF0F172A),
+  ),
+  appBar: AppBarColors(
+    topBarBackground: Color(0xFFF5F5F0),
+    topBarBorder: Color(0xFF8E9379),
+    topBarText: Color(0xFF111508),
+    backButtonColor: Color(0xFF111508),
+    iconColor: Color(0xFF111508),
+    bottomBarBackground: Color(0xFFF5F5F0),
+    bottomBarIconColors: Color(0xFF111508),
   ),
   accent: AccentColors(
     primaryFixed: Color(0xFFC45C26),
@@ -125,15 +150,8 @@ const warmTerracottaColors = AppColors(
     onPrimaryContainer: Color(0xFF8B3A14),
     headline: Color(0xFF2C1810),
   ),
-  status: StatusColors(
-    error: Color(0xFFDC2626),
-    warning: Color(0xFFD97706),
-    success: Color(0xFF059669),
-  ),
-  shimmer: ShimmerColors(
-    baseColor: Color(0xFFE8D9C8),
-    highlightColor: Color(0xFFF5EDE3),
-  ),
+  status: StatusColors(error: Color(0xFFDC2626), warning: Color(0xFFD97706), success: Color(0xFF059669)),
+  shimmer: ShimmerColors(baseColor: Color(0xFFE8D9C8), highlightColor: Color(0xFFF5EDE3)),
 );
 
 const warmTerracottaDarkColors = AppColors(
@@ -149,6 +167,19 @@ const warmTerracottaDarkColors = AppColors(
     containerHighest: Color(0xFF4A372C),
     containerLowest: Color(0xFF120C09),
     outline: Color(0xFF8B6F5C),
+    topBarBackground: Color.fromARGB(255, 152, 198, 245),
+    topBarText: Color(0xFF0F172A),
+    bottomBarBackground: Color.fromARGB(255, 152, 198, 245),
+    bottomBarIconColors: Color(0xFF0F172A),
+  ),
+  appBar: AppBarColors(
+    topBarBackground: Color(0xFFF5F5F0),
+    topBarBorder: Color(0xFF8E9379),
+    topBarText: Color(0xFF111508),
+    backButtonColor: Color(0xFF111508),
+    iconColor: Color(0xFF111508),
+    bottomBarBackground: Color(0xFFF5F5F0),
+    bottomBarIconColors: Color(0xFF111508),
   ),
   accent: AccentColors(
     primaryFixed: Color(0xFFE07A45),
@@ -159,13 +190,6 @@ const warmTerracottaDarkColors = AppColors(
     onPrimaryContainer: Color(0xFFFCE8DC),
     headline: Color(0xFFF5EDE3),
   ),
-  status: StatusColors(
-    error: Color(0xFFF87171),
-    warning: Color(0xFFFBBF24),
-    success: Color(0xFF34D399),
-  ),
-  shimmer: ShimmerColors(
-    baseColor: Color(0xFF2C1F18),
-    highlightColor: Color(0xFF3D2C22),
-  ),
+  status: StatusColors(error: Color(0xFFF87171), warning: Color(0xFFFBBF24), success: Color(0xFF34D399)),
+  shimmer: ShimmerColors(baseColor: Color(0xFF2C1F18), highlightColor: Color(0xFF3D2C22)),
 );
