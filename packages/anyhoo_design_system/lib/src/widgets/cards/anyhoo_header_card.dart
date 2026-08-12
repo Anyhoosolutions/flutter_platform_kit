@@ -17,74 +17,57 @@ class AnyhooHeaderCard extends StatelessWidget {
   final Widget child;
   final IconData? leadingIcon;
 
-  static const _level1Shadow = [
-    BoxShadow(
-      color: Color(0x0D000000),
-      offset: Offset(0, 2),
-      blurRadius: 4,
-    ),
-  ];
-
   @override
   Widget build(BuildContext context) {
     final surface = context.surface;
     final accent = context.accent;
 
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: surface.cardBackground,
-        borderRadius: BorderRadius.circular(DesignTokens.radiusXl),
-        border: Border.all(color: surface.cardBorder.withValues(alpha: 0.3)),
-        boxShadow: _level1Shadow,
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(DesignTokens.radiusXl),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ColoredBox(
-              color: accent.primaryContainer,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: DesignTokens.spacingMd,
-                  vertical: 12,
-                ),
-                child: Row(
-                  children: [
-                    if (leadingIcon != null) ...[
-                      Icon(leadingIcon, size: 20, color: accent.onPrimaryContainer),
-                      const SizedBox(width: DesignTokens.spacingSm),
-                    ],
-                    Expanded(
-                      child: Text(
-                        title,
-                        style: AppFonts.inter.copyWith(
-                          fontSize: 20,
-                          height: 28 / 20,
-                          fontWeight: FontWeight.w600,
-                          color: accent.onPrimaryContainer,
-                        ),
+    return AnyhooCardShell(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ColoredBox(
+            color: accent.primaryContainer,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: DesignTokens.spacingMd,
+                vertical: 12,
+              ),
+              child: Row(
+                children: [
+                  if (leadingIcon != null) ...[
+                    Icon(leadingIcon, size: 20, color: accent.onPrimaryContainer),
+                    const SizedBox(width: DesignTokens.spacingSm),
+                  ],
+                  Expanded(
+                    child: Text(
+                      title,
+                      style: AppFonts.inter.copyWith(
+                        fontSize: 20,
+                        height: 28 / 20,
+                        fontWeight: FontWeight.w600,
+                        color: accent.onPrimaryContainer,
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(DesignTokens.spacingMd),
-              child: DefaultTextStyle(
-                style: AppFonts.inter.copyWith(
-                  fontSize: 14,
-                  height: 20 / 14,
-                  fontWeight: FontWeight.w400,
-                  color: surface.secondaryText,
-                ),
-                child: child,
+          ),
+          Padding(
+            padding: const EdgeInsets.all(DesignTokens.spacingMd),
+            child: DefaultTextStyle(
+              style: AppFonts.inter.copyWith(
+                fontSize: 14,
+                height: 20 / 14,
+                fontWeight: FontWeight.w400,
+                color: surface.secondaryText,
               ),
+              child: child,
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

@@ -43,6 +43,8 @@ dependencies:
     path: ../packages/anyhoo_search_bar
   anyhoo_design_system:
     path: ../packages/anyhoo_design_system
+  anyhoo_widget_extension_methods:
+    path: ../packages/anyhoo_widget_extension_methods
 
 dev_dependencies:
   flutter_test:
