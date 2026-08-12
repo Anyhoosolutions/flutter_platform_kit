@@ -15,3 +15,5 @@ export 'src/widgets/buttons/anyhoo_round_button.dart';
 
 export 'src/widgets/appBar/bottom_bar.dart';
 export 'src/widgets/appBar/top_bar.dart';
+
+export 'src/widgets/cards/anyhoo_header_card.dart';
