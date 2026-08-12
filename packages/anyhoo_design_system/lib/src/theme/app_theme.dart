@@ -25,10 +25,7 @@ class AnyhooTheme {
       useMaterial3: true,
       brightness: brightness,
       scaffoldBackgroundColor: surface.scaffoldBackground,
-      extensions: [
-        colors,
-        ...?extraExtensions,
-      ],
+      extensions: [colors, ...?extraExtensions],
       appBarTheme: AppBarTheme(
         backgroundColor: surface.scaffoldBackground,
         foregroundColor: surface.primaryText,

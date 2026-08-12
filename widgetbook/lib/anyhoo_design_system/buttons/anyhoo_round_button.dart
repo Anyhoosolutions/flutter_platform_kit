@@ -11,6 +11,6 @@ Widget buildAnyhooRoundButton(BuildContext context) {
 
   return DesignSystemDeviceFrameWrapper.wrapInDeviceFrame(
     context,
-    AnyhooButtonsGallery(enabled: enabled),
+    SafeArea(child: AnyhooButtonsGallery(enabled: enabled)),
   );
 }

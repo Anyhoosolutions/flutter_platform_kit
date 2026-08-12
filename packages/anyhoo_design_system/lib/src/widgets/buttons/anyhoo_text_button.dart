@@ -2,11 +2,11 @@ import 'package:anyhoo_design_system/anyhoo_design_system.dart';
 import 'package:anyhoo_design_system/src/widgets/buttons/anyhoo_button_content.dart';
 import 'package:flutter/material.dart';
 
-/// Outlined secondary action button (Kinetic Logic).
+/// Text-only action button (Kinetic Logic).
 ///
-/// Surface fill, outline border, primary-colored label, 48px height, 8px radius.
-class AnyhooSecondaryButton extends StatelessWidget {
-  const AnyhooSecondaryButton({
+/// Primary-colored label, no fill or border, 48px height, 8px radius hit target.
+class AnyhooTextButton extends StatelessWidget {
+  const AnyhooTextButton({
     super.key,
     required this.label,
     required this.onPressed,
@@ -29,13 +29,11 @@ class AnyhooSecondaryButton extends StatelessWidget {
     final accent = context.accent;
     final surface = context.surface;
 
-    final button = OutlinedButton(
+    final button = TextButton(
       onPressed: onPressed,
-      style: OutlinedButton.styleFrom(
+      style: TextButton.styleFrom(
         foregroundColor: accent.primaryFixed,
-        backgroundColor: surface.scaffoldBackground,
         disabledForegroundColor: accent.primaryDisabled,
-        side: BorderSide(color: onPressed != null ? surface.outline : surface.cardBorder),
         minimumSize: Size(fullWidth ? double.infinity : _minWidth, _height),
         maximumSize: const Size(double.infinity, _height),
         padding: const EdgeInsets.symmetric(horizontal: DesignTokens.spacingLg),
