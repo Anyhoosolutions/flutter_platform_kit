@@ -119,10 +119,12 @@ class AccentColors extends ThemeExtension<AccentColors> with _$AccentColorsTailo
 @immutable
 @TailorMixinComponent()
 class StatusColors extends ThemeExtension<StatusColors> with _$StatusColorsTailorMixin {
-  const StatusColors({required this.error, required this.warning, required this.success});
+  const StatusColors({required this.error, required this.errorContainer, required this.warning, required this.success});
 
   @override
   final Color error;
+  @override
+  final Color errorContainer;
   @override
   final Color warning;
   @override

@@ -4,22 +4,17 @@ import 'package:flutter/material.dart';
 
 /// Simple elevated card with title, body, and an optional text action.
 class AnyhooErrorCard extends StatelessWidget {
-  const AnyhooErrorCard({super.key, required this.title, required this.child, this.actionLabel, this.onAction});
+  const AnyhooErrorCard({super.key, required this.title, required this.child});
 
   final String title;
   final Widget child;
-  final String? actionLabel;
-  final VoidCallback? onAction;
 
   @override
   Widget build(BuildContext context) {
-    final surface = context.surface;
-    final accent = context.accent;
     final status = context.status;
-    final showAction = actionLabel != null && onAction != null;
 
     return AnyhooCardShell(
-      backgroundColor: Colors.red.shade200,
+      backgroundColor: status.errorContainer,
       padding: const EdgeInsets.all(DesignTokens.spacingMd),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -45,36 +40,10 @@ class AnyhooErrorCard extends StatelessWidget {
               fontSize: 14,
               height: 20 / 14,
               fontWeight: FontWeight.w400,
-              color: surface.secondaryText,
+              color: status.error,
             ),
             child: child,
           ),
-          if (showAction) ...[
-            const SizedBox(height: DesignTokens.spacingSm),
-            Divider(height: DesignTokens.spacingSm * 2, color: surface.cardBorder.withValues(alpha: 0.2)),
-            Align(
-              alignment: Alignment.centerRight,
-              child: TextButton(
-                onPressed: onAction,
-                style: TextButton.styleFrom(
-                  foregroundColor: accent.primaryFixed,
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: DesignTokens.spacingSm),
-                  minimumSize: Size.zero,
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                ),
-                child: Text(
-                  actionLabel!.toUpperCase(),
-                  style: AppFonts.inter.copyWith(
-                    fontSize: 12,
-                    height: 16 / 12,
-                    fontWeight: FontWeight.w500,
-                    letterSpacing: 0.5,
-                    color: status.error,
-                  ),
-                ),
-              ),
-            ),
-          ],
         ],
       ),
     );

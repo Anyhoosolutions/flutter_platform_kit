@@ -405,13 +405,20 @@ mixin _$AccentColorsTailorMixin on ThemeExtension<AccentColors> {
 
 mixin _$StatusColorsTailorMixin on ThemeExtension<StatusColors> {
   Color get error;
+  Color get errorContainer;
   Color get warning;
   Color get success;
 
   @override
-  StatusColors copyWith({Color? error, Color? warning, Color? success}) {
+  StatusColors copyWith({
+    Color? error,
+    Color? errorContainer,
+    Color? warning,
+    Color? success,
+  }) {
     return StatusColors(
       error: error ?? this.error,
+      errorContainer: errorContainer ?? this.errorContainer,
       warning: warning ?? this.warning,
       success: success ?? this.success,
     );
@@ -422,6 +429,7 @@ mixin _$StatusColorsTailorMixin on ThemeExtension<StatusColors> {
     if (other is! StatusColors) return this as StatusColors;
     return StatusColors(
       error: Color.lerp(error, other.error, t)!,
+      errorContainer: Color.lerp(errorContainer, other.errorContainer, t)!,
       warning: Color.lerp(warning, other.warning, t)!,
       success: Color.lerp(success, other.success, t)!,
     );
@@ -433,6 +441,10 @@ mixin _$StatusColorsTailorMixin on ThemeExtension<StatusColors> {
         (other.runtimeType == runtimeType &&
             other is StatusColors &&
             const DeepCollectionEquality().equals(error, other.error) &&
+            const DeepCollectionEquality().equals(
+              errorContainer,
+              other.errorContainer,
+            ) &&
             const DeepCollectionEquality().equals(warning, other.warning) &&
             const DeepCollectionEquality().equals(success, other.success));
   }
@@ -442,6 +454,7 @@ mixin _$StatusColorsTailorMixin on ThemeExtension<StatusColors> {
     return Object.hash(
       runtimeType.hashCode,
       const DeepCollectionEquality().hash(error),
+      const DeepCollectionEquality().hash(errorContainer),
       const DeepCollectionEquality().hash(warning),
       const DeepCollectionEquality().hash(success),
     );

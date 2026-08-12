@@ -69,7 +69,12 @@ const slateSkyColors = AppColors(
     onPrimaryContainer: Color(0xFF0369A1),
     headline: Color(0xFF0F172A),
   ),
-  status: StatusColors(error: Color(0xFFEF4444), warning: Color(0xFFF59E0B), success: Color(0xFF10B981)),
+  status: StatusColors(
+    error: Color(0xFFEF4444),
+    errorContainer: Color(0xFF93000a),
+    warning: Color(0xFFF59E0B),
+    success: Color(0xFF10B981),
+  ),
   shimmer: ShimmerColors(baseColor: Color(0xFFE2E8F0), highlightColor: Color(0xFFF1F5F9)),
 );
 
@@ -109,7 +114,12 @@ const slateSkyDarkColors = AppColors(
     onPrimaryContainer: Color(0xFFE0F2FE),
     headline: Color(0xFFF8FAFC),
   ),
-  status: StatusColors(error: Color(0xFFF87171), warning: Color(0xFFFBBF24), success: Color(0xFF34D399)),
+  status: StatusColors(
+    error: Color(0xFFF87171),
+    errorContainer: Color(0xFF93000a),
+    warning: Color(0xFFFBBF24),
+    success: Color(0xFF34D399),
+  ),
   shimmer: ShimmerColors(baseColor: Color(0xFF1E293B), highlightColor: Color(0xFF334155)),
 );
 
@@ -150,7 +160,12 @@ const warmTerracottaColors = AppColors(
     onPrimaryContainer: Color(0xFF8B3A14),
     headline: Color(0xFF2C1810),
   ),
-  status: StatusColors(error: Color(0xFFDC2626), warning: Color(0xFFD97706), success: Color(0xFF059669)),
+  status: StatusColors(
+    error: Color(0xFFDC2626),
+    errorContainer: Color(0xFF93000a),
+    warning: Color(0xFFD97706),
+    success: Color(0xFF059669),
+  ),
   shimmer: ShimmerColors(baseColor: Color(0xFFE8D9C8), highlightColor: Color(0xFFF5EDE3)),
 );
 
@@ -190,6 +205,11 @@ const warmTerracottaDarkColors = AppColors(
     onPrimaryContainer: Color(0xFFFCE8DC),
     headline: Color(0xFFF5EDE3),
   ),
-  status: StatusColors(error: Color(0xFFF87171), warning: Color(0xFFFBBF24), success: Color(0xFF34D399)),
+  status: StatusColors(
+    error: Color(0xFFF87171),
+    errorContainer: Color(0xFF93000a),
+    warning: Color(0xFFFBBF24),
+    success: Color(0xFF34D399),
+  ),
   shimmer: ShimmerColors(baseColor: Color(0xFF2C1F18), highlightColor: Color(0xFF3D2C22)),
 );

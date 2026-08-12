@@ -5,12 +5,14 @@ import 'package:flutter/material.dart';
 class AnyhooStandardCard extends StatelessWidget {
   const AnyhooStandardCard({
     super.key,
+    this.prefixIcon,
     required this.title,
     required this.child,
     this.actionLabel,
     this.onAction,
   });
 
+  final IconData? prefixIcon;
   final String title;
   final Widget child;
   final String? actionLabel;
@@ -28,14 +30,22 @@ class AnyhooStandardCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(
-            title,
-            style: AppFonts.inter.copyWith(
-              fontSize: 20,
-              height: 28 / 20,
-              fontWeight: FontWeight.w600,
-              color: surface.primaryText,
-            ),
+          Row(
+            children: [
+              if (prefixIcon != null) ...[
+                Icon(prefixIcon!, color: accent.primaryFixed),
+                const SizedBox(width: DesignTokens.spacingSm),
+              ],
+              Text(
+                title,
+                style: AppFonts.inter.copyWith(
+                  fontSize: 20,
+                  height: 28 / 20,
+                  fontWeight: FontWeight.w600,
+                  color: surface.primaryText,
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: DesignTokens.spacingSm),
           DefaultTextStyle(
@@ -56,10 +66,7 @@ class AnyhooStandardCard extends StatelessWidget {
                 onPressed: onAction,
                 style: TextButton.styleFrom(
                   foregroundColor: accent.primaryFixed,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: DesignTokens.spacingSm,
-                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: DesignTokens.spacingSm),
                   minimumSize: Size.zero,
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),

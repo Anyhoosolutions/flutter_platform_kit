@@ -17,7 +17,8 @@ const defaultAccentColors = AccentColors(
 );
 
 const defaultStatusColors = StatusColors(
-  error: DesignTokens.errorRed,
+  error: Color(0xFF93000a),
+  errorContainer: Color(0xFFffdad6),
   warning: Color(0xFFF59E0B),
   success: Color(0xFF2170E4),
 );
@@ -83,7 +84,8 @@ const defaultDarkColors = AppColors(
     headline: DesignTokens.primaryFixedDim,
   ),
   status: StatusColors(
-    error: Color(0xFFFFB4AB),
+    error: Color(0xFF93000a),
+    errorContainer: Color(0xFFFFB4AB),
     warning: Color(0xFFFBBF24),
     success: DesignTokens.primaryFixedDim,
   ),

@@ -35,13 +35,21 @@ class _AnyhooCardsGallery extends StatelessWidget {
                 'This is a simple elevated card with standard padding. It uses Level 1 elevation to lift slightly off the background.',
               ),
             ),
+            const SizedBox(height: DesignTokens.spacingMd),
+            AnyhooStandardCard(
+              prefixIcon: Icons.palette,
+              title: 'Standard Card with icon',
+              actionLabel: 'Action',
+              onAction: () {},
+              child: const Text(
+                'This is a simple elevated card with standard padding. It uses Level 1 elevation to lift slightly off the background.',
+              ),
+            ),
             const SizedBox(height: DesignTokens.spacingLg),
 
             'Different background color'.headline(size: HeadlineSize.tiny).pad(b: 4),
             AnyhooErrorCard(
               title: 'Warning',
-              actionLabel: 'OK',
-              onAction: () {},
               child: const Text(
                 'This is a simple elevated card with standard padding. It uses Level 1 elevation to lift slightly off the background.',
               ),
