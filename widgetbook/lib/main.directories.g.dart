@@ -29,6 +29,8 @@ import 'package:widgetbook_workspace/anyhoo_design_system/buttons/anyhoo_round_b
     as _widgetbook_workspace_anyhoo_design_system_buttons_anyhoo_round_button;
 import 'package:widgetbook_workspace/anyhoo_design_system/cards/anyhoo_cards_gallery.dart'
     as _widgetbook_workspace_anyhoo_design_system_cards_anyhoo_cards_gallery;
+import 'package:widgetbook_workspace/anyhoo_design_system/chips/anyhoo_chips_gallery.dart'
+    as _widgetbook_workspace_anyhoo_design_system_chips_anyhoo_chips_gallery;
 import 'package:widgetbook_workspace/anyhoo_design_system/controls/anyhoo_controls_gallery.dart'
     as _widgetbook_workspace_anyhoo_design_system_controls_anyhoo_controls_gallery;
 import 'package:widgetbook_workspace/anyhoo_design_system/feedback/anyhoo_feedback_gallery.dart'
@@ -166,6 +168,22 @@ final directories = <_widgetbook.WidgetbookNode>[
                 builder:
                     _widgetbook_workspace_anyhoo_design_system_cards_anyhoo_cards_gallery
                         .buildAnyhooCardsGallery,
+              ),
+            ],
+          ),
+        ],
+      ),
+      _widgetbook.WidgetbookFolder(
+        name: 'chips',
+        children: [
+          _widgetbook.WidgetbookComponent(
+            name: 'AnyhooChip',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Gallery',
+                builder:
+                    _widgetbook_workspace_anyhoo_design_system_chips_anyhoo_chips_gallery
+                        .buildAnyhooChipsGallery,
               ),
             ],
           ),

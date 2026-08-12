@@ -43,4 +43,6 @@ export 'src/widgets/feedback/anyhoo_banner.dart';
 export 'src/widgets/feedback/anyhoo_dialog.dart';
 export 'src/widgets/feedback/anyhoo_toast.dart';
 
+export 'src/widgets/chips/anyhoo_chip.dart';
+
 export 'src/widgets/typography/anyhoo_text.dart';

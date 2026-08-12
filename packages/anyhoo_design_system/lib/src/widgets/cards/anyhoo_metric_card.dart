@@ -64,22 +64,10 @@ class AnyhooMetricCard extends StatelessWidget {
                       ),
                       const Spacer(),
                       if (badgeLabel != null)
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: surface.containerHigh,
-                            borderRadius: BorderRadius.circular(999),
-                          ),
-                          child: Text(
-                            badgeLabel!,
-                            style: AppFonts.inter.copyWith(
-                              fontSize: 12,
-                              height: 16 / 12,
-                              fontWeight: FontWeight.w500,
-                              letterSpacing: 0.5,
-                              color: surface.secondaryText,
-                            ),
-                          ),
+                        AnyhooChip(
+                          label: badgeLabel!,
+                          variant: AnyhooChipVariant.surface,
+                          shape: AnyhooChipShape.pill,
                         ),
                     ],
                   ),
