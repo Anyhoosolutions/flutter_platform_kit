@@ -1,39 +1,24 @@
-<!--
-This README describes the package. If you publish this package to pub.dev,
-this README's contents appear on the landing page for your package.
+# anyhoo_design_system
 
-For information about how to write a good package README, see the guide for
-[writing package pages](https://dart.dev/tools/pub/writing-package-pages).
-
-For general information about developing packages, see the Dart guide for
-[creating packages](https://dart.dev/guides/libraries/create-packages)
-and the Flutter guide for
-[developing packages and plugins](https://flutter.dev/to/develop-packages).
--->
-
-TODO: Put a short description of the package here that helps potential users
-know whether this package might be useful for them.
-
-## Features
-
-TODO: List what your package can do. Maybe include images, gifs, or videos.
+Core design tokens, `ThemeTailor`-based themes, and reusable UI components for Anyhoo Flutter apps.
 
 ## Getting started
 
-TODO: List prerequisites and provide or point to information on how to
-start using the package.
+Add as a path dependency, then use `AnyhooTheme.light()` / `AnyhooTheme.dark()` (optionally with custom `AppColors`).
 
-## Usage
+Full setup, theme overrides, domain extensions, and Widgetbook gallery reuse:
 
-TODO: Include short and useful examples for package users. Add longer examples
-to `/example` folder.
+→ [`docs/anyhoo_design_system_guide.md`](docs/anyhoo_design_system_guide.md)
+
+## Widgetbook galleries
+
+Shared component demos are exported separately so apps can reuse them under their own theme without copying layout code:
 
 ```dart
-const like = 'sample';
+import 'package:anyhoo_design_system/galleries.dart';
+
+// Wrap with your app's AnyhooTheme in Widgetbook:
+const AnyhooCardsGallery();
 ```
 
-## Additional information
-
-TODO: Tell users more about the package: where to find more information, how to
-contribute to the package, how to file issues, what response they can expect
-from the package authors, and more.
+See [§4 in the integration guide](docs/anyhoo_design_system_guide.md#4-reusing-design-system-galleries-in-app-widgetbook) for the full gallery list and UseCase examples.

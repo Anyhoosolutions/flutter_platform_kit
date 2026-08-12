@@ -159,7 +159,81 @@ void main() {
 
 ---
 
-## 4. Extending with App-Specific Domain Tokens
+## 4. Reusing Design-System Galleries in App Widgetbook
+
+Do **not** copy gallery layout code from the platform-kit Widgetbook. Shared demos live in a secondary package export so each app can show the same widgets under its own theme.
+
+| Where | Responsibility |
+|---|---|
+| `package:anyhoo_design_system/galleries.dart` | Theme-agnostic gallery / composition widgets |
+| App (or kit) Widgetbook | `@UseCase`, knobs, device frame, and **your** `AnyhooTheme` |
+
+### Import
+
+```dart
+import 'package:anyhoo_design_system/galleries.dart';
+```
+
+Keep this separate from `anyhoo_design_system.dart` so production apps only pull demos when they opt in.
+
+### Available galleries
+
+| Widget | Contents |
+|---|---|
+| `AnyhooCardsGallery` | Standard, header, profile, media, metric, image-background, error cards |
+| `AnyhooButtonsGallery` | Round / add / minus / remove (`enabled` optional) |
+| `AnyhooChipsGallery` | Chip variants, shapes, icons |
+| `AnyhooControlsGallery` | Switch, checkbox, radio, progress, skeleton, list |
+| `AnyhooFormsGallery` | Search, segmented control, sliders, date picker |
+| `AnyhooFeedbackGallery` | Banner, dialog, toast |
+| `AnyhooNavigationGallery` | Breadcrumb, stepper, expansion, empty state |
+| `AnyhooDataGallery` | Data table, filter chips, badges, preference list |
+| `AnyhooTypographyGallery` | Display / headline / body / label scale |
+| `AnyhooAppBarGallery` | Top bar + bottom bar |
+| `AnyhooExecutiveDashboardScreen` | Composition: metrics + table + nav |
+| `AnyhooAppSettingsScreen` | Composition: profile + settings sections |
+
+### Widgetbook UseCase example
+
+Wire a thin UseCase that injects the app theme around a shared gallery:
+
+```dart
+import 'package:anyhoo_design_system/anyhoo_design_system.dart';
+import 'package:anyhoo_design_system/galleries.dart';
+import 'package:flutter/material.dart';
+import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
+import 'theme/app_colors_override.dart'; // your AppColors
+
+@widgetbook.UseCase(name: 'Gallery', type: AnyhooStandardCard, path: 'design_system/cards')
+Widget cardsGallery(BuildContext context) {
+  return MaterialApp(
+    debugShowCheckedModeBanner: false,
+    theme: AnyhooTheme.light(colors: myCustomLightColors),
+    darkTheme: AnyhooTheme.dark(colors: myCustomLightColors),
+    home: const Scaffold(body: AnyhooCardsGallery()),
+  );
+}
+```
+
+For buttons with knobs:
+
+```dart
+@widgetbook.UseCase(name: 'Default', type: AnyhooRoundButton, path: 'design_system/buttons')
+Widget buttonsGallery(BuildContext context) {
+  final enabled = context.knobs.boolean(label: 'Enabled', initialValue: true);
+  return MaterialApp(
+    theme: AnyhooTheme.light(colors: myCustomLightColors),
+    darkTheme: AnyhooTheme.dark(colors: myCustomLightColors),
+    home: Scaffold(body: AnyhooButtonsGallery(enabled: enabled)),
+  );
+}
+```
+
+Optional: wrap with a device-frame helper (see the platform-kit `DesignSystemDeviceFrameWrapper` for a reference). Prefer focusing the app Widgetbook on **app screens** plus a curated subset of these galleries under the app brand; the full default-theme catalog remains in the platform-kit Widgetbook.
+
+---
+
+## 5. Extending with App-Specific Domain Tokens
 
 When an app requires tokens specific to its domain (e.g., specialized status badges, chart colors, or feature themes) without modifying `anyhoo_design_system`, pass them via `extraExtensions`.
 
