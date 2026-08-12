@@ -29,6 +29,8 @@ import 'package:widgetbook_workspace/anyhoo_design_system/buttons/anyhoo_round_b
     as _widgetbook_workspace_anyhoo_design_system_buttons_anyhoo_round_button;
 import 'package:widgetbook_workspace/anyhoo_design_system/cards/anyhoo_cards_gallery.dart'
     as _widgetbook_workspace_anyhoo_design_system_cards_anyhoo_cards_gallery;
+import 'package:widgetbook_workspace/anyhoo_design_system/typography/anyhoo_typography_gallery.dart'
+    as _widgetbook_workspace_anyhoo_design_system_typography_anyhoo_typography_gallery;
 import 'package:widgetbook_workspace/anyhoo_firebase/firebase_analytics_page.dart'
     as _widgetbook_workspace_anyhoo_firebase_firebase_analytics_page;
 import 'package:widgetbook_workspace/anyhoo_form_builder_widgets/anyhoo_form_builder_multi_select.dart'
@@ -160,6 +162,22 @@ final directories = <_widgetbook.WidgetbookNode>[
                 builder:
                     _widgetbook_workspace_anyhoo_design_system_cards_anyhoo_cards_gallery
                         .buildAnyhooCardsGallery,
+              ),
+            ],
+          ),
+        ],
+      ),
+      _widgetbook.WidgetbookFolder(
+        name: 'typography',
+        children: [
+          _widgetbook.WidgetbookComponent(
+            name: 'AnyhooHeadline',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Gallery',
+                builder:
+                    _widgetbook_workspace_anyhoo_design_system_typography_anyhoo_typography_gallery
+                        .buildAnyhooTypographyGallery,
               ),
             ],
           ),
