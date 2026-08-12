@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:widgetbook/widgetbook.dart';
 import 'package:widgetbook_workspace/anyhoo_design_system/showcase_themes.dart';
 import 'package:widgetbook_workspace/helpers/device_frame_widget.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 /// Device-frame wrapper for `anyhoo_design_system` showcases.
 ///
@@ -45,6 +46,13 @@ class DesignSystemDeviceFrameWrapper {
         debugShowCheckedModeBanner: false,
         theme: showcaseTheme.lightTheme(),
         darkTheme: showcaseTheme.darkTheme(),
+        localizationsDelegates: [
+          // AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: const [Locale('en'), Locale('sv')],
         themeMode: themeMode,
         home: Scaffold(body: child),
       ),

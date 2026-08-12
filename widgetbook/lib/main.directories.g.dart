@@ -23,8 +23,8 @@ import 'package:widgetbook_workspace/anyhoo_core/error_page.dart'
     as _widgetbook_workspace_anyhoo_core_error_page;
 import 'package:widgetbook_workspace/anyhoo_core/waiting_page.dart'
     as _widgetbook_workspace_anyhoo_core_waiting_page;
-import 'package:widgetbook_workspace/anyhoo_design_system/anyhoo_round_button.dart'
-    as _widgetbook_workspace_anyhoo_design_system_anyhoo_round_button;
+import 'package:widgetbook_workspace/anyhoo_design_system/buttons/anyhoo_round_button.dart'
+    as _widgetbook_workspace_anyhoo_design_system_buttons_anyhoo_round_button;
 import 'package:widgetbook_workspace/anyhoo_firebase/firebase_analytics_page.dart'
     as _widgetbook_workspace_anyhoo_firebase_firebase_analytics_page;
 import 'package:widgetbook_workspace/anyhoo_form_builder_widgets/anyhoo_form_builder_multi_select.dart'
@@ -113,14 +113,19 @@ final directories = <_widgetbook.WidgetbookNode>[
   _widgetbook.WidgetbookFolder(
     name: 'anyhoo_design_system',
     children: [
-      _widgetbook.WidgetbookComponent(
-        name: 'AnyhooRoundButton',
-        useCases: [
-          _widgetbook.WidgetbookUseCase(
-            name: 'Default',
-            builder:
-                _widgetbook_workspace_anyhoo_design_system_anyhoo_round_button
-                    .buildAnyhooRoundButton,
+      _widgetbook.WidgetbookFolder(
+        name: 'buttons',
+        children: [
+          _widgetbook.WidgetbookComponent(
+            name: 'AnyhooRoundButton',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Default',
+                builder:
+                    _widgetbook_workspace_anyhoo_design_system_buttons_anyhoo_round_button
+                        .buildAnyhooRoundButton,
+              ),
+            ],
           ),
         ],
       ),

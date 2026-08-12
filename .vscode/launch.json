@@ -1,40 +1,56 @@
 {
-  "version": "0.2.0",
-  "configurations": [
-    {
-      "name": "example_app (Chrome)",
-      "request": "launch",
-      "type": "dart",
-      "program": "example_app/lib/main.dart",
-      "deviceId": "chrome",
-      "args": [
-        "--dart-define=LOCATION=America/Boston",
-        "--dart-define=CURRENT_TIME=2025-04-29T11:22:59.000Z"
-      ]
-    },
-    {
-      "name": "example_app (Android Emulator)",
-      "request": "launch",
-      "type": "dart",
-      "program": "example_app/lib/main.dart",
-      "deviceId": "emulator-5554",
-      "args": []
-    },
-    {
-      "name": "example_app (Android Device - Pixel 4)",
-      "request": "launch",
-      "type": "dart",
-      "program": "example_app/lib/main.dart",
-      "deviceId": "9B271FFBA0010W",
-      "args": []
-    },
-    {
-      "name": "example_app (iOS Simulator)",
-      "request": "launch",
-      "type": "dart",
-      "program": "example_app/lib/main.dart",
-      "deviceId": "ios",
-      "args": []
-    }
-  ]
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"name": "example_app (Chrome)",
+			"request": "launch",
+			"type": "dart",
+			"program": "example_app/lib/main.dart",
+			"deviceId": "chrome",
+			"args": [
+				"--dart-define=LOCATION=America/Boston",
+				"--dart-define=CURRENT_TIME=2025-04-29T11:22:59.000Z"
+			]
+		},
+		{
+			"name": "example_app (Android Emulator)",
+			"request": "launch",
+			"type": "dart",
+			"program": "example_app/lib/main.dart",
+			"deviceId": "emulator-5554",
+			"args": []
+		},
+		{
+			"name": "example_app (Android Device - Pixel 4)",
+			"request": "launch",
+			"type": "dart",
+			"program": "example_app/lib/main.dart",
+			"deviceId": "9B271FFBA0010W",
+			"args": []
+		},
+		{
+			"name": "example_app (iOS Simulator)",
+			"request": "launch",
+			"type": "dart",
+			"program": "example_app/lib/main.dart",
+			"deviceId": "ios",
+			"args": []
+		},
+		{
+			"name": "Launch Widgetbook (chrome)",
+			"request": "launch",
+			"type": "dart",
+			"program": "lib/main.dart",
+			"cwd": "${workspaceFolder}/widgetbook",
+			"args": ["-d", "chrome", "--web-port", "45678"]
+		},
+		{
+			"name": "Launch Widgetbook (macos)",
+			"request": "launch",
+			"type": "dart",
+			"program": "lib/main.dart",
+			"cwd": "${workspaceFolder}/widgetbook",
+			"args": ["-d", "macos", "--web-port", "45678"]
+		}
+	]
 }

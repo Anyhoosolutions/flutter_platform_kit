@@ -9,6 +9,7 @@ workspace:
   - packages/anyhoo_app_bar
   - packages/anyhoo_auth
   - packages/anyhoo_core
+  - packages/anyhoo_design_system
   - packages/anyhoo_extension_methods
   - packages/anyhoo_firebase
   - packages/anyhoo_form_builder_widgets
