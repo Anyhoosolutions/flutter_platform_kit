@@ -1,18 +1,23 @@
 import 'package:anyhoo_design_system/anyhoo_design_system.dart';
+import 'package:anyhoo_widget_extension_methods/anyhoo_widget_extension_methods.dart';
 import 'package:flutter/material.dart';
 import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
 import 'package:widgetbook_workspace/helpers/design_system_device_frame_wrapper.dart';
 
 @widgetbook.UseCase(name: 'Executive Dashboard', type: AnyhooMetricCard, path: 'anyhoo_design_system/screens')
 Widget buildExecutiveDashboardScreen(BuildContext context) {
-  return DesignSystemDeviceFrameWrapper.wrapInDeviceFrame(
-    context,
-    const _ExecutiveDashboardScreen(),
-  );
+  return DesignSystemDeviceFrameWrapper.wrapInDeviceFrame(context, const _ExecutiveDashboardScreen());
 }
 
 class _ExecutiveDashboardScreen extends StatelessWidget {
   const _ExecutiveDashboardScreen();
+
+  static const _destinations = [
+    NavigationDestination(icon: Icon(Icons.dashboard_outlined), label: 'Dashboard'),
+    NavigationDestination(icon: Icon(Icons.widgets_outlined), label: 'Components'),
+    NavigationDestination(icon: Icon(Icons.forum_outlined), label: 'Feedback'),
+    NavigationDestination(icon: Icon(Icons.palette_outlined), label: 'Design'),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -28,19 +33,9 @@ class _ExecutiveDashboardScreen extends StatelessWidget {
             child: ListView(
               padding: const EdgeInsets.all(DesignTokens.marginMobile),
               children: [
-                Text(
-                  'Executive Overview',
-                  style: AnyhooTypography.display(DisplaySize.medium).copyWith(
-                    color: surface.primaryText,
-                  ),
-                ),
+                'Executive Overview'.display(size: DisplaySize.medium),
                 const SizedBox(height: DesignTokens.spacingXs),
-                Text(
-                  'Performance metrics for Q3.',
-                  style: AnyhooTypography.body(BodySize.large).copyWith(
-                    color: surface.secondaryText,
-                  ),
-                ),
+                'Performance metrics for Q3.'.body(size: BodySize.large),
                 const SizedBox(height: DesignTokens.spacingLg),
                 AnyhooMetricCard(
                   label: 'Engagement',
@@ -63,12 +58,7 @@ class _ExecutiveDashboardScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'Quick Actions',
-                        style: AnyhooTypography.headline(HeadlineSize.small).copyWith(
-                          color: surface.primaryText,
-                        ),
-                      ),
+                      'Quick Actions'.headline(size: HeadlineSize.small),
                       const SizedBox(height: DesignTokens.spacingMd),
                       Wrap(
                         spacing: DesignTokens.spacingMd,
@@ -82,39 +72,27 @@ class _ExecutiveDashboardScreen extends StatelessWidget {
                               backgroundColor: accent.primaryFixed,
                               foregroundColor: accent.onPrimaryFixed,
                               minimumSize: const Size(0, 48),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(DesignTokens.radiusMd),
-                              ),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(DesignTokens.radiusMd)),
                             ),
                           ),
                           OutlinedButton.icon(
                             onPressed: () {},
                             icon: Icon(Icons.cloud_download, size: 18, color: accent.primaryFixed),
-                            label: Text(
-                              'Export Data',
-                              style: TextStyle(color: accent.primaryFixed),
-                            ),
+                            label: Text('Export Data', style: TextStyle(color: accent.primaryFixed)),
                             style: OutlinedButton.styleFrom(
                               minimumSize: const Size(0, 48),
                               side: BorderSide(color: surface.cardBorder),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(DesignTokens.radiusMd),
-                              ),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(DesignTokens.radiusMd)),
                             ),
                           ),
                           OutlinedButton.icon(
                             onPressed: () {},
                             icon: Icon(Icons.settings, size: 18, color: accent.primaryFixed),
-                            label: Text(
-                              'Configure',
-                              style: TextStyle(color: accent.primaryFixed),
-                            ),
+                            label: Text('Configure', style: TextStyle(color: accent.primaryFixed)),
                             style: OutlinedButton.styleFrom(
                               minimumSize: const Size(0, 48),
                               side: BorderSide(color: surface.cardBorder),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(DesignTokens.radiusMd),
-                              ),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(DesignTokens.radiusMd)),
                             ),
                           ),
                         ],
@@ -123,12 +101,7 @@ class _ExecutiveDashboardScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: DesignTokens.spacingLg),
-                Text(
-                  'Recent System Users',
-                  style: AnyhooTypography.headline(HeadlineSize.small).copyWith(
-                    color: surface.primaryText,
-                  ),
-                ),
+                'Recent System Users'.headline(size: HeadlineSize.small),
                 const SizedBox(height: DesignTokens.spacingSm),
                 AnyhooDataTable(
                   columns: const ['User', 'Role', 'Status', 'Last Active'],
@@ -157,7 +130,7 @@ class _ExecutiveDashboardScreen extends StatelessWidget {
                         label: 'Active',
                         variant: AnyhooChipVariant.secondary,
                         shape: AnyhooChipShape.pill,
-                      ),
+                      ).pad(h: 8),
                       '2 mins ago',
                     ],
                     [
@@ -168,11 +141,7 @@ class _ExecutiveDashboardScreen extends StatelessWidget {
                             backgroundColor: surface.containerHighest,
                             child: Text(
                               'B',
-                              style: TextStyle(
-                                color: surface.secondaryText,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 12,
-                              ),
+                              style: TextStyle(color: surface.secondaryText, fontWeight: FontWeight.bold, fontSize: 12),
                             ),
                           ),
                           const SizedBox(width: 8),
@@ -184,7 +153,7 @@ class _ExecutiveDashboardScreen extends StatelessWidget {
                         label: 'Active',
                         variant: AnyhooChipVariant.secondary,
                         shape: AnyhooChipShape.pill,
-                      ),
+                      ).pad(h: 8),
                       '1 hr ago',
                     ],
                     [
@@ -195,11 +164,7 @@ class _ExecutiveDashboardScreen extends StatelessWidget {
                             backgroundColor: surface.containerHighest,
                             child: Text(
                               'C',
-                              style: TextStyle(
-                                color: surface.secondaryText,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 12,
-                              ),
+                              style: TextStyle(color: surface.secondaryText, fontWeight: FontWeight.bold, fontSize: 12),
                             ),
                           ),
                           const SizedBox(width: 8),
@@ -211,7 +176,7 @@ class _ExecutiveDashboardScreen extends StatelessWidget {
                         label: 'Offline',
                         variant: AnyhooChipVariant.neutral,
                         shape: AnyhooChipShape.pill,
-                      ),
+                      ).pad(h: 8),
                       'Yesterday',
                     ],
                   ],
@@ -220,79 +185,12 @@ class _ExecutiveDashboardScreen extends StatelessWidget {
               ],
             ),
           ),
-          _ScreenBottomNav(selectedIndex: 0, labels: const ['Dashboard', 'Components', 'Feedback', 'Design']),
+          AnyhooBottomBar(
+            destinations: _destinations,
+            selectedIndex: 0,
+            onDestinationSelected: (context, index) {},
+          ),
         ],
-      ),
-    );
-  }
-}
-
-class _ScreenBottomNav extends StatelessWidget {
-  const _ScreenBottomNav({required this.selectedIndex, required this.labels});
-
-  final int selectedIndex;
-  final List<String> labels;
-
-  static const _icons = [
-    Icons.dashboard_outlined,
-    Icons.widgets_outlined,
-    Icons.forum_outlined,
-    Icons.palette_outlined,
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    final surface = context.surface;
-
-    return Material(
-      color: surface.bottomBarBackground,
-      child: SafeArea(
-        top: false,
-        child: Container(
-          height: 64,
-          decoration: BoxDecoration(
-            border: Border(top: BorderSide(color: surface.cardBorder)),
-          ),
-          child: Row(
-            children: [
-              for (var i = 0; i < labels.length; i++)
-                Expanded(
-                  child: Center(
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        color: i == selectedIndex ? surface.secondaryContainer : Colors.transparent,
-                        borderRadius: BorderRadius.circular(DesignTokens.radiusLg),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              _icons[i],
-                              size: 20,
-                              color: i == selectedIndex
-                                  ? surface.onSecondaryContainer
-                                  : surface.secondaryText,
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              labels[i],
-                              style: AnyhooTypography.label(LabelSize.medium).copyWith(
-                                color: i == selectedIndex
-                                    ? surface.onSecondaryContainer
-                                    : surface.secondaryText,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-            ],
-          ),
-        ),
       ),
     );
   }
