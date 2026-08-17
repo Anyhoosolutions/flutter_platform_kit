@@ -1,13 +1,12 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:anyhoo_auth/widgets/login_widget_settings.dart';
-import 'package:anyhoo_core/anyhoo_core.dart';
+import 'package:anyhoo_models/anyhoo_models.dart';
 import 'package:flutter/material.dart';
 import 'package:widgetbook/widgetbook.dart';
 import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
 import 'package:widgetbook_workspace/helpers/wrap_in_mocks_helper.dart';
 import 'package:anyhoo_auth/anyhoo_auth.dart';
-import 'package:anyhoo_core/models/anyhoo_user.dart';
 import 'package:anyhoo_auth/widgets/login_widget.dart';
 
 @widgetbook.UseCase(name: 'LoginWidget', type: LoginWidget, path: 'anyhoo_auth')

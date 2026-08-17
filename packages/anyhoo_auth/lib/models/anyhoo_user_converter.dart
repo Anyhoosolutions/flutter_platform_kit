@@ -1,4 +1,4 @@
-import 'package:anyhoo_core/anyhoo_core.dart';
+import 'package:anyhoo_models/anyhoo_models.dart';
 
 /// Interface for converting between JSON and user objects.
 ///

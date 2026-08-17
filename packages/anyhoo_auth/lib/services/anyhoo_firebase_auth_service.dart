@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:anyhoo_auth/services/anyhoo_auth_service.dart';
-import 'package:anyhoo_core/models/anyhoo_user.dart';
 import 'package:anyhoo_logging/anyhoo_logging.dart';
+import 'package:anyhoo_models/anyhoo_models.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:google_sign_in/google_sign_in.dart';
@@ -113,7 +113,8 @@ class AnyhooFirebaseAuthService<T extends AnyhooUser> implements AnyhooAuthServi
           final userCredential = await _firebaseAuth.signInWithPopup(googleProvider);
           _log.info('✓ Google Sign-In popup completed. User ID: ${userCredential.user?.uid ?? 'null'}');
         } on firebase_auth.FirebaseAuthException catch (e, stackTrace) {
-          _log.severe('FirebaseAuthException during signInWithPopup: code=${e.code} message=${e.message}', e, stackTrace);
+          _log.severe(
+              'FirebaseAuthException during signInWithPopup: code=${e.code} message=${e.message}', e, stackTrace);
           SentryHelper.captureException(e, stackTrace: stackTrace, fatal: false);
           rethrow;
         }

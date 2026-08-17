@@ -16,6 +16,8 @@ dependencies:
     path: ../anyhoo_core
   anyhoo_logging:
     path: ../anyhoo_logging
+  anyhoo_models:
+    path: ../anyhoo_models
   flutter_bloc: ^9.1.1
   firebase_auth: ^6.5.7
   flutter_form_builder: ^10.3.0+2

@@ -1,5 +1,5 @@
 import 'package:anyhoo_auth/anyhoo_auth.dart';
-import 'package:anyhoo_core/models/anyhoo_user.dart';
+import 'package:anyhoo_models/anyhoo_models.dart';
 
 /// Creates a mock EnhanceUserService for demonstration purposes.
 ///
