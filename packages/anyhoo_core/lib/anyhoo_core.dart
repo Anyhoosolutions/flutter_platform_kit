@@ -4,7 +4,6 @@
 // ignore: unnecessary_library_name
 library anyhoo_core;
 
-export 'models/anyhoo_user.dart';
 export 'models/arguments.dart';
 export 'arguments_parser.dart';
 export 'widgets/error_page.dart';

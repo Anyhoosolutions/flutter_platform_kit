@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:anyhoo_auth/services/anyhoo_enhance_user_service.dart';
-import 'package:anyhoo_core/models/anyhoo_user.dart';
+import 'package:anyhoo_models/anyhoo_models.dart';
 import 'package:anyhoo_logging/anyhoo_logging.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:logging/logging.dart';

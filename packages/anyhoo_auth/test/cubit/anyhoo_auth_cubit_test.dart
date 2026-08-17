@@ -5,7 +5,7 @@ import 'package:anyhoo_auth/cubit/anyhoo_auth_state.dart';
 import 'package:anyhoo_auth/models/anyhoo_user_converter.dart';
 import 'package:anyhoo_auth/services/anyhoo_auth_service.dart';
 import 'package:anyhoo_auth/services/anyhoo_enhance_user_service.dart';
-import 'package:anyhoo_core/anyhoo_core.dart';
+import 'package:anyhoo_models/anyhoo_models.dart';
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:logging/logging.dart';

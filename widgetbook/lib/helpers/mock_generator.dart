@@ -1,5 +1,5 @@
 import 'package:anyhoo_auth/cubit/anyhoo_auth_state.dart';
-import 'package:anyhoo_core/models/anyhoo_user.dart';
+import 'package:anyhoo_models/anyhoo_models.dart';
 import 'package:mocktail/mocktail.dart';
 
 import 'mock_classes.dart';

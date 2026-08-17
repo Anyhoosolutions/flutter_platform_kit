@@ -5,7 +5,7 @@ import 'package:anyhoo_auth/cubit/anyhoo_auth_state.dart';
 import 'package:anyhoo_auth/icons/apple_icon_svg.dart';
 import 'package:anyhoo_auth/icons/google_icon_svg.dart';
 import 'package:anyhoo_auth/widgets/login_widget_settings.dart';
-import 'package:anyhoo_core/anyhoo_core.dart';
+import 'package:anyhoo_models/anyhoo_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';

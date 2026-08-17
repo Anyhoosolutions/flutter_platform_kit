@@ -39,6 +39,8 @@ dependencies:
     path: ../packages/anyhoo_widget_extension_methods
   anyhoo_extension_methods:
     path: ../packages/anyhoo_extension_methods
+  anyhoo_models:
+    path: ../packages/anyhoo_models
 
   # Required dependencies
   flutter_bloc: ^9.1.0

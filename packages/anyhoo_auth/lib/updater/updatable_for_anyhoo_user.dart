@@ -1,4 +1,4 @@
-import 'package:anyhoo_core/models/anyhoo_user.dart';
+import 'package:anyhoo_models/anyhoo_models.dart';
 
 abstract class UpdatableForAnyhooUser {
   void updateUser(AnyhooUser? user);

@@ -12,6 +12,8 @@ environment:
 dependencies:
   anyhoo_logging:
     path: ../anyhoo_logging
+  anyhoo_models:
+    path: ../anyhoo_models
   bloc: ^9.1.0
   flutter:
     sdk: flutter

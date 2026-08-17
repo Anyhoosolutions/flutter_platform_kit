@@ -1,6 +1,5 @@
+import 'package:anyhoo_models/anyhoo_models.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:anyhoo_core/anyhoo_core.dart';
 
 void main() {
   group('AuthUser', () {

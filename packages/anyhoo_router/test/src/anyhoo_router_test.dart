@@ -1,6 +1,6 @@
 import 'package:anyhoo_auth/cubit/anyhoo_auth_cubit.dart';
 import 'package:anyhoo_auth/cubit/anyhoo_auth_state.dart';
-import 'package:anyhoo_core/models/anyhoo_user.dart';
+import 'package:anyhoo_models/anyhoo_models.dart';
 import 'package:anyhoo_router/anyhoo_router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

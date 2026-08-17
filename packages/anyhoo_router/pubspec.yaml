@@ -16,6 +16,8 @@ dependencies:
   logging: ^1.3.0
   anyhoo_auth:
     path: ../anyhoo_auth
+  anyhoo_models:
+    path: ../anyhoo_models
   anyhoo_core:
     path: ../anyhoo_core
   flutter_bloc: ^9.1.0

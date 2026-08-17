@@ -45,6 +45,8 @@ dependencies:
     path: ../packages/anyhoo_design_system
   anyhoo_widget_extension_methods:
     path: ../packages/anyhoo_widget_extension_methods
+  anyhoo_models:
+    path: ../packages/anyhoo_models
 
 dev_dependencies:
   flutter_test:
