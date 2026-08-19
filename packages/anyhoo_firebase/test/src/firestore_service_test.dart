@@ -143,24 +143,6 @@ void main() {
       });
     });
 
-    group('getDocumentIdsStreamAsJson', () {
-      test('returns stream of JSON encoded documents', () async {
-        final doc1 = MockQueryDocumentSnapshot();
-        when(() => doc1.id).thenReturn('doc1');
-        when(() => doc1.data()).thenReturn({'name': 'Test 1'});
-        when(() => mockQuerySnapshot.docs).thenReturn([doc1]);
-        when(() => mockCollection.snapshots()).thenAnswer((_) => Stream.value(mockQuerySnapshot));
-        when(() => mockFirestore.collection(any())).thenReturn(mockCollection);
-
-        final stream = firestoreService.getDocumentIdsStreamAsJson('test_collection');
-        final result = await stream.first;
-
-        expect(result.length, 1);
-        expect(result[0], contains('"id":"doc1"'));
-        expect(result[0], contains('"name":"Test 1"'));
-      });
-    });
-
     group('getSnapshotsForDocument', () {
       test('returns stream of document data', () async {
         when(() => mockDocumentSnapshot.data()).thenReturn({'name': 'Test', 'value': 42});
@@ -183,20 +165,6 @@ void main() {
         final result = await stream.first;
 
         expect(result, isNull);
-      });
-    });
-
-    group('getDocumentIdStreamAsJson', () {
-      test('returns stream of JSON encoded document', () async {
-        when(() => mockDocumentSnapshot.data()).thenReturn({'name': 'Test', 'value': 42});
-        when(() => mockDocument.snapshots()).thenAnswer((_) => Stream.value(mockDocumentSnapshot));
-        when(() => mockFirestore.doc('test_collection/doc1')).thenReturn(mockDocument);
-
-        final stream = firestoreService.getDocumentIdStreamAsJson('test_collection/doc1');
-        final result = await stream.first;
-
-        expect(result, contains('"name":"Test"'));
-        expect(result, contains('"value":42'));
       });
     });
 
@@ -253,22 +221,6 @@ void main() {
       });
     });
 
-    group('getSnapshotsListAsJson', () {
-      test('returns JSON encoded list of documents', () async {
-        final doc1 = MockQueryDocumentSnapshot();
-        when(() => doc1.id).thenReturn('doc1');
-        when(() => doc1.data()).thenReturn({'name': 'Test 1'});
-        when(() => mockQuerySnapshot.docs).thenReturn([doc1]);
-        when(() => mockCollection.get()).thenAnswer((_) async => mockQuerySnapshot);
-        when(() => mockFirestore.collection(any())).thenReturn(mockCollection);
-
-        final result = await firestoreService.getSnapshotsListAsJson('test_collection');
-
-        expect(result, contains('"id":"doc1"'));
-        expect(result, contains('"name":"Test 1"'));
-      });
-    });
-
     group('getDocument', () {
       test('returns document data when document exists', () async {
         when(() => mockDocumentSnapshot.data()).thenReturn({'name': 'Test', 'value': 42});
@@ -297,19 +249,6 @@ void main() {
         when(() => mockFirestore.doc('test_collection/doc1')).thenReturn(mockDocument);
 
         expect(() => firestoreService.getDocument('test_collection/doc1'), throwsException);
-      });
-    });
-
-    group('getDocumentAsJson', () {
-      test('returns JSON encoded document', () async {
-        when(() => mockDocumentSnapshot.data()).thenReturn({'name': 'Test', 'value': 42});
-        when(() => mockDocument.get()).thenAnswer((_) async => mockDocumentSnapshot);
-        when(() => mockFirestore.doc('test_collection/doc1')).thenReturn(mockDocument);
-
-        final result = await firestoreService.getDocumentAsJson('test_collection/doc1');
-
-        expect(result, contains('"name":"Test"'));
-        expect(result, contains('"value":42'));
       });
     });
 
@@ -367,24 +306,6 @@ void main() {
       });
     });
 
-    group('addDocumentAsJson', () {
-      test('decodes JSON and calls addDocument', () async {
-        when(() => mockFirestore.collection('test_collection')).thenReturn(mockCollection);
-        when(() => mockFirestore.doc('test_collection/doc1')).thenReturn(mockDocument);
-        when(() => mockDocument.set(any())).thenAnswer((_) async => {});
-
-        await firestoreService.addDocumentAsJson(
-          path: 'test_collection',
-          data: '{"name":"Test","value":42}',
-          docId: 'doc1',
-        );
-
-        verify(() => mockFirestore.collection('test_collection')).called(1);
-        verify(() => mockFirestore.doc('test_collection/doc1')).called(1);
-        verify(() => mockDocument.set({'name': 'Test', 'value': 42})).called(1);
-      });
-    });
-
     group('updateDocument', () {
       test('updates document successfully', () async {
         when(() => mockCollection.doc('doc1')).thenReturn(mockDocument);
@@ -407,18 +328,6 @@ void main() {
           () => firestoreService.updateDocument('test_collection', 'doc1', {'name': 'Updated'}),
           throwsA(isA<Exception>()),
         );
-      });
-    });
-
-    group('updateDocumentAsJson', () {
-      test('decodes JSON and calls updateDocument', () async {
-        when(() => mockCollection.doc('doc1')).thenReturn(mockDocument);
-        when(() => mockDocument.update(any())).thenAnswer((_) async => {});
-        when(() => mockFirestore.collection('test_collection')).thenReturn(mockCollection);
-
-        await firestoreService.updateDocumentAsJson('test_collection', 'doc1', '{"name":"Updated","value":100}');
-
-        verify(() => mockDocument.update({'name': 'Updated', 'value': 100})).called(1);
       });
     });
 
