@@ -1,5 +1,4 @@
-import 'dart:convert';
-
+import 'package:anyhoo_firebase/src/services/firestore_document_converter.dart';
 import 'package:anyhoo_logging/anyhoo_logging.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:logging/logging.dart';
@@ -10,7 +9,7 @@ class FirestoreService {
 
   FirestoreService({required this.firestore});
 
-  Stream<List<Map<String, dynamic>>> getSnapshotsStream(
+  Stream<List<Map<String, dynamic>>> watchCollection(
     String path, {
     String? orderBy,
     bool? descending,
@@ -30,27 +29,15 @@ class FirestoreService {
       query = query.limit(limit);
     }
     return query.snapshots().map(
-      (snapshot) => snapshot.docs.map((snapshot) => {...snapshot.data(), 'id': snapshot.id}).toList(),
+      (snapshot) => snapshot.docs.map((doc) => fromFirestoreDocument(doc.data(), doc.id)!).toList(),
     );
   }
 
-  Stream<List<String>> getDocumentIdsStreamAsJson(String path) {
-    return getSnapshotsStream(path).map((snapshots) => snapshots.map((snapshot) => jsonEncode(snapshot)).toList());
+  Stream<Map<String, dynamic>?> watchDocument(String path) {
+    return firestore.doc(path).snapshots().map((snapshot) => fromFirestoreDocument(snapshot.data(), snapshot.id));
   }
 
-  Stream<Map<String, dynamic>?> getSnapshotsForDocument(String path) {
-    final query = firestore.doc(path).snapshots();
-
-    return query.map((snapshot) {
-      return snapshot.data();
-    });
-  }
-
-  Stream<String> getDocumentIdStreamAsJson(String path) {
-    return getSnapshotsForDocument(path).map((snapshot) => jsonEncode(snapshot));
-  }
-
-  Future<List<Map<String, dynamic>>> getSnapshotsList(
+  Future<List<Map<String, dynamic>>> getCollection(
     String path, {
     String? orderBy,
     bool? descending,
@@ -70,27 +57,19 @@ class FirestoreService {
       query = query.limit(limit);
     }
     return query.get().then(
-      (snapshot) => snapshot.docs.map((snapshot) => {...snapshot.data(), 'id': snapshot.id}).toList(),
+      (snapshot) => snapshot.docs.map((doc) => fromFirestoreDocument(doc.data(), doc.id)!).toList(),
     );
-  }
-
-  Future<String> getSnapshotsListAsJson(String path) async {
-    return getSnapshotsList(path).then((snapshots) => jsonEncode(snapshots));
   }
 
   Future<Map<String, dynamic>?> getDocument(String path) async {
     try {
       final docRef = await firestore.doc(path).get();
-      return docRef.data();
+      return fromFirestoreDocument(docRef.data(), docRef.id);
     } catch (e, stackTrace) {
       _log.warning('Error getting document at $path: $e');
       SentryHelper.captureException(e, stackTrace: stackTrace, fatal: false);
       rethrow;
     }
-  }
-
-  Future<String> getDocumentAsJson(String path) async {
-    return getDocument(path).then((snapshot) => jsonEncode(snapshot));
   }
 
   Future<String> addDocument({
@@ -116,31 +95,18 @@ class FirestoreService {
 
     _log.info('fullPath: $fullPath');
     _log.info('data: $data');
-    await firestore.doc(fullPath).set(data);
+    await firestore.doc(fullPath).set(toFirestoreDocument(data));
 
     return docId;
   }
 
-  Future<String> addDocumentAsJson({
-    required String path,
-    required String data,
-    String? docId,
-    Map<String, String>? idFields,
-  }) async {
-    return addDocument(path: path, data: jsonDecode(data), docId: docId, idFields: idFields);
-  }
-
   Future<void> updateDocument(String path, String id, Map<String, dynamic> data) async {
     try {
-      return await firestore.collection(path).doc(id).update(data);
+      return await firestore.collection(path).doc(id).update(toFirestoreDocument(data));
     } catch (e, stackTrace) {
       SentryHelper.captureException(e, stackTrace: stackTrace, fatal: false);
       throw Exception('Failed to update document at $path $id: $e');
     }
-  }
-
-  Future<void> updateDocumentAsJson(String path, String id, String data) async {
-    return updateDocument(path, id, jsonDecode(data));
   }
 
   Future<void> deleteDocument(String path, String id) async {
