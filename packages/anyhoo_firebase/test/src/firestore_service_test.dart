@@ -84,7 +84,7 @@ void main() {
         when(() => mockCollection.snapshots()).thenAnswer((_) => Stream.value(mockQuerySnapshot));
         when(() => mockFirestore.collection(any())).thenReturn(mockCollection);
 
-        final stream = firestoreService.getSnapshotsStream('test_collection');
+        final stream = firestoreService.watchCollection('test_collection');
         final result = await stream.first;
 
         expect(result.length, 2);
@@ -107,7 +107,7 @@ void main() {
         when(() => mockCollection.orderBy(any(), descending: any(named: 'descending'))).thenReturn(mockQuery);
         when(() => mockFirestore.collection(any())).thenReturn(mockCollection);
 
-        await firestoreService.getSnapshotsStream('test_collection', orderBy: 'name', descending: true).first;
+        await firestoreService.watchCollection('test_collection', orderBy: 'name', descending: true).first;
 
         verify(() => mockCollection.orderBy('name', descending: true)).called(1);
       });
@@ -122,7 +122,7 @@ void main() {
         when(() => mockCollection.where(any(), isNull: any(named: 'isNull'))).thenReturn(mockQuery);
         when(() => mockFirestore.collection(any())).thenReturn(mockCollection);
 
-        await firestoreService.getSnapshotsStream('test_collection', whereNullFields: ['deletedAt']).first;
+        await firestoreService.watchCollection('test_collection', whereNullFields: ['deletedAt']).first;
 
         verify(() => mockCollection.where('deletedAt', isNull: true)).called(1);
       });
@@ -137,7 +137,7 @@ void main() {
         when(() => mockCollection.limit(any())).thenReturn(mockQuery);
         when(() => mockFirestore.collection(any())).thenReturn(mockCollection);
 
-        await firestoreService.getSnapshotsStream('test_collection', limit: 5).first;
+        await firestoreService.watchCollection('test_collection', limit: 5).first;
 
         verify(() => mockCollection.limit(5)).called(1);
       });
@@ -149,7 +149,7 @@ void main() {
         when(() => mockDocument.snapshots()).thenAnswer((_) => Stream.value(mockDocumentSnapshot));
         when(() => mockFirestore.doc('test_collection/doc1')).thenReturn(mockDocument);
 
-        final stream = firestoreService.getSnapshotsForDocument('test_collection/doc1');
+        final stream = firestoreService.watchDocument('test_collection/doc1');
         final result = await stream.first;
 
         expect(result, {'name': 'Test', 'value': 42});
@@ -161,7 +161,7 @@ void main() {
         when(() => mockDocument.snapshots()).thenAnswer((_) => Stream.value(mockDocumentSnapshot));
         when(() => mockFirestore.doc('test_collection/doc1')).thenReturn(mockDocument);
 
-        final stream = firestoreService.getSnapshotsForDocument('test_collection/doc1');
+        final stream = firestoreService.watchDocument('test_collection/doc1');
         final result = await stream.first;
 
         expect(result, isNull);
@@ -182,7 +182,7 @@ void main() {
         when(() => mockCollection.get()).thenAnswer((_) async => mockQuerySnapshot);
         when(() => mockFirestore.collection(any())).thenReturn(mockCollection);
 
-        final result = await firestoreService.getSnapshotsList('test_collection');
+        final result = await firestoreService.getCollection('test_collection');
 
         expect(result.length, 2);
         expect(result[0]['id'], 'doc1');
@@ -205,7 +205,7 @@ void main() {
         when(() => mockCollection.orderBy(any(), descending: any(named: 'descending'))).thenReturn(mockQuery);
         when(() => mockFirestore.collection(any())).thenReturn(mockCollection);
 
-        await firestoreService.getSnapshotsList(
+        await firestoreService.getCollection(
           'test_collection',
           orderBy: 'name',
           descending: true,

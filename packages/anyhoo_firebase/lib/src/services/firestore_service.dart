@@ -8,7 +8,7 @@ class FirestoreService {
 
   FirestoreService({required this.firestore});
 
-  Stream<List<Map<String, dynamic>>> getSnapshotsStream(
+  Stream<List<Map<String, dynamic>>> watchCollection(
     String path, {
     String? orderBy,
     bool? descending,
@@ -32,7 +32,7 @@ class FirestoreService {
     );
   }
 
-  Stream<Map<String, dynamic>?> getSnapshotsForDocument(String path) {
+  Stream<Map<String, dynamic>?> watchDocument(String path) {
     final query = firestore.doc(path).snapshots();
 
     return query.map((snapshot) {
@@ -40,7 +40,7 @@ class FirestoreService {
     });
   }
 
-  Future<List<Map<String, dynamic>>> getSnapshotsList(
+  Future<List<Map<String, dynamic>>> getCollection(
     String path, {
     String? orderBy,
     bool? descending,
