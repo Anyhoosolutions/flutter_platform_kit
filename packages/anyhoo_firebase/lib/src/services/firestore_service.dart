@@ -1,3 +1,4 @@
+import 'package:anyhoo_firebase/src/services/firestore_document_converter.dart';
 import 'package:anyhoo_logging/anyhoo_logging.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:logging/logging.dart';
@@ -28,16 +29,12 @@ class FirestoreService {
       query = query.limit(limit);
     }
     return query.snapshots().map(
-      (snapshot) => snapshot.docs.map((snapshot) => {...snapshot.data(), 'id': snapshot.id}).toList(),
+      (snapshot) => snapshot.docs.map((doc) => fromFirestoreDocument(doc.data(), doc.id)!).toList(),
     );
   }
 
   Stream<Map<String, dynamic>?> watchDocument(String path) {
-    final query = firestore.doc(path).snapshots();
-
-    return query.map((snapshot) {
-      return snapshot.data();
-    });
+    return firestore.doc(path).snapshots().map((snapshot) => fromFirestoreDocument(snapshot.data(), snapshot.id));
   }
 
   Future<List<Map<String, dynamic>>> getCollection(
@@ -60,14 +57,14 @@ class FirestoreService {
       query = query.limit(limit);
     }
     return query.get().then(
-      (snapshot) => snapshot.docs.map((snapshot) => {...snapshot.data(), 'id': snapshot.id}).toList(),
+      (snapshot) => snapshot.docs.map((doc) => fromFirestoreDocument(doc.data(), doc.id)!).toList(),
     );
   }
 
   Future<Map<String, dynamic>?> getDocument(String path) async {
     try {
       final docRef = await firestore.doc(path).get();
-      return docRef.data();
+      return fromFirestoreDocument(docRef.data(), docRef.id);
     } catch (e, stackTrace) {
       _log.warning('Error getting document at $path: $e');
       SentryHelper.captureException(e, stackTrace: stackTrace, fatal: false);
@@ -98,14 +95,14 @@ class FirestoreService {
 
     _log.info('fullPath: $fullPath');
     _log.info('data: $data');
-    await firestore.doc(fullPath).set(data);
+    await firestore.doc(fullPath).set(toFirestoreDocument(data));
 
     return docId;
   }
 
   Future<void> updateDocument(String path, String id, Map<String, dynamic> data) async {
     try {
-      return await firestore.collection(path).doc(id).update(data);
+      return await firestore.collection(path).doc(id).update(toFirestoreDocument(data));
     } catch (e, stackTrace) {
       SentryHelper.captureException(e, stackTrace: stackTrace, fatal: false);
       throw Exception('Failed to update document at $path $id: $e');

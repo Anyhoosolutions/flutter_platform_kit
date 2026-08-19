@@ -68,7 +68,7 @@ void main() {
   });
 
   group('FirestoreService', () {
-    group('getSnapshotsStream', () {
+    group('watchCollection', () {
       test('returns stream of documents with id field', () async {
         final doc1 = MockQueryDocumentSnapshot();
         final doc2 = MockQueryDocumentSnapshot();
@@ -143,8 +143,9 @@ void main() {
       });
     });
 
-    group('getSnapshotsForDocument', () {
+    group('watchDocument', () {
       test('returns stream of document data', () async {
+        when(() => mockDocumentSnapshot.id).thenReturn('doc1');
         when(() => mockDocumentSnapshot.data()).thenReturn({'name': 'Test', 'value': 42});
         when(() => mockDocument.snapshots()).thenAnswer((_) => Stream.value(mockDocumentSnapshot));
         when(() => mockFirestore.doc('test_collection/doc1')).thenReturn(mockDocument);
@@ -152,11 +153,12 @@ void main() {
         final stream = firestoreService.watchDocument('test_collection/doc1');
         final result = await stream.first;
 
-        expect(result, {'name': 'Test', 'value': 42});
+        expect(result, {'name': 'Test', 'value': 42, 'id': 'doc1'});
         verify(() => mockFirestore.doc('test_collection/doc1')).called(1);
       });
 
       test('returns null when document does not exist', () async {
+        when(() => mockDocumentSnapshot.id).thenReturn('doc1');
         when(() => mockDocumentSnapshot.data()).thenReturn(null);
         when(() => mockDocument.snapshots()).thenAnswer((_) => Stream.value(mockDocumentSnapshot));
         when(() => mockFirestore.doc('test_collection/doc1')).thenReturn(mockDocument);
@@ -166,9 +168,25 @@ void main() {
 
         expect(result, isNull);
       });
+
+      test('converts Timestamp fields and adds id', () async {
+        final updatedAt = Timestamp.fromDate(DateTime.utc(2024, 6, 1, 13));
+        when(() => mockDocumentSnapshot.id).thenReturn('doc1');
+        when(() => mockDocumentSnapshot.data()).thenReturn({'name': 'Test', 'updatedAt': updatedAt});
+        when(() => mockDocument.snapshots()).thenAnswer((_) => Stream.value(mockDocumentSnapshot));
+        when(() => mockFirestore.doc('test_collection/doc1')).thenReturn(mockDocument);
+
+        final result = await firestoreService.watchDocument('test_collection/doc1').first;
+
+        expect(result, {
+          'name': 'Test',
+          'updatedAt': '2024-06-01T13:00:00.000Z',
+          'id': 'doc1',
+        });
+      });
     });
 
-    group('getSnapshotsList', () {
+    group('getCollection', () {
       test('returns list of documents with id field', () async {
         final doc1 = MockQueryDocumentSnapshot();
         final doc2 = MockQueryDocumentSnapshot();
@@ -219,22 +237,44 @@ void main() {
         verify(() => mockQuery.where('deletedAt', isNull: true)).called(1);
         verify(() => mockQuery.limit(10)).called(1);
       });
+
+      test('converts Timestamp fields and keeps id', () async {
+        final updatedAt = Timestamp.fromDate(DateTime.utc(2024, 6, 1, 13));
+        final doc1 = MockQueryDocumentSnapshot();
+        when(() => doc1.id).thenReturn('doc1');
+        when(() => doc1.data()).thenReturn({'name': 'Test 1', 'updatedAt': updatedAt});
+        when(() => mockQuerySnapshot.docs).thenReturn([doc1]);
+        when(() => mockCollection.get()).thenAnswer((_) async => mockQuerySnapshot);
+        when(() => mockFirestore.collection(any())).thenReturn(mockCollection);
+
+        final result = await firestoreService.getCollection('test_collection');
+
+        expect(result, [
+          {
+            'name': 'Test 1',
+            'updatedAt': '2024-06-01T13:00:00.000Z',
+            'id': 'doc1',
+          },
+        ]);
+      });
     });
 
     group('getDocument', () {
       test('returns document data when document exists', () async {
+        when(() => mockDocumentSnapshot.id).thenReturn('doc1');
         when(() => mockDocumentSnapshot.data()).thenReturn({'name': 'Test', 'value': 42});
         when(() => mockDocument.get()).thenAnswer((_) async => mockDocumentSnapshot);
         when(() => mockFirestore.doc('test_collection/doc1')).thenReturn(mockDocument);
 
         final result = await firestoreService.getDocument('test_collection/doc1');
 
-        expect(result, {'name': 'Test', 'value': 42});
+        expect(result, {'name': 'Test', 'value': 42, 'id': 'doc1'});
         verify(() => mockFirestore.doc('test_collection/doc1')).called(1);
         verify(() => mockDocument.get()).called(1);
       });
 
       test('returns null when document does not exist', () async {
+        when(() => mockDocumentSnapshot.id).thenReturn('doc1');
         when(() => mockDocumentSnapshot.data()).thenReturn(null);
         when(() => mockDocument.get()).thenAnswer((_) async => mockDocumentSnapshot);
         when(() => mockFirestore.doc('test_collection/doc1')).thenReturn(mockDocument);
@@ -249,6 +289,22 @@ void main() {
         when(() => mockFirestore.doc('test_collection/doc1')).thenReturn(mockDocument);
 
         expect(() => firestoreService.getDocument('test_collection/doc1'), throwsException);
+      });
+
+      test('converts Timestamp fields and adds id', () async {
+        final updatedAt = Timestamp.fromDate(DateTime.utc(2024, 6, 1, 13));
+        when(() => mockDocumentSnapshot.id).thenReturn('doc1');
+        when(() => mockDocumentSnapshot.data()).thenReturn({'name': 'Test', 'updatedAt': updatedAt});
+        when(() => mockDocument.get()).thenAnswer((_) async => mockDocumentSnapshot);
+        when(() => mockFirestore.doc('test_collection/doc1')).thenReturn(mockDocument);
+
+        final result = await firestoreService.getDocument('test_collection/doc1');
+
+        expect(result, {
+          'name': 'Test',
+          'updatedAt': '2024-06-01T13:00:00.000Z',
+          'id': 'doc1',
+        });
       });
     });
 
@@ -304,6 +360,41 @@ void main() {
         verify(() => mockFirestore.doc('test_collection/doc1')).called(1);
         verify(() => mockDocument.set({'name': 'Test', 'refId': 'ref_doc1'})).called(1);
       });
+
+      test('converts DateTime fields to Timestamp', () async {
+        when(() => mockFirestore.collection('test_collection')).thenReturn(mockCollection);
+        when(() => mockFirestore.doc('test_collection/doc1')).thenReturn(mockDocument);
+        when(() => mockDocument.set(any())).thenAnswer((_) async => {});
+
+        final updatedAt = DateTime.utc(2024, 6, 1, 13);
+        await firestoreService.addDocument(
+          path: 'test_collection',
+          data: {'name': 'Test', 'updatedAt': updatedAt},
+          docId: 'doc1',
+        );
+
+        verify(
+          () => mockDocument.set({
+            'name': 'Test',
+            'updatedAt': Timestamp.fromDate(updatedAt),
+          }),
+        ).called(1);
+      });
+
+      test('leaves FieldValue.serverTimestamp unchanged', () async {
+        when(() => mockFirestore.collection('test_collection')).thenReturn(mockCollection);
+        when(() => mockFirestore.doc('test_collection/doc1')).thenReturn(mockDocument);
+        when(() => mockDocument.set(any())).thenAnswer((_) async => {});
+
+        final serverTimestamp = FieldValue.serverTimestamp();
+        await firestoreService.addDocument(
+          path: 'test_collection',
+          data: {'name': 'Test', 'createdAt': serverTimestamp},
+          docId: 'doc1',
+        );
+
+        verify(() => mockDocument.set({'name': 'Test', 'createdAt': serverTimestamp})).called(1);
+      });
     });
 
     group('updateDocument', () {
@@ -328,6 +419,25 @@ void main() {
           () => firestoreService.updateDocument('test_collection', 'doc1', {'name': 'Updated'}),
           throwsA(isA<Exception>()),
         );
+      });
+
+      test('converts DateTime fields to Timestamp', () async {
+        when(() => mockCollection.doc('doc1')).thenReturn(mockDocument);
+        when(() => mockDocument.update(any())).thenAnswer((_) async => {});
+        when(() => mockFirestore.collection('test_collection')).thenReturn(mockCollection);
+
+        final updatedAt = DateTime.utc(2024, 6, 1, 13);
+        await firestoreService.updateDocument('test_collection', 'doc1', {
+          'name': 'Updated',
+          'updatedAt': updatedAt,
+        });
+
+        verify(
+          () => mockDocument.update({
+            'name': 'Updated',
+            'updatedAt': Timestamp.fromDate(updatedAt),
+          }),
+        ).called(1);
       });
     });
 
