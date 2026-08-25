@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 
 /// Showcase of top and bottom bars.
 class AnyhooAppBarGallery extends StatelessWidget {
-  const AnyhooAppBarGallery({super.key});
+  const AnyhooAppBarGallery({super.key, this.useSubtitle = false});
+
+  final bool useSubtitle;
 
   @override
   Widget build(BuildContext context) {
@@ -12,7 +14,8 @@ class AnyhooAppBarGallery extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           AnyhooTopBar(
-            topBarText: 'Anyhoo Top Bar',
+            topBarTitle: 'Anyhoo Top Bar',
+            topBarSubtitle: useSubtitle ? 'Subtitle' : null,
             showBackButton: true,
             onSettingsTap: () {
               ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Settings')));

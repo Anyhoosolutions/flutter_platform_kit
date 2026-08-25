@@ -26,12 +26,6 @@ class AnyhooTheme {
       brightness: brightness,
       scaffoldBackgroundColor: surface.scaffoldBackground,
       extensions: [colors, ...?extraExtensions],
-      appBarTheme: AppBarTheme(
-        backgroundColor: surface.scaffoldBackground,
-        foregroundColor: surface.primaryText,
-        elevation: 0,
-        surfaceTintColor: Colors.transparent,
-      ),
       cardTheme: CardThemeData(
         color: surface.cardBackground,
         surfaceTintColor: Colors.transparent,

@@ -64,7 +64,7 @@ class AppBarColors extends ThemeExtension<AppBarColors> with _$AppBarColorsTailo
     required this.topBarBorder,
     required this.topBarText,
     required this.backButtonColor,
-    required this.iconColor,
+    required this.avatarColor,
     required this.bottomBarBackground,
     required this.bottomBarIconColors,
   });
@@ -78,7 +78,7 @@ class AppBarColors extends ThemeExtension<AppBarColors> with _$AppBarColorsTailo
   @override
   final Color backButtonColor;
   @override
-  final Color iconColor;
+  final Color avatarColor;
 
   @override
   final Color bottomBarBackground;

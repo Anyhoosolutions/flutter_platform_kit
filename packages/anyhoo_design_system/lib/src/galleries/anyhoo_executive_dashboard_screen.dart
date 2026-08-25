@@ -22,7 +22,7 @@ class AnyhooExecutiveDashboardScreen extends StatelessWidget {
       color: surface.scaffoldBackground,
       child: Column(
         children: [
-          AnyhooTopBar(topBarText: 'Overview'),
+          AnyhooTopBar(topBarTitle: 'Overview'),
           Expanded(
             child: ListView(
               padding: const EdgeInsets.all(DesignTokens.marginMobile),
@@ -179,11 +179,7 @@ class AnyhooExecutiveDashboardScreen extends StatelessWidget {
               ],
             ),
           ),
-          AnyhooBottomBar(
-            destinations: _destinations,
-            selectedIndex: 0,
-            onDestinationSelected: (context, index) {},
-          ),
+          AnyhooBottomBar(destinations: _destinations, selectedIndex: 0, onDestinationSelected: (context, index) {}),
         ],
       ),
     );
