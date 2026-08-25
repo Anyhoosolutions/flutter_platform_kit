@@ -25,10 +25,6 @@ mixin _$SurfaceColorsTailorMixin on ThemeExtension<SurfaceColors> {
   Color get onSecondaryContainer;
   Color get inverseSurface;
   Color get inverseOnSurface;
-  Color get topBarBackground;
-  Color get topBarText;
-  Color get bottomBarBackground;
-  Color get bottomBarIconColors;
 
   @override
   SurfaceColors copyWith({
@@ -47,10 +43,6 @@ mixin _$SurfaceColorsTailorMixin on ThemeExtension<SurfaceColors> {
     Color? onSecondaryContainer,
     Color? inverseSurface,
     Color? inverseOnSurface,
-    Color? topBarBackground,
-    Color? topBarText,
-    Color? bottomBarBackground,
-    Color? bottomBarIconColors,
   }) {
     return SurfaceColors(
       scaffoldBackground: scaffoldBackground ?? this.scaffoldBackground,
@@ -69,10 +61,6 @@ mixin _$SurfaceColorsTailorMixin on ThemeExtension<SurfaceColors> {
       onSecondaryContainer: onSecondaryContainer ?? this.onSecondaryContainer,
       inverseSurface: inverseSurface ?? this.inverseSurface,
       inverseOnSurface: inverseOnSurface ?? this.inverseOnSurface,
-      topBarBackground: topBarBackground ?? this.topBarBackground,
-      topBarText: topBarText ?? this.topBarText,
-      bottomBarBackground: bottomBarBackground ?? this.bottomBarBackground,
-      bottomBarIconColors: bottomBarIconColors ?? this.bottomBarIconColors,
     );
   }
 
@@ -117,22 +105,6 @@ mixin _$SurfaceColorsTailorMixin on ThemeExtension<SurfaceColors> {
       inverseOnSurface: Color.lerp(
         inverseOnSurface,
         other.inverseOnSurface,
-        t,
-      )!,
-      topBarBackground: Color.lerp(
-        topBarBackground,
-        other.topBarBackground,
-        t,
-      )!,
-      topBarText: Color.lerp(topBarText, other.topBarText, t)!,
-      bottomBarBackground: Color.lerp(
-        bottomBarBackground,
-        other.bottomBarBackground,
-        t,
-      )!,
-      bottomBarIconColors: Color.lerp(
-        bottomBarIconColors,
-        other.bottomBarIconColors,
         t,
       )!,
     );
@@ -199,22 +171,6 @@ mixin _$SurfaceColorsTailorMixin on ThemeExtension<SurfaceColors> {
             const DeepCollectionEquality().equals(
               inverseOnSurface,
               other.inverseOnSurface,
-            ) &&
-            const DeepCollectionEquality().equals(
-              topBarBackground,
-              other.topBarBackground,
-            ) &&
-            const DeepCollectionEquality().equals(
-              topBarText,
-              other.topBarText,
-            ) &&
-            const DeepCollectionEquality().equals(
-              bottomBarBackground,
-              other.bottomBarBackground,
-            ) &&
-            const DeepCollectionEquality().equals(
-              bottomBarIconColors,
-              other.bottomBarIconColors,
             ));
   }
 
@@ -237,10 +193,6 @@ mixin _$SurfaceColorsTailorMixin on ThemeExtension<SurfaceColors> {
       const DeepCollectionEquality().hash(onSecondaryContainer),
       const DeepCollectionEquality().hash(inverseSurface),
       const DeepCollectionEquality().hash(inverseOnSurface),
-      const DeepCollectionEquality().hash(topBarBackground),
-      const DeepCollectionEquality().hash(topBarText),
-      const DeepCollectionEquality().hash(bottomBarBackground),
-      const DeepCollectionEquality().hash(bottomBarIconColors),
     );
   }
 }

@@ -41,10 +41,6 @@ const defaultLightColors = AppColors(
     onSecondaryContainer: DesignTokens.onSecondaryContainer,
     inverseSurface: DesignTokens.inverseSurface,
     inverseOnSurface: DesignTokens.inverseOnSurface,
-    topBarBackground: Color(0xFFFAF8FF),
-    topBarText: Color(0xFF131B2E),
-    bottomBarBackground: Color(0xFFFAF8FF),
-    bottomBarIconColors: Color(0xFF131B2E),
   ),
   appBar: AppBarColors(
     topBarBackground: Color(0xFFFAF8FF),
@@ -78,10 +74,6 @@ const defaultDarkColors = AppColors(
     onSecondaryContainer: Color(0xFFB0B2FF),
     inverseSurface: Color(0xFFDAE2FD),
     inverseOnSurface: Color(0xFF283044),
-    topBarBackground: Color(0xFF0B1326),
-    topBarText: Color(0xFFDAE2FD),
-    bottomBarBackground: Color(0xFF0B1326),
-    bottomBarIconColors: Color(0xFFDAE2FD),
   ),
   accent: AccentColors(
     primaryFixed: Color(0xFFADC6FF), // primary

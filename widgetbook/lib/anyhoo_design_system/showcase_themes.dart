@@ -50,10 +50,6 @@ const slateSkyColors = AppColors(
     onSecondaryContainer: Color(0xFF0369A1),
     inverseSurface: Color(0xFF1E293B),
     inverseOnSurface: Color(0xFFF8FAFC),
-    topBarBackground: Color.fromARGB(255, 58, 132, 205),
-    topBarText: Color(0xFF0F172A),
-    bottomBarBackground: Color.fromARGB(255, 152, 198, 245),
-    bottomBarIconColors: Color(0xFF0F172A),
   ),
   appBar: AppBarColors(
     topBarBackground: Color(0xFFF5F5F0),
@@ -100,10 +96,6 @@ const slateSkyDarkColors = AppColors(
     onSecondaryContainer: Color(0xFFE0F2FE),
     inverseSurface: Color(0xFFE2E8F0),
     inverseOnSurface: Color(0xFF1E293B),
-    topBarBackground: Color.fromARGB(255, 58, 132, 205),
-    topBarText: Color(0xFF0F172A),
-    bottomBarBackground: Color.fromARGB(255, 152, 198, 245),
-    bottomBarIconColors: Color(0xFF0F172A),
   ),
   appBar: AppBarColors(
     topBarBackground: Color(0xFFF5F5F0),
@@ -151,10 +143,6 @@ const warmTerracottaColors = AppColors(
     onSecondaryContainer: Color(0xFF8B3A14),
     inverseSurface: Color(0xFF2C1F18),
     inverseOnSurface: Color(0xFFF5EDE3),
-    topBarBackground: Color.fromARGB(255, 152, 198, 245),
-    topBarText: Color(0xFF0F172A),
-    bottomBarBackground: Color.fromARGB(255, 152, 198, 245),
-    bottomBarIconColors: Color(0xFF0F172A),
   ),
   appBar: AppBarColors(
     topBarBackground: Color(0xFFF5F5F0),
@@ -201,10 +189,6 @@ const warmTerracottaDarkColors = AppColors(
     onSecondaryContainer: Color(0xFFFCE8DC),
     inverseSurface: Color(0xFFF5EDE3),
     inverseOnSurface: Color(0xFF2C1F18),
-    topBarBackground: Color.fromARGB(255, 152, 198, 245),
-    topBarText: Color(0xFF0F172A),
-    bottomBarBackground: Color.fromARGB(255, 152, 198, 245),
-    bottomBarIconColors: Color(0xFF0F172A),
   ),
   appBar: AppBarColors(
     topBarBackground: Color(0xFFF5F5F0),
