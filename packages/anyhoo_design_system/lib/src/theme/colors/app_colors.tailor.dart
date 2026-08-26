@@ -206,6 +206,7 @@ mixin _$AppBarColorsTailorMixin on ThemeExtension<AppBarColors> {
   Color get bottomBarBackground;
   Color get bottomBarIconColors;
   Color get bottomBarIndicatorColor;
+  Color get bottomBarBorderColor;
 
   @override
   AppBarColors copyWith({
@@ -217,6 +218,7 @@ mixin _$AppBarColorsTailorMixin on ThemeExtension<AppBarColors> {
     Color? bottomBarBackground,
     Color? bottomBarIconColors,
     Color? bottomBarIndicatorColor,
+    Color? bottomBarBorderColor,
   }) {
     return AppBarColors(
       topBarBackground: topBarBackground ?? this.topBarBackground,
@@ -228,6 +230,7 @@ mixin _$AppBarColorsTailorMixin on ThemeExtension<AppBarColors> {
       bottomBarIconColors: bottomBarIconColors ?? this.bottomBarIconColors,
       bottomBarIndicatorColor:
           bottomBarIndicatorColor ?? this.bottomBarIndicatorColor,
+      bottomBarBorderColor: bottomBarBorderColor ?? this.bottomBarBorderColor,
     );
   }
 
@@ -257,6 +260,11 @@ mixin _$AppBarColorsTailorMixin on ThemeExtension<AppBarColors> {
       bottomBarIndicatorColor: Color.lerp(
         bottomBarIndicatorColor,
         other.bottomBarIndicatorColor,
+        t,
+      )!,
+      bottomBarBorderColor: Color.lerp(
+        bottomBarBorderColor,
+        other.bottomBarBorderColor,
         t,
       )!,
     );
@@ -298,6 +306,10 @@ mixin _$AppBarColorsTailorMixin on ThemeExtension<AppBarColors> {
             const DeepCollectionEquality().equals(
               bottomBarIndicatorColor,
               other.bottomBarIndicatorColor,
+            ) &&
+            const DeepCollectionEquality().equals(
+              bottomBarBorderColor,
+              other.bottomBarBorderColor,
             ));
   }
 
@@ -313,6 +325,7 @@ mixin _$AppBarColorsTailorMixin on ThemeExtension<AppBarColors> {
       const DeepCollectionEquality().hash(bottomBarBackground),
       const DeepCollectionEquality().hash(bottomBarIconColors),
       const DeepCollectionEquality().hash(bottomBarIndicatorColor),
+      const DeepCollectionEquality().hash(bottomBarBorderColor),
     );
   }
 }

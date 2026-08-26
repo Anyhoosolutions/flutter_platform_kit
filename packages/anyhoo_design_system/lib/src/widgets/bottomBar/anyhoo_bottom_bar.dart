@@ -20,15 +20,24 @@ class AnyhooBottomBar extends StatelessWidget {
         )
         .toList();
 
-    return NavigationBar(
-      backgroundColor: appBar.bottomBarBackground,
-      selectedIndex: selectedIndex,
-      height: 64,
-      indicatorColor: appBar.bottomBarIndicatorColor,
-      onDestinationSelected: (index) {
-        destinations[index].onTap();
-      },
-      destinations: styledDestinations,
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Divider(height: 1, thickness: 1, color: appBar.bottomBarBorderColor),
+        NavigationBar(
+          backgroundColor: appBar.bottomBarBackground,
+          elevation: 0,
+          shadowColor: Colors.transparent,
+          surfaceTintColor: Colors.transparent,
+          selectedIndex: selectedIndex,
+          height: 64,
+          indicatorColor: appBar.bottomBarIndicatorColor,
+          onDestinationSelected: (index) {
+            destinations[index].onTap();
+          },
+          destinations: styledDestinations,
+        ),
+      ],
     );
   }
 }
