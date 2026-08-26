@@ -22,10 +22,6 @@ class SurfaceColors extends ThemeExtension<SurfaceColors> with _$SurfaceColorsTa
     required this.onSecondaryContainer,
     required this.inverseSurface,
     required this.inverseOnSurface,
-    required this.topBarBackground,
-    required this.topBarText,
-    required this.bottomBarBackground,
-    required this.bottomBarIconColors,
   });
 
   @override
@@ -58,15 +54,6 @@ class SurfaceColors extends ThemeExtension<SurfaceColors> with _$SurfaceColorsTa
   final Color inverseSurface;
   @override
   final Color inverseOnSurface;
-  @override
-  final Color topBarBackground;
-  @override
-  final Color topBarText;
-
-  @override
-  final Color bottomBarBackground;
-  @override
-  final Color bottomBarIconColors;
 }
 
 @immutable
@@ -77,9 +64,11 @@ class AppBarColors extends ThemeExtension<AppBarColors> with _$AppBarColorsTailo
     required this.topBarBorder,
     required this.topBarText,
     required this.backButtonColor,
-    required this.iconColor,
+    required this.avatarColor,
     required this.bottomBarBackground,
     required this.bottomBarIconColors,
+    required this.bottomBarIndicatorColor,
+    required this.bottomBarBorderColor,
   });
 
   @override
@@ -91,12 +80,16 @@ class AppBarColors extends ThemeExtension<AppBarColors> with _$AppBarColorsTailo
   @override
   final Color backButtonColor;
   @override
-  final Color iconColor;
+  final Color avatarColor;
 
   @override
   final Color bottomBarBackground;
   @override
   final Color bottomBarIconColors;
+  @override
+  final Color bottomBarIndicatorColor;
+  @override
+  final Color bottomBarBorderColor;
 }
 
 @immutable

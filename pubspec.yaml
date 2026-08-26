@@ -6,7 +6,6 @@ environment:
   sdk: ^3.9.0
 
 workspace:
-  - packages/anyhoo_app_bar
   - packages/anyhoo_auth
   - packages/anyhoo_core
   - packages/anyhoo_design_system

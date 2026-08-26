@@ -24,8 +24,6 @@ A package for handling logging in and logging out.
 
 ### anyhoo_image_selector
 
-### anyhoo_app_bar
-
 ### anyhoo_form_builder_widgets
 
 ### anyhoo_logging

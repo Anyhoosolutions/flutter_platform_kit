@@ -1,6 +1,5 @@
 // ignore_for_file: deprecated_member_use
 
-import 'package:anyhoo_app_bar/anyhoo_app_bar.dart';
 import 'package:anyhoo_search_bar/anyhoo_search_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:widgetbook/widgetbook.dart';
@@ -21,7 +20,6 @@ Widget build(BuildContext context) {
   final widget = Center(
     child: CustomScrollView(
       slivers: [
-        AnyhooAppBar(hasBackButton: false, title: 'Example app', imageUrl: null, actionButtons: []),
         AnyhooSearchBar(
           icon: icon == 'search'
               ? Icons.search

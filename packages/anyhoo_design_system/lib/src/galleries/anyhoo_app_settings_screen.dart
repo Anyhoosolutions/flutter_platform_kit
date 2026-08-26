@@ -27,7 +27,7 @@ class _AnyhooAppSettingsScreenState extends State<AnyhooAppSettingsScreen> {
       color: surface.scaffoldBackground,
       child: Column(
         children: [
-          const AnyhooTopBar(topBarText: 'Settings', showBackButton: true),
+          const AnyhooTopBar(topBarTitle: 'Settings', showBackButton: true),
           Expanded(
             child: ListView(
               padding: const EdgeInsets.all(DesignTokens.marginMobile),
@@ -56,15 +56,13 @@ class _AnyhooAppSettingsScreenState extends State<AnyhooAppSettingsScreen> {
                           children: [
                             Text(
                               'Alex Sterling',
-                              style: AnyhooTypography.headline(HeadlineSize.medium).copyWith(
-                                color: surface.primaryText,
-                              ),
+                              style: AnyhooTypography.headline(
+                                HeadlineSize.medium,
+                              ).copyWith(color: surface.primaryText),
                             ),
                             Text(
                               'alex.sterling@example.com',
-                              style: AnyhooTypography.body(BodySize.medium).copyWith(
-                                color: surface.secondaryText,
-                              ),
+                              style: AnyhooTypography.body(BodySize.medium).copyWith(color: surface.secondaryText),
                             ),
                           ],
                         ),
@@ -73,9 +71,7 @@ class _AnyhooAppSettingsScreenState extends State<AnyhooAppSettingsScreen> {
                         onPressed: () {},
                         child: Text(
                           'Edit',
-                          style: AnyhooTypography.label(LabelSize.medium).copyWith(
-                            color: accent.primaryFixed,
-                          ),
+                          style: AnyhooTypography.label(LabelSize.medium).copyWith(color: accent.primaryFixed),
                         ),
                       ),
                     ],
@@ -125,10 +121,7 @@ class _AnyhooAppSettingsScreenState extends State<AnyhooAppSettingsScreen> {
                         title: 'Dark Mode',
                         subtitle: 'Adjust app theme',
                         showChevron: false,
-                        trailing: AnyhooSwitch(
-                          value: _darkMode,
-                          onChanged: (v) => setState(() => _darkMode = v),
-                        ),
+                        trailing: AnyhooSwitch(value: _darkMode, onChanged: (v) => setState(() => _darkMode = v)),
                       ),
                       Divider(height: 1, color: surface.cardBorder.withValues(alpha: 0.3)),
                       Padding(
@@ -139,10 +132,7 @@ class _AnyhooAppSettingsScreenState extends State<AnyhooAppSettingsScreen> {
                             Row(
                               children: [
                                 DecoratedBox(
-                                  decoration: BoxDecoration(
-                                    color: surface.containerHigh,
-                                    shape: BoxShape.circle,
-                                  ),
+                                  decoration: BoxDecoration(color: surface.containerHigh, shape: BoxShape.circle),
                                   child: Padding(
                                     padding: const EdgeInsets.all(DesignTokens.spacingSm),
                                     child: Icon(Icons.language, color: accent.primaryFixed),
@@ -155,15 +145,15 @@ class _AnyhooAppSettingsScreenState extends State<AnyhooAppSettingsScreen> {
                                     children: [
                                       Text(
                                         'Language',
-                                        style: AnyhooTypography.label(LabelSize.large).copyWith(
-                                          color: surface.primaryText,
-                                        ),
+                                        style: AnyhooTypography.label(
+                                          LabelSize.large,
+                                        ).copyWith(color: surface.primaryText),
                                       ),
                                       Text(
                                         'Select interface language',
-                                        style: AnyhooTypography.body(BodySize.medium).copyWith(
-                                          color: surface.secondaryText,
-                                        ),
+                                        style: AnyhooTypography.body(
+                                          BodySize.medium,
+                                        ).copyWith(color: surface.secondaryText),
                                       ),
                                     ],
                                   ),
@@ -191,10 +181,7 @@ class _AnyhooAppSettingsScreenState extends State<AnyhooAppSettingsScreen> {
                             Row(
                               children: [
                                 DecoratedBox(
-                                  decoration: BoxDecoration(
-                                    color: surface.containerHigh,
-                                    shape: BoxShape.circle,
-                                  ),
+                                  decoration: BoxDecoration(color: surface.containerHigh, shape: BoxShape.circle),
                                   child: Padding(
                                     padding: const EdgeInsets.all(DesignTokens.spacingSm),
                                     child: Icon(Icons.notifications_outlined, color: accent.primaryFixed),
@@ -207,15 +194,15 @@ class _AnyhooAppSettingsScreenState extends State<AnyhooAppSettingsScreen> {
                                     children: [
                                       Text(
                                         'Notification Volume',
-                                        style: AnyhooTypography.label(LabelSize.large).copyWith(
-                                          color: surface.primaryText,
-                                        ),
+                                        style: AnyhooTypography.label(
+                                          LabelSize.large,
+                                        ).copyWith(color: surface.primaryText),
                                       ),
                                       Text(
                                         'Adjust alert frequency',
-                                        style: AnyhooTypography.body(BodySize.medium).copyWith(
-                                          color: surface.secondaryText,
-                                        ),
+                                        style: AnyhooTypography.body(
+                                          BodySize.medium,
+                                        ).copyWith(color: surface.secondaryText),
                                       ),
                                     ],
                                   ),
@@ -262,16 +249,11 @@ class _AnyhooAppSettingsScreenState extends State<AnyhooAppSettingsScreen> {
                 OutlinedButton.icon(
                   onPressed: () {},
                   icon: Icon(Icons.logout, color: status.error),
-                  label: Text(
-                    'Log Out',
-                    style: AnyhooTypography.label(LabelSize.large).copyWith(color: status.error),
-                  ),
+                  label: Text('Log Out', style: AnyhooTypography.label(LabelSize.large).copyWith(color: status.error)),
                   style: OutlinedButton.styleFrom(
                     minimumSize: const Size.fromHeight(48),
                     side: BorderSide(color: DesignTokens.errorRed),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(DesignTokens.radiusMd),
-                    ),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(DesignTokens.radiusMd)),
                   ),
                 ),
                 const SizedBox(height: DesignTokens.spacingXl),
@@ -292,16 +274,8 @@ class _SectionLabel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(
-        left: DesignTokens.spacingSm,
-        bottom: DesignTokens.spacingSm,
-      ),
-      child: Text(
-        label,
-        style: AnyhooTypography.label(LabelSize.large).copyWith(
-          color: context.surface.secondaryText,
-        ),
-      ),
+      padding: const EdgeInsets.only(left: DesignTokens.spacingSm, bottom: DesignTokens.spacingSm),
+      child: Text(label, style: AnyhooTypography.label(LabelSize.large).copyWith(color: context.surface.secondaryText)),
     );
   }
 }

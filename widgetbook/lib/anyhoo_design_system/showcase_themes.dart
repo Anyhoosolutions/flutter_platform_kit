@@ -5,7 +5,8 @@ import 'package:flutter/material.dart';
 enum ShowcaseThemeOption {
   defaults('Default'),
   slateSky('Slate + Sky'),
-  warmTerracotta('Warm Terracotta');
+  warmTerracotta('Warm Terracotta'),
+  crazy('Crazy');
 
   const ShowcaseThemeOption(this.label);
 
@@ -20,6 +21,7 @@ enum ShowcaseThemeOption {
       ShowcaseThemeOption.defaults => AnyhooTheme.light(),
       ShowcaseThemeOption.slateSky => AnyhooTheme.light(colors: slateSkyColors),
       ShowcaseThemeOption.warmTerracotta => AnyhooTheme.light(colors: warmTerracottaColors),
+      ShowcaseThemeOption.crazy => AnyhooTheme.light(colors: crazyColors),
     };
   }
 
@@ -28,6 +30,7 @@ enum ShowcaseThemeOption {
       ShowcaseThemeOption.defaults => AnyhooTheme.dark(),
       ShowcaseThemeOption.slateSky => AnyhooTheme.dark(colors: slateSkyDarkColors),
       ShowcaseThemeOption.warmTerracotta => AnyhooTheme.dark(colors: warmTerracottaDarkColors),
+      ShowcaseThemeOption.crazy => AnyhooTheme.dark(colors: crazyDarkColors),
     };
   }
 }
@@ -50,19 +53,17 @@ const slateSkyColors = AppColors(
     onSecondaryContainer: Color(0xFF0369A1),
     inverseSurface: Color(0xFF1E293B),
     inverseOnSurface: Color(0xFFF8FAFC),
-    topBarBackground: Color.fromARGB(255, 58, 132, 205),
-    topBarText: Color(0xFF0F172A),
-    bottomBarBackground: Color.fromARGB(255, 152, 198, 245),
-    bottomBarIconColors: Color(0xFF0F172A),
   ),
   appBar: AppBarColors(
     topBarBackground: Color(0xFFF5F5F0),
     topBarBorder: Color(0xFF8E9379),
     topBarText: Color(0xFF111508),
     backButtonColor: Color(0xFF111508),
-    iconColor: Color(0xFF111508),
+    avatarColor: Color(0xFF111508),
     bottomBarBackground: Color(0xFFF5F5F0),
     bottomBarIconColors: Color(0xFF111508),
+    bottomBarIndicatorColor: Color.fromARGB(255, 16, 139, 144),
+    bottomBarBorderColor: Color.fromARGB(255, 242, 244, 237),
   ),
   accent: AccentColors(
     primaryFixed: Color(0xFF0284C7),
@@ -100,19 +101,17 @@ const slateSkyDarkColors = AppColors(
     onSecondaryContainer: Color(0xFFE0F2FE),
     inverseSurface: Color(0xFFE2E8F0),
     inverseOnSurface: Color(0xFF1E293B),
-    topBarBackground: Color.fromARGB(255, 58, 132, 205),
-    topBarText: Color(0xFF0F172A),
-    bottomBarBackground: Color.fromARGB(255, 152, 198, 245),
-    bottomBarIconColors: Color(0xFF0F172A),
   ),
   appBar: AppBarColors(
     topBarBackground: Color(0xFFF5F5F0),
     topBarBorder: Color(0xFF8E9379),
     topBarText: Color(0xFF111508),
     backButtonColor: Color(0xFF111508),
-    iconColor: Color(0xFF111508),
-    bottomBarBackground: Color(0xFFF5F5F0),
-    bottomBarIconColors: Color(0xFF111508),
+    avatarColor: Color(0xFF111508),
+    bottomBarBackground: Color(0xFF0F172A),
+    bottomBarIconColors: Color.fromARGB(255, 242, 244, 237),
+    bottomBarIndicatorColor: Color.fromARGB(255, 16, 139, 144),
+    bottomBarBorderColor: Color.fromARGB(255, 242, 244, 237),
   ),
   accent: AccentColors(
     primaryFixed: Color(0xFF38BDF8),
@@ -151,19 +150,17 @@ const warmTerracottaColors = AppColors(
     onSecondaryContainer: Color(0xFF8B3A14),
     inverseSurface: Color(0xFF2C1F18),
     inverseOnSurface: Color(0xFFF5EDE3),
-    topBarBackground: Color.fromARGB(255, 152, 198, 245),
-    topBarText: Color(0xFF0F172A),
-    bottomBarBackground: Color.fromARGB(255, 152, 198, 245),
-    bottomBarIconColors: Color(0xFF0F172A),
   ),
   appBar: AppBarColors(
     topBarBackground: Color(0xFFF5F5F0),
     topBarBorder: Color(0xFF8E9379),
     topBarText: Color(0xFF111508),
     backButtonColor: Color(0xFF111508),
-    iconColor: Color(0xFF111508),
+    avatarColor: Color(0xFF111508),
     bottomBarBackground: Color(0xFFF5F5F0),
     bottomBarIconColors: Color(0xFF111508),
+    bottomBarIndicatorColor: Color(0xFF111508),
+    bottomBarBorderColor: Color(0xFF8E9379),
   ),
   accent: AccentColors(
     primaryFixed: Color(0xFFC45C26),
@@ -201,19 +198,17 @@ const warmTerracottaDarkColors = AppColors(
     onSecondaryContainer: Color(0xFFFCE8DC),
     inverseSurface: Color(0xFFF5EDE3),
     inverseOnSurface: Color(0xFF2C1F18),
-    topBarBackground: Color.fromARGB(255, 152, 198, 245),
-    topBarText: Color(0xFF0F172A),
-    bottomBarBackground: Color.fromARGB(255, 152, 198, 245),
-    bottomBarIconColors: Color(0xFF0F172A),
   ),
   appBar: AppBarColors(
     topBarBackground: Color(0xFFF5F5F0),
     topBarBorder: Color(0xFF8E9379),
     topBarText: Color(0xFF111508),
     backButtonColor: Color(0xFF111508),
-    iconColor: Color(0xFF111508),
+    avatarColor: Color(0xFF111508),
     bottomBarBackground: Color(0xFFF5F5F0),
     bottomBarIconColors: Color(0xFF111508),
+    bottomBarIndicatorColor: Color(0xFF111508),
+    bottomBarBorderColor: Color(0xFF8E9379),
   ),
   accent: AccentColors(
     primaryFixed: Color(0xFFE07A45),
@@ -232,4 +227,101 @@ const warmTerracottaDarkColors = AppColors(
     success: Color(0xFF34D399),
   ),
   shimmer: ShimmerColors(baseColor: Color(0xFF2C1F18), highlightColor: Color(0xFF3D2C22)),
+);
+
+/// Slate surfaces with a sky-blue accent (from the design system guide).
+const crazyColors = AppColors(
+  surface: SurfaceColors(
+    scaffoldBackground: Color(0xFFF8FAFC),
+    lowContrastBackground: Color(0xFFF1F5F9),
+    primaryText: Color(0xFF0F172A),
+    secondaryText: Color(0xFF475569),
+    cardBackground: Color(0xFFFFFFFF),
+    cardBorder: Color(0xFFE2E8F0),
+    containerHigh: Color(0xFFE2E8F0),
+    containerLow: Color(0xFFF1F5F9),
+    containerHighest: Color(0xFFCBD5E1),
+    containerLowest: Color(0xFFFFFFFF),
+    outline: Color(0xFF94A3B8),
+    secondaryContainer: Color(0xFFE0F2FE),
+    onSecondaryContainer: Color(0xFF0369A1),
+    inverseSurface: Color(0xFF1E293B),
+    inverseOnSurface: Color(0xFFF8FAFC),
+  ),
+  appBar: AppBarColors(
+    topBarBackground: Colors.red, // Color(0xFFF5F5F0),
+    topBarBorder: Colors.yellow, // Color(0xFF8E9379),
+    topBarText: Colors.blue, // Color(0xFF111508),
+    backButtonColor: Colors.green, // Color(0xFF111508),
+    avatarColor: Colors.purple, // Color(0xFF111508),
+    bottomBarBackground: Colors.orange, // Color(0xFFF5F5F0),
+    bottomBarIconColors: Colors.pink, // Color(0xFF111508),
+    bottomBarIndicatorColor: Colors.cyan, // Color(0xFF111508),
+    bottomBarBorderColor: Color.fromARGB(255, 30, 164, 231),
+  ),
+  accent: AccentColors(
+    primaryFixed: Color(0xFF0284C7),
+    onPrimaryFixed: Color(0xFFFFFFFF),
+    primaryDisabled: Color(0xFFBAE6FD),
+    onPrimaryDisabled: Color(0xFF0369A1),
+    primaryContainer: Color(0xFFE0F2FE),
+    onPrimaryContainer: Color(0xFF0369A1),
+    headline: Color(0xFF0F172A),
+    inversePrimary: Color(0xFF7DD3FC),
+  ),
+  status: StatusColors(
+    error: Color(0xFFEF4444),
+    errorContainer: Color(0xFF93000a),
+    warning: Color(0xFFF59E0B),
+    success: Color(0xFF10B981),
+  ),
+  shimmer: ShimmerColors(baseColor: Color(0xFFE2E8F0), highlightColor: Color(0xFFF1F5F9)),
+);
+
+const crazyDarkColors = AppColors(
+  surface: SurfaceColors(
+    scaffoldBackground: Color(0xFF0F172A),
+    lowContrastBackground: Color(0xFF1E293B),
+    primaryText: Color(0xFFF8FAFC),
+    secondaryText: Color(0xFFCBD5E1),
+    cardBackground: Color(0xFF1E293B),
+    cardBorder: Color(0xFF334155),
+    containerHigh: Color(0xFF334155),
+    containerLow: Color(0xFF1E293B),
+    containerHighest: Color(0xFF475569),
+    containerLowest: Color(0xFF020617),
+    outline: Color(0xFF64748B),
+    secondaryContainer: Color(0xFF075985),
+    onSecondaryContainer: Color(0xFFE0F2FE),
+    inverseSurface: Color(0xFFE2E8F0),
+    inverseOnSurface: Color(0xFF1E293B),
+  ),
+  appBar: AppBarColors(
+    topBarBackground: Color(0xFFF5F5F0),
+    topBarBorder: Color(0xFF8E9379),
+    topBarText: Color(0xFF111508),
+    backButtonColor: Color(0xFF111508),
+    avatarColor: Color(0xFF111508),
+    bottomBarBackground: Color(0xFFF5F5F0),
+    bottomBarIconColors: Color(0xFF111508),
+    bottomBarIndicatorColor: Color(0xFF111508),
+    bottomBarBorderColor: Color(0xFF8E9379),
+  ),
+  accent: AccentColors(
+    primaryFixed: Color(0xFF38BDF8),
+    onPrimaryFixed: Color(0xFF0C4A6E),
+    primaryDisabled: Color(0xFF0E7490),
+    onPrimaryDisabled: Color(0xFFBAE6FD),
+    primaryContainer: Color(0xFF075985),
+    onPrimaryContainer: Color(0xFFE0F2FE),
+    headline: Color(0xFFF8FAFC),
+    inversePrimary: Color(0xFF0284C7),
+  ),
+  status: StatusColors(
+    error: Color(0xFFF87171),
+    errorContainer: Color(0xFF93000a),
+    warning: Color(0xFFFBBF24),
+    success: Color(0xFF34D399),
+  ),
+  shimmer: ShimmerColors(baseColor: Color(0xFF1E293B), highlightColor: Color(0xFF334155)),
 );

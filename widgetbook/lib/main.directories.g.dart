@@ -11,10 +11,6 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:widgetbook/widgetbook.dart' as _widgetbook;
-import 'package:widgetbook_workspace/anyhoo_app_bar/anyhoo_app_bar.dart'
-    as _widgetbook_workspace_anyhoo_app_bar_anyhoo_app_bar;
-import 'package:widgetbook_workspace/anyhoo_app_bar/anyhoo_bottom_bar.dart'
-    as _widgetbook_workspace_anyhoo_app_bar_anyhoo_bottom_bar;
 import 'package:widgetbook_workspace/anyhoo_auth/login_widget.dart'
     as _widgetbook_workspace_anyhoo_auth_login_widget;
 import 'package:widgetbook_workspace/anyhoo_core/error_display_widget.dart'
@@ -25,6 +21,8 @@ import 'package:widgetbook_workspace/anyhoo_core/waiting_page.dart'
     as _widgetbook_workspace_anyhoo_core_waiting_page;
 import 'package:widgetbook_workspace/anyhoo_design_system/appBar/anyhoo_top_bar.dart'
     as _widgetbook_workspace_anyhoo_design_system_appBar_anyhoo_top_bar;
+import 'package:widgetbook_workspace/anyhoo_design_system/bottomBar/anyhoo_bottom_bar.dart'
+    as _widgetbook_workspace_anyhoo_design_system_bottomBar_anyhoo_bottom_bar;
 import 'package:widgetbook_workspace/anyhoo_design_system/buttons/anyhoo_round_button.dart'
     as _widgetbook_workspace_anyhoo_design_system_buttons_anyhoo_round_button;
 import 'package:widgetbook_workspace/anyhoo_design_system/cards/anyhoo_cards_gallery.dart'
@@ -61,30 +59,6 @@ import 'package:widgetbook_workspace/anyhoo_shimmer/shimmer.dart'
     as _widgetbook_workspace_anyhoo_shimmer_shimmer;
 
 final directories = <_widgetbook.WidgetbookNode>[
-  _widgetbook.WidgetbookFolder(
-    name: 'anyhoo_app_bar',
-    children: [
-      _widgetbook.WidgetbookComponent(
-        name: 'AnyhooAppBar',
-        useCases: [
-          _widgetbook.WidgetbookUseCase(
-            name: 'AnyhooAppBar',
-            builder: _widgetbook_workspace_anyhoo_app_bar_anyhoo_app_bar.build,
-          ),
-        ],
-      ),
-      _widgetbook.WidgetbookComponent(
-        name: 'AnyhooBottomBar',
-        useCases: [
-          _widgetbook.WidgetbookUseCase(
-            name: 'AnyhooBottomBar',
-            builder:
-                _widgetbook_workspace_anyhoo_app_bar_anyhoo_bottom_bar.build,
-          ),
-        ],
-      ),
-    ],
-  ),
   _widgetbook.WidgetbookFolder(
     name: 'anyhoo_auth',
     children: [
@@ -136,15 +110,15 @@ final directories = <_widgetbook.WidgetbookNode>[
     name: 'anyhoo_design_system',
     children: [
       _widgetbook.WidgetbookFolder(
-        name: 'appBar',
+        name: 'appBottomBar',
         children: [
           _widgetbook.WidgetbookComponent(
-            name: 'AnyhooTopBar',
+            name: 'AnyhooBottomBar',
             useCases: [
               _widgetbook.WidgetbookUseCase(
-                name: 'Default',
+                name: 'AnyhooBottomBar',
                 builder:
-                    _widgetbook_workspace_anyhoo_design_system_appBar_anyhoo_top_bar
+                    _widgetbook_workspace_anyhoo_design_system_bottomBar_anyhoo_bottom_bar
                         .buildAnyhooTopBar,
               ),
             ],
@@ -301,6 +275,22 @@ final directories = <_widgetbook.WidgetbookNode>[
                 builder:
                     _widgetbook_workspace_anyhoo_design_system_screens_executive_dashboard_screen
                         .buildExecutiveDashboardScreen,
+              ),
+            ],
+          ),
+        ],
+      ),
+      _widgetbook.WidgetbookFolder(
+        name: 'topBar',
+        children: [
+          _widgetbook.WidgetbookComponent(
+            name: 'AnyhooTopBar',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'AnyhooTopBar',
+                builder:
+                    _widgetbook_workspace_anyhoo_design_system_appBar_anyhoo_top_bar
+                        .buildAnyhooTopBar,
               ),
             ],
           ),

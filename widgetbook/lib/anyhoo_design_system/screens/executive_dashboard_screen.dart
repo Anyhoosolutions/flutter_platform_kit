@@ -6,8 +6,5 @@ import 'package:widgetbook_workspace/helpers/design_system_device_frame_wrapper.
 
 @widgetbook.UseCase(name: 'Executive Dashboard', type: AnyhooMetricCard, path: 'anyhoo_design_system/screens')
 Widget buildExecutiveDashboardScreen(BuildContext context) {
-  return DesignSystemDeviceFrameWrapper.wrapInDeviceFrame(
-    context,
-    const AnyhooExecutiveDashboardScreen(),
-  );
+  return DesignSystemDeviceFrameWrapper.wrapInDeviceFrame(context, AnyhooExecutiveDashboardScreen());
 }

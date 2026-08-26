@@ -34,12 +34,6 @@
 			"title": "Flutter packages",
 			"subpages": [
 				{
-					"filepath": "anyhoo_app_bar/README.md",
-					"name": "Anyhoo App Bar",
-					"title": "Anyhoo App Bar",
-					"subpages": []
-				},
-				{
 					"filepath": "anyhoo_auth/README.md",
 					"name": "Anyhoo Auth",
 					"title": "Anyhoo Auth",
