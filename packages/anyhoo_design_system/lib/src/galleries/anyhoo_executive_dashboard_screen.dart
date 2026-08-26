@@ -18,9 +18,8 @@ class AnyhooExecutiveDashboardScreen extends StatelessWidget {
     final surface = context.surface;
     final accent = context.accent;
 
-    return ColoredBox(
-      color: surface.scaffoldBackground,
-      child: Column(
+    return Scaffold(
+      body: Column(
         children: [
           AnyhooTopBar(topBarTitle: 'Overview'),
           Expanded(
@@ -179,9 +178,9 @@ class AnyhooExecutiveDashboardScreen extends StatelessWidget {
               ],
             ),
           ),
-          AnyhooBottomBar(destinations: _destinations, selectedIndex: 0),
         ],
       ),
+      bottomNavigationBar: AnyhooBottomBar(destinations: _destinations, selectedIndex: 0),
     );
   }
 }
