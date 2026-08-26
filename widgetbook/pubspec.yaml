@@ -35,8 +35,6 @@ dependencies:
     path: ../packages/anyhoo_remote_config
   anyhoo_shimmer:
     path: ../packages/anyhoo_shimmer
-  anyhoo_app_bar:
-    path: ../packages/anyhoo_app_bar
   anyhoo_form_builder_widgets:
     path: ../packages/anyhoo_form_builder_widgets
   anyhoo_search_bar:

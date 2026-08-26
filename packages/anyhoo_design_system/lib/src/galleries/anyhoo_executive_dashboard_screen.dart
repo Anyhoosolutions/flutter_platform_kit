@@ -4,13 +4,13 @@ import 'package:flutter/material.dart';
 
 /// Composition screen: metrics, actions, and a users table.
 class AnyhooExecutiveDashboardScreen extends StatelessWidget {
-  const AnyhooExecutiveDashboardScreen({super.key});
+  AnyhooExecutiveDashboardScreen({super.key});
 
-  static const _destinations = [
-    NavigationDestination(icon: Icon(Icons.dashboard_outlined), label: 'Dashboard'),
-    NavigationDestination(icon: Icon(Icons.widgets_outlined), label: 'Components'),
-    NavigationDestination(icon: Icon(Icons.forum_outlined), label: 'Feedback'),
-    NavigationDestination(icon: Icon(Icons.palette_outlined), label: 'Design'),
+  final _destinations = [
+    AnyhooBottomBarButton(icon: Icons.dashboard_outlined, label: 'Dashboard', onTap: () {}),
+    AnyhooBottomBarButton(icon: Icons.widgets_outlined, label: 'Components', onTap: () {}),
+    AnyhooBottomBarButton(icon: Icons.forum_outlined, label: 'Feedback', onTap: () {}),
+    AnyhooBottomBarButton(icon: Icons.palette_outlined, label: 'Design', onTap: () {}),
   ];
 
   @override
@@ -179,7 +179,7 @@ class AnyhooExecutiveDashboardScreen extends StatelessWidget {
               ],
             ),
           ),
-          AnyhooBottomBar(destinations: _destinations, selectedIndex: 0, onDestinationSelected: (context, index) {}),
+          AnyhooBottomBar(destinations: _destinations, selectedIndex: 0),
         ],
       ),
     );

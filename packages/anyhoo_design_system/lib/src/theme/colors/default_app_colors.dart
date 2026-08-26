@@ -50,6 +50,7 @@ const defaultLightColors = AppColors(
     avatarColor: Color(0xFF0058BE),
     bottomBarBackground: Color(0xFFFAF8FF),
     bottomBarIconColors: Color(0xFF131B2E),
+    bottomBarIndicatorColor: Color(0xFF131B2E),
   ),
   accent: defaultAccentColors,
   status: defaultStatusColors,
@@ -100,5 +101,6 @@ const defaultDarkColors = AppColors(
     avatarColor: Color(0xFFADC6FF),
     bottomBarBackground: Color(0xFF0B1326),
     bottomBarIconColors: Color(0xFFDAE2FD),
+    bottomBarIndicatorColor: Color(0xFFDAE2FD),
   ),
 );

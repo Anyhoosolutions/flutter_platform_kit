@@ -2,8 +2,8 @@ import 'package:anyhoo_design_system/anyhoo_design_system.dart';
 import 'package:flutter/material.dart';
 
 /// Showcase of top and bottom bars.
-class AnyhooAppBarGallery extends StatelessWidget {
-  const AnyhooAppBarGallery({super.key, this.useSubtitle = false});
+class AnyhooTopBarGallery extends StatelessWidget {
+  const AnyhooTopBarGallery({super.key, this.useSubtitle = false});
 
   final bool useSubtitle;
 
@@ -27,7 +27,6 @@ class AnyhooAppBarGallery extends StatelessWidget {
               ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Log out')));
             },
           ),
-          AnyhooBottomBar.fromPath(''),
         ],
       ),
     );

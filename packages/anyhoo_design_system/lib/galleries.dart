@@ -11,7 +11,8 @@
 /// `AnyhooTheme.light/dark(colors: ...)` in Widgetbook.
 library;
 
-export 'src/galleries/anyhoo_app_bar_gallery.dart';
+export 'src/galleries/anyhoo_top_bar_gallery.dart';
+export 'src/galleries/anyhoo_bottom_bar_gallery.dart';
 export 'src/galleries/anyhoo_app_settings_screen.dart';
 export 'src/galleries/anyhoo_buttons_gallery.dart';
 export 'src/galleries/anyhoo_cards_gallery.dart';

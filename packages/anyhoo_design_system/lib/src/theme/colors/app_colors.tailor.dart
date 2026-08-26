@@ -46,7 +46,8 @@ mixin _$SurfaceColorsTailorMixin on ThemeExtension<SurfaceColors> {
   }) {
     return SurfaceColors(
       scaffoldBackground: scaffoldBackground ?? this.scaffoldBackground,
-      lowContrastBackground: lowContrastBackground ?? this.lowContrastBackground,
+      lowContrastBackground:
+          lowContrastBackground ?? this.lowContrastBackground,
       primaryText: primaryText ?? this.primaryText,
       secondaryText: secondaryText ?? this.secondaryText,
       cardBackground: cardBackground ?? this.cardBackground,
@@ -67,21 +68,45 @@ mixin _$SurfaceColorsTailorMixin on ThemeExtension<SurfaceColors> {
   SurfaceColors lerp(covariant ThemeExtension<SurfaceColors>? other, double t) {
     if (other is! SurfaceColors) return this as SurfaceColors;
     return SurfaceColors(
-      scaffoldBackground: Color.lerp(scaffoldBackground, other.scaffoldBackground, t)!,
-      lowContrastBackground: Color.lerp(lowContrastBackground, other.lowContrastBackground, t)!,
+      scaffoldBackground: Color.lerp(
+        scaffoldBackground,
+        other.scaffoldBackground,
+        t,
+      )!,
+      lowContrastBackground: Color.lerp(
+        lowContrastBackground,
+        other.lowContrastBackground,
+        t,
+      )!,
       primaryText: Color.lerp(primaryText, other.primaryText, t)!,
       secondaryText: Color.lerp(secondaryText, other.secondaryText, t)!,
       cardBackground: Color.lerp(cardBackground, other.cardBackground, t)!,
       cardBorder: Color.lerp(cardBorder, other.cardBorder, t)!,
       containerHigh: Color.lerp(containerHigh, other.containerHigh, t)!,
       containerLow: Color.lerp(containerLow, other.containerLow, t)!,
-      containerHighest: Color.lerp(containerHighest, other.containerHighest, t)!,
+      containerHighest: Color.lerp(
+        containerHighest,
+        other.containerHighest,
+        t,
+      )!,
       containerLowest: Color.lerp(containerLowest, other.containerLowest, t)!,
       outline: Color.lerp(outline, other.outline, t)!,
-      secondaryContainer: Color.lerp(secondaryContainer, other.secondaryContainer, t)!,
-      onSecondaryContainer: Color.lerp(onSecondaryContainer, other.onSecondaryContainer, t)!,
+      secondaryContainer: Color.lerp(
+        secondaryContainer,
+        other.secondaryContainer,
+        t,
+      )!,
+      onSecondaryContainer: Color.lerp(
+        onSecondaryContainer,
+        other.onSecondaryContainer,
+        t,
+      )!,
       inverseSurface: Color.lerp(inverseSurface, other.inverseSurface, t)!,
-      inverseOnSurface: Color.lerp(inverseOnSurface, other.inverseOnSurface, t)!,
+      inverseOnSurface: Color.lerp(
+        inverseOnSurface,
+        other.inverseOnSurface,
+        t,
+      )!,
     );
   }
 
@@ -90,21 +115,63 @@ mixin _$SurfaceColorsTailorMixin on ThemeExtension<SurfaceColors> {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is SurfaceColors &&
-            const DeepCollectionEquality().equals(scaffoldBackground, other.scaffoldBackground) &&
-            const DeepCollectionEquality().equals(lowContrastBackground, other.lowContrastBackground) &&
-            const DeepCollectionEquality().equals(primaryText, other.primaryText) &&
-            const DeepCollectionEquality().equals(secondaryText, other.secondaryText) &&
-            const DeepCollectionEquality().equals(cardBackground, other.cardBackground) &&
-            const DeepCollectionEquality().equals(cardBorder, other.cardBorder) &&
-            const DeepCollectionEquality().equals(containerHigh, other.containerHigh) &&
-            const DeepCollectionEquality().equals(containerLow, other.containerLow) &&
-            const DeepCollectionEquality().equals(containerHighest, other.containerHighest) &&
-            const DeepCollectionEquality().equals(containerLowest, other.containerLowest) &&
+            const DeepCollectionEquality().equals(
+              scaffoldBackground,
+              other.scaffoldBackground,
+            ) &&
+            const DeepCollectionEquality().equals(
+              lowContrastBackground,
+              other.lowContrastBackground,
+            ) &&
+            const DeepCollectionEquality().equals(
+              primaryText,
+              other.primaryText,
+            ) &&
+            const DeepCollectionEquality().equals(
+              secondaryText,
+              other.secondaryText,
+            ) &&
+            const DeepCollectionEquality().equals(
+              cardBackground,
+              other.cardBackground,
+            ) &&
+            const DeepCollectionEquality().equals(
+              cardBorder,
+              other.cardBorder,
+            ) &&
+            const DeepCollectionEquality().equals(
+              containerHigh,
+              other.containerHigh,
+            ) &&
+            const DeepCollectionEquality().equals(
+              containerLow,
+              other.containerLow,
+            ) &&
+            const DeepCollectionEquality().equals(
+              containerHighest,
+              other.containerHighest,
+            ) &&
+            const DeepCollectionEquality().equals(
+              containerLowest,
+              other.containerLowest,
+            ) &&
             const DeepCollectionEquality().equals(outline, other.outline) &&
-            const DeepCollectionEquality().equals(secondaryContainer, other.secondaryContainer) &&
-            const DeepCollectionEquality().equals(onSecondaryContainer, other.onSecondaryContainer) &&
-            const DeepCollectionEquality().equals(inverseSurface, other.inverseSurface) &&
-            const DeepCollectionEquality().equals(inverseOnSurface, other.inverseOnSurface));
+            const DeepCollectionEquality().equals(
+              secondaryContainer,
+              other.secondaryContainer,
+            ) &&
+            const DeepCollectionEquality().equals(
+              onSecondaryContainer,
+              other.onSecondaryContainer,
+            ) &&
+            const DeepCollectionEquality().equals(
+              inverseSurface,
+              other.inverseSurface,
+            ) &&
+            const DeepCollectionEquality().equals(
+              inverseOnSurface,
+              other.inverseOnSurface,
+            ));
   }
 
   @override
@@ -138,6 +205,7 @@ mixin _$AppBarColorsTailorMixin on ThemeExtension<AppBarColors> {
   Color get avatarColor;
   Color get bottomBarBackground;
   Color get bottomBarIconColors;
+  Color get bottomBarIndicatorColor;
 
   @override
   AppBarColors copyWith({
@@ -145,18 +213,21 @@ mixin _$AppBarColorsTailorMixin on ThemeExtension<AppBarColors> {
     Color? topBarBorder,
     Color? topBarText,
     Color? backButtonColor,
-    Color? iconColor,
+    Color? avatarColor,
     Color? bottomBarBackground,
     Color? bottomBarIconColors,
+    Color? bottomBarIndicatorColor,
   }) {
     return AppBarColors(
       topBarBackground: topBarBackground ?? this.topBarBackground,
       topBarBorder: topBarBorder ?? this.topBarBorder,
       topBarText: topBarText ?? this.topBarText,
       backButtonColor: backButtonColor ?? this.backButtonColor,
-      avatarColor: iconColor ?? this.avatarColor,
+      avatarColor: avatarColor ?? this.avatarColor,
       bottomBarBackground: bottomBarBackground ?? this.bottomBarBackground,
       bottomBarIconColors: bottomBarIconColors ?? this.bottomBarIconColors,
+      bottomBarIndicatorColor:
+          bottomBarIndicatorColor ?? this.bottomBarIndicatorColor,
     );
   }
 
@@ -164,13 +235,30 @@ mixin _$AppBarColorsTailorMixin on ThemeExtension<AppBarColors> {
   AppBarColors lerp(covariant ThemeExtension<AppBarColors>? other, double t) {
     if (other is! AppBarColors) return this as AppBarColors;
     return AppBarColors(
-      topBarBackground: Color.lerp(topBarBackground, other.topBarBackground, t)!,
+      topBarBackground: Color.lerp(
+        topBarBackground,
+        other.topBarBackground,
+        t,
+      )!,
       topBarBorder: Color.lerp(topBarBorder, other.topBarBorder, t)!,
       topBarText: Color.lerp(topBarText, other.topBarText, t)!,
       backButtonColor: Color.lerp(backButtonColor, other.backButtonColor, t)!,
       avatarColor: Color.lerp(avatarColor, other.avatarColor, t)!,
-      bottomBarBackground: Color.lerp(bottomBarBackground, other.bottomBarBackground, t)!,
-      bottomBarIconColors: Color.lerp(bottomBarIconColors, other.bottomBarIconColors, t)!,
+      bottomBarBackground: Color.lerp(
+        bottomBarBackground,
+        other.bottomBarBackground,
+        t,
+      )!,
+      bottomBarIconColors: Color.lerp(
+        bottomBarIconColors,
+        other.bottomBarIconColors,
+        t,
+      )!,
+      bottomBarIndicatorColor: Color.lerp(
+        bottomBarIndicatorColor,
+        other.bottomBarIndicatorColor,
+        t,
+      )!,
     );
   }
 
@@ -179,13 +267,38 @@ mixin _$AppBarColorsTailorMixin on ThemeExtension<AppBarColors> {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is AppBarColors &&
-            const DeepCollectionEquality().equals(topBarBackground, other.topBarBackground) &&
-            const DeepCollectionEquality().equals(topBarBorder, other.topBarBorder) &&
-            const DeepCollectionEquality().equals(topBarText, other.topBarText) &&
-            const DeepCollectionEquality().equals(backButtonColor, other.backButtonColor) &&
-            const DeepCollectionEquality().equals(avatarColor, other.avatarColor) &&
-            const DeepCollectionEquality().equals(bottomBarBackground, other.bottomBarBackground) &&
-            const DeepCollectionEquality().equals(bottomBarIconColors, other.bottomBarIconColors));
+            const DeepCollectionEquality().equals(
+              topBarBackground,
+              other.topBarBackground,
+            ) &&
+            const DeepCollectionEquality().equals(
+              topBarBorder,
+              other.topBarBorder,
+            ) &&
+            const DeepCollectionEquality().equals(
+              topBarText,
+              other.topBarText,
+            ) &&
+            const DeepCollectionEquality().equals(
+              backButtonColor,
+              other.backButtonColor,
+            ) &&
+            const DeepCollectionEquality().equals(
+              avatarColor,
+              other.avatarColor,
+            ) &&
+            const DeepCollectionEquality().equals(
+              bottomBarBackground,
+              other.bottomBarBackground,
+            ) &&
+            const DeepCollectionEquality().equals(
+              bottomBarIconColors,
+              other.bottomBarIconColors,
+            ) &&
+            const DeepCollectionEquality().equals(
+              bottomBarIndicatorColor,
+              other.bottomBarIndicatorColor,
+            ));
   }
 
   @override
@@ -199,6 +312,7 @@ mixin _$AppBarColorsTailorMixin on ThemeExtension<AppBarColors> {
       const DeepCollectionEquality().hash(avatarColor),
       const DeepCollectionEquality().hash(bottomBarBackground),
       const DeepCollectionEquality().hash(bottomBarIconColors),
+      const DeepCollectionEquality().hash(bottomBarIndicatorColor),
     );
   }
 }
@@ -243,9 +357,21 @@ mixin _$AccentColorsTailorMixin on ThemeExtension<AccentColors> {
       primaryFixed: Color.lerp(primaryFixed, other.primaryFixed, t)!,
       onPrimaryFixed: Color.lerp(onPrimaryFixed, other.onPrimaryFixed, t)!,
       primaryDisabled: Color.lerp(primaryDisabled, other.primaryDisabled, t)!,
-      onPrimaryDisabled: Color.lerp(onPrimaryDisabled, other.onPrimaryDisabled, t)!,
-      primaryContainer: Color.lerp(primaryContainer, other.primaryContainer, t)!,
-      onPrimaryContainer: Color.lerp(onPrimaryContainer, other.onPrimaryContainer, t)!,
+      onPrimaryDisabled: Color.lerp(
+        onPrimaryDisabled,
+        other.onPrimaryDisabled,
+        t,
+      )!,
+      primaryContainer: Color.lerp(
+        primaryContainer,
+        other.primaryContainer,
+        t,
+      )!,
+      onPrimaryContainer: Color.lerp(
+        onPrimaryContainer,
+        other.onPrimaryContainer,
+        t,
+      )!,
       headline: Color.lerp(headline, other.headline, t)!,
       inversePrimary: Color.lerp(inversePrimary, other.inversePrimary, t)!,
     );
@@ -256,14 +382,35 @@ mixin _$AccentColorsTailorMixin on ThemeExtension<AccentColors> {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is AccentColors &&
-            const DeepCollectionEquality().equals(primaryFixed, other.primaryFixed) &&
-            const DeepCollectionEquality().equals(onPrimaryFixed, other.onPrimaryFixed) &&
-            const DeepCollectionEquality().equals(primaryDisabled, other.primaryDisabled) &&
-            const DeepCollectionEquality().equals(onPrimaryDisabled, other.onPrimaryDisabled) &&
-            const DeepCollectionEquality().equals(primaryContainer, other.primaryContainer) &&
-            const DeepCollectionEquality().equals(onPrimaryContainer, other.onPrimaryContainer) &&
+            const DeepCollectionEquality().equals(
+              primaryFixed,
+              other.primaryFixed,
+            ) &&
+            const DeepCollectionEquality().equals(
+              onPrimaryFixed,
+              other.onPrimaryFixed,
+            ) &&
+            const DeepCollectionEquality().equals(
+              primaryDisabled,
+              other.primaryDisabled,
+            ) &&
+            const DeepCollectionEquality().equals(
+              onPrimaryDisabled,
+              other.onPrimaryDisabled,
+            ) &&
+            const DeepCollectionEquality().equals(
+              primaryContainer,
+              other.primaryContainer,
+            ) &&
+            const DeepCollectionEquality().equals(
+              onPrimaryContainer,
+              other.onPrimaryContainer,
+            ) &&
             const DeepCollectionEquality().equals(headline, other.headline) &&
-            const DeepCollectionEquality().equals(inversePrimary, other.inversePrimary));
+            const DeepCollectionEquality().equals(
+              inversePrimary,
+              other.inversePrimary,
+            ));
   }
 
   @override
@@ -289,7 +436,12 @@ mixin _$StatusColorsTailorMixin on ThemeExtension<StatusColors> {
   Color get success;
 
   @override
-  StatusColors copyWith({Color? error, Color? errorContainer, Color? warning, Color? success}) {
+  StatusColors copyWith({
+    Color? error,
+    Color? errorContainer,
+    Color? warning,
+    Color? success,
+  }) {
     return StatusColors(
       error: error ?? this.error,
       errorContainer: errorContainer ?? this.errorContainer,
@@ -315,7 +467,10 @@ mixin _$StatusColorsTailorMixin on ThemeExtension<StatusColors> {
         (other.runtimeType == runtimeType &&
             other is StatusColors &&
             const DeepCollectionEquality().equals(error, other.error) &&
-            const DeepCollectionEquality().equals(errorContainer, other.errorContainer) &&
+            const DeepCollectionEquality().equals(
+              errorContainer,
+              other.errorContainer,
+            ) &&
             const DeepCollectionEquality().equals(warning, other.warning) &&
             const DeepCollectionEquality().equals(success, other.success));
   }
@@ -338,7 +493,10 @@ mixin _$ShimmerColorsTailorMixin on ThemeExtension<ShimmerColors> {
 
   @override
   ShimmerColors copyWith({Color? baseColor, Color? highlightColor}) {
-    return ShimmerColors(baseColor: baseColor ?? this.baseColor, highlightColor: highlightColor ?? this.highlightColor);
+    return ShimmerColors(
+      baseColor: baseColor ?? this.baseColor,
+      highlightColor: highlightColor ?? this.highlightColor,
+    );
   }
 
   @override
@@ -356,7 +514,10 @@ mixin _$ShimmerColorsTailorMixin on ThemeExtension<ShimmerColors> {
         (other.runtimeType == runtimeType &&
             other is ShimmerColors &&
             const DeepCollectionEquality().equals(baseColor, other.baseColor) &&
-            const DeepCollectionEquality().equals(highlightColor, other.highlightColor));
+            const DeepCollectionEquality().equals(
+              highlightColor,
+              other.highlightColor,
+            ));
   }
 
   @override
