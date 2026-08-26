@@ -103,11 +103,11 @@ const slateSkyDarkColors = AppColors(
     inverseOnSurface: Color(0xFF1E293B),
   ),
   appBar: AppBarColors(
-    topBarBackground: Color(0xFFF5F5F0),
+    topBarBackground: Color(0xFF0F172A),
     topBarBorder: Color(0xFF8E9379),
     topBarText: Color(0xFF111508),
-    backButtonColor: Color(0xFF111508),
-    avatarColor: Color(0xFF111508),
+    backButtonColor: Color.fromARGB(255, 16, 139, 144),
+    avatarColor: Color.fromARGB(255, 16, 139, 144),
     bottomBarBackground: Color(0xFF0F172A),
     bottomBarIconColors: Color.fromARGB(255, 242, 244, 237),
     bottomBarIndicatorColor: Color.fromARGB(255, 16, 139, 144),
@@ -159,8 +159,8 @@ const warmTerracottaColors = AppColors(
     avatarColor: Color(0xFF111508),
     bottomBarBackground: Color(0xFFF5F5F0),
     bottomBarIconColors: Color(0xFF111508),
-    bottomBarIndicatorColor: Color(0xFF111508),
-    bottomBarBorderColor: Color(0xFF8E9379),
+    bottomBarIndicatorColor: Color(0xFFC45C26),
+    bottomBarBorderColor: Color(0xFFC45C26),
   ),
   accent: AccentColors(
     primaryFixed: Color(0xFFC45C26),
@@ -183,7 +183,7 @@ const warmTerracottaColors = AppColors(
 
 const warmTerracottaDarkColors = AppColors(
   surface: SurfaceColors(
-    scaffoldBackground: Color(0xFF1A120E),
+    scaffoldBackground: Color(0xFFC45C26),
     lowContrastBackground: Color(0xFF241A14),
     primaryText: Color(0xFFF5EDE3),
     secondaryText: Color(0xFFD4C4B0),
@@ -200,15 +200,15 @@ const warmTerracottaDarkColors = AppColors(
     inverseOnSurface: Color(0xFF2C1F18),
   ),
   appBar: AppBarColors(
-    topBarBackground: Color(0xFFF5F5F0),
+    topBarBackground: Color(0xFFC45C26),
     topBarBorder: Color(0xFF8E9379),
     topBarText: Color(0xFF111508),
     backButtonColor: Color(0xFF111508),
     avatarColor: Color(0xFF111508),
-    bottomBarBackground: Color(0xFFF5F5F0),
+    bottomBarBackground: Color(0xFFC45C26),
     bottomBarIconColors: Color(0xFF111508),
-    bottomBarIndicatorColor: Color(0xFF111508),
-    bottomBarBorderColor: Color(0xFF8E9379),
+    bottomBarIndicatorColor: Color(0xFFC45C26),
+    bottomBarBorderColor: Color(0xFFC45C26),
   ),
   accent: AccentColors(
     primaryFixed: Color(0xFFE07A45),
@@ -280,7 +280,7 @@ const crazyColors = AppColors(
 
 const crazyDarkColors = AppColors(
   surface: SurfaceColors(
-    scaffoldBackground: Color(0xFF0F172A),
+    scaffoldBackground: Color(0xFFC45C26),
     lowContrastBackground: Color(0xFF1E293B),
     primaryText: Color(0xFFF8FAFC),
     secondaryText: Color(0xFFCBD5E1),
@@ -297,15 +297,15 @@ const crazyDarkColors = AppColors(
     inverseOnSurface: Color(0xFF1E293B),
   ),
   appBar: AppBarColors(
-    topBarBackground: Color(0xFFF5F5F0),
-    topBarBorder: Color(0xFF8E9379),
-    topBarText: Color(0xFF111508),
-    backButtonColor: Color(0xFF111508),
-    avatarColor: Color(0xFF111508),
-    bottomBarBackground: Color(0xFFF5F5F0),
-    bottomBarIconColors: Color(0xFF111508),
-    bottomBarIndicatorColor: Color(0xFF111508),
-    bottomBarBorderColor: Color(0xFF8E9379),
+    topBarBackground: Colors.red, // Color(0xFFF5F5F0),
+    topBarBorder: Colors.yellow, // Color(0xFF8E9379),
+    topBarText: Colors.blue, // Color(0xFF111508),
+    backButtonColor: Colors.green, // Color(0xFF111508),
+    avatarColor: Colors.purple, // Color(0xFF111508),
+    bottomBarBackground: Colors.orange, // Color(0xFFF5F5F0),
+    bottomBarIconColors: Colors.pink, // Color(0xFF111508),
+    bottomBarIndicatorColor: Colors.cyan, // Color(0xFF111508),
+    bottomBarBorderColor: Color.fromARGB(255, 30, 164, 231),
   ),
   accent: AccentColors(
     primaryFixed: Color(0xFF38BDF8),
