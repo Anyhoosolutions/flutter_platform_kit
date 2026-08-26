@@ -43,7 +43,6 @@ All apps depend on a monorepo called `flutter_platform_kit` which provides:
 | `anyhoo_router` | Go Router wrapper with auth redirects, refresh streams, route stack observer. |
 | `anyhoo_firebase` | Firebase initialization (Firestore, Auth, Storage), emulator config, `AnyhooStorageService`, Analytics, Crashlytics setup. |
 | `anyhoo_remote_config` | Remote Config Cubit wrapping Firebase Remote Config. |
-| `anyhoo_app_bar` | Shared app bar and bottom navigation bar widgets. |
 | `anyhoo_shimmer` | Shimmer loading placeholder widgets. |
 | `anyhoo_form_builder_widgets` | Form builder widgets (e.g. multi-select dropdown). |
 | `anyhoo_image_selector` | Image selection from camera/gallery with cropping. |
@@ -152,7 +151,6 @@ After gathering answers, produce a PRD with these sections:
 
 ### 3. Information Architecture
 - Screen map / navigation tree (compatible with go_router + anyhoo_router)
-- Bottom nav structure (if applicable, using anyhoo_app_bar)
 - Auth redirect rules
 
 ### 4. Features
