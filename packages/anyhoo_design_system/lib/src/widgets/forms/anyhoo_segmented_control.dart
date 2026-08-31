@@ -3,23 +3,16 @@ import 'package:flutter/material.dart';
 
 /// A labeled value segment for [AnyhooSegmentedControl].
 class AnyhooSegment<T> {
-  const AnyhooSegment({
-    required this.label,
-    required this.value,
-  });
+  const AnyhooSegment({required this.label, required this.value, this.key});
 
   final String label;
   final T value;
+  final Key? key;
 }
 
 /// Pill-track segmented control with an elevated selected thumb.
 class AnyhooSegmentedControl<T> extends StatelessWidget {
-  const AnyhooSegmentedControl({
-    super.key,
-    required this.segments,
-    required this.selected,
-    required this.onChanged,
-  });
+  const AnyhooSegmentedControl({super.key, required this.segments, required this.selected, required this.onChanged});
 
   final List<AnyhooSegment<T>> segments;
   final T selected;
@@ -41,6 +34,7 @@ class AnyhooSegmentedControl<T> extends StatelessWidget {
             for (final segment in segments)
               Expanded(
                 child: _SegmentThumb(
+                  key: segment.key,
                   label: segment.label,
                   selected: segment.value == selected,
                   onTap: () => onChanged(segment.value),
@@ -54,11 +48,7 @@ class AnyhooSegmentedControl<T> extends StatelessWidget {
 }
 
 class _SegmentThumb extends StatelessWidget {
-  const _SegmentThumb({
-    required this.label,
-    required this.selected,
-    required this.onTap,
-  });
+  const _SegmentThumb({required this.label, required this.selected, required this.onTap});
 
   final String label;
   final bool selected;
@@ -74,10 +64,7 @@ class _SegmentThumb extends StatelessWidget {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 150),
         curve: Curves.easeInOut,
-        padding: const EdgeInsets.symmetric(
-          horizontal: DesignTokens.spacingSm,
-          vertical: DesignTokens.spacingSm,
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: DesignTokens.spacingSm, vertical: DesignTokens.spacingSm),
         decoration: BoxDecoration(
           color: selected ? surface.cardBackground : Colors.transparent,
           borderRadius: BorderRadius.circular(DesignTokens.radiusSm),
