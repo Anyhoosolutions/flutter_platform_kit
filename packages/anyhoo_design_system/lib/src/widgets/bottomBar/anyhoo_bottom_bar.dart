@@ -14,6 +14,7 @@ class AnyhooBottomBar extends StatelessWidget {
     final styledDestinations = destinations
         .map(
           (e) => NavigationDestination(
+            key: e.key,
             icon: Icon(e.icon, color: appBar.bottomBarIconColors),
             label: '',
           ),
