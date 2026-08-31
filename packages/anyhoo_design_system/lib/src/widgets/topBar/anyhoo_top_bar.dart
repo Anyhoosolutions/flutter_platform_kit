@@ -1,4 +1,5 @@
 import 'package:anyhoo_design_system/anyhoo_design_system.dart';
+import 'package:anyhoo_design_system/src/widgets/topBar/keys.dart';
 import 'package:flutter/material.dart';
 
 enum _AvatarMenuAction { settings, profile, logout }
@@ -101,19 +102,22 @@ class AnyhooTopBar extends StatelessWidget implements PreferredSizeWidget {
         }
       },
       itemBuilder: (context) => [
-        const PopupMenuItem(
+        PopupMenuItem(
+          key: keys.topBar.settings,
           value: _AvatarMenuAction.settings,
-          child: ListTile(
+          child: const ListTile(
             contentPadding: EdgeInsets.zero,
             leading: Icon(Icons.settings_outlined),
             title: Text('Settings'),
           ),
         ),
-        const PopupMenuItem(
+        PopupMenuItem(
+          key: keys.topBar.profile,
           value: _AvatarMenuAction.profile,
           child: ListTile(contentPadding: EdgeInsets.zero, leading: Icon(Icons.person_outline), title: Text('Profile')),
         ),
-        const PopupMenuItem(
+        PopupMenuItem(
+          key: keys.topBar.logout,
           value: _AvatarMenuAction.logout,
           child: ListTile(contentPadding: EdgeInsets.zero, leading: Icon(Icons.logout), title: Text('Log out')),
         ),
@@ -132,6 +136,7 @@ class _Avatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      key: keys.topBar.avatar,
       width: 40,
       height: 40,
       decoration: BoxDecoration(shape: BoxShape.circle),

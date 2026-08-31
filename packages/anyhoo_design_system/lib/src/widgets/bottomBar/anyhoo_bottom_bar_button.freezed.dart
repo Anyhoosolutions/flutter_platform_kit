@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$AnyhooBottomBarButton {
 
- String get label; IconData get icon; VoidCallback get onTap;
+ String get label; IconData get icon; VoidCallback get onTap; Key? get key;
 /// Create a copy of AnyhooBottomBarButton
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $AnyhooBottomBarButtonCopyWith<AnyhooBottomBarButton> get copyWith => _$AnyhooBo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is AnyhooBottomBarButton&&(identical(other.label, label) || other.label == label)&&(identical(other.icon, icon) || other.icon == icon)&&(identical(other.onTap, onTap) || other.onTap == onTap));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is AnyhooBottomBarButton&&(identical(other.label, label) || other.label == label)&&(identical(other.icon, icon) || other.icon == icon)&&(identical(other.onTap, onTap) || other.onTap == onTap)&&(identical(other.key, key) || other.key == key));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,label,icon,onTap);
+int get hashCode => Object.hash(runtimeType,label,icon,onTap,key);
 
 @override
 String toString() {
-  return 'AnyhooBottomBarButton(label: $label, icon: $icon, onTap: $onTap)';
+  return 'AnyhooBottomBarButton(label: $label, icon: $icon, onTap: $onTap, key: $key)';
 }
 
 
@@ -45,7 +45,7 @@ abstract mixin class $AnyhooBottomBarButtonCopyWith<$Res>  {
   factory $AnyhooBottomBarButtonCopyWith(AnyhooBottomBarButton value, $Res Function(AnyhooBottomBarButton) _then) = _$AnyhooBottomBarButtonCopyWithImpl;
 @useResult
 $Res call({
- String label, IconData icon, VoidCallback onTap
+ String label, IconData icon, VoidCallback onTap, Key? key
 });
 
 
@@ -62,12 +62,13 @@ class _$AnyhooBottomBarButtonCopyWithImpl<$Res>
 
 /// Create a copy of AnyhooBottomBarButton
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? label = null,Object? icon = null,Object? onTap = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? label = null,Object? icon = null,Object? onTap = null,Object? key = freezed,}) {
   return _then(_self.copyWith(
 label: null == label ? _self.label : label // ignore: cast_nullable_to_non_nullable
 as String,icon: null == icon ? _self.icon : icon // ignore: cast_nullable_to_non_nullable
 as IconData,onTap: null == onTap ? _self.onTap : onTap // ignore: cast_nullable_to_non_nullable
-as VoidCallback,
+as VoidCallback,key: freezed == key ? _self.key : key // ignore: cast_nullable_to_non_nullable
+as Key?,
   ));
 }
 
@@ -152,10 +153,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String label,  IconData icon,  VoidCallback onTap)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String label,  IconData icon,  VoidCallback onTap,  Key? key)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _AnyhooBottomBarButton() when $default != null:
-return $default(_that.label,_that.icon,_that.onTap);case _:
+return $default(_that.label,_that.icon,_that.onTap,_that.key);case _:
   return orElse();
 
 }
@@ -173,10 +174,10 @@ return $default(_that.label,_that.icon,_that.onTap);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String label,  IconData icon,  VoidCallback onTap)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String label,  IconData icon,  VoidCallback onTap,  Key? key)  $default,) {final _that = this;
 switch (_that) {
 case _AnyhooBottomBarButton():
-return $default(_that.label,_that.icon,_that.onTap);case _:
+return $default(_that.label,_that.icon,_that.onTap,_that.key);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -193,10 +194,10 @@ return $default(_that.label,_that.icon,_that.onTap);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String label,  IconData icon,  VoidCallback onTap)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String label,  IconData icon,  VoidCallback onTap,  Key? key)?  $default,) {final _that = this;
 switch (_that) {
 case _AnyhooBottomBarButton() when $default != null:
-return $default(_that.label,_that.icon,_that.onTap);case _:
+return $default(_that.label,_that.icon,_that.onTap,_that.key);case _:
   return null;
 
 }
@@ -208,12 +209,13 @@ return $default(_that.label,_that.icon,_that.onTap);case _:
 
 
 class _AnyhooBottomBarButton implements AnyhooBottomBarButton {
-  const _AnyhooBottomBarButton({required this.label, required this.icon, required this.onTap});
+  const _AnyhooBottomBarButton({required this.label, required this.icon, required this.onTap, this.key = null});
   
 
 @override final  String label;
 @override final  IconData icon;
 @override final  VoidCallback onTap;
+@override@JsonKey() final  Key? key;
 
 /// Create a copy of AnyhooBottomBarButton
 /// with the given fields replaced by the non-null parameter values.
@@ -225,16 +227,16 @@ _$AnyhooBottomBarButtonCopyWith<_AnyhooBottomBarButton> get copyWith => __$Anyho
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AnyhooBottomBarButton&&(identical(other.label, label) || other.label == label)&&(identical(other.icon, icon) || other.icon == icon)&&(identical(other.onTap, onTap) || other.onTap == onTap));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AnyhooBottomBarButton&&(identical(other.label, label) || other.label == label)&&(identical(other.icon, icon) || other.icon == icon)&&(identical(other.onTap, onTap) || other.onTap == onTap)&&(identical(other.key, key) || other.key == key));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,label,icon,onTap);
+int get hashCode => Object.hash(runtimeType,label,icon,onTap,key);
 
 @override
 String toString() {
-  return 'AnyhooBottomBarButton(label: $label, icon: $icon, onTap: $onTap)';
+  return 'AnyhooBottomBarButton(label: $label, icon: $icon, onTap: $onTap, key: $key)';
 }
 
 
@@ -245,7 +247,7 @@ abstract mixin class _$AnyhooBottomBarButtonCopyWith<$Res> implements $AnyhooBot
   factory _$AnyhooBottomBarButtonCopyWith(_AnyhooBottomBarButton value, $Res Function(_AnyhooBottomBarButton) _then) = __$AnyhooBottomBarButtonCopyWithImpl;
 @override @useResult
 $Res call({
- String label, IconData icon, VoidCallback onTap
+ String label, IconData icon, VoidCallback onTap, Key? key
 });
 
 
@@ -262,12 +264,13 @@ class __$AnyhooBottomBarButtonCopyWithImpl<$Res>
 
 /// Create a copy of AnyhooBottomBarButton
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? label = null,Object? icon = null,Object? onTap = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? label = null,Object? icon = null,Object? onTap = null,Object? key = freezed,}) {
   return _then(_AnyhooBottomBarButton(
 label: null == label ? _self.label : label // ignore: cast_nullable_to_non_nullable
 as String,icon: null == icon ? _self.icon : icon // ignore: cast_nullable_to_non_nullable
 as IconData,onTap: null == onTap ? _self.onTap : onTap // ignore: cast_nullable_to_non_nullable
-as VoidCallback,
+as VoidCallback,key: freezed == key ? _self.key : key // ignore: cast_nullable_to_non_nullable
+as Key?,
   ));
 }
 
