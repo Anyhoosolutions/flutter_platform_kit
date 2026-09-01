@@ -41,25 +41,13 @@ class FirebaseInitializer {
       return;
     }
 
-    // If we already have a Firebase app instance, return it
     if (_firebaseApp != null) {
       _log.info('!! Returning cached Firebase app');
+      return;
     }
 
     try {
-      // Try to get the existing app first
-      try {
-        final existingApp = Firebase.app();
-        _log.info('!! Firebase already initialized, returning existing app');
-        _firebaseApp = existingApp;
-      } catch (e) {
-        // No existing app found, proceed with initialization
-        _log.info('!! No existing Firebase app found, initializing new app');
-      }
-
-      final firebase = await Firebase.initializeApp(options: firebaseOptions);
-      _log.info('!! Firebase initialized');
-      _firebaseApp = firebase;
+      _firebaseApp = await _ensureFirebaseApp(firebaseOptions);
 
       if (emulatorConfig.useFirebaseAuth) {
         await _setupFirebaseAuth();
@@ -75,22 +63,28 @@ class FirebaseInitializer {
 
       _log.info('!! Firebase initialized and setup');
     } catch (e, stackTrace) {
-      // If we get a duplicate app error, try to get the existing app
-      if (e.toString().contains('duplicate-app') || e.toString().contains('already exists')) {
-        _log.info('!! Caught duplicate app error, returning existing app');
-        try {
-          final existingApp = Firebase.app();
-          _firebaseApp = existingApp;
-        } catch (getAppError, getAppStackTrace) {
-          _log.severe('!! Failed to get existing app after duplicate error: $getAppError');
-          SentryHelper.captureException(getAppError, stackTrace: getAppStackTrace, fatal: true);
-          rethrow;
-        }
-      }
-
       _log.severe('!! Error initializing Firebase: $e');
       _log.severe('!! Stack trace: $stackTrace');
       SentryHelper.captureException(e, stackTrace: stackTrace, fatal: true);
+      rethrow;
+    }
+  }
+
+  Future<FirebaseApp> _ensureFirebaseApp(FirebaseOptions firebaseOptions) async {
+    if (Firebase.apps.isNotEmpty) {
+      _log.info('!! Firebase already initialized, using existing app');
+      return Firebase.app();
+    }
+
+    try {
+      final firebase = await Firebase.initializeApp(options: firebaseOptions);
+      _log.info('!! Firebase initialized');
+      return firebase;
+    } on FirebaseException catch (e) {
+      if (e.code == 'duplicate-app') {
+        _log.info('!! Caught duplicate app error, using existing app');
+        return Firebase.app();
+      }
       rethrow;
     }
   }
