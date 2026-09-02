@@ -54,6 +54,7 @@ export 'src/widgets/navigation/anyhoo_expansion_panel.dart';
 export 'src/widgets/navigation/anyhoo_empty_state.dart';
 
 export 'src/widgets/dropdown/anyhoo_dropdown.dart';
+export 'src/widgets/dropdown/anyhoo_dropdown_group.dart';
 export 'src/widgets/dropdown/anyhoo_dropdown_option.dart';
 
 export 'src/widgets/forms/anyhoo_search_field.dart';

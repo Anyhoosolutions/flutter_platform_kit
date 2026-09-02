@@ -5,20 +5,28 @@ import 'package:flutter/services.dart';
 /// Outlined dropdown field with overlay options.
 ///
 /// Use [AnyhooDropdown.single] or [AnyhooDropdown.multi]. Pass [onCreate] to
-/// show an add-new footer (single closes after create; multi stays open).
+/// show an add-new footer (not allowed with [groups]). Pass [searchEnabled]
+/// to filter options by label.
 class AnyhooDropdown<T> extends StatefulWidget {
   const AnyhooDropdown.single({
     super.key,
-    required this.options,
+    this.options,
+    this.groups,
     required T? value,
     required ValueChanged<T?> onChanged,
     this.label,
     this.hint = 'Select...',
     this.onCreate,
+    this.searchEnabled = false,
     this.semanticLabel,
     this.maxWidth = 280,
     this.maxVisibleOptions = 6,
-  }) : isMulti = false,
+  }) : assert(
+         (options != null) ^ (groups != null),
+         'Provide exactly one of options or groups',
+       ),
+       assert(onCreate == null || groups == null, 'onCreate is not supported with groups'),
+       isMulti = false,
        singleValue = value,
        onSingleChanged = onChanged,
        multiValue = const [],
@@ -26,23 +34,31 @@ class AnyhooDropdown<T> extends StatefulWidget {
 
   const AnyhooDropdown.multi({
     super.key,
-    required this.options,
+    this.options,
+    this.groups,
     required List<T> value,
     required ValueChanged<List<T>> onChanged,
     this.label,
     this.hint = 'Select items...',
     this.onCreate,
+    this.searchEnabled = false,
     this.semanticLabel,
     this.maxWidth = 280,
     this.maxVisibleOptions = 6,
-  }) : isMulti = true,
+  }) : assert(
+         (options != null) ^ (groups != null),
+         'Provide exactly one of options or groups',
+       ),
+       assert(onCreate == null || groups == null, 'onCreate is not supported with groups'),
+       isMulti = true,
        multiValue = value,
        onMultiChanged = onChanged,
        singleValue = null,
        onSingleChanged = null;
 
   final bool isMulti;
-  final List<AnyhooDropdownOption<T>> options;
+  final List<AnyhooDropdownOption<T>>? options;
+  final List<AnyhooDropdownGroup<T>>? groups;
   final T? singleValue;
   final ValueChanged<T?>? onSingleChanged;
   final List<T> multiValue;
@@ -50,6 +66,7 @@ class AnyhooDropdown<T> extends StatefulWidget {
   final String? label;
   final String hint;
   final T Function(String label)? onCreate;
+  final bool searchEnabled;
   final String? semanticLabel;
   final double maxWidth;
   final int maxVisibleOptions;
@@ -64,13 +81,16 @@ class _AnyhooDropdownState<T> extends State<AnyhooDropdown<T>> {
   static const _overlayGap = 8.0;
   static const _overlayEdgePadding = 16.0;
   static const _rowHeight = 48.0;
+  static const _headerHeight = 32.0;
   static const _footerHeight = 56.0;
+  static const _searchHeight = 48.0;
   static const _overlayPadding = 8.0;
 
   final OverlayPortalController _overlayController = OverlayPortalController();
   final LayerLink _layerLink = LayerLink();
   final GlobalKey _triggerKey = GlobalKey();
   final TextEditingController _addController = TextEditingController();
+  final TextEditingController _searchController = TextEditingController();
   final Object _tapRegionGroup = Object();
 
   bool _openAbove = false;
@@ -79,33 +99,69 @@ class _AnyhooDropdownState<T> extends State<AnyhooDropdown<T>> {
 
   bool get _isOpen => _overlayController.isShowing;
 
+  List<AnyhooDropdownOption<T>> get _catalog {
+    if (widget.groups != null) {
+      return [for (final group in widget.groups!) ...group.options];
+    }
+    return widget.options ?? const [];
+  }
+
   @override
   void initState() {
     super.initState();
     _addController.addListener(() => setState(() {}));
+    _searchController.addListener(() => setState(() {}));
   }
 
   @override
   void dispose() {
     _addController.dispose();
+    _searchController.dispose();
     super.dispose();
   }
 
-  String _labelFor(T value) {
-    for (final option in widget.options) {
-      if (option.value == value) return option.label;
+  AnyhooDropdownOption<T>? _optionFor(T value) {
+    for (final option in _catalog) {
+      if (option.value == value) return option;
     }
-    return value.toString();
+    return null;
   }
+
+  String _labelFor(T value) => _optionFor(value)?.label ?? value.toString();
+
+  IconData? _iconFor(T value) => _optionFor(value)?.icon;
 
   bool _isSelected(T value) {
     if (widget.isMulti) return widget.multiValue.contains(value);
     return widget.singleValue == value;
   }
 
+  bool _matchesSearch(AnyhooDropdownOption<T> option) {
+    final query = _searchController.text.trim().toLowerCase();
+    if (query.isEmpty) return true;
+    return option.label.toLowerCase().contains(query);
+  }
+
+  List<AnyhooDropdownOption<T>> get _filteredOptions {
+    return _catalog.where(_matchesSearch).toList();
+  }
+
+  List<AnyhooDropdownGroup<T>> get _filteredGroups {
+    final groups = widget.groups;
+    if (groups == null) return const [];
+    return [
+      for (final group in groups)
+        AnyhooDropdownGroup<T>(
+          title: group.title,
+          options: group.options.where(_matchesSearch).toList(),
+        ),
+    ].where((group) => group.options.isNotEmpty).toList();
+  }
+
   void _closeOverlay() {
     if (!_isOpen) return;
     _addController.clear();
+    _searchController.clear();
     _overlayController.hide();
     setState(() {});
   }
@@ -149,10 +205,15 @@ class _AnyhooDropdownState<T> extends State<AnyhooDropdown<T>> {
   }
 
   double _estimatedOverlayHeight() {
-    final rows = widget.options.length.clamp(1, widget.maxVisibleOptions);
-    final listHeight = rows * _rowHeight;
+    final optionCount = widget.groups != null
+        ? _filteredGroups.fold<int>(0, (count, group) => count + group.options.length)
+        : _filteredOptions.length;
+    final headerCount = widget.groups != null ? _filteredGroups.length : 0;
+    final visibleOptions = optionCount.clamp(1, widget.maxVisibleOptions);
+    final listHeight = visibleOptions * _rowHeight + headerCount * _headerHeight;
     final footer = widget.onCreate != null ? _footerHeight : 0.0;
-    return listHeight + footer + _overlayPadding * 2;
+    final search = widget.searchEnabled ? _searchHeight : 0.0;
+    return listHeight + footer + search + _overlayPadding * 2;
   }
 
   void _onOptionTap(AnyhooDropdownOption<T> option) {
@@ -217,12 +278,15 @@ class _AnyhooDropdownState<T> extends State<AnyhooDropdown<T>> {
                       child: _DropdownOverlay<T>(
                         width: _triggerWidth > 0 ? _triggerWidth : fieldWidth,
                         maxListHeight: _overlayMaxHeight,
-                        options: widget.options,
+                        options: widget.groups == null ? _filteredOptions : null,
+                        groups: widget.groups == null ? null : _filteredGroups,
                         isSelected: _isSelected,
                         onOptionTap: _onOptionTap,
                         onCreate: widget.onCreate,
                         addController: _addController,
                         onSubmitCreate: _submitCreate,
+                        searchEnabled: widget.searchEnabled,
+                        searchController: _searchController,
                       ),
                     ),
                   ),
@@ -240,6 +304,7 @@ class _AnyhooDropdownState<T> extends State<AnyhooDropdown<T>> {
                   singleValue: widget.singleValue,
                   multiValue: widget.multiValue,
                   labelFor: _labelFor,
+                  iconFor: _iconFor,
                   onToggle: _toggleOverlay,
                   onRemoveMulti: _removeMulti,
                 ),
@@ -263,6 +328,7 @@ class _DropdownField<T> extends StatelessWidget {
     required this.singleValue,
     required this.multiValue,
     required this.labelFor,
+    required this.iconFor,
     required this.onToggle,
     required this.onRemoveMulti,
   });
@@ -276,6 +342,7 @@ class _DropdownField<T> extends StatelessWidget {
   final T? singleValue;
   final List<T> multiValue;
   final String Function(T value) labelFor;
+  final IconData? Function(T value) iconFor;
   final VoidCallback onToggle;
   final ValueChanged<T> onRemoveMulti;
 
@@ -343,11 +410,22 @@ class _DropdownField<T> extends StatelessWidget {
           overflow: TextOverflow.ellipsis,
         );
       }
-      return Text(
-        labelFor(singleValue as T),
-        style: AnyhooTypography.body(BodySize.large).copyWith(color: surface.primaryText),
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
+      final icon = iconFor(singleValue as T);
+      return Row(
+        children: [
+          if (icon != null) ...[
+            Icon(icon, size: 20, color: surface.primaryText),
+            const SizedBox(width: DesignTokens.spacingSm),
+          ],
+          Expanded(
+            child: Text(
+              labelFor(singleValue as T),
+              style: AnyhooTypography.body(BodySize.large).copyWith(color: surface.primaryText),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
       );
     }
 
@@ -363,6 +441,7 @@ class _DropdownField<T> extends StatelessWidget {
     return _MultiValueChips<T>(
       values: multiValue,
       labelFor: labelFor,
+      iconFor: iconFor,
       onRemove: onRemoveMulti,
     );
   }
@@ -372,11 +451,13 @@ class _MultiValueChips<T> extends StatelessWidget {
   const _MultiValueChips({
     required this.values,
     required this.labelFor,
+    required this.iconFor,
     required this.onRemove,
   });
 
   final List<T> values;
   final String Function(T value) labelFor;
+  final IconData? Function(T value) iconFor;
   final ValueChanged<T> onRemove;
 
   @override
@@ -395,6 +476,7 @@ class _MultiValueChips<T> extends StatelessWidget {
             onTap: () {},
             child: AnyhooChip(
               label: labelFor(value),
+              leadingIcon: iconFor(value),
               onDeleted: () => onRemove(value),
             ),
           ),
@@ -413,30 +495,69 @@ class _DropdownOverlay<T> extends StatelessWidget {
     required this.width,
     required this.maxListHeight,
     required this.options,
+    required this.groups,
     required this.isSelected,
     required this.onOptionTap,
     required this.onCreate,
     required this.addController,
     required this.onSubmitCreate,
+    required this.searchEnabled,
+    required this.searchController,
   });
 
   final double width;
   final double maxListHeight;
-  final List<AnyhooDropdownOption<T>> options;
+  final List<AnyhooDropdownOption<T>>? options;
+  final List<AnyhooDropdownGroup<T>>? groups;
   final bool Function(T value) isSelected;
   final ValueChanged<AnyhooDropdownOption<T>> onOptionTap;
   final T Function(String label)? onCreate;
   final TextEditingController addController;
   final VoidCallback onSubmitCreate;
+  final bool searchEnabled;
+  final TextEditingController searchController;
 
   @override
   Widget build(BuildContext context) {
     final surface = context.surface;
-    final accent = context.accent;
     final footerHeight = onCreate != null ? _AnyhooDropdownState._footerHeight : 0.0;
-    final listMax = (maxListHeight - footerHeight - _AnyhooDropdownState._overlayPadding * 2)
+    final searchHeight = searchEnabled ? _AnyhooDropdownState._searchHeight : 0.0;
+    final listMax = (maxListHeight - footerHeight - searchHeight - _AnyhooDropdownState._overlayPadding * 2)
         .clamp(0, maxListHeight)
         .toDouble();
+
+    final listChildren = <Widget>[];
+    if (groups != null) {
+      if (groups!.isEmpty && searchController.text.trim().isNotEmpty) {
+        listChildren.add(_noMatches(context));
+      }
+      for (final group in groups!) {
+        listChildren.add(_GroupHeader(title: group.title));
+        for (final option in group.options) {
+          listChildren.add(
+            _OptionRow<T>(
+              option: option,
+              selected: isSelected(option.value),
+              onTap: () => onOptionTap(option),
+            ),
+          );
+        }
+      }
+    } else {
+      final items = options ?? const [];
+      if (items.isEmpty && searchController.text.trim().isNotEmpty) {
+        listChildren.add(_noMatches(context));
+      }
+      for (final option in items) {
+        listChildren.add(
+          _OptionRow<T>(
+            option: option,
+            selected: isSelected(option.value),
+            onTap: () => onOptionTap(option),
+          ),
+        );
+      }
+    }
 
     return Material(
       elevation: 8,
@@ -451,51 +572,17 @@ class _DropdownOverlay<T> extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              if (options.isNotEmpty)
+              if (searchEnabled) ...[
+                _SearchField(controller: searchController),
+                const SizedBox(height: DesignTokens.spacingSm),
+              ],
+              if (listChildren.isNotEmpty)
                 ConstrainedBox(
                   constraints: BoxConstraints(maxHeight: listMax),
-                  child: ListView.builder(
+                  child: ListView(
                     padding: EdgeInsets.zero,
                     shrinkWrap: true,
-                    itemCount: options.length,
-                    itemBuilder: (context, index) {
-                      final option = options[index];
-                      final selected = isSelected(option.value);
-                      return InkWell(
-                        onTap: () => onOptionTap(option),
-                        borderRadius: BorderRadius.circular(DesignTokens.radiusSm),
-                        child: ColoredBox(
-                          color: selected
-                              ? accent.primaryFixed.withValues(alpha: 0.12)
-                              : Colors.transparent,
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: DesignTokens.spacingMd,
-                              vertical: DesignTokens.spacingSm,
-                            ),
-                            child: SizedBox(
-                              height: 32,
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      option.label,
-                                      style: AnyhooTypography.body(BodySize.large).copyWith(
-                                        color: surface.primaryText,
-                                      ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                  if (selected)
-                                    Icon(Icons.check, size: 20, color: accent.primaryFixed),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      );
-                    },
+                    children: listChildren,
                   ),
                 ),
               if (onCreate != null) ...[
@@ -508,6 +595,137 @@ class _DropdownOverlay<T> extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _noMatches(BuildContext context) {
+    final surface = context.surface;
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: DesignTokens.spacingMd,
+        vertical: DesignTokens.spacingSm,
+      ),
+      child: Text(
+        'No matches',
+        style: AnyhooTypography.body(BodySize.medium).copyWith(color: surface.secondaryText),
+      ),
+    );
+  }
+}
+
+class _GroupHeader extends StatelessWidget {
+  const _GroupHeader({required this.title});
+
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    final surface = context.surface;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        DesignTokens.spacingMd,
+        DesignTokens.spacingSm,
+        DesignTokens.spacingMd,
+        DesignTokens.spacingXs,
+      ),
+      child: Text(
+        title.toUpperCase(),
+        style: AnyhooTypography.label(LabelSize.medium).copyWith(color: surface.secondaryText),
+      ),
+    );
+  }
+}
+
+class _OptionRow<T> extends StatelessWidget {
+  const _OptionRow({
+    required this.option,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final AnyhooDropdownOption<T> option;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final surface = context.surface;
+    final accent = context.accent;
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(DesignTokens.radiusSm),
+      child: ColoredBox(
+        color: selected ? accent.primaryFixed.withValues(alpha: 0.12) : Colors.transparent,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: DesignTokens.spacingMd,
+            vertical: DesignTokens.spacingSm,
+          ),
+          child: SizedBox(
+            height: 32,
+            child: Row(
+              children: [
+                if (option.icon != null) ...[
+                  Icon(option.icon, size: 20, color: surface.primaryText),
+                  const SizedBox(width: DesignTokens.spacingSm),
+                ],
+                Expanded(
+                  child: Text(
+                    option.label,
+                    style: AnyhooTypography.body(BodySize.large).copyWith(color: surface.primaryText),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                if (selected) Icon(Icons.check, size: 20, color: accent.primaryFixed),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SearchField extends StatelessWidget {
+  const _SearchField({required this.controller});
+
+  final TextEditingController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    final surface = context.surface;
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(DesignTokens.radiusMd),
+        border: Border.all(color: surface.outline.withValues(alpha: 0.6)),
+      ),
+      child: Row(
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(left: DesignTokens.spacingSm),
+            child: Icon(Icons.search, size: 20, color: surface.secondaryText),
+          ),
+          Expanded(
+            child: TextField(
+              controller: controller,
+              style: AnyhooTypography.body(BodySize.medium).copyWith(color: surface.primaryText),
+              decoration: InputDecoration(
+                hintText: 'Search...',
+                hintStyle: AnyhooTypography.body(BodySize.medium).copyWith(color: surface.secondaryText),
+                border: InputBorder.none,
+                isDense: true,
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: DesignTokens.spacingSm,
+                  vertical: DesignTokens.spacingSm,
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -18,19 +18,38 @@ class _DropdownOverviewPage extends StatefulWidget {
 
 class _DropdownOverviewPageState extends State<_DropdownOverviewPage> {
   static const _widgetTypes = [
-    AnyhooDropdownOption(value: 'elevated', label: 'ElevatedButton'),
-    AnyhooDropdownOption(value: 'filled', label: 'FilledButton'),
-    AnyhooDropdownOption(value: 'text', label: 'TextButton'),
-    AnyhooDropdownOption(value: 'outlined', label: 'OutlinedButton'),
+    AnyhooDropdownOption(value: 'elevated', label: 'ElevatedButton', icon: Icons.layers),
+    AnyhooDropdownOption(value: 'filled', label: 'FilledButton', icon: Icons.rectangle),
+    AnyhooDropdownOption(value: 'text', label: 'TextButton', icon: Icons.text_fields),
+    AnyhooDropdownOption(value: 'outlined', label: 'OutlinedButton', icon: Icons.crop_square),
   ];
 
   static const _animals = [
-    AnyhooDropdownOption(value: 'dog', label: 'Dog'),
-    AnyhooDropdownOption(value: 'cat', label: 'Cat'),
-    AnyhooDropdownOption(value: 'bird', label: 'Bird'),
-    AnyhooDropdownOption(value: 'cow', label: 'Cow'),
-    AnyhooDropdownOption(value: 'pig', label: 'Pig'),
-    AnyhooDropdownOption(value: 'chicken', label: 'Chicken'),
+    AnyhooDropdownOption(value: 'dog', label: 'Dog', icon: Icons.pets),
+    AnyhooDropdownOption(value: 'cat', label: 'Cat', icon: Icons.pets),
+    AnyhooDropdownOption(value: 'bird', label: 'Bird', icon: Icons.flutter_dash),
+    AnyhooDropdownOption(value: 'cow', label: 'Cow', icon: Icons.grass),
+    AnyhooDropdownOption(value: 'pig', label: 'Pig', icon: Icons.agriculture),
+    AnyhooDropdownOption(value: 'chicken', label: 'Chicken', icon: Icons.egg),
+  ];
+
+  static const _groupedAnimals = [
+    AnyhooDropdownGroup(
+      title: 'Pets',
+      options: [
+        AnyhooDropdownOption(value: 'dog', label: 'Dog', icon: Icons.pets),
+        AnyhooDropdownOption(value: 'cat', label: 'Cat', icon: Icons.pets),
+        AnyhooDropdownOption(value: 'bird', label: 'Bird', icon: Icons.flutter_dash),
+      ],
+    ),
+    AnyhooDropdownGroup(
+      title: 'Farm',
+      options: [
+        AnyhooDropdownOption(value: 'cow', label: 'Cow', icon: Icons.grass),
+        AnyhooDropdownOption(value: 'pig', label: 'Pig', icon: Icons.agriculture),
+        AnyhooDropdownOption(value: 'chicken', label: 'Chicken', icon: Icons.egg),
+      ],
+    ),
   ];
 
   String? _singleValue = 'elevated';
@@ -40,6 +59,9 @@ class _DropdownOverviewPageState extends State<_DropdownOverviewPage> {
   List<AnyhooDropdownOption<String>> _addableSingleOptions = List.of(_widgetTypes);
   List<String> _addableMulti = const [];
   List<AnyhooDropdownOption<String>> _addableMultiOptions = List.of(_animals);
+  String? _searchValue = 'elevated';
+  List<String> _groupedMulti = const ['dog'];
+  String? _groupedSingle = 'cat';
 
   @override
   Widget build(BuildContext context) {
@@ -55,11 +77,11 @@ class _DropdownOverviewPageState extends State<_DropdownOverviewPage> {
             Text(
               'One overlay dropdown for single and multi selection. '
               'Constructors: AnyhooDropdown.single (T? value) and AnyhooDropdown.multi (List<T> value). '
-              'Shared arguments: options (List<AnyhooDropdownOption<T>>), label, hint, onChanged, '
-              'optional onCreate (shows the add-new footer), maxVisibleOptions, maxWidth. '
+              'Pass either options or groups (not both). AnyhooDropdownOption has value, label, and optional icon. '
+              'Shared arguments: label, hint, onChanged, searchEnabled, optional onCreate (add-new footer; not with groups), '
+              'maxVisibleOptions, maxWidth. '
               'Multi shows up to 3 chips; if there are more, the last chip is "+N items" and is not deletable. '
-              'The menu opens below the field, or above when there is not enough space. '
-              'Search, option icons, and grouped categories are not in this phase.',
+              'The menu opens below the field, or above when there is not enough space.',
               style: AnyhooTypography.body(BodySize.medium).copyWith(color: surface.secondaryText),
             ),
             const SizedBox(height: DesignTokens.spacingLg),
@@ -130,6 +152,39 @@ class _DropdownOverviewPageState extends State<_DropdownOverviewPage> {
                   });
                   return name;
                 },
+              ),
+            ),
+            _section(
+              title: 'Search',
+              description: 'searchEnabled: true — filters options by label. Independent of the add-new footer.',
+              child: AnyhooDropdown<String>.single(
+                label: 'Widget type',
+                value: _searchValue,
+                options: _widgetTypes,
+                searchEnabled: true,
+                onChanged: (value) => setState(() => _searchValue = value),
+              ),
+            ),
+            _section(
+              title: 'Categories (single)',
+              description: 'Pass groups instead of options. Headers are labels only. onCreate is not allowed.',
+              child: AnyhooDropdown<String>.single(
+                label: 'Animal',
+                value: _groupedSingle,
+                groups: _groupedAnimals,
+                searchEnabled: true,
+                onChanged: (value) => setState(() => _groupedSingle = value),
+              ),
+            ),
+            _section(
+              title: 'Categories (multi)',
+              description: 'Same groups API on multi. Search hides empty groups.',
+              child: AnyhooDropdown<String>.multi(
+                label: 'Animals',
+                value: _groupedMulti,
+                groups: _groupedAnimals,
+                searchEnabled: true,
+                onChanged: (value) => setState(() => _groupedMulti = value),
               ),
             ),
             _section(
