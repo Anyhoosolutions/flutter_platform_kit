@@ -184,7 +184,7 @@ Keep this separate from `anyhoo_design_system.dart` so production apps only pull
 | `AnyhooButtonsGallery` | Round / add / minus / remove (`enabled` optional) |
 | `AnyhooChipsGallery` | Chip variants, shapes, icons |
 | `AnyhooControlsGallery` | Switch, checkbox, radio, progress, skeleton, list |
-| `AnyhooFormsGallery` | Search, segmented control, sliders, date picker |
+| `AnyhooFormsGallery` | Search, segmented control, sliders, multi-select, date picker |
 | `AnyhooFeedbackGallery` | Banner, dialog, toast |
 | `AnyhooNavigationGallery` | Breadcrumb, stepper, expansion, empty state |
 | `AnyhooDataGallery` | Data table, filter chips, badges, preference list |

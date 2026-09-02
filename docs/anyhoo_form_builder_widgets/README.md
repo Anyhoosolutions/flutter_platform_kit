@@ -42,6 +42,10 @@ from the package authors, and more.
 
 ## Changelog
 
+### 0.0.3
+
+* AnyhooFormBuilderMultiSelect (adapter). Visual `AnyhooMultiSelect*` types live in `anyhoo_design_system` and are re-exported.
+
 ### 0.0.2
  
 * Renaming in library

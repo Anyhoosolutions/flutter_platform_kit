@@ -1,7 +1,7 @@
 name: anyhoo_form_builder_widgets
 resolution: workspace
-description: "A collection of widgets for form building using Flutter Form Builder."
-version: 0.1.0
+description: "Flutter Form Builder adapters for Anyhoo design-system form widgets."
+version: 0.2.0
 homepage: https://anyhoosolutions.web.app/documentation/flutter_platform_kit
 publish_to: none
 
@@ -13,6 +13,8 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_form_builder: ^10.2.0
+  anyhoo_design_system:
+    path: ../anyhoo_design_system
 
 dev_dependencies:
   flutter_test:

@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.2.0
+
+**Breaking:** Visual multi-select widgets moved to `anyhoo_design_system`.
+
+- `AnyhooMultiSelect`, `AnyhooMultiSelectSection`, `AnyhooMultiSelectStyle`, and
+  `AnyhooMultiSelectValueDisplay` now live in the design system.
+- This package re-exports those types and keeps `AnyhooFormBuilderMultiSelect` as a
+  `flutter_form_builder` adapter.
+
 ## 0.1.0
 
 **Breaking:** Unified multi-select API.

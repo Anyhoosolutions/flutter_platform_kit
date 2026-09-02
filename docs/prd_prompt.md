@@ -44,7 +44,7 @@ All apps depend on a monorepo called `flutter_platform_kit` which provides:
 | `anyhoo_firebase` | Firebase initialization (Firestore, Auth, Storage), emulator config, `AnyhooStorageService`, Analytics, Crashlytics setup. |
 | `anyhoo_remote_config` | Remote Config Cubit wrapping Firebase Remote Config. |
 | `anyhoo_shimmer` | Shimmer loading placeholder widgets. |
-| `anyhoo_form_builder_widgets` | Form builder widgets (e.g. multi-select dropdown). |
+| `anyhoo_form_builder_widgets` | `flutter_form_builder` adapters (e.g. `AnyhooFormBuilderMultiSelect`). Visual controls live in `anyhoo_design_system`. |
 | `anyhoo_image_selector` | Image selection from camera/gallery with cropping. |
 | `anyhoo_map` | Map widgets (Google Maps, flutter_map). |
 | `anyhoo_search_bar` | Search bar widget. |
