@@ -1,22 +1,22 @@
 // ignore_for_file: deprecated_member_use
 
-import 'package:anyhoo_form_builder_widgets/anyhoo_form_builder_widgets.dart';
+import 'package:anyhoo_design_system/anyhoo_design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:widgetbook/widgetbook.dart';
 import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
 import 'package:widgetbook_workspace/helpers/wrap_in_mocks_helper.dart';
 
-@widgetbook.UseCase(name: 'Flat with add new', type: AnyhooMultiSelect, path: 'anyhoo_form_builder_widgets')
+@widgetbook.UseCase(name: 'Flat with add new', type: AnyhooMultiSelect, path: 'anyhoo_design_system/forms')
 Widget buildFlatAddNew(BuildContext context) {
   return WrapInMocksHelper().wrapInMocks(context, _FlatAddNewDemo());
 }
 
-@widgetbook.UseCase(name: 'Single selection', type: AnyhooMultiSelect, path: 'anyhoo_form_builder_widgets')
+@widgetbook.UseCase(name: 'Single selection', type: AnyhooMultiSelect, path: 'anyhoo_design_system/forms')
 Widget buildSingleSelection(BuildContext context) {
   return WrapInMocksHelper().wrapInMocks(context, _SingleSelectionDemo());
 }
 
-@widgetbook.UseCase(name: 'Sectioned', type: AnyhooMultiSelect, path: 'anyhoo_form_builder_widgets')
+@widgetbook.UseCase(name: 'Sectioned', type: AnyhooMultiSelect, path: 'anyhoo_design_system/forms')
 Widget buildSectioned(BuildContext context) {
   return WrapInMocksHelper().wrapInMocks(context, _SectionedDemo());
 }

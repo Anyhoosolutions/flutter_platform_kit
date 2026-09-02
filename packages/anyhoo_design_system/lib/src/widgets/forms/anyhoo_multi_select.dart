@@ -1,7 +1,8 @@
-import 'package:anyhoo_form_builder_widgets/src/anyhoo_multi_select_section.dart';
-import 'package:anyhoo_form_builder_widgets/src/anyhoo_multi_select_style.dart';
-import 'package:anyhoo_form_builder_widgets/src/anyhoo_multi_select_value_display.dart';
 import 'package:flutter/material.dart';
+
+import 'anyhoo_multi_select_section.dart';
+import 'anyhoo_multi_select_style.dart';
+import 'anyhoo_multi_select_value_display.dart';
 
 /// Multi-select field with optional search, sections, add-new (flat only), and styling.
 class AnyhooMultiSelect<T> extends StatefulWidget {

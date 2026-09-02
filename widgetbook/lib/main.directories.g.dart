@@ -37,6 +37,8 @@ import 'package:widgetbook_workspace/anyhoo_design_system/feedback/anyhoo_feedba
     as _widgetbook_workspace_anyhoo_design_system_feedback_anyhoo_feedback_gallery;
 import 'package:widgetbook_workspace/anyhoo_design_system/forms/anyhoo_forms_gallery.dart'
     as _widgetbook_workspace_anyhoo_design_system_forms_anyhoo_forms_gallery;
+import 'package:widgetbook_workspace/anyhoo_design_system/forms/anyhoo_multi_select.dart'
+    as _widgetbook_workspace_anyhoo_design_system_forms_anyhoo_multi_select;
 import 'package:widgetbook_workspace/anyhoo_design_system/navigation/anyhoo_navigation_gallery.dart'
     as _widgetbook_workspace_anyhoo_design_system_navigation_anyhoo_navigation_gallery;
 import 'package:widgetbook_workspace/anyhoo_design_system/screens/app_settings_screen.dart'
@@ -49,8 +51,6 @@ import 'package:widgetbook_workspace/anyhoo_firebase/firebase_analytics_page.dar
     as _widgetbook_workspace_anyhoo_firebase_firebase_analytics_page;
 import 'package:widgetbook_workspace/anyhoo_form_builder_widgets/anyhoo_form_builder_multi_select.dart'
     as _widgetbook_workspace_anyhoo_form_builder_widgets_anyhoo_form_builder_multi_select;
-import 'package:widgetbook_workspace/anyhoo_form_builder_widgets/anyhoo_multi_select.dart'
-    as _widgetbook_workspace_anyhoo_form_builder_widgets_anyhoo_multi_select;
 import 'package:widgetbook_workspace/anyhoo_image_selector/image_selector_widget.dart'
     as _widgetbook_workspace_anyhoo_image_selector_image_selector_widget;
 import 'package:widgetbook_workspace/anyhoo_search_bar/anyhoo_search_bar.dart'
@@ -225,6 +225,29 @@ final directories = <_widgetbook.WidgetbookNode>[
         name: 'forms',
         children: [
           _widgetbook.WidgetbookComponent(
+            name: 'AnyhooMultiSelect',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Flat with add new',
+                builder:
+                    _widgetbook_workspace_anyhoo_design_system_forms_anyhoo_multi_select
+                        .buildFlatAddNew,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Sectioned',
+                builder:
+                    _widgetbook_workspace_anyhoo_design_system_forms_anyhoo_multi_select
+                        .buildSectioned,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Single selection',
+                builder:
+                    _widgetbook_workspace_anyhoo_design_system_forms_anyhoo_multi_select
+                        .buildSingleSelection,
+              ),
+            ],
+          ),
+          _widgetbook.WidgetbookComponent(
             name: 'AnyhooSearchField',
             useCases: [
               _widgetbook.WidgetbookUseCase(
@@ -341,29 +364,6 @@ final directories = <_widgetbook.WidgetbookNode>[
             builder:
                 _widgetbook_workspace_anyhoo_form_builder_widgets_anyhoo_form_builder_multi_select
                     .build,
-          ),
-        ],
-      ),
-      _widgetbook.WidgetbookComponent(
-        name: 'AnyhooMultiSelect',
-        useCases: [
-          _widgetbook.WidgetbookUseCase(
-            name: 'Flat with add new',
-            builder:
-                _widgetbook_workspace_anyhoo_form_builder_widgets_anyhoo_multi_select
-                    .buildFlatAddNew,
-          ),
-          _widgetbook.WidgetbookUseCase(
-            name: 'Sectioned',
-            builder:
-                _widgetbook_workspace_anyhoo_form_builder_widgets_anyhoo_multi_select
-                    .buildSectioned,
-          ),
-          _widgetbook.WidgetbookUseCase(
-            name: 'Single selection',
-            builder:
-                _widgetbook_workspace_anyhoo_form_builder_widgets_anyhoo_multi_select
-                    .buildSingleSelection,
           ),
         ],
       ),

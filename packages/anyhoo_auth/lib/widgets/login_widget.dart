@@ -399,16 +399,19 @@ class _LoginWidgetState<T extends AnyhooUser> extends State<LoginWidget<T>> {
             if (kDebugMode)
               SizedBox(
                 width: double.infinity,
-                child: ElevatedButton(
-                  key: const Key('login_widget_sign_in_with_test_account_button'),
-                  onPressed: _isLoading ? null : _handleSignInWithTestAccount,
-                  child: _isLoading
-                      ? const SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(), // TODO: Shimmer
-                        )
-                      : Text('Sign In with Test Account'),
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: ElevatedButton(
+                    key: const Key('login_widget_sign_in_with_test_account_button'),
+                    onPressed: _isLoading ? null : _handleSignInWithTestAccount,
+                    child: _isLoading
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(), // TODO: Shimmer
+                          )
+                        : Text('Sign In with Test Account'),
+                  ),
                 ),
               ),
 

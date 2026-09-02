@@ -1,7 +1,4 @@
-import 'package:anyhoo_form_builder_widgets/src/anyhoo_multi_select.dart';
-import 'package:anyhoo_form_builder_widgets/src/anyhoo_multi_select_section.dart';
-import 'package:anyhoo_form_builder_widgets/src/anyhoo_multi_select_style.dart';
-import 'package:anyhoo_form_builder_widgets/src/anyhoo_multi_select_value_display.dart';
+import 'package:anyhoo_design_system/anyhoo_design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 

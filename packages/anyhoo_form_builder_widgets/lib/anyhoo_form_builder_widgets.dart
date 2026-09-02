@@ -1,11 +1,13 @@
-/// form_builder_widgets Package
-///
-/// A collection of widgets for form building using Flutter Form Builder.
+/// Form Builder adapters for Anyhoo design-system widgets.
 // ignore: unnecessary_library_name
 library anyhoo_form_builder_widgets;
 
+export 'package:anyhoo_design_system/anyhoo_design_system.dart'
+    show
+        AnyhooMultiSelect,
+        AnyhooMultiSelectSection,
+        AnyhooMultiSelectStyle,
+        AnyhooMultiSelectValueDisplay,
+        AnyhooMultiSelectValueTextBuilder;
+
 export 'src/anyhoo_form_builder_multi_select.dart';
-export 'src/anyhoo_multi_select.dart';
-export 'src/anyhoo_multi_select_section.dart';
-export 'src/anyhoo_multi_select_style.dart';
-export 'src/anyhoo_multi_select_value_display.dart';

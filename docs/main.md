@@ -26,6 +26,8 @@ A package for handling logging in and logging out.
 
 ### anyhoo_form_builder_widgets
 
+`flutter_form_builder` adapters over design-system form widgets (e.g. `AnyhooFormBuilderMultiSelect`). Use `anyhoo_design_system` for `AnyhooMultiSelect` without Form Builder.
+
 ### anyhoo_logging
 
 ### anyhoo_shimmer
