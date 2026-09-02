@@ -1,5 +1,15 @@
 {
   "projects": {
     "default": "flutterplatformkit"
-  }
+  },
+  "targets": {
+    "flutterplatformkit": {
+      "hosting": {
+        "widgetbook": [
+          "flutterplatformkit-widgetbook"
+        ]
+      }
+    }
+  },
+  "etags": {}
 }
