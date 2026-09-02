@@ -24,6 +24,22 @@
 		}
 	],
 	"storage": { "rules": "storage.rules" },
+	"hosting": [
+		{
+			"target": "widgetbook",
+			"public": "widgetbook-hosting",
+			"predeploy": [
+				"rm -rf widgetbook-hosting && cp -R ../widgetbook/build/web widgetbook-hosting"
+			],
+			"ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+			"rewrites": [
+				{
+					"source": "**",
+					"destination": "/index.html"
+				}
+			]
+		}
+	],
 	"emulators": {
 		"ui": {
 			"enabled": true,
