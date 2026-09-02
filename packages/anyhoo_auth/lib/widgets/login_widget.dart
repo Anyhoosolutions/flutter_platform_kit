@@ -6,6 +6,7 @@ import 'package:anyhoo_auth/icons/apple_icon_svg.dart';
 import 'package:anyhoo_auth/icons/google_icon_svg.dart';
 import 'package:anyhoo_auth/widgets/login_widget_settings.dart';
 import 'package:anyhoo_models/anyhoo_models.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
@@ -216,25 +217,23 @@ class _LoginWidgetState<T extends AnyhooUser> extends State<LoginWidget<T>> {
   }
 
   void _handleSignInWithTestAccount() async {
-    if (_formKey.currentState?.saveAndValidate() ?? false) {
-      setState(() {
-        _isLoading = true;
-      });
+    setState(() {
+      _isLoading = true;
+    });
 
-      try {
-        _getCubit(context).login('test@email.com', 'test1234');
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error: ${e.toString()}'),
-            backgroundColor: Theme.of(context).colorScheme.error,
-          ),
-        );
-      } finally {
-        setState(() {
-          _isLoading = false;
-        });
-      }
+    try {
+      _getCubit(context).login('test@email.com', 'test1234');
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error: ${e.toString()}'),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        ),
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
@@ -397,20 +396,21 @@ class _LoginWidgetState<T extends AnyhooUser> extends State<LoginWidget<T>> {
             ),
 
             // Sign In with test account button
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                key: const Key('login_widget_sign_in_with_test_account_button'),
-                onPressed: _isLoading ? null : _handleSignInWithTestAccount,
-                child: _isLoading
-                    ? const SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(), // TODO: Shimmer
-                      )
-                    : Text('Sign In with Test Account'),
+            if (kDebugMode)
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  key: const Key('login_widget_sign_in_with_test_account_button'),
+                  onPressed: _isLoading ? null : _handleSignInWithTestAccount,
+                  child: _isLoading
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(), // TODO: Shimmer
+                        )
+                      : Text('Sign In with Test Account'),
+                ),
               ),
-            ),
 
             const SizedBox(height: 24),
           ],
