@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.1
+
+* Added `AnyhooFormBuilderDropdown` (`.single` / `.multi`) wrapping `AnyhooDropdown`.
+
 ## 0.2.0
 
 **Breaking:** Visual multi-select widgets moved to `anyhoo_design_system`.

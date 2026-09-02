@@ -256,6 +256,7 @@ class _AnyhooDropdownState<T> extends State<AnyhooDropdown<T>> {
     return LayoutBuilder(
       builder: (context, constraints) {
         final fieldWidth = constraints.maxWidth.isFinite ? constraints.maxWidth : widget.maxWidth;
+        final theme = Theme.of(context);
         return SizedBox(
           width: fieldWidth,
           child: TapRegion(
@@ -263,8 +264,10 @@ class _AnyhooDropdownState<T> extends State<AnyhooDropdown<T>> {
             onTapOutside: (_) => _closeOverlay(),
             child: OverlayPortal(
               controller: _overlayController,
-              overlayChildBuilder: (context) {
-                return TapRegion(
+              overlayChildBuilder: (overlayContext) {
+                return Theme(
+                  data: theme,
+                  child: TapRegion(
                   groupId: _tapRegionGroup,
                   child: CompositedTransformFollower(
                     link: _layerLink,
@@ -290,6 +293,7 @@ class _AnyhooDropdownState<T> extends State<AnyhooDropdown<T>> {
                       ),
                     ),
                   ),
+                ),
                 );
               },
               child: CompositedTransformTarget(
