@@ -215,6 +215,29 @@ class _LoginWidgetState<T extends AnyhooUser> extends State<LoginWidget<T>> {
     }
   }
 
+  void _handleSignInWithTestAccount() async {
+    if (_formKey.currentState?.saveAndValidate() ?? false) {
+      setState(() {
+        _isLoading = true;
+      });
+
+      try {
+        _getCubit(context).login('test@email.com', 'test1234');
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: ${e.toString()}'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      } finally {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
   void _handleGoogleSignIn() async {
     setState(() {
       _isLoading = true;
@@ -370,6 +393,22 @@ class _LoginWidgetState<T extends AnyhooUser> extends State<LoginWidget<T>> {
                         child: CircularProgressIndicator(), // TODO: Shimmer
                       )
                     : Text(_isSignUp ? 'Create Account' : 'Sign In'),
+              ),
+            ),
+
+            // Sign In with test account button
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                key: const Key('login_widget_sign_in_with_test_account_button'),
+                onPressed: _isLoading ? null : _handleSignInWithTestAccount,
+                child: _isLoading
+                    ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(), // TODO: Shimmer
+                      )
+                    : Text('Sign In with Test Account'),
               ),
             ),
 
