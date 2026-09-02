@@ -35,6 +35,8 @@ import 'package:widgetbook_workspace/anyhoo_design_system/data/anyhoo_data_galle
     as _widgetbook_workspace_anyhoo_design_system_data_anyhoo_data_gallery;
 import 'package:widgetbook_workspace/anyhoo_design_system/feedback/anyhoo_feedback_gallery.dart'
     as _widgetbook_workspace_anyhoo_design_system_feedback_anyhoo_feedback_gallery;
+import 'package:widgetbook_workspace/anyhoo_design_system/forms/anyhoo_dropdown.dart'
+    as _widgetbook_workspace_anyhoo_design_system_forms_anyhoo_dropdown;
 import 'package:widgetbook_workspace/anyhoo_design_system/forms/anyhoo_forms_gallery.dart'
     as _widgetbook_workspace_anyhoo_design_system_forms_anyhoo_forms_gallery;
 import 'package:widgetbook_workspace/anyhoo_design_system/forms/anyhoo_multi_select.dart'
@@ -224,6 +226,17 @@ final directories = <_widgetbook.WidgetbookNode>[
       _widgetbook.WidgetbookFolder(
         name: 'forms',
         children: [
+          _widgetbook.WidgetbookComponent(
+            name: 'AnyhooDropdown',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Overview',
+                builder:
+                    _widgetbook_workspace_anyhoo_design_system_forms_anyhoo_dropdown
+                        .buildAnyhooDropdownOverview,
+              ),
+            ],
+          ),
           _widgetbook.WidgetbookComponent(
             name: 'AnyhooMultiSelect',
             useCases: [
