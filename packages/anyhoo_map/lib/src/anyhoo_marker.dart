@@ -1,48 +1,25 @@
-import 'package:anyhoo_core/utils/string_utils.dart';
-import 'package:anyhoo_map/anyhoo_map.dart';
+import 'package:anyhoo_map/src/anyhoo_latlong.dart';
+import 'package:flutter/widgets.dart';
 
-import 'package:latlong2/latlong.dart';
+/// Builds a flutter_map pin. Google Maps ignores this and uses default markers.
+typedef AnyhooMarkerWidgetBuilder =
+    Widget Function(BuildContext context, AnyhooMarker marker, bool selected);
 
+/// A map pin. [id] is the source of truth for selection and tap callbacks.
 class AnyhooMarker {
-  final String _id;
+  final String id;
   final AnyhooLatLong location;
   final String title;
   final String description;
-  // final AnyhooMapSettings settings;
 
-  AnyhooMarker({
-    String? id,
+  /// Optional flutter_map widget. Ignored by the Google engine.
+  final Widget? child;
+
+  const AnyhooMarker({
+    required this.id,
     required this.location,
     required this.title,
     required this.description,
-    // required this.settings,
-  }) : _id = id ?? _generateId();
-
-  static String _generateId() {
-    return AnyhooStringUtils.generateRandomString(10);
-  }
-
-  String getId() {
-    return _id;
-  }
-
-  // @override
-  // String toString() {
-  //   return 'AnyhooMarker(latitude: $latitude, longitude: $longitude)';
-  // }
-
-  static double getDistance(AnyhooLatLong point1, AnyhooLatLong point2, AnyhooLatLongUnit unit) {
-    final Distance distance = Distance();
-    final LengthUnit lengthUnit = switch (unit) {
-      AnyhooLatLongUnit.meter => LengthUnit.Meter,
-      AnyhooLatLongUnit.kilometer => LengthUnit.Kilometer,
-      AnyhooLatLongUnit.mile => LengthUnit.Mile,
-    };
-    final double d = distance.as(
-      lengthUnit,
-      LatLng(point1.latitude, point1.longitude),
-      LatLng(point2.latitude, point2.longitude),
-    );
-    return d;
-  }
+    this.child,
+  });
 }
