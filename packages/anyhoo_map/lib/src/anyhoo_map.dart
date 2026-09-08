@@ -11,6 +11,10 @@ class AnyhooMap extends StatelessWidget {
   final AnyhooLatLong location;
   final List<AnyhooMarker> markers;
   final AnyhooMapSettings settings;
+  final String? selectedMarkerId;
+  final ValueChanged<String>? onMarkerTapped;
+  final ValueChanged<AnyhooLatLong>? onMapTapped;
+  final AnyhooMarkerWidgetBuilder? markerBuilder;
 
   const AnyhooMap({
     super.key,
@@ -18,6 +22,10 @@ class AnyhooMap extends StatelessWidget {
     required this.location,
     required this.markers,
     required this.settings,
+    this.selectedMarkerId,
+    this.onMarkerTapped,
+    this.onMapTapped,
+    this.markerBuilder,
   });
 
   @override
@@ -27,12 +35,19 @@ class AnyhooMap extends StatelessWidget {
         location: location,
         markers: markers,
         settings: settings,
+        selectedMarkerId: selectedMarkerId,
+        onMarkerTapped: onMarkerTapped,
+        onMapTapped: onMapTapped,
       );
     } else if (mapType == AnyhooMapType.flutter) {
       return FlutterMapView(
         location: location,
         markers: markers,
         settings: settings,
+        selectedMarkerId: selectedMarkerId,
+        onMarkerTapped: onMarkerTapped,
+        onMapTapped: onMapTapped,
+        markerBuilder: markerBuilder,
       );
     } else {
       throw Exception('Invalid map type: $mapType');

@@ -11,12 +11,20 @@ class FlutterMapView extends StatefulWidget {
   final AnyhooLatLong location;
   final List<AnyhooMarker> markers;
   final AnyhooMapSettings settings;
+  final String? selectedMarkerId;
+  final ValueChanged<String>? onMarkerTapped;
+  final ValueChanged<AnyhooLatLong>? onMapTapped;
+  final AnyhooMarkerWidgetBuilder? markerBuilder;
 
   const FlutterMapView({
     super.key,
     required this.location,
     this.markers = const [],
     required this.settings,
+    this.selectedMarkerId,
+    this.onMarkerTapped,
+    this.onMapTapped,
+    this.markerBuilder,
   });
 
   @override
@@ -80,6 +88,33 @@ class _FlutterMapViewState extends State<FlutterMapView> {
     );
   }
 
+  Widget _markerChild(BuildContext context, AnyhooMarker marker) {
+    final selected = marker.id == widget.selectedMarkerId;
+    final Widget pin;
+    if (marker.child != null) {
+      pin = marker.child!;
+    } else if (widget.markerBuilder != null) {
+      pin = widget.markerBuilder!(context, marker, selected);
+    } else {
+      pin = Tooltip(
+        message: '${marker.title}\n${marker.description}',
+        child: Icon(
+          Icons.location_on,
+          color: selected ? Colors.blue : Colors.red,
+          size: selected ? 48 : 40,
+        ),
+      );
+    }
+
+    return GestureDetector(
+      key: ValueKey(marker.id),
+      onTap: widget.onMarkerTapped == null
+          ? null
+          : () => widget.onMarkerTapped!(marker.id),
+      child: pin,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final flutter = _flutterSettings;
@@ -90,6 +125,14 @@ class _FlutterMapViewState extends State<FlutterMapView> {
           widget.location.longitude,
         ),
         initialZoom: widget.settings.initialZoom,
+        onTap: widget.onMapTapped == null
+            ? null
+            : (tapPosition, point) => widget.onMapTapped!(
+                AnyhooLatLong(
+                  latitude: point.latitude,
+                  longitude: point.longitude,
+                ),
+              ),
       ),
       children: [
         _tileLayer,
@@ -101,17 +144,10 @@ class _FlutterMapViewState extends State<FlutterMapView> {
                     marker.location.latitude,
                     marker.location.longitude,
                   ),
-                  width: 80,
-                  height: 80,
+                  width: 48,
+                  height: 48,
                   alignment: Alignment.bottomCenter,
-                  child: Tooltip(
-                    message: '${marker.title}\n${marker.description}',
-                    child: const Icon(
-                      Icons.location_on,
-                      color: Colors.red,
-                      size: 40,
-                    ),
-                  ),
+                  child: _markerChild(context, marker),
                 ),
               )
               .toList(),
