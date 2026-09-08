@@ -22,7 +22,16 @@ class MapPage extends StatelessWidget {
                 height: 400,
                 width: 600,
                 child: AnyhooMap(
-                  settings: AnyhooMapSettings(initialZoom: 15),
+                  settings: AnyhooMapSettings(
+                    initialZoom: 15,
+                    // Example only. Production apps should use a tile host that
+                    // permits their traffic, not public OSM as a silent default.
+                    flutter: AnyhooFlutterMapSettings(
+                      urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                      userAgentPackageName: 'example_app',
+                      attribution: 'OpenStreetMap contributors',
+                    ),
+                  ),
                   mapType: AnyhooMapType.flutter,
                   location: AnyhooLatLong(latitude: 51.5074, longitude: -0.1278),
                   markers: [

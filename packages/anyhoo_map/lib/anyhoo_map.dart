@@ -10,3 +10,4 @@ export 'src/anyhoo_map.dart';
 export 'src/anyhoo_map_type.dart';
 export 'src/anyhoo_marker.dart';
 export 'src/anyhoo_map_settings.dart';
+export 'src/anyhoo_tile_provider.dart';

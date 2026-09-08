@@ -9,10 +9,16 @@ class GoogleMapView extends StatelessWidget {
   final List<AnyhooMarker> markers;
   final AnyhooMapSettings settings;
 
-  const GoogleMapView({super.key, required this.location, this.markers = const [], required this.settings});
+  const GoogleMapView({
+    super.key,
+    required this.location,
+    this.markers = const [],
+    required this.settings,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final google = settings.googleOrDefault;
     return GoogleMap(
       initialCameraPosition: CameraPosition(
         target: LatLng(location.latitude, location.longitude),
@@ -22,16 +28,22 @@ class GoogleMapView extends StatelessWidget {
           .map(
             (marker) => Marker(
               markerId: MarkerId(marker.id),
-              position: LatLng(marker.location.latitude, marker.location.longitude),
-              infoWindow: InfoWindow(title: marker.title, snippet: marker.description),
+              position: LatLng(
+                marker.location.latitude,
+                marker.location.longitude,
+              ),
+              infoWindow: InfoWindow(
+                title: marker.title,
+                snippet: marker.description,
+              ),
             ),
           )
           .toSet(),
-
-      myLocationEnabled: settings.showUserLocation,
-      myLocationButtonEnabled: settings.showUserLocationButton,
-      zoomControlsEnabled: settings.showZoomControls,
-      mapToolbarEnabled: settings.showMapToolbar,
+      myLocationEnabled: google.showUserLocation,
+      myLocationButtonEnabled: google.showMyLocationButton,
+      zoomControlsEnabled: google.showZoomControls,
+      mapToolbarEnabled: google.showMapToolbar,
+      cloudMapId: google.mapId,
     );
   }
 }
