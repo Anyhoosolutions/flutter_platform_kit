@@ -57,20 +57,13 @@ class _GoogleMapViewState extends State<GoogleMapView> {
     _google = controller;
     _ready = true;
     widget.mapController.attachGoogle(controller, widget.settings);
-    await widget.mapController.applyInitialCamera(
-      widget.location,
-      widget.markers,
-    );
+    await widget.mapController.applyInitialCamera(widget.location, widget.markers);
   }
 
   void _syncCamera(GoogleMapView oldWidget) {
-    final paddingChanged =
-        oldWidget.settings.cameraPadding != widget.settings.cameraPadding;
+    final paddingChanged = oldWidget.settings.cameraPadding != widget.settings.cameraPadding;
     if (widget.settings.fitToMarkers) {
-      if (AnyhooMapController.markersDiffer(
-            oldWidget.markers,
-            widget.markers,
-          ) ||
+      if (AnyhooMapController.markersDiffer(oldWidget.markers, widget.markers) ||
           paddingChanged ||
           !oldWidget.settings.fitToMarkers) {
         widget.mapController.fitMarkers(widget.markers);
@@ -96,34 +89,22 @@ class _GoogleMapViewState extends State<GoogleMapView> {
         return Marker(
           markerId: MarkerId(marker.id),
           position: LatLng(marker.location.latitude, marker.location.longitude),
-          infoWindow: InfoWindow(
-            title: marker.title,
-            snippet: marker.description,
-          ),
-          icon: BitmapDescriptor.defaultMarkerWithHue(
-            selected ? BitmapDescriptor.hueAzure : BitmapDescriptor.hueRed,
-          ),
+          infoWindow: InfoWindow(title: marker.title, snippet: marker.description),
+          icon: BitmapDescriptor.defaultMarkerWithHue(selected ? BitmapDescriptor.hueAzure : BitmapDescriptor.hueRed),
           zIndexInt: selected ? 1 : 0,
           consumeTapEvents: widget.onMarkerTapped != null,
-          onTap: widget.onMarkerTapped == null
-              ? null
-              : () => widget.onMarkerTapped!(marker.id),
+          onTap: widget.onMarkerTapped == null ? null : () => widget.onMarkerTapped!(marker.id),
         );
       }).toSet(),
       myLocationEnabled: google.showUserLocation,
       myLocationButtonEnabled: google.showMyLocationButton,
       zoomControlsEnabled: google.showZoomControls,
       mapToolbarEnabled: google.showMapToolbar,
-      cloudMapId: google.mapId,
+      mapId: google.mapId,
       onMapCreated: _onMapCreated,
       onTap: widget.onMapTapped == null
           ? null
-          : (latLng) => widget.onMapTapped!(
-              AnyhooLatLong(
-                latitude: latLng.latitude,
-                longitude: latLng.longitude,
-              ),
-            ),
+          : (latLng) => widget.onMapTapped!(AnyhooLatLong(latitude: latLng.latitude, longitude: latLng.longitude)),
     );
   }
 }
