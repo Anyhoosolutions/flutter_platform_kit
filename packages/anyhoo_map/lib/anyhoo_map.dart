@@ -5,8 +5,6 @@
 // ignore: unnecessary_library_name
 library anyhoo_map;
 
-export 'src/google_map.dart';
-export 'src/flutter_map.dart';
 export 'src/anyhoo_latlong.dart';
 export 'src/anyhoo_map.dart';
 export 'src/anyhoo_map_type.dart';

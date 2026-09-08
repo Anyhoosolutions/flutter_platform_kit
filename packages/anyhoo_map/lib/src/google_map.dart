@@ -1,4 +1,6 @@
-import 'package:anyhoo_map/anyhoo_map.dart';
+import 'package:anyhoo_map/src/anyhoo_latlong.dart';
+import 'package:anyhoo_map/src/anyhoo_map_settings.dart';
+import 'package:anyhoo_map/src/anyhoo_marker.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
@@ -19,7 +21,7 @@ class GoogleMapView extends StatelessWidget {
       markers: markers
           .map(
             (marker) => Marker(
-              markerId: MarkerId(marker.getId()),
+              markerId: MarkerId(marker.id),
               position: LatLng(marker.location.latitude, marker.location.longitude),
               infoWindow: InfoWindow(title: marker.title, snippet: marker.description),
             ),

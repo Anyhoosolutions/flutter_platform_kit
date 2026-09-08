@@ -14,8 +14,6 @@ dependencies:
     sdk: flutter
   google_maps_flutter: ^2.14.0
   latlong2: ^0.9.1
-  anyhoo_core:
-    path: ../anyhoo_core
   flutter_map: ^8.2.2
   http: ^1.6.0
   retry: ^3.1.2

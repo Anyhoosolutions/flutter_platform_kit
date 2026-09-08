@@ -1,4 +1,9 @@
-import 'package:anyhoo_map/anyhoo_map.dart';
+import 'package:anyhoo_map/src/anyhoo_latlong.dart';
+import 'package:anyhoo_map/src/anyhoo_map_settings.dart';
+import 'package:anyhoo_map/src/anyhoo_map_type.dart';
+import 'package:anyhoo_map/src/anyhoo_marker.dart';
+import 'package:anyhoo_map/src/flutter_map.dart';
+import 'package:anyhoo_map/src/google_map.dart';
 import 'package:flutter/material.dart';
 
 class AnyhooMap extends StatelessWidget {
@@ -18,9 +23,17 @@ class AnyhooMap extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (mapType == AnyhooMapType.google) {
-      return GoogleMapView(location: location, markers: markers, settings: settings);
+      return GoogleMapView(
+        location: location,
+        markers: markers,
+        settings: settings,
+      );
     } else if (mapType == AnyhooMapType.flutter) {
-      return FlutterMapView(location: location, markers: markers, settings: settings);
+      return FlutterMapView(
+        location: location,
+        markers: markers,
+        settings: settings,
+      );
     } else {
       throw Exception('Invalid map type: $mapType');
     }

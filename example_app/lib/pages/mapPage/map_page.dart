@@ -27,11 +27,13 @@ class MapPage extends StatelessWidget {
                   location: AnyhooLatLong(latitude: 51.5074, longitude: -0.1278),
                   markers: [
                     AnyhooMarker(
+                      id: 'london-1',
                       location: AnyhooLatLong(latitude: 51.5094, longitude: -0.1278),
                       title: 'London',
                       description: 'This is a marker in London',
                     ),
                     AnyhooMarker(
+                      id: 'london-2',
                       location: AnyhooLatLong(latitude: 51.5070, longitude: -0.1260),
                       title: 'London',
                       description: 'Here is another marker',
