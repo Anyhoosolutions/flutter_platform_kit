@@ -1,4 +1,5 @@
 import 'package:anyhoo_map/src/anyhoo_latlong.dart';
+import 'package:anyhoo_map/src/anyhoo_map_controller.dart';
 import 'package:anyhoo_map/src/anyhoo_map_settings.dart';
 import 'package:anyhoo_map/src/anyhoo_marker.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +12,7 @@ class FlutterMapView extends StatefulWidget {
   final AnyhooLatLong location;
   final List<AnyhooMarker> markers;
   final AnyhooMapSettings settings;
+  final AnyhooMapController mapController;
   final String? selectedMarkerId;
   final ValueChanged<String>? onMarkerTapped;
   final ValueChanged<AnyhooLatLong>? onMapTapped;
@@ -21,6 +23,7 @@ class FlutterMapView extends StatefulWidget {
     required this.location,
     this.markers = const [],
     required this.settings,
+    required this.mapController,
     this.selectedMarkerId,
     this.onMarkerTapped,
     this.onMapTapped,
@@ -32,8 +35,10 @@ class FlutterMapView extends StatefulWidget {
 }
 
 class _FlutterMapViewState extends State<FlutterMapView> {
+  late final MapController _flutterController;
   late TileLayer _tileLayer;
   RetryClient? _httpClient;
+  var _ready = false;
 
   AnyhooFlutterMapSettings get _flutterSettings {
     final flutter = widget.settings.flutter;
@@ -54,6 +59,7 @@ class _FlutterMapViewState extends State<FlutterMapView> {
   @override
   void initState() {
     super.initState();
+    _flutterController = MapController();
     _tileLayer = _buildTileLayer(_flutterSettings);
   }
 
@@ -68,12 +74,49 @@ class _FlutterMapViewState extends State<FlutterMapView> {
         !identical(previous.tileProvider, next.tileProvider)) {
       _tileLayer = _buildTileLayer(next);
     }
+
+    if (!_ready) {
+      return;
+    }
+    if (!identical(oldWidget.mapController, widget.mapController)) {
+      widget.mapController.attachFlutter(_flutterController, widget.settings);
+    } else {
+      widget.mapController.updateSettings(widget.settings);
+    }
+    _syncCamera(oldWidget);
   }
 
   @override
   void dispose() {
+    widget.mapController.detach();
+    _flutterController.dispose();
     _httpClient?.close();
     super.dispose();
+  }
+
+  void _onMapReady() {
+    _ready = true;
+    widget.mapController.attachFlutter(_flutterController, widget.settings);
+    widget.mapController.applyInitialCamera(widget.location, widget.markers);
+  }
+
+  void _syncCamera(FlutterMapView oldWidget) {
+    final paddingChanged =
+        oldWidget.settings.cameraPadding != widget.settings.cameraPadding;
+    if (widget.settings.fitToMarkers) {
+      if (AnyhooMapController.markersDiffer(
+            oldWidget.markers,
+            widget.markers,
+          ) ||
+          paddingChanged ||
+          !oldWidget.settings.fitToMarkers) {
+        widget.mapController.fitMarkers(widget.markers);
+      }
+      return;
+    }
+    if (oldWidget.location != widget.location || paddingChanged) {
+      widget.mapController.moveTo(widget.location);
+    }
   }
 
   TileLayer _buildTileLayer(AnyhooFlutterMapSettings flutter) {
@@ -118,13 +161,25 @@ class _FlutterMapViewState extends State<FlutterMapView> {
   @override
   Widget build(BuildContext context) {
     final flutter = _flutterSettings;
+    final coordinates = [
+      for (final marker in widget.markers)
+        LatLng(marker.location.latitude, marker.location.longitude),
+    ];
     return FlutterMap(
+      mapController: _flutterController,
       options: MapOptions(
         initialCenter: LatLng(
           widget.location.latitude,
           widget.location.longitude,
         ),
         initialZoom: widget.settings.initialZoom,
+        initialCameraFit: widget.settings.fitToMarkers && coordinates.isNotEmpty
+            ? CameraFit.coordinates(
+                coordinates: coordinates,
+                padding: widget.settings.cameraPadding,
+              )
+            : null,
+        onMapReady: _onMapReady,
         onTap: widget.onMapTapped == null
             ? null
             : (tapPosition, point) => widget.onMapTapped!(
@@ -153,9 +208,12 @@ class _FlutterMapViewState extends State<FlutterMapView> {
               .toList(),
         ),
         if (flutter.attribution != null)
-          SimpleAttributionWidget(
-            source: Text(flutter.attribution!),
-            alignment: Alignment.bottomLeft,
+          Padding(
+            padding: widget.settings.cameraPadding,
+            child: SimpleAttributionWidget(
+              source: Text(flutter.attribution!),
+              alignment: Alignment.bottomLeft,
+            ),
           ),
       ],
     );

@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$AnyhooMapSettings {
 
- double get initialZoom; AnyhooGoogleMapSettings? get google; AnyhooFlutterMapSettings? get flutter;
+ double get initialZoom; bool get fitToMarkers; EdgeInsets get cameraPadding; AnyhooGoogleMapSettings? get google; AnyhooFlutterMapSettings? get flutter;
 /// Create a copy of AnyhooMapSettings
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $AnyhooMapSettingsCopyWith<AnyhooMapSettings> get copyWith => _$AnyhooMapSetting
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is AnyhooMapSettings&&(identical(other.initialZoom, initialZoom) || other.initialZoom == initialZoom)&&(identical(other.google, google) || other.google == google)&&(identical(other.flutter, flutter) || other.flutter == flutter));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is AnyhooMapSettings&&(identical(other.initialZoom, initialZoom) || other.initialZoom == initialZoom)&&(identical(other.fitToMarkers, fitToMarkers) || other.fitToMarkers == fitToMarkers)&&(identical(other.cameraPadding, cameraPadding) || other.cameraPadding == cameraPadding)&&(identical(other.google, google) || other.google == google)&&(identical(other.flutter, flutter) || other.flutter == flutter));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,initialZoom,google,flutter);
+int get hashCode => Object.hash(runtimeType,initialZoom,fitToMarkers,cameraPadding,google,flutter);
 
 @override
 String toString() {
-  return 'AnyhooMapSettings(initialZoom: $initialZoom, google: $google, flutter: $flutter)';
+  return 'AnyhooMapSettings(initialZoom: $initialZoom, fitToMarkers: $fitToMarkers, cameraPadding: $cameraPadding, google: $google, flutter: $flutter)';
 }
 
 
@@ -45,7 +45,7 @@ abstract mixin class $AnyhooMapSettingsCopyWith<$Res>  {
   factory $AnyhooMapSettingsCopyWith(AnyhooMapSettings value, $Res Function(AnyhooMapSettings) _then) = _$AnyhooMapSettingsCopyWithImpl;
 @useResult
 $Res call({
- double initialZoom, AnyhooGoogleMapSettings? google, AnyhooFlutterMapSettings? flutter
+ double initialZoom, bool fitToMarkers, EdgeInsets cameraPadding, AnyhooGoogleMapSettings? google, AnyhooFlutterMapSettings? flutter
 });
 
 
@@ -62,10 +62,12 @@ class _$AnyhooMapSettingsCopyWithImpl<$Res>
 
 /// Create a copy of AnyhooMapSettings
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? initialZoom = null,Object? google = freezed,Object? flutter = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? initialZoom = null,Object? fitToMarkers = null,Object? cameraPadding = null,Object? google = freezed,Object? flutter = freezed,}) {
   return _then(_self.copyWith(
 initialZoom: null == initialZoom ? _self.initialZoom : initialZoom // ignore: cast_nullable_to_non_nullable
-as double,google: freezed == google ? _self.google : google // ignore: cast_nullable_to_non_nullable
+as double,fitToMarkers: null == fitToMarkers ? _self.fitToMarkers : fitToMarkers // ignore: cast_nullable_to_non_nullable
+as bool,cameraPadding: null == cameraPadding ? _self.cameraPadding : cameraPadding // ignore: cast_nullable_to_non_nullable
+as EdgeInsets,google: freezed == google ? _self.google : google // ignore: cast_nullable_to_non_nullable
 as AnyhooGoogleMapSettings?,flutter: freezed == flutter ? _self.flutter : flutter // ignore: cast_nullable_to_non_nullable
 as AnyhooFlutterMapSettings?,
   ));
@@ -176,10 +178,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( double initialZoom,  AnyhooGoogleMapSettings? google,  AnyhooFlutterMapSettings? flutter)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( double initialZoom,  bool fitToMarkers,  EdgeInsets cameraPadding,  AnyhooGoogleMapSettings? google,  AnyhooFlutterMapSettings? flutter)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _AnyhooMapSettings() when $default != null:
-return $default(_that.initialZoom,_that.google,_that.flutter);case _:
+return $default(_that.initialZoom,_that.fitToMarkers,_that.cameraPadding,_that.google,_that.flutter);case _:
   return orElse();
 
 }
@@ -197,10 +199,10 @@ return $default(_that.initialZoom,_that.google,_that.flutter);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( double initialZoom,  AnyhooGoogleMapSettings? google,  AnyhooFlutterMapSettings? flutter)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( double initialZoom,  bool fitToMarkers,  EdgeInsets cameraPadding,  AnyhooGoogleMapSettings? google,  AnyhooFlutterMapSettings? flutter)  $default,) {final _that = this;
 switch (_that) {
 case _AnyhooMapSettings():
-return $default(_that.initialZoom,_that.google,_that.flutter);case _:
+return $default(_that.initialZoom,_that.fitToMarkers,_that.cameraPadding,_that.google,_that.flutter);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -217,10 +219,10 @@ return $default(_that.initialZoom,_that.google,_that.flutter);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( double initialZoom,  AnyhooGoogleMapSettings? google,  AnyhooFlutterMapSettings? flutter)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( double initialZoom,  bool fitToMarkers,  EdgeInsets cameraPadding,  AnyhooGoogleMapSettings? google,  AnyhooFlutterMapSettings? flutter)?  $default,) {final _that = this;
 switch (_that) {
 case _AnyhooMapSettings() when $default != null:
-return $default(_that.initialZoom,_that.google,_that.flutter);case _:
+return $default(_that.initialZoom,_that.fitToMarkers,_that.cameraPadding,_that.google,_that.flutter);case _:
   return null;
 
 }
@@ -232,10 +234,12 @@ return $default(_that.initialZoom,_that.google,_that.flutter);case _:
 
 
 class _AnyhooMapSettings extends AnyhooMapSettings {
-  const _AnyhooMapSettings({this.initialZoom = 15, this.google, this.flutter}): super._();
+  const _AnyhooMapSettings({this.initialZoom = 15, this.fitToMarkers = false, this.cameraPadding = EdgeInsets.zero, this.google, this.flutter}): super._();
   
 
 @override@JsonKey() final  double initialZoom;
+@override@JsonKey() final  bool fitToMarkers;
+@override@JsonKey() final  EdgeInsets cameraPadding;
 @override final  AnyhooGoogleMapSettings? google;
 @override final  AnyhooFlutterMapSettings? flutter;
 
@@ -249,16 +253,16 @@ _$AnyhooMapSettingsCopyWith<_AnyhooMapSettings> get copyWith => __$AnyhooMapSett
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AnyhooMapSettings&&(identical(other.initialZoom, initialZoom) || other.initialZoom == initialZoom)&&(identical(other.google, google) || other.google == google)&&(identical(other.flutter, flutter) || other.flutter == flutter));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AnyhooMapSettings&&(identical(other.initialZoom, initialZoom) || other.initialZoom == initialZoom)&&(identical(other.fitToMarkers, fitToMarkers) || other.fitToMarkers == fitToMarkers)&&(identical(other.cameraPadding, cameraPadding) || other.cameraPadding == cameraPadding)&&(identical(other.google, google) || other.google == google)&&(identical(other.flutter, flutter) || other.flutter == flutter));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,initialZoom,google,flutter);
+int get hashCode => Object.hash(runtimeType,initialZoom,fitToMarkers,cameraPadding,google,flutter);
 
 @override
 String toString() {
-  return 'AnyhooMapSettings(initialZoom: $initialZoom, google: $google, flutter: $flutter)';
+  return 'AnyhooMapSettings(initialZoom: $initialZoom, fitToMarkers: $fitToMarkers, cameraPadding: $cameraPadding, google: $google, flutter: $flutter)';
 }
 
 
@@ -269,7 +273,7 @@ abstract mixin class _$AnyhooMapSettingsCopyWith<$Res> implements $AnyhooMapSett
   factory _$AnyhooMapSettingsCopyWith(_AnyhooMapSettings value, $Res Function(_AnyhooMapSettings) _then) = __$AnyhooMapSettingsCopyWithImpl;
 @override @useResult
 $Res call({
- double initialZoom, AnyhooGoogleMapSettings? google, AnyhooFlutterMapSettings? flutter
+ double initialZoom, bool fitToMarkers, EdgeInsets cameraPadding, AnyhooGoogleMapSettings? google, AnyhooFlutterMapSettings? flutter
 });
 
 
@@ -286,10 +290,12 @@ class __$AnyhooMapSettingsCopyWithImpl<$Res>
 
 /// Create a copy of AnyhooMapSettings
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? initialZoom = null,Object? google = freezed,Object? flutter = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? initialZoom = null,Object? fitToMarkers = null,Object? cameraPadding = null,Object? google = freezed,Object? flutter = freezed,}) {
   return _then(_AnyhooMapSettings(
 initialZoom: null == initialZoom ? _self.initialZoom : initialZoom // ignore: cast_nullable_to_non_nullable
-as double,google: freezed == google ? _self.google : google // ignore: cast_nullable_to_non_nullable
+as double,fitToMarkers: null == fitToMarkers ? _self.fitToMarkers : fitToMarkers // ignore: cast_nullable_to_non_nullable
+as bool,cameraPadding: null == cameraPadding ? _self.cameraPadding : cameraPadding // ignore: cast_nullable_to_non_nullable
+as EdgeInsets,google: freezed == google ? _self.google : google // ignore: cast_nullable_to_non_nullable
 as AnyhooGoogleMapSettings?,flutter: freezed == flutter ? _self.flutter : flutter // ignore: cast_nullable_to_non_nullable
 as AnyhooFlutterMapSettings?,
   ));

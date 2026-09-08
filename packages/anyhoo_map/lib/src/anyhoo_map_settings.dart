@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
@@ -9,6 +10,8 @@ abstract class AnyhooMapSettings with _$AnyhooMapSettings {
 
   const factory AnyhooMapSettings({
     @Default(15) double initialZoom,
+    @Default(false) bool fitToMarkers,
+    @Default(EdgeInsets.zero) EdgeInsets cameraPadding,
     AnyhooGoogleMapSettings? google,
     AnyhooFlutterMapSettings? flutter,
   }) = _AnyhooMapSettings;

@@ -79,4 +79,39 @@ void main() {
     expect(icons.any((icon) => icon.color == Colors.blue), isTrue);
     expect(icons.any((icon) => icon.color == Colors.red), isTrue);
   });
+
+  testWidgets('fitToMarkers builds with camera padding and no network tiles', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      _wrap(
+        AnyhooMap(
+          mapType: AnyhooMapType.flutter,
+          location: const AnyhooLatLong(latitude: 0, longitude: 0),
+          markers: const [
+            AnyhooMarker(
+              id: 'a',
+              location: AnyhooLatLong(latitude: 0, longitude: 0),
+              title: 'A',
+              description: '',
+            ),
+            AnyhooMarker(
+              id: 'b',
+              location: AnyhooLatLong(latitude: 0.02, longitude: 0.02),
+              title: 'B',
+              description: '',
+            ),
+          ],
+          settings: AnyhooMapSettings(
+            fitToMarkers: true,
+            cameraPadding: const EdgeInsets.only(bottom: 120, top: 48),
+            flutter: _testSettings.flutter,
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+
+    expect(find.byType(AnyhooMap), findsOneWidget);
+  });
 }
