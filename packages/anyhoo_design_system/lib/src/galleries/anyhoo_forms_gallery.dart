@@ -30,9 +30,16 @@ class _AnyhooFormsGalleryState extends State<AnyhooFormsGallery> {
             'Search Input'.headline(size: HeadlineSize.small).pad(b: 8),
             AnyhooCardShell(
               padding: const EdgeInsets.all(DesignTokens.spacingMd),
-              child: AnyhooSearchField(
-                hint: 'Search...',
-                onFilterTap: () {},
+              child: Column(
+                children: [
+                  AnyhooSearchField(hint: 'Search...', onFilterTap: () {}),
+                  const SizedBox(height: DesignTokens.spacingMd),
+                  AnyhooSearchField(
+                    hint: 'Search with active filters...',
+                    onFilterTap: () {},
+                    isFilterActive: true,
+                  ),
+                ],
               ),
             ),
             const SizedBox(height: DesignTokens.spacingLg),

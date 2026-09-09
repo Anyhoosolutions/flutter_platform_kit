@@ -1,3 +1,8 @@
+## 0.0.3
+
+* `AnyhooSearchField` takes `isFilterActive`. Inactive filter icons use
+  `surface.secondaryText`; active ones keep `accent.primaryFixed`.
+
 ## 0.0.2
 
 * Added `AnyhooDropdown` (`.single` / `.multi`) with optional add-new footer,

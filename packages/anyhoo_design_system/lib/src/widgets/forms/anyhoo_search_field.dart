@@ -9,12 +9,17 @@ class AnyhooSearchField extends StatelessWidget {
     this.onChanged,
     this.hint = 'Search',
     this.onFilterTap,
+    this.isFilterActive = false,
   });
 
   final TextEditingController? controller;
   final ValueChanged<String>? onChanged;
   final String hint;
   final VoidCallback? onFilterTap;
+
+  /// When true, the filter icon uses the accent color. When false, it uses
+  /// [SurfaceColors.secondaryText] (same as the search icon).
+  final bool isFilterActive;
 
   @override
   Widget build(BuildContext context) {
@@ -36,14 +41,14 @@ class AnyhooSearchField extends StatelessWidget {
             child: TextField(
               controller: controller,
               onChanged: onChanged,
-              style: AnyhooTypography.body(BodySize.large).copyWith(
-                color: surface.primaryText,
-              ),
+              style: AnyhooTypography.body(
+                BodySize.large,
+              ).copyWith(color: surface.primaryText),
               decoration: InputDecoration(
                 hintText: hint,
-                hintStyle: AnyhooTypography.body(BodySize.large).copyWith(
-                  color: surface.secondaryText,
-                ),
+                hintStyle: AnyhooTypography.body(
+                  BodySize.large,
+                ).copyWith(color: surface.secondaryText),
                 border: InputBorder.none,
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: DesignTokens.spacingSm,
@@ -56,7 +61,13 @@ class AnyhooSearchField extends StatelessWidget {
           if (onFilterTap != null)
             IconButton(
               onPressed: onFilterTap,
-              icon: Icon(Icons.tune, size: 20, color: accent.primaryFixed),
+              icon: Icon(
+                Icons.tune,
+                size: 20,
+                color: isFilterActive
+                    ? accent.primaryFixed
+                    : surface.secondaryText,
+              ),
               constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
             ),
         ],
