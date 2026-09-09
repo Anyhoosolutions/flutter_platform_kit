@@ -1,3 +1,4 @@
+import 'package:anyhoo_map/src/anyhoo_circle.dart';
 import 'package:anyhoo_map/src/anyhoo_latlong.dart';
 import 'package:anyhoo_map/src/anyhoo_map_controller.dart';
 import 'package:anyhoo_map/src/anyhoo_map_settings.dart';
@@ -11,6 +12,7 @@ class AnyhooMap extends StatefulWidget {
   final AnyhooMapType mapType;
   final AnyhooLatLong location;
   final List<AnyhooMarker> markers;
+  final List<AnyhooCircle> circles;
   final AnyhooMapSettings settings;
   final AnyhooMapController? controller;
   final String? selectedMarkerId;
@@ -23,6 +25,7 @@ class AnyhooMap extends StatefulWidget {
     required this.mapType,
     required this.location,
     required this.markers,
+    this.circles = const [],
     required this.settings,
     this.controller,
     this.selectedMarkerId,
@@ -58,6 +61,7 @@ class _AnyhooMapState extends State<AnyhooMap> {
       return GoogleMapView(
         location: widget.location,
         markers: widget.markers,
+        circles: widget.circles,
         settings: widget.settings,
         mapController: _controller,
         selectedMarkerId: widget.selectedMarkerId,
@@ -68,6 +72,7 @@ class _AnyhooMapState extends State<AnyhooMap> {
       return FlutterMapView(
         location: widget.location,
         markers: widget.markers,
+        circles: widget.circles,
         settings: widget.settings,
         mapController: _controller,
         selectedMarkerId: widget.selectedMarkerId,

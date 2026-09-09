@@ -5,6 +5,7 @@
 // ignore: unnecessary_library_name
 library anyhoo_map;
 
+export 'src/anyhoo_circle.dart';
 export 'src/anyhoo_latlong.dart';
 export 'src/anyhoo_map.dart';
 export 'src/anyhoo_map_type.dart';

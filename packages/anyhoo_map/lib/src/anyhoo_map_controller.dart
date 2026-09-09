@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 
+import 'package:anyhoo_map/src/anyhoo_circle.dart';
 import 'package:anyhoo_map/src/anyhoo_latlong.dart';
 import 'package:anyhoo_map/src/anyhoo_map_settings.dart';
 import 'package:anyhoo_map/src/anyhoo_marker.dart';
@@ -12,6 +13,7 @@ import 'package:latlong2/latlong.dart';
 ///
 /// [AnyhooMap.location] also updates the camera when [AnyhooMapSettings.fitToMarkers]
 /// is false. Use this controller for peek-sheet padding changes and add-item flows.
+/// When [AnyhooMapSettings.fitToMarkers] is true, circles are included in the fit.
 class AnyhooMapController {
   gmaps.GoogleMapController? _google;
   MapController? _flutter;
@@ -43,10 +45,11 @@ class AnyhooMapController {
 
   Future<void> applyInitialCamera(
     AnyhooLatLong location,
-    List<AnyhooMarker> markers,
-  ) {
+    List<AnyhooMarker> markers, {
+    List<AnyhooCircle> circles = const [],
+  }) {
     if (_settings.fitToMarkers) {
-      return fitMarkers(markers);
+      return fitMarkers(markers, circles: circles);
     }
     return moveTo(location, zoom: _settings.initialZoom);
   }
@@ -78,17 +81,24 @@ class AnyhooMapController {
 
   Future<void> fitMarkers(
     List<AnyhooMarker> markers, {
+    List<AnyhooCircle> circles = const [],
     EdgeInsets? padding,
   }) async {
-    if (markers.isEmpty) {
+    final coordinates = fitCoordinates(markers: markers, circles: circles);
+    if (coordinates.isEmpty) {
       return;
     }
     final pad = padding ?? _settings.cameraPadding;
 
     if (_google != null) {
-      final bounds = _googleBounds(markers);
+      final bounds = _googleBoundsFrom(coordinates);
       if (bounds == null) {
-        await moveTo(markers.first.location);
+        await moveTo(
+          AnyhooLatLong(
+            latitude: coordinates.first.latitude,
+            longitude: coordinates.first.longitude,
+          ),
+        );
         return;
       }
       await _google!.animateCamera(
@@ -102,14 +112,21 @@ class AnyhooMapController {
       return;
     }
     flutter.fitCamera(
-      CameraFit.coordinates(
-        coordinates: [
-          for (final marker in markers)
-            LatLng(marker.location.latitude, marker.location.longitude),
-        ],
-        padding: pad,
-      ),
+      CameraFit.coordinates(coordinates: coordinates, padding: pad),
     );
+  }
+
+  static List<LatLng> fitCoordinates({
+    required List<AnyhooMarker> markers,
+    List<AnyhooCircle> circles = const [],
+  }) {
+    return [
+      for (final marker in markers)
+        LatLng(marker.location.latitude, marker.location.longitude),
+      for (final circle in circles)
+        for (final point in circle.boundingCoordinates)
+          LatLng(point.latitude, point.longitude),
+    ];
   }
 
   static bool markersDiffer(List<AnyhooMarker> a, List<AnyhooMarker> b) {
@@ -124,16 +141,33 @@ class AnyhooMapController {
     return false;
   }
 
-  static gmaps.LatLngBounds? _googleBounds(List<AnyhooMarker> markers) {
-    var minLat = markers.first.location.latitude;
+  static bool circlesDiffer(List<AnyhooCircle> a, List<AnyhooCircle> b) {
+    if (a.length != b.length) {
+      return true;
+    }
+    for (var i = 0; i < a.length; i++) {
+      if (a[i].id != b[i].id ||
+          a[i].center != b[i].center ||
+          a[i].radiusMeters != b[i].radiusMeters) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  static gmaps.LatLngBounds? _googleBoundsFrom(List<LatLng> coordinates) {
+    if (coordinates.isEmpty) {
+      return null;
+    }
+    var minLat = coordinates.first.latitude;
     var maxLat = minLat;
-    var minLng = markers.first.location.longitude;
+    var minLng = coordinates.first.longitude;
     var maxLng = minLng;
-    for (final marker in markers.skip(1)) {
-      minLat = math.min(minLat, marker.location.latitude);
-      maxLat = math.max(maxLat, marker.location.latitude);
-      minLng = math.min(minLng, marker.location.longitude);
-      maxLng = math.max(maxLng, marker.location.longitude);
+    for (final point in coordinates.skip(1)) {
+      minLat = math.min(minLat, point.latitude);
+      maxLat = math.max(maxLat, point.latitude);
+      minLng = math.min(minLng, point.longitude);
+      maxLng = math.max(maxLng, point.longitude);
     }
     if (minLat == maxLat && minLng == maxLng) {
       return null;
