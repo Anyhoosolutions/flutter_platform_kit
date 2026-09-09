@@ -10,10 +10,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 /// - nested maps and lists, recursively
 Map<String, dynamic>? fromFirestoreDocument(Map<String, dynamic>? data, String id) {
   if (data == null) return null;
-  return {
-    for (final entry in data.entries) entry.key: _fromFirestoreValue(entry.value),
-    'id': id,
-  };
+  return {for (final entry in data.entries) entry.key: _fromFirestoreValue(entry.value), 'id': id};
 }
 
 /// Converts app-facing document values to Firestore types.
@@ -30,7 +27,7 @@ Map<String, dynamic> toFirestoreDocument(Map<String, dynamic> data) {
 
 dynamic _fromFirestoreValue(dynamic value) {
   if (value is Timestamp) {
-    return value.toDate().toUtc().toIso8601String();
+    return value.toDate();
   }
   if (value is GeoPoint) {
     return {'latitude': value.latitude, 'longitude': value.longitude};
