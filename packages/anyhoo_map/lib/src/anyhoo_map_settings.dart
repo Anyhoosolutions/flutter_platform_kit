@@ -10,6 +10,8 @@ abstract class AnyhooMapSettings with _$AnyhooMapSettings {
 
   const factory AnyhooMapSettings({
     @Default(15) double initialZoom,
+
+    /// Frames markers and circles after the first frame.
     @Default(false) bool fitToMarkers,
     @Default(EdgeInsets.zero) EdgeInsets cameraPadding,
     AnyhooGoogleMapSettings? google,

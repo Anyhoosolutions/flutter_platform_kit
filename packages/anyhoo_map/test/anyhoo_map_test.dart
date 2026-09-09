@@ -114,4 +114,37 @@ void main() {
 
     expect(find.byType(AnyhooMap), findsOneWidget);
   });
+
+  testWidgets('flutter map builds with a circle overlay', (tester) async {
+    await tester.pumpWidget(
+      _wrap(
+        AnyhooMap(
+          mapType: AnyhooMapType.flutter,
+          location: const AnyhooLatLong(latitude: 0, longitude: 0),
+          markers: const [
+            AnyhooMarker(
+              id: 'origin',
+              location: AnyhooLatLong(latitude: 0, longitude: 0),
+              title: 'Origin',
+              description: '',
+            ),
+          ],
+          circles: const [
+            AnyhooCircle(
+              id: 'radius',
+              center: AnyhooLatLong(latitude: 0, longitude: 0),
+              radiusMeters: 1609.34,
+            ),
+          ],
+          settings: AnyhooMapSettings(
+            fitToMarkers: true,
+            flutter: _testSettings.flutter,
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+
+    expect(find.byType(AnyhooMap), findsOneWidget);
+  });
 }

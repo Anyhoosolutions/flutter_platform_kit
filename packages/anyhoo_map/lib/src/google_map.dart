@@ -1,3 +1,4 @@
+import 'package:anyhoo_map/src/anyhoo_circle.dart';
 import 'package:anyhoo_map/src/anyhoo_latlong.dart';
 import 'package:anyhoo_map/src/anyhoo_map_controller.dart';
 import 'package:anyhoo_map/src/anyhoo_map_settings.dart';
@@ -8,6 +9,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 class GoogleMapView extends StatefulWidget {
   final AnyhooLatLong location;
   final List<AnyhooMarker> markers;
+  final List<AnyhooCircle> circles;
   final AnyhooMapSettings settings;
   final AnyhooMapController mapController;
   final String? selectedMarkerId;
@@ -18,6 +20,7 @@ class GoogleMapView extends StatefulWidget {
     super.key,
     required this.location,
     this.markers = const [],
+    this.circles = const [],
     required this.settings,
     required this.mapController,
     this.selectedMarkerId,
@@ -57,16 +60,31 @@ class _GoogleMapViewState extends State<GoogleMapView> {
     _google = controller;
     _ready = true;
     widget.mapController.attachGoogle(controller, widget.settings);
-    await widget.mapController.applyInitialCamera(widget.location, widget.markers);
+    await widget.mapController.applyInitialCamera(
+      widget.location,
+      widget.markers,
+      circles: widget.circles,
+    );
   }
 
   void _syncCamera(GoogleMapView oldWidget) {
-    final paddingChanged = oldWidget.settings.cameraPadding != widget.settings.cameraPadding;
+    final paddingChanged =
+        oldWidget.settings.cameraPadding != widget.settings.cameraPadding;
     if (widget.settings.fitToMarkers) {
-      if (AnyhooMapController.markersDiffer(oldWidget.markers, widget.markers) ||
+      if (AnyhooMapController.markersDiffer(
+            oldWidget.markers,
+            widget.markers,
+          ) ||
+          AnyhooMapController.circlesDiffer(
+            oldWidget.circles,
+            widget.circles,
+          ) ||
           paddingChanged ||
           !oldWidget.settings.fitToMarkers) {
-        widget.mapController.fitMarkers(widget.markers);
+        widget.mapController.fitMarkers(
+          widget.markers,
+          circles: widget.circles,
+        );
       }
       return;
     }
@@ -89,13 +107,31 @@ class _GoogleMapViewState extends State<GoogleMapView> {
         return Marker(
           markerId: MarkerId(marker.id),
           position: LatLng(marker.location.latitude, marker.location.longitude),
-          infoWindow: InfoWindow(title: marker.title, snippet: marker.description),
-          icon: BitmapDescriptor.defaultMarkerWithHue(selected ? BitmapDescriptor.hueAzure : BitmapDescriptor.hueRed),
+          infoWindow: InfoWindow(
+            title: marker.title,
+            snippet: marker.description,
+          ),
+          icon: BitmapDescriptor.defaultMarkerWithHue(
+            selected ? BitmapDescriptor.hueAzure : BitmapDescriptor.hueRed,
+          ),
           zIndexInt: selected ? 1 : 0,
           consumeTapEvents: widget.onMarkerTapped != null,
-          onTap: widget.onMarkerTapped == null ? null : () => widget.onMarkerTapped!(marker.id),
+          onTap: widget.onMarkerTapped == null
+              ? null
+              : () => widget.onMarkerTapped!(marker.id),
         );
       }).toSet(),
+      circles: {
+        for (final circle in widget.circles)
+          Circle(
+            circleId: CircleId(circle.id),
+            center: LatLng(circle.center.latitude, circle.center.longitude),
+            radius: circle.radiusMeters,
+            fillColor: circle.fillColor,
+            strokeColor: circle.strokeColor,
+            strokeWidth: circle.strokeWidth.round().clamp(0, 100),
+          ),
+      },
       myLocationEnabled: google.showUserLocation,
       myLocationButtonEnabled: google.showMyLocationButton,
       zoomControlsEnabled: google.showZoomControls,
@@ -104,7 +140,12 @@ class _GoogleMapViewState extends State<GoogleMapView> {
       onMapCreated: _onMapCreated,
       onTap: widget.onMapTapped == null
           ? null
-          : (latLng) => widget.onMapTapped!(AnyhooLatLong(latitude: latLng.latitude, longitude: latLng.longitude)),
+          : (latLng) => widget.onMapTapped!(
+              AnyhooLatLong(
+                latitude: latLng.latitude,
+                longitude: latLng.longitude,
+              ),
+            ),
     );
   }
 }

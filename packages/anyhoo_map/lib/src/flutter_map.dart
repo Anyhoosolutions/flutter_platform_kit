@@ -1,3 +1,4 @@
+import 'package:anyhoo_map/src/anyhoo_circle.dart';
 import 'package:anyhoo_map/src/anyhoo_latlong.dart';
 import 'package:anyhoo_map/src/anyhoo_map_controller.dart';
 import 'package:anyhoo_map/src/anyhoo_map_settings.dart';
@@ -11,6 +12,7 @@ import 'package:latlong2/latlong.dart';
 class FlutterMapView extends StatefulWidget {
   final AnyhooLatLong location;
   final List<AnyhooMarker> markers;
+  final List<AnyhooCircle> circles;
   final AnyhooMapSettings settings;
   final AnyhooMapController mapController;
   final String? selectedMarkerId;
@@ -22,6 +24,7 @@ class FlutterMapView extends StatefulWidget {
     super.key,
     required this.location,
     this.markers = const [],
+    this.circles = const [],
     required this.settings,
     required this.mapController,
     this.selectedMarkerId,
@@ -97,7 +100,11 @@ class _FlutterMapViewState extends State<FlutterMapView> {
   void _onMapReady() {
     _ready = true;
     widget.mapController.attachFlutter(_flutterController, widget.settings);
-    widget.mapController.applyInitialCamera(widget.location, widget.markers);
+    widget.mapController.applyInitialCamera(
+      widget.location,
+      widget.markers,
+      circles: widget.circles,
+    );
   }
 
   void _syncCamera(FlutterMapView oldWidget) {
@@ -108,9 +115,16 @@ class _FlutterMapViewState extends State<FlutterMapView> {
             oldWidget.markers,
             widget.markers,
           ) ||
+          AnyhooMapController.circlesDiffer(
+            oldWidget.circles,
+            widget.circles,
+          ) ||
           paddingChanged ||
           !oldWidget.settings.fitToMarkers) {
-        widget.mapController.fitMarkers(widget.markers);
+        widget.mapController.fitMarkers(
+          widget.markers,
+          circles: widget.circles,
+        );
       }
       return;
     }
@@ -161,10 +175,10 @@ class _FlutterMapViewState extends State<FlutterMapView> {
   @override
   Widget build(BuildContext context) {
     final flutter = _flutterSettings;
-    final coordinates = [
-      for (final marker in widget.markers)
-        LatLng(marker.location.latitude, marker.location.longitude),
-    ];
+    final coordinates = AnyhooMapController.fitCoordinates(
+      markers: widget.markers,
+      circles: widget.circles,
+    );
     return FlutterMap(
       mapController: _flutterController,
       options: MapOptions(
@@ -191,6 +205,23 @@ class _FlutterMapViewState extends State<FlutterMapView> {
       ),
       children: [
         _tileLayer,
+        if (widget.circles.isNotEmpty)
+          CircleLayer(
+            circles: [
+              for (final circle in widget.circles)
+                CircleMarker(
+                  point: LatLng(
+                    circle.center.latitude,
+                    circle.center.longitude,
+                  ),
+                  radius: circle.radiusMeters,
+                  useRadiusInMeter: true,
+                  color: circle.fillColor,
+                  borderColor: circle.strokeColor,
+                  borderStrokeWidth: circle.strokeWidth,
+                ),
+            ],
+          ),
         MarkerLayer(
           markers: widget.markers
               .map(

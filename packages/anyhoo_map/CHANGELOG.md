@@ -1,3 +1,8 @@
+## 0.2.0
+
+* Add `AnyhooCircle` overlays (`AnyhooMap.circles`) on flutter_map and Google Maps.
+* `fitToMarkers` also frames circles so a radius preview can show the whole area.
+
 ## 0.1.0
 
 * Require `AnyhooMarker.id` (no random ids).

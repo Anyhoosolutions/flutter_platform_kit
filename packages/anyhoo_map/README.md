@@ -32,11 +32,46 @@ AnyhooMap(
 )
 ```
 
+## Circles
+
+`AnyhooCircle` draws a filled geographic radius (meters) on both engines. Pass `id` the same way as markers.
+
+```dart
+AnyhooMap(
+  mapType: AnyhooMapType.flutter,
+  location: origin,
+  markers: [
+    AnyhooMarker(
+      id: 'origin',
+      location: origin,
+      title: 'Origin',
+      description: '',
+    ),
+  ],
+  circles: [
+    AnyhooCircle(
+      id: 'radius',
+      center: origin,
+      radiusMeters: 24140, // 15 miles
+    ),
+  ],
+  settings: AnyhooMapSettings(
+    fitToMarkers: true,
+    flutter: AnyhooFlutterMapSettings(
+      urlTemplate: 'https://your-tile-host/{z}/{x}/{y}.png',
+      userAgentPackageName: 'com.example.your_app',
+    ),
+  ),
+)
+```
+
+`fitToMarkers: true` also frames circles.
+
 ## Camera
 
 `location` is a live target. After the first frame, changing it moves the camera. `initialZoom` is not a one-shot-only camera.
 
-- `fitToMarkers: true` frames every pin (takes priority over `location`).
+- `fitToMarkers: true` frames every pin **and** circle (takes priority over `location`).
 - `cameraPadding` keeps pins and flutter_map attribution clear of a peek sheet or list/map toggle.
 - `AnyhooMapController.moveTo` / `fitMarkers` for add-item flows and sheet height changes.
 
