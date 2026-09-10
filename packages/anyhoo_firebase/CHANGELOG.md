@@ -1,3 +1,8 @@
+## 0.0.17
+
+* Convert Firestore `Timestamp` to UTC `DateTime` and back
+* Wrap document conversions in `FirestoreConversionException` with document and field path
+
 ## 0.0.16
 
 * Resolve Firebase emulator host for macOS, Windows, Linux, and Fuchsia (`localhost`)

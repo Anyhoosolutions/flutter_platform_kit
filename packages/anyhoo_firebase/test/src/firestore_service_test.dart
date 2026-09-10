@@ -1,6 +1,7 @@
 // ignore_for_file: subtype_of_sealed_class
 
 import 'dart:async';
+import 'dart:collection';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -180,7 +181,7 @@ void main() {
 
         expect(result, {
           'name': 'Test',
-          'updatedAt': '2024-06-01T13:00:00.000Z',
+          'updatedAt': DateTime.utc(2024, 6, 1, 13),
           'id': 'doc1',
         });
       });
@@ -252,7 +253,7 @@ void main() {
         expect(result, [
           {
             'name': 'Test 1',
-            'updatedAt': '2024-06-01T13:00:00.000Z',
+            'updatedAt': DateTime.utc(2024, 6, 1, 13),
             'id': 'doc1',
           },
         ]);
@@ -302,9 +303,25 @@ void main() {
 
         expect(result, {
           'name': 'Test',
-          'updatedAt': '2024-06-01T13:00:00.000Z',
+          'updatedAt': DateTime.utc(2024, 6, 1, 13),
           'id': 'doc1',
         });
+      });
+
+      test('conversion failures include document and field path', () async {
+        when(() => mockDocumentSnapshot.id).thenReturn('doc1');
+        when(() => mockDocumentSnapshot.data()).thenReturn({'meta': _ThrowingMap()});
+        when(() => mockDocument.get()).thenAnswer((_) async => mockDocumentSnapshot);
+        when(() => mockFirestore.doc('places/doc1')).thenReturn(mockDocument);
+
+        expect(
+          () => firestoreService.getDocument('places/doc1'),
+          throwsA(
+            isA<FirestoreConversionException>()
+                .having((e) => e.documentPath, 'documentPath', 'places/doc1')
+                .having((e) => e.fieldPath, 'fieldPath', 'meta'),
+          ),
+        );
       });
     });
 
@@ -455,4 +472,24 @@ void main() {
       });
     });
   });
+}
+
+class _ThrowingMap extends MapBase<String, dynamic> {
+  @override
+  Iterable<MapEntry<String, dynamic>> get entries => throw StateError('cannot read entries');
+
+  @override
+  dynamic operator [](Object? key) => null;
+
+  @override
+  void operator []=(String key, dynamic value) {}
+
+  @override
+  void clear() {}
+
+  @override
+  Iterable<String> get keys => const [];
+
+  @override
+  dynamic remove(Object? key) => null;
 }

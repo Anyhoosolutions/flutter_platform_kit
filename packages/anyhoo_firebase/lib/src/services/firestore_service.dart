@@ -3,6 +3,8 @@ import 'package:anyhoo_logging/anyhoo_logging.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:logging/logging.dart';
 
+export 'firestore_document_converter.dart' show FirestoreConversionException;
+
 class FirestoreService {
   final FirebaseFirestore firestore;
   final _log = Logger('FirestoreService');
@@ -16,25 +18,19 @@ class FirestoreService {
     List<String>? whereNullFields,
     int? limit,
   }) {
-    Query<Map<String, dynamic>> query = firestore.collection(path);
-    if (orderBy != null) {
-      query = query.orderBy(orderBy, descending: descending!);
-    }
-    if (whereNullFields != null) {
-      for (var field in whereNullFields) {
-        query = query.where(field, isNull: true);
-      }
-    }
-    if (limit != null) {
-      query = query.limit(limit);
-    }
-    return query.snapshots().map(
-      (snapshot) => snapshot.docs.map((doc) => fromFirestoreDocument(doc.data(), doc.id)!).toList(),
+    return _collectionQuery(
+      path,
+      orderBy: orderBy,
+      descending: descending,
+      whereNullFields: whereNullFields,
+      limit: limit,
+    ).snapshots().map(
+      (snapshot) => snapshot.docs.map((doc) => _readDocument(doc.data(), doc.id, '$path/${doc.id}')!).toList(),
     );
   }
 
   Stream<Map<String, dynamic>?> watchDocument(String path) {
-    return firestore.doc(path).snapshots().map((snapshot) => fromFirestoreDocument(snapshot.data(), snapshot.id));
+    return firestore.doc(path).snapshots().map((snapshot) => _readDocument(snapshot.data(), snapshot.id, path));
   }
 
   Future<List<Map<String, dynamic>>> getCollection(
@@ -44,27 +40,23 @@ class FirestoreService {
     List<String>? whereNullFields,
     int? limit,
   }) {
-    Query<Map<String, dynamic>> query = firestore.collection(path);
-    if (orderBy != null) {
-      query = query.orderBy(orderBy, descending: descending!);
-    }
-    if (whereNullFields != null) {
-      for (var field in whereNullFields) {
-        query = query.where(field, isNull: true);
-      }
-    }
-    if (limit != null) {
-      query = query.limit(limit);
-    }
-    return query.get().then(
-      (snapshot) => snapshot.docs.map((doc) => fromFirestoreDocument(doc.data(), doc.id)!).toList(),
+    return _collectionQuery(
+      path,
+      orderBy: orderBy,
+      descending: descending,
+      whereNullFields: whereNullFields,
+      limit: limit,
+    ).get().then(
+      (snapshot) => snapshot.docs.map((doc) => _readDocument(doc.data(), doc.id, '$path/${doc.id}')!).toList(),
     );
   }
 
   Future<Map<String, dynamic>?> getDocument(String path) async {
     try {
       final docRef = await firestore.doc(path).get();
-      return fromFirestoreDocument(docRef.data(), docRef.id);
+      return _readDocument(docRef.data(), docRef.id, path);
+    } on FirestoreConversionException {
+      rethrow;
     } catch (e, stackTrace) {
       _log.warning('Error getting document at $path: $e');
       SentryHelper.captureException(e, stackTrace: stackTrace, fatal: false);
@@ -95,14 +87,17 @@ class FirestoreService {
 
     _log.info('fullPath: $fullPath');
     _log.info('data: $data');
-    await firestore.doc(fullPath).set(toFirestoreDocument(data));
+    await firestore.doc(fullPath).set(_writeDocument(data, fullPath));
 
     return docId;
   }
 
   Future<void> updateDocument(String path, String id, Map<String, dynamic> data) async {
+    final documentPath = '$path/$id';
     try {
-      return await firestore.collection(path).doc(id).update(toFirestoreDocument(data));
+      return await firestore.collection(path).doc(id).update(_writeDocument(data, documentPath));
+    } on FirestoreConversionException {
+      rethrow;
     } catch (e, stackTrace) {
       SentryHelper.captureException(e, stackTrace: stackTrace, fatal: false);
       throw Exception('Failed to update document at $path $id: $e');
@@ -111,5 +106,47 @@ class FirestoreService {
 
   Future<void> deleteDocument(String path, String id) async {
     return firestore.collection(path).doc(id).delete();
+  }
+
+  Query<Map<String, dynamic>> _collectionQuery(
+    String path, {
+    String? orderBy,
+    bool? descending,
+    List<String>? whereNullFields,
+    int? limit,
+  }) {
+    Query<Map<String, dynamic>> query = firestore.collection(path);
+    if (orderBy != null) {
+      query = query.orderBy(orderBy, descending: descending!);
+    }
+    if (whereNullFields != null) {
+      for (var field in whereNullFields) {
+        query = query.where(field, isNull: true);
+      }
+    }
+    if (limit != null) {
+      query = query.limit(limit);
+    }
+    return query;
+  }
+
+  Map<String, dynamic>? _readDocument(Map<String, dynamic>? data, String id, String documentPath) {
+    try {
+      return fromFirestoreDocument(data, id, documentPath: documentPath);
+    } on FirestoreConversionException catch (e, stackTrace) {
+      _log.warning('Error converting document at $documentPath: $e');
+      SentryHelper.captureException(e, stackTrace: stackTrace, fatal: false);
+      rethrow;
+    }
+  }
+
+  Map<String, dynamic> _writeDocument(Map<String, dynamic> data, String documentPath) {
+    try {
+      return toFirestoreDocument(data, documentPath: documentPath);
+    } on FirestoreConversionException catch (e, stackTrace) {
+      _log.warning('Error converting document for write at $documentPath: $e');
+      SentryHelper.captureException(e, stackTrace: stackTrace, fatal: false);
+      rethrow;
+    }
   }
 }
