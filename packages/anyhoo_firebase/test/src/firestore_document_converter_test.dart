@@ -7,6 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   final utc = DateTime.utc(2024, 6, 1, 13, 0, 0);
   final timestamp = Timestamp.fromDate(utc);
+  final iso = utc.toIso8601String();
   final geoPoint = GeoPoint(59.3293, 18.0686);
   final geoMap = {'latitude': 59.3293, 'longitude': 18.0686};
 
@@ -37,11 +38,11 @@ void main() {
       expect(original['updatedAt'], timestamp);
     });
 
-    test('converts Timestamp to a UTC DateTime', () {
+    test('converts Timestamp to a UTC ISO-8601 string', () {
       final result = fromFirestoreDocument({'updatedAt': timestamp}, 'doc1');
 
-      expect(result!['updatedAt'], utc);
-      expect((result['updatedAt'] as DateTime).isUtc, isTrue);
+      expect(result!['updatedAt'], iso);
+      expect(iso, endsWith('Z'));
     });
 
     test('converts Timestamp nested in a map', () {
@@ -49,7 +50,7 @@ void main() {
         'meta': {'updatedAt': timestamp},
       }, 'doc1');
 
-      expect(result!['meta'], {'updatedAt': utc});
+      expect(result!['meta'], {'updatedAt': iso});
     });
 
     test('converts Timestamp nested in a list', () {
@@ -57,7 +58,7 @@ void main() {
         'history': [timestamp, 'ok', 1],
       }, 'doc1');
 
-      expect(result!['history'], [utc, 'ok', 1]);
+      expect(result!['history'], [iso, 'ok', 1]);
     });
 
     test('converts GeoPoint to a latitude/longitude map', () {
@@ -127,18 +128,27 @@ void main() {
       expect(result['updatedAt'], timestamp);
     });
 
-    test('leaves ISO-8601 strings unchanged', () {
-      final iso = utc.toIso8601String();
-
+    test('converts a UTC ISO-8601 string to Timestamp', () {
       final result = toFirestoreDocument({'updatedAt': iso});
 
-      expect(result['updatedAt'], iso);
+      expect(result['updatedAt'], timestamp);
     });
 
     test('converts a local DateTime to Timestamp of the same instant', () {
       final local = utc.toLocal();
 
       final result = toFirestoreDocument({'updatedAt': local});
+
+      expect(result['updatedAt'], Timestamp.fromDate(local));
+    });
+
+    test('converts an unqualified ISO-8601 string as local time', () {
+      final local = DateTime(2024, 6, 1, 15, 0, 0);
+      final localIso = local.toIso8601String();
+
+      expect(localIso.contains('Z'), isFalse);
+
+      final result = toFirestoreDocument({'updatedAt': localIso});
 
       expect(result['updatedAt'], Timestamp.fromDate(local));
     });
@@ -187,6 +197,18 @@ void main() {
 
       expect(result['meta'], {'updatedAt': timestamp});
       expect(result['history'], [timestamp, 'ok']);
+    });
+
+    test('converts ISO-8601 strings nested in a list of maps', () {
+      final result = toFirestoreDocument({
+        'deployedStates': [
+          {'recordedAt': iso},
+        ],
+      });
+
+      expect(result['deployedStates'], [
+        {'recordedAt': timestamp},
+      ]);
     });
 
     test('leaves FieldValue sentinels unchanged', () {
