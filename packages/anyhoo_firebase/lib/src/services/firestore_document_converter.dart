@@ -40,7 +40,7 @@ class FirestoreConversionException implements Exception {
 /// Returns null when [data] is null (the document does not exist).
 ///
 /// Conversions:
-/// - [Timestamp] → UTC [DateTime]
+/// - [Timestamp] → UTC ISO-8601 string (`...Z`)
 /// - [GeoPoint] → `{latitude, longitude}`
 /// - nested maps and lists, recursively
 Map<String, dynamic>? fromFirestoreDocument(
@@ -63,6 +63,7 @@ Map<String, dynamic>? fromFirestoreDocument(
 ///
 /// Conversions:
 /// - [DateTime] → [Timestamp]
+/// - UTC/offset ISO-8601 strings → [Timestamp]
 /// - `{latitude, longitude}` maps → [GeoPoint]
 /// - nested maps and lists, recursively
 /// - [FieldValue] sentinels left unchanged
@@ -103,7 +104,7 @@ dynamic _fromFirestoreValue(
 }) {
   return _convertValue(value, path: path, documentPath: documentPath, convert: () {
     if (value is Timestamp) {
-      return value.toDate().toUtc();
+      return value.toDate().toUtc().toIso8601String();
     }
     if (value is GeoPoint) {
       return {'latitude': value.latitude, 'longitude': value.longitude};
@@ -139,6 +140,9 @@ dynamic _toFirestoreValue(
     }
     if (value is DateTime) {
       return Timestamp.fromDate(value);
+    }
+    if (value is String && _isIsoDateTimeString(value)) {
+      return Timestamp.fromDate(DateTime.parse(value));
     }
     if (value is Map) {
       if (_isGeoMap(value)) {
@@ -182,6 +186,10 @@ T _convertValue<T>(
       cause: e,
     );
   }
+}
+
+bool _isIsoDateTimeString(String value) {
+  return value.contains('T') && DateTime.tryParse(value) != null;
 }
 
 bool _isGeoMap(Map<dynamic, dynamic> value) {

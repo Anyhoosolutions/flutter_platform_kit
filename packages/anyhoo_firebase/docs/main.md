@@ -64,27 +64,42 @@ await firestoreService.deleteDocument('places', id);
 
 ## Type conversions
 
-Reads and writes convert Firestore types so the app can use Dart values. Nested maps and lists are converted recursively. Input maps are not mutated.
+Reads and writes convert Firestore types so the app can use Dart / JSON-shaped values. Nested maps and lists are converted recursively. Input maps are not mutated.
 
 | Firestore | In the app (read) | Written back |
 | --- | --- | --- |
-| `Timestamp` | UTC `DateTime` | `DateTime` → `Timestamp` |
+| `Timestamp` | UTC ISO-8601 string (`2024-06-01T13:00:00.000Z`) | `DateTime` or that ISO string → `Timestamp` |
 | `GeoPoint` | `{latitude, longitude}` | that map → `GeoPoint` |
 | `FieldValue` (write only) | — | left unchanged (`serverTimestamp`, `increment`, `delete`, …) |
 
-A map is only turned into a `GeoPoint` when it has exactly `latitude` and `longitude` (ints or doubles). Extra keys keep it as a map.
+Timestamps are stored as instants (Unix epoch, UTC). The ISO string always includes `Z`. Show local time in the UI with `DateTime.parse(iso).toLocal()`.
+
+Date-only strings such as `'2024-06-01'` are not treated as timestamps. A map is only turned into a `GeoPoint` when it has exactly `latitude` and `longitude` (ints or doubles). Extra keys keep it as a map.
 
 If a conversion fails, `FirestoreService` throws `FirestoreConversionException` with the document path and field path (for example `places/abc` and `meta.history[0]`).
 
-```dart
-final data = await firestoreService.getDocument('places/abc');
-final updatedAt = data!['updatedAt'] as DateTime;
+This is meant to work with Freezed / `json_serializable` with no Timestamp converters:
 
-await firestoreService.addDocument(
-  path: 'places',
-  data: {'name': 'Cafe', 'updatedAt': DateTime.now().toUtc()},
-);
+```dart
+@freezed
+abstract class Place with _$Place {
+  const factory Place({
+    required String id,
+    required String name,
+    required DateTime updatedAt,
+    required AnyhooLatLong location,
+  }) = _Place;
+
+  factory Place.fromJson(Map<String, dynamic> json) => _$PlaceFromJson(json);
+}
+
+final data = await firestoreService.getDocument('places/abc');
+final place = Place.fromJson(data!);
+
+await firestoreService.addDocument(path: 'places', data: place.toJson());
 ```
+
+`DateTime` is parsed from the UTC ISO string. Give `AnyhooLatLong` (or any lat/lng POJO) `fromJson` / `toJson` using `latitude` and `longitude`; you do not need a Freezed `Location` type.
 
 Use `FieldValue.serverTimestamp()` when the time must be the server clock at commit (ordering, billing). For a rough “when was this saved?” display, `DateTime.now()` is enough.
 
@@ -92,8 +107,7 @@ Use `FieldValue.serverTimestamp()` when the time must be the server clock at com
 await firestoreService.addDocument(
   path: 'places',
   data: {
-    'name': place.name,
-    'updatedAt': place.updatedAt,
+    ...place.toJson(),
     'createdAt': FieldValue.serverTimestamp(),
   },
 );

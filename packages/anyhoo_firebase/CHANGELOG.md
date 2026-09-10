@@ -1,3 +1,7 @@
+## 0.0.18
+
+* Convert ISO-8601 strings to Firestore `Timestamp` on write and `Timestamp` to UTC ISO-8601 strings on read so Freezed models can keep `DateTime` without converters
+
 ## 0.0.17
 
 * Convert Firestore `Timestamp` to UTC `DateTime` and back

@@ -181,7 +181,7 @@ void main() {
 
         expect(result, {
           'name': 'Test',
-          'updatedAt': DateTime.utc(2024, 6, 1, 13),
+          'updatedAt': '2024-06-01T13:00:00.000Z',
           'id': 'doc1',
         });
       });
@@ -253,7 +253,7 @@ void main() {
         expect(result, [
           {
             'name': 'Test 1',
-            'updatedAt': DateTime.utc(2024, 6, 1, 13),
+            'updatedAt': '2024-06-01T13:00:00.000Z',
             'id': 'doc1',
           },
         ]);
@@ -303,7 +303,7 @@ void main() {
 
         expect(result, {
           'name': 'Test',
-          'updatedAt': DateTime.utc(2024, 6, 1, 13),
+          'updatedAt': '2024-06-01T13:00:00.000Z',
           'id': 'doc1',
         });
       });
