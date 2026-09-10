@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:anyhoo_firebase/src/services/firestore_document_converter.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -5,7 +7,6 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   final utc = DateTime.utc(2024, 6, 1, 13, 0, 0);
   final timestamp = Timestamp.fromDate(utc);
-  final iso = utc.toIso8601String();
   final geoPoint = GeoPoint(59.3293, 18.0686);
   final geoMap = {'latitude': 59.3293, 'longitude': 18.0686};
 
@@ -36,11 +37,11 @@ void main() {
       expect(original['updatedAt'], timestamp);
     });
 
-    test('converts Timestamp to a UTC ISO-8601 string', () {
+    test('converts Timestamp to a UTC DateTime', () {
       final result = fromFirestoreDocument({'updatedAt': timestamp}, 'doc1');
 
-      expect(result!['updatedAt'], iso);
-      expect(iso, endsWith('Z'));
+      expect(result!['updatedAt'], utc);
+      expect((result['updatedAt'] as DateTime).isUtc, isTrue);
     });
 
     test('converts Timestamp nested in a map', () {
@@ -48,7 +49,7 @@ void main() {
         'meta': {'updatedAt': timestamp},
       }, 'doc1');
 
-      expect(result!['meta'], {'updatedAt': iso});
+      expect(result!['meta'], {'updatedAt': utc});
     });
 
     test('converts Timestamp nested in a list', () {
@@ -56,7 +57,7 @@ void main() {
         'history': [timestamp, 'ok', 1],
       }, 'doc1');
 
-      expect(result!['history'], [iso, 'ok', 1]);
+      expect(result!['history'], [utc, 'ok', 1]);
     });
 
     test('converts GeoPoint to a latitude/longitude map', () {
@@ -91,6 +92,32 @@ void main() {
         'id': 'doc1',
       });
     });
+
+    test('wraps conversion failures with document and field path', () {
+      expect(
+        () => fromFirestoreDocument(
+          {
+            'meta': {'history': [_ThrowingMap()]},
+          },
+          'doc1',
+          documentPath: 'places/doc1',
+        ),
+        throwsA(
+          isA<FirestoreConversionException>()
+              .having((e) => e.documentPath, 'documentPath', 'places/doc1')
+              .having((e) => e.fieldPath, 'fieldPath', 'meta.history[0]')
+              .having(
+                (e) => e.toString(),
+                'toString',
+                allOf(
+                  contains('document: places/doc1'),
+                  contains('field: meta.history[0]'),
+                  contains('cannot read entries'),
+                ),
+              ),
+        ),
+      );
+    });
   });
 
   group('toFirestoreDocument', () {
@@ -100,27 +127,18 @@ void main() {
       expect(result['updatedAt'], timestamp);
     });
 
-    test('converts a UTC ISO-8601 string to Timestamp', () {
+    test('leaves ISO-8601 strings unchanged', () {
+      final iso = utc.toIso8601String();
+
       final result = toFirestoreDocument({'updatedAt': iso});
 
-      expect(result['updatedAt'], timestamp);
+      expect(result['updatedAt'], iso);
     });
 
     test('converts a local DateTime to Timestamp of the same instant', () {
       final local = utc.toLocal();
 
       final result = toFirestoreDocument({'updatedAt': local});
-
-      expect(result['updatedAt'], Timestamp.fromDate(local));
-    });
-
-    test('converts an unqualified ISO-8601 string as local time', () {
-      final local = DateTime(2024, 6, 1, 15, 0, 0);
-      final localIso = local.toIso8601String();
-
-      expect(localIso.contains('Z'), isFalse);
-
-      final result = toFirestoreDocument({'updatedAt': localIso});
 
       expect(result['updatedAt'], Timestamp.fromDate(local));
     });
@@ -214,6 +232,31 @@ void main() {
 
       expect(result, {'count': 3, 'active': true, 'deletedAt': null});
     });
+
+    test('wraps conversion failures with document and field path', () {
+      expect(
+        () => toFirestoreDocument(
+          {
+            'meta': {'history': [_ThrowingMap()]},
+          },
+          documentPath: 'places/doc1',
+        ),
+        throwsA(
+          isA<FirestoreConversionException>()
+              .having((e) => e.documentPath, 'documentPath', 'places/doc1')
+              .having((e) => e.fieldPath, 'fieldPath', 'meta.history[0]')
+              .having(
+                (e) => e.toString(),
+                'toString',
+                allOf(
+                  contains('document: places/doc1'),
+                  contains('field: meta.history[0]'),
+                  contains('cannot read entries'),
+                ),
+              ),
+        ),
+      );
+    });
   });
 
   group('round trip', () {
@@ -229,4 +272,24 @@ void main() {
       expect(back['id'], 'doc1');
     });
   });
+}
+
+class _ThrowingMap extends MapBase<String, dynamic> {
+  @override
+  Iterable<MapEntry<String, dynamic>> get entries => throw StateError('cannot read entries');
+
+  @override
+  dynamic operator [](Object? key) => null;
+
+  @override
+  void operator []=(String key, dynamic value) {}
+
+  @override
+  void clear() {}
+
+  @override
+  Iterable<String> get keys => const [];
+
+  @override
+  dynamic remove(Object? key) => null;
 }
