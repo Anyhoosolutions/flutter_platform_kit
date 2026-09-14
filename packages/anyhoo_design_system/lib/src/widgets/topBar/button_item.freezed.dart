@@ -3,7 +3,7 @@
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
-part of 'menu_item.dart';
+part of 'button_item.dart';
 
 // **************************************************************************
 // FreezedGenerator
@@ -12,40 +12,40 @@ part of 'menu_item.dart';
 // dart format off
 T _$identity<T>(T value) => value;
 /// @nodoc
-mixin _$MenuItem {
+mixin _$ButtonItem {
 
- Key get key; String get label; IconData? get icon; VoidCallback get onTap;
-/// Create a copy of MenuItem
+ Key get key; String get label; IconData? get icon; VoidCallback get onTap; Color? get color;
+/// Create a copy of ButtonItem
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
-$MenuItemCopyWith<MenuItem> get copyWith => _$MenuItemCopyWithImpl<MenuItem>(this as MenuItem, _$identity);
+$ButtonItemCopyWith<ButtonItem> get copyWith => _$ButtonItemCopyWithImpl<ButtonItem>(this as ButtonItem, _$identity);
 
 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is MenuItem&&(identical(other.key, key) || other.key == key)&&(identical(other.label, label) || other.label == label)&&(identical(other.icon, icon) || other.icon == icon)&&(identical(other.onTap, onTap) || other.onTap == onTap));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ButtonItem&&(identical(other.key, key) || other.key == key)&&(identical(other.label, label) || other.label == label)&&(identical(other.icon, icon) || other.icon == icon)&&(identical(other.onTap, onTap) || other.onTap == onTap)&&(identical(other.color, color) || other.color == color));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,key,label,icon,onTap);
+int get hashCode => Object.hash(runtimeType,key,label,icon,onTap,color);
 
 @override
 String toString() {
-  return 'MenuItem(key: $key, label: $label, icon: $icon, onTap: $onTap)';
+  return 'ButtonItem(key: $key, label: $label, icon: $icon, onTap: $onTap, color: $color)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class $MenuItemCopyWith<$Res>  {
-  factory $MenuItemCopyWith(MenuItem value, $Res Function(MenuItem) _then) = _$MenuItemCopyWithImpl;
+abstract mixin class $ButtonItemCopyWith<$Res>  {
+  factory $ButtonItemCopyWith(ButtonItem value, $Res Function(ButtonItem) _then) = _$ButtonItemCopyWithImpl;
 @useResult
 $Res call({
- Key key, String label, IconData? icon, VoidCallback onTap
+ Key key, String label, IconData? icon, VoidCallback onTap, Color? color
 });
 
 
@@ -53,30 +53,31 @@ $Res call({
 
 }
 /// @nodoc
-class _$MenuItemCopyWithImpl<$Res>
-    implements $MenuItemCopyWith<$Res> {
-  _$MenuItemCopyWithImpl(this._self, this._then);
+class _$ButtonItemCopyWithImpl<$Res>
+    implements $ButtonItemCopyWith<$Res> {
+  _$ButtonItemCopyWithImpl(this._self, this._then);
 
-  final MenuItem _self;
-  final $Res Function(MenuItem) _then;
+  final ButtonItem _self;
+  final $Res Function(ButtonItem) _then;
 
-/// Create a copy of MenuItem
+/// Create a copy of ButtonItem
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? key = null,Object? label = null,Object? icon = freezed,Object? onTap = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? key = null,Object? label = null,Object? icon = freezed,Object? onTap = null,Object? color = freezed,}) {
   return _then(_self.copyWith(
 key: null == key ? _self.key : key // ignore: cast_nullable_to_non_nullable
 as Key,label: null == label ? _self.label : label // ignore: cast_nullable_to_non_nullable
 as String,icon: freezed == icon ? _self.icon : icon // ignore: cast_nullable_to_non_nullable
 as IconData?,onTap: null == onTap ? _self.onTap : onTap // ignore: cast_nullable_to_non_nullable
-as VoidCallback,
+as VoidCallback,color: freezed == color ? _self.color : color // ignore: cast_nullable_to_non_nullable
+as Color?,
   ));
 }
 
 }
 
 
-/// Adds pattern-matching-related methods to [MenuItem].
-extension MenuItemPatterns on MenuItem {
+/// Adds pattern-matching-related methods to [ButtonItem].
+extension ButtonItemPatterns on ButtonItem {
 /// A variant of `map` that fallback to returning `orElse`.
 ///
 /// It is equivalent to doing:
@@ -153,10 +154,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( Key key,  String label,  IconData? icon,  VoidCallback onTap)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( Key key,  String label,  IconData? icon,  VoidCallback onTap,  Color? color)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _MenuItem() when $default != null:
-return $default(_that.key,_that.label,_that.icon,_that.onTap);case _:
+return $default(_that.key,_that.label,_that.icon,_that.onTap,_that.color);case _:
   return orElse();
 
 }
@@ -174,10 +175,10 @@ return $default(_that.key,_that.label,_that.icon,_that.onTap);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( Key key,  String label,  IconData? icon,  VoidCallback onTap)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( Key key,  String label,  IconData? icon,  VoidCallback onTap,  Color? color)  $default,) {final _that = this;
 switch (_that) {
 case _MenuItem():
-return $default(_that.key,_that.label,_that.icon,_that.onTap);case _:
+return $default(_that.key,_that.label,_that.icon,_that.onTap,_that.color);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -194,10 +195,10 @@ return $default(_that.key,_that.label,_that.icon,_that.onTap);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( Key key,  String label,  IconData? icon,  VoidCallback onTap)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( Key key,  String label,  IconData? icon,  VoidCallback onTap,  Color? color)?  $default,) {final _that = this;
 switch (_that) {
 case _MenuItem() when $default != null:
-return $default(_that.key,_that.label,_that.icon,_that.onTap);case _:
+return $default(_that.key,_that.label,_that.icon,_that.onTap,_that.color);case _:
   return null;
 
 }
@@ -208,16 +209,17 @@ return $default(_that.key,_that.label,_that.icon,_that.onTap);case _:
 /// @nodoc
 
 
-class _MenuItem implements MenuItem {
-  const _MenuItem({required this.key, required this.label, required this.icon, required this.onTap});
+class _MenuItem implements ButtonItem {
+  const _MenuItem({required this.key, required this.label, required this.icon, required this.onTap, this.color = null});
   
 
 @override final  Key key;
 @override final  String label;
 @override final  IconData? icon;
 @override final  VoidCallback onTap;
+@override@JsonKey() final  Color? color;
 
-/// Create a copy of MenuItem
+/// Create a copy of ButtonItem
 /// with the given fields replaced by the non-null parameter values.
 @override @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
@@ -227,27 +229,27 @@ _$MenuItemCopyWith<_MenuItem> get copyWith => __$MenuItemCopyWithImpl<_MenuItem>
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _MenuItem&&(identical(other.key, key) || other.key == key)&&(identical(other.label, label) || other.label == label)&&(identical(other.icon, icon) || other.icon == icon)&&(identical(other.onTap, onTap) || other.onTap == onTap));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _MenuItem&&(identical(other.key, key) || other.key == key)&&(identical(other.label, label) || other.label == label)&&(identical(other.icon, icon) || other.icon == icon)&&(identical(other.onTap, onTap) || other.onTap == onTap)&&(identical(other.color, color) || other.color == color));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,key,label,icon,onTap);
+int get hashCode => Object.hash(runtimeType,key,label,icon,onTap,color);
 
 @override
 String toString() {
-  return 'MenuItem(key: $key, label: $label, icon: $icon, onTap: $onTap)';
+  return 'ButtonItem(key: $key, label: $label, icon: $icon, onTap: $onTap, color: $color)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class _$MenuItemCopyWith<$Res> implements $MenuItemCopyWith<$Res> {
+abstract mixin class _$MenuItemCopyWith<$Res> implements $ButtonItemCopyWith<$Res> {
   factory _$MenuItemCopyWith(_MenuItem value, $Res Function(_MenuItem) _then) = __$MenuItemCopyWithImpl;
 @override @useResult
 $Res call({
- Key key, String label, IconData? icon, VoidCallback onTap
+ Key key, String label, IconData? icon, VoidCallback onTap, Color? color
 });
 
 
@@ -262,15 +264,16 @@ class __$MenuItemCopyWithImpl<$Res>
   final _MenuItem _self;
   final $Res Function(_MenuItem) _then;
 
-/// Create a copy of MenuItem
+/// Create a copy of ButtonItem
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? key = null,Object? label = null,Object? icon = freezed,Object? onTap = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? key = null,Object? label = null,Object? icon = freezed,Object? onTap = null,Object? color = freezed,}) {
   return _then(_MenuItem(
 key: null == key ? _self.key : key // ignore: cast_nullable_to_non_nullable
 as Key,label: null == label ? _self.label : label // ignore: cast_nullable_to_non_nullable
 as String,icon: freezed == icon ? _self.icon : icon // ignore: cast_nullable_to_non_nullable
 as IconData?,onTap: null == onTap ? _self.onTap : onTap // ignore: cast_nullable_to_non_nullable
-as VoidCallback,
+as VoidCallback,color: freezed == color ? _self.color : color // ignore: cast_nullable_to_non_nullable
+as Color?,
   ));
 }
 

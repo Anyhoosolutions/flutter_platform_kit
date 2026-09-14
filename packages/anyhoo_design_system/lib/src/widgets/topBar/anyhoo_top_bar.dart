@@ -1,4 +1,5 @@
 import 'package:anyhoo_design_system/anyhoo_design_system.dart';
+import 'package:anyhoo_design_system/src/widgets/topBar/button_item.dart';
 import 'package:anyhoo_design_system/src/widgets/topBar/keys.dart';
 import 'package:anyhoo_design_system/src/widgets/topBar/menu_item.dart';
 import 'package:flutter/material.dart';
@@ -12,7 +13,10 @@ class AnyhooTopBar extends StatelessWidget implements PreferredSizeWidget {
     this.showBackButton = false,
     this.onBackTap,
     this.logoAssetPath,
+    this.overflowMenuIcon,
+    this.overflowMenuIconColor,
     this.menuItems,
+    this.buttonItems,
   });
 
   final String? topBarTitle;
@@ -22,6 +26,9 @@ class AnyhooTopBar extends StatelessWidget implements PreferredSizeWidget {
   final bool showBackButton;
   final VoidCallback? onBackTap;
   final List<MenuItem>? menuItems;
+  final List<ButtonItem>? buttonItems;
+  final IconData? overflowMenuIcon;
+  final Color? overflowMenuIconColor;
 
   @override
   Size get preferredSize => const Size.fromHeight(64);
@@ -66,6 +73,7 @@ class AnyhooTopBar extends StatelessWidget implements PreferredSizeWidget {
                       ],
                     ),
                   ),
+                  ..._buttons(appBar) ?? [],
                   ?_getMenu(appBar),
                 ],
               ),
@@ -82,6 +90,21 @@ class AnyhooTopBar extends StatelessWidget implements PreferredSizeWidget {
     }
   }
 
+  List<Widget>? _buttons(AppBarColors appBar) {
+    if (buttonItems == null) {
+      return null;
+    }
+    return buttonItems!
+        .map(
+          (item) => IconButton(
+            key: item.key,
+            onPressed: () {},
+            icon: Icon(item.icon, color: item.color ?? appBar.backButtonColor),
+          ),
+        )
+        .toList();
+  }
+
   PopupMenuButton? _getMenu(AppBarColors appBar) {
     if (menuItems == null) {
       return null;
@@ -93,6 +116,7 @@ class AnyhooTopBar extends StatelessWidget implements PreferredSizeWidget {
           menuItems
               ?.map(
                 (item) => PopupMenuItem(
+                  key: item.key,
                   value: item,
                   child: ListTile(
                     contentPadding: EdgeInsets.zero,
@@ -103,16 +127,21 @@ class AnyhooTopBar extends StatelessWidget implements PreferredSizeWidget {
               )
               .toList() ??
           [],
-      child: _Avatar(avatarUrl: avatarUrl, avatarColor: appBar.avatarColor),
+      child: _Avatar(
+        avatarUrl: avatarUrl,
+        overflowMenuIcon: overflowMenuIcon,
+        overflowMenuIconColor: appBar.avatarColor,
+      ),
     );
   }
 }
 
 class _Avatar extends StatelessWidget {
-  const _Avatar({required this.avatarColor, this.avatarUrl});
+  const _Avatar({this.avatarUrl, this.overflowMenuIcon, this.overflowMenuIconColor});
 
   final String? avatarUrl;
-  final Color avatarColor;
+  final IconData? overflowMenuIcon;
+  final Color? overflowMenuIconColor;
 
   @override
   Widget build(BuildContext context) {
@@ -126,7 +155,7 @@ class _Avatar extends StatelessWidget {
           ? Image.network(avatarUrl!, fit: BoxFit.cover)
           : ColoredBox(
               color: context.surface.containerHighest,
-              child: Icon(Icons.person, color: avatarColor),
+              child: Icon(overflowMenuIcon ?? Icons.person, color: overflowMenuIconColor),
             ),
     );
   }
