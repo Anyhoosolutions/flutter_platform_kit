@@ -18,6 +18,8 @@ export 'src/widgets/buttons/anyhoo_text_button.dart';
 export 'src/widgets/buttons/anyhoo_round_button.dart';
 
 export 'src/widgets/topBar/anyhoo_top_bar.dart';
+export 'src/widgets/topBar/button_item.dart';
+export 'src/widgets/topBar/menu_item.dart';
 export 'src/widgets/bottomBar/anyhoo_bottom_bar.dart';
 export 'src/widgets/bottomBar/anyhoo_bottom_bar_button.dart';
 
