@@ -1,7 +1,5 @@
 import 'package:anyhoo_design_system/anyhoo_design_system.dart';
-import 'package:anyhoo_design_system/src/widgets/topBar/button_item.dart';
 import 'package:anyhoo_design_system/src/widgets/topBar/keys.dart';
-import 'package:anyhoo_design_system/src/widgets/topBar/menu_item.dart';
 import 'package:flutter/material.dart';
 
 class AnyhooTopBar extends StatelessWidget implements PreferredSizeWidget {
@@ -25,8 +23,8 @@ class AnyhooTopBar extends StatelessWidget implements PreferredSizeWidget {
   final String? avatarUrl;
   final bool showBackButton;
   final VoidCallback? onBackTap;
-  final List<MenuItem>? menuItems;
-  final List<ButtonItem>? buttonItems;
+  final List<AnyhooTopBarMenuItem>? menuItems;
+  final List<AnyhooTopBarButtonItem>? buttonItems;
   final IconData? overflowMenuIcon;
   final Color? overflowMenuIconColor;
 
@@ -109,7 +107,7 @@ class AnyhooTopBar extends StatelessWidget implements PreferredSizeWidget {
     if (menuItems == null) {
       return null;
     }
-    return PopupMenuButton<MenuItem>(
+    return PopupMenuButton<AnyhooTopBarMenuItem>(
       offset: const Offset(0, 48),
       onSelected: (item) => item.onTap(),
       itemBuilder: (context) =>

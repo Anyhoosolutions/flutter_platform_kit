@@ -12,20 +12,20 @@ part of 'button_item.dart';
 // dart format off
 T _$identity<T>(T value) => value;
 /// @nodoc
-mixin _$ButtonItem {
+mixin _$AnyhooTopBarButtonItem {
 
  Key get key; String get label; IconData? get icon; VoidCallback get onTap; Color? get color;
-/// Create a copy of ButtonItem
+/// Create a copy of AnyhooTopBarButtonItem
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
-$ButtonItemCopyWith<ButtonItem> get copyWith => _$ButtonItemCopyWithImpl<ButtonItem>(this as ButtonItem, _$identity);
+$AnyhooTopBarButtonItemCopyWith<AnyhooTopBarButtonItem> get copyWith => _$AnyhooTopBarButtonItemCopyWithImpl<AnyhooTopBarButtonItem>(this as AnyhooTopBarButtonItem, _$identity);
 
 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ButtonItem&&(identical(other.key, key) || other.key == key)&&(identical(other.label, label) || other.label == label)&&(identical(other.icon, icon) || other.icon == icon)&&(identical(other.onTap, onTap) || other.onTap == onTap)&&(identical(other.color, color) || other.color == color));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is AnyhooTopBarButtonItem&&(identical(other.key, key) || other.key == key)&&(identical(other.label, label) || other.label == label)&&(identical(other.icon, icon) || other.icon == icon)&&(identical(other.onTap, onTap) || other.onTap == onTap)&&(identical(other.color, color) || other.color == color));
 }
 
 
@@ -34,15 +34,15 @@ int get hashCode => Object.hash(runtimeType,key,label,icon,onTap,color);
 
 @override
 String toString() {
-  return 'ButtonItem(key: $key, label: $label, icon: $icon, onTap: $onTap, color: $color)';
+  return 'AnyhooTopBarButtonItem(key: $key, label: $label, icon: $icon, onTap: $onTap, color: $color)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class $ButtonItemCopyWith<$Res>  {
-  factory $ButtonItemCopyWith(ButtonItem value, $Res Function(ButtonItem) _then) = _$ButtonItemCopyWithImpl;
+abstract mixin class $AnyhooTopBarButtonItemCopyWith<$Res>  {
+  factory $AnyhooTopBarButtonItemCopyWith(AnyhooTopBarButtonItem value, $Res Function(AnyhooTopBarButtonItem) _then) = _$AnyhooTopBarButtonItemCopyWithImpl;
 @useResult
 $Res call({
  Key key, String label, IconData? icon, VoidCallback onTap, Color? color
@@ -53,14 +53,14 @@ $Res call({
 
 }
 /// @nodoc
-class _$ButtonItemCopyWithImpl<$Res>
-    implements $ButtonItemCopyWith<$Res> {
-  _$ButtonItemCopyWithImpl(this._self, this._then);
+class _$AnyhooTopBarButtonItemCopyWithImpl<$Res>
+    implements $AnyhooTopBarButtonItemCopyWith<$Res> {
+  _$AnyhooTopBarButtonItemCopyWithImpl(this._self, this._then);
 
-  final ButtonItem _self;
-  final $Res Function(ButtonItem) _then;
+  final AnyhooTopBarButtonItem _self;
+  final $Res Function(AnyhooTopBarButtonItem) _then;
 
-/// Create a copy of ButtonItem
+/// Create a copy of AnyhooTopBarButtonItem
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? key = null,Object? label = null,Object? icon = freezed,Object? onTap = null,Object? color = freezed,}) {
   return _then(_self.copyWith(
@@ -76,8 +76,8 @@ as Color?,
 }
 
 
-/// Adds pattern-matching-related methods to [ButtonItem].
-extension ButtonItemPatterns on ButtonItem {
+/// Adds pattern-matching-related methods to [AnyhooTopBarButtonItem].
+extension AnyhooTopBarButtonItemPatterns on AnyhooTopBarButtonItem {
 /// A variant of `map` that fallback to returning `orElse`.
 ///
 /// It is equivalent to doing:
@@ -90,10 +90,10 @@ extension ButtonItemPatterns on ButtonItem {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _MenuItem value)?  $default,{required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _AnyhooTopBarButtonItem value)?  $default,{required TResult orElse(),}){
 final _that = this;
 switch (_that) {
-case _MenuItem() when $default != null:
+case _AnyhooTopBarButtonItem() when $default != null:
 return $default(_that);case _:
   return orElse();
 
@@ -112,10 +112,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _MenuItem value)  $default,){
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _AnyhooTopBarButtonItem value)  $default,){
 final _that = this;
 switch (_that) {
-case _MenuItem():
+case _AnyhooTopBarButtonItem():
 return $default(_that);case _:
   throw StateError('Unexpected subclass');
 
@@ -133,10 +133,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _MenuItem value)?  $default,){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _AnyhooTopBarButtonItem value)?  $default,){
 final _that = this;
 switch (_that) {
-case _MenuItem() when $default != null:
+case _AnyhooTopBarButtonItem() when $default != null:
 return $default(_that);case _:
   return null;
 
@@ -156,7 +156,7 @@ return $default(_that);case _:
 
 @optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( Key key,  String label,  IconData? icon,  VoidCallback onTap,  Color? color)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
-case _MenuItem() when $default != null:
+case _AnyhooTopBarButtonItem() when $default != null:
 return $default(_that.key,_that.label,_that.icon,_that.onTap,_that.color);case _:
   return orElse();
 
@@ -177,7 +177,7 @@ return $default(_that.key,_that.label,_that.icon,_that.onTap,_that.color);case _
 
 @optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( Key key,  String label,  IconData? icon,  VoidCallback onTap,  Color? color)  $default,) {final _that = this;
 switch (_that) {
-case _MenuItem():
+case _AnyhooTopBarButtonItem():
 return $default(_that.key,_that.label,_that.icon,_that.onTap,_that.color);case _:
   throw StateError('Unexpected subclass');
 
@@ -197,7 +197,7 @@ return $default(_that.key,_that.label,_that.icon,_that.onTap,_that.color);case _
 
 @optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( Key key,  String label,  IconData? icon,  VoidCallback onTap,  Color? color)?  $default,) {final _that = this;
 switch (_that) {
-case _MenuItem() when $default != null:
+case _AnyhooTopBarButtonItem() when $default != null:
 return $default(_that.key,_that.label,_that.icon,_that.onTap,_that.color);case _:
   return null;
 
@@ -209,8 +209,8 @@ return $default(_that.key,_that.label,_that.icon,_that.onTap,_that.color);case _
 /// @nodoc
 
 
-class _MenuItem implements ButtonItem {
-  const _MenuItem({required this.key, required this.label, required this.icon, required this.onTap, this.color = null});
+class _AnyhooTopBarButtonItem implements AnyhooTopBarButtonItem {
+  const _AnyhooTopBarButtonItem({required this.key, required this.label, required this.icon, required this.onTap, this.color = null});
   
 
 @override final  Key key;
@@ -219,17 +219,17 @@ class _MenuItem implements ButtonItem {
 @override final  VoidCallback onTap;
 @override@JsonKey() final  Color? color;
 
-/// Create a copy of ButtonItem
+/// Create a copy of AnyhooTopBarButtonItem
 /// with the given fields replaced by the non-null parameter values.
 @override @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
-_$MenuItemCopyWith<_MenuItem> get copyWith => __$MenuItemCopyWithImpl<_MenuItem>(this, _$identity);
+_$AnyhooTopBarButtonItemCopyWith<_AnyhooTopBarButtonItem> get copyWith => __$AnyhooTopBarButtonItemCopyWithImpl<_AnyhooTopBarButtonItem>(this, _$identity);
 
 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _MenuItem&&(identical(other.key, key) || other.key == key)&&(identical(other.label, label) || other.label == label)&&(identical(other.icon, icon) || other.icon == icon)&&(identical(other.onTap, onTap) || other.onTap == onTap)&&(identical(other.color, color) || other.color == color));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AnyhooTopBarButtonItem&&(identical(other.key, key) || other.key == key)&&(identical(other.label, label) || other.label == label)&&(identical(other.icon, icon) || other.icon == icon)&&(identical(other.onTap, onTap) || other.onTap == onTap)&&(identical(other.color, color) || other.color == color));
 }
 
 
@@ -238,15 +238,15 @@ int get hashCode => Object.hash(runtimeType,key,label,icon,onTap,color);
 
 @override
 String toString() {
-  return 'ButtonItem(key: $key, label: $label, icon: $icon, onTap: $onTap, color: $color)';
+  return 'AnyhooTopBarButtonItem(key: $key, label: $label, icon: $icon, onTap: $onTap, color: $color)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class _$MenuItemCopyWith<$Res> implements $ButtonItemCopyWith<$Res> {
-  factory _$MenuItemCopyWith(_MenuItem value, $Res Function(_MenuItem) _then) = __$MenuItemCopyWithImpl;
+abstract mixin class _$AnyhooTopBarButtonItemCopyWith<$Res> implements $AnyhooTopBarButtonItemCopyWith<$Res> {
+  factory _$AnyhooTopBarButtonItemCopyWith(_AnyhooTopBarButtonItem value, $Res Function(_AnyhooTopBarButtonItem) _then) = __$AnyhooTopBarButtonItemCopyWithImpl;
 @override @useResult
 $Res call({
  Key key, String label, IconData? icon, VoidCallback onTap, Color? color
@@ -257,17 +257,17 @@ $Res call({
 
 }
 /// @nodoc
-class __$MenuItemCopyWithImpl<$Res>
-    implements _$MenuItemCopyWith<$Res> {
-  __$MenuItemCopyWithImpl(this._self, this._then);
+class __$AnyhooTopBarButtonItemCopyWithImpl<$Res>
+    implements _$AnyhooTopBarButtonItemCopyWith<$Res> {
+  __$AnyhooTopBarButtonItemCopyWithImpl(this._self, this._then);
 
-  final _MenuItem _self;
-  final $Res Function(_MenuItem) _then;
+  final _AnyhooTopBarButtonItem _self;
+  final $Res Function(_AnyhooTopBarButtonItem) _then;
 
-/// Create a copy of ButtonItem
+/// Create a copy of AnyhooTopBarButtonItem
 /// with the given fields replaced by the non-null parameter values.
 @override @pragma('vm:prefer-inline') $Res call({Object? key = null,Object? label = null,Object? icon = freezed,Object? onTap = null,Object? color = freezed,}) {
-  return _then(_MenuItem(
+  return _then(_AnyhooTopBarButtonItem(
 key: null == key ? _self.key : key // ignore: cast_nullable_to_non_nullable
 as Key,label: null == label ? _self.label : label // ignore: cast_nullable_to_non_nullable
 as String,icon: freezed == icon ? _self.icon : icon // ignore: cast_nullable_to_non_nullable

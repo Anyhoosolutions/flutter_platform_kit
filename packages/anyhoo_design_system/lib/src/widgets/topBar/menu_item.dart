@@ -4,11 +4,11 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'menu_item.freezed.dart';
 
 @freezed
-abstract class MenuItem with _$MenuItem {
-  const factory MenuItem({
+abstract class AnyhooTopBarMenuItem with _$AnyhooTopBarMenuItem {
+  const factory AnyhooTopBarMenuItem({
     required Key key,
     required String label,
     required IconData? icon,
     required VoidCallback onTap,
-  }) = _MenuItem;
+  }) = _AnyhooTopBarMenuItem;
 }

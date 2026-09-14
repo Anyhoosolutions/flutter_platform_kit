@@ -1,6 +1,4 @@
 import 'package:anyhoo_design_system/anyhoo_design_system.dart';
-import 'package:anyhoo_design_system/src/widgets/topBar/button_item.dart';
-import 'package:anyhoo_design_system/src/widgets/topBar/menu_item.dart';
 import 'package:flutter/material.dart';
 
 /// Showcase of top and bottom bars.
@@ -21,7 +19,7 @@ class AnyhooTopBarGallery extends StatelessWidget {
             showBackButton: true,
             overflowMenuIcon: Icons.add_business_outlined,
             buttonItems: [
-              ButtonItem(
+              AnyhooTopBarButtonItem(
                 key: const Key('settings'),
                 label: 'Settings',
                 icon: Icons.car_crash,
@@ -32,7 +30,7 @@ class AnyhooTopBarGallery extends StatelessWidget {
               ),
             ],
             menuItems: [
-              MenuItem(
+              AnyhooTopBarMenuItem(
                 key: const Key('settings'),
                 label: 'Settings',
                 icon: Icons.car_crash,
@@ -40,7 +38,7 @@ class AnyhooTopBarGallery extends StatelessWidget {
                   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Settings')));
                 },
               ),
-              MenuItem(
+              AnyhooTopBarMenuItem(
                 key: const Key('profile'),
                 label: 'Profile',
                 icon: Icons.celebration,
