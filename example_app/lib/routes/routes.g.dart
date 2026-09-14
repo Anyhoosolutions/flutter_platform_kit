@@ -11,51 +11,89 @@ List<RouteBase> get $appRoutes => [$homeScreenRoute];
 RouteBase get $homeScreenRoute => GoRouteData.$route(
   path: '/',
   name: 'home',
+  hasOverriddenOnExit: false,
   factory: $HomeScreenRoute._fromState,
   routes: [
-    GoRouteData.$route(path: 'analytics', factory: $AnalyticsRoute._fromState),
-    GoRouteData.$route(path: 'arguments', factory: $ArgumentsRoute._fromState),
-    GoRouteData.$route(path: 'auth', factory: $AuthRoute._fromState),
+    GoRouteData.$route(
+      path: 'analytics',
+      hasOverriddenOnExit: false,
+      factory: $AnalyticsRoute._fromState,
+    ),
+    GoRouteData.$route(
+      path: 'arguments',
+      hasOverriddenOnExit: false,
+      factory: $ArgumentsRoute._fromState,
+    ),
+    GoRouteData.$route(
+      path: 'auth',
+      hasOverriddenOnExit: false,
+      factory: $AuthRoute._fromState,
+    ),
     GoRouteData.$route(
       path: 'enhance-user',
+      hasOverriddenOnExit: false,
       factory: $EnhanceUserRoute._fromState,
     ),
-    GoRouteData.$route(path: 'firestore', factory: $FirestoreRoute._fromState),
+    GoRouteData.$route(
+      path: 'firestore',
+      hasOverriddenOnExit: false,
+      factory: $FirestoreRoute._fromState,
+    ),
     GoRouteData.$route(
       path: 'image-selector',
+      hasOverriddenOnExit: false,
       factory: $ImageSelectorRoute._fromState,
     ),
     GoRouteData.$route(
       path: 'remote-config',
+      hasOverriddenOnExit: false,
       factory: $RemoteConfigRoute._fromState,
     ),
-    GoRouteData.$route(path: 'map', factory: $MapRoute._fromState),
-    GoRouteData.$route(path: 'logging', factory: $LoggingRoute._fromState),
+    GoRouteData.$route(
+      path: 'map',
+      hasOverriddenOnExit: false,
+      factory: $MapRoute._fromState,
+    ),
+    GoRouteData.$route(
+      path: 'logging',
+      hasOverriddenOnExit: false,
+      factory: $LoggingRoute._fromState,
+    ),
     GoRouteData.$route(
       path: 'route-demo',
+      hasOverriddenOnExit: false,
       factory: $RouteDemoRoute._fromState,
       routes: [
         GoRouteData.$route(
           path: 'nested',
+          hasOverriddenOnExit: false,
           factory: $RouteNestedDemoRoute._fromState,
         ),
         GoRouteData.$route(
           path: 'redirecting',
+          hasOverriddenOnExit: false,
           factory: $RouteRedirectingDemoRoute._fromState,
         ),
       ],
     ),
     GoRouteData.$route(
       path: 'error-page-demo',
+      hasOverriddenOnExit: false,
       factory: $ErrorPageDemoRoute._fromState,
     ),
     GoRouteData.$route(
       path: 'waiting-page-demo',
+      hasOverriddenOnExit: false,
       factory: $WaitingPageDemoRoute._fromState,
     ),
-    GoRouteData.$route(path: 'login', factory: $LoginRoute._fromState),
+    GoRouteData.$route(
+      path: 'login',
+      hasOverriddenOnExit: false,
+      factory: $LoginRoute._fromState,
+    ),
     GoRouteData.$route(
       path: 'not-logged-in-redirector',
+      hasOverriddenOnExit: false,
       factory: $NotLoggedInRedirectorRoute._fromState,
     ),
   ],

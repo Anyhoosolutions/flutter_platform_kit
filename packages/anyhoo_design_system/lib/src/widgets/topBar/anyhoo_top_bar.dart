@@ -1,8 +1,8 @@
 import 'package:anyhoo_design_system/anyhoo_design_system.dart';
+import 'package:anyhoo_design_system/src/widgets/topBar/button_item.dart';
 import 'package:anyhoo_design_system/src/widgets/topBar/keys.dart';
+import 'package:anyhoo_design_system/src/widgets/topBar/menu_item.dart';
 import 'package:flutter/material.dart';
-
-enum _AvatarMenuAction { settings, profile, logout }
 
 class AnyhooTopBar extends StatelessWidget implements PreferredSizeWidget {
   const AnyhooTopBar({
@@ -10,24 +10,25 @@ class AnyhooTopBar extends StatelessWidget implements PreferredSizeWidget {
     this.topBarTitle,
     this.topBarSubtitle,
     this.avatarUrl,
-    this.onSettingsTap,
-    this.onProfileTap,
     this.showBackButton = false,
     this.onBackTap,
     this.logoAssetPath,
-    this.onLogoutClick,
+    this.overflowMenuIcon,
+    this.overflowMenuIconColor,
+    this.menuItems,
+    this.buttonItems,
   });
 
   final String? topBarTitle;
   final String? topBarSubtitle;
   final String? logoAssetPath;
   final String? avatarUrl;
-  final VoidCallback? onSettingsTap;
-  final VoidCallback? onProfileTap;
   final bool showBackButton;
   final VoidCallback? onBackTap;
-
-  final VoidCallback? onLogoutClick;
+  final List<MenuItem>? menuItems;
+  final List<ButtonItem>? buttonItems;
+  final IconData? overflowMenuIcon;
+  final Color? overflowMenuIconColor;
 
   @override
   Size get preferredSize => const Size.fromHeight(64);
@@ -72,7 +73,8 @@ class AnyhooTopBar extends StatelessWidget implements PreferredSizeWidget {
                       ],
                     ),
                   ),
-                  _getMenu(appBar),
+                  ..._buttons(appBar) ?? [],
+                  ?_getMenu(appBar),
                 ],
               ),
             ),
@@ -88,50 +90,58 @@ class AnyhooTopBar extends StatelessWidget implements PreferredSizeWidget {
     }
   }
 
-  PopupMenuButton _getMenu(AppBarColors appBar) {
-    return PopupMenuButton<_AvatarMenuAction>(
-      offset: const Offset(0, 48),
-      onSelected: (action) {
-        switch (action) {
-          case _AvatarMenuAction.settings:
-            onSettingsTap?.call();
-          case _AvatarMenuAction.profile:
-            onProfileTap?.call();
-          case _AvatarMenuAction.logout:
-            onLogoutClick?.call();
-        }
-      },
-      itemBuilder: (context) => [
-        PopupMenuItem(
-          key: keys.topBar.settings,
-          value: _AvatarMenuAction.settings,
-          child: const ListTile(
-            contentPadding: EdgeInsets.zero,
-            leading: Icon(Icons.settings_outlined),
-            title: Text('Settings'),
+  List<Widget>? _buttons(AppBarColors appBar) {
+    if (buttonItems == null) {
+      return null;
+    }
+    return buttonItems!
+        .map(
+          (item) => IconButton(
+            key: item.key,
+            onPressed: () {},
+            icon: Icon(item.icon, color: item.color ?? appBar.backButtonColor),
           ),
-        ),
-        PopupMenuItem(
-          key: keys.topBar.profile,
-          value: _AvatarMenuAction.profile,
-          child: ListTile(contentPadding: EdgeInsets.zero, leading: Icon(Icons.person_outline), title: Text('Profile')),
-        ),
-        PopupMenuItem(
-          key: keys.topBar.logout,
-          value: _AvatarMenuAction.logout,
-          child: ListTile(contentPadding: EdgeInsets.zero, leading: Icon(Icons.logout), title: Text('Log out')),
-        ),
-      ],
-      child: _Avatar(avatarUrl: avatarUrl, avatarColor: appBar.avatarColor),
+        )
+        .toList();
+  }
+
+  PopupMenuButton? _getMenu(AppBarColors appBar) {
+    if (menuItems == null) {
+      return null;
+    }
+    return PopupMenuButton<MenuItem>(
+      offset: const Offset(0, 48),
+      onSelected: (item) => item.onTap(),
+      itemBuilder: (context) =>
+          menuItems
+              ?.map(
+                (item) => PopupMenuItem(
+                  key: item.key,
+                  value: item,
+                  child: ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: item.icon != null ? Icon(item.icon) : null,
+                    title: Text(item.label),
+                  ),
+                ),
+              )
+              .toList() ??
+          [],
+      child: _Avatar(
+        avatarUrl: avatarUrl,
+        overflowMenuIcon: overflowMenuIcon,
+        overflowMenuIconColor: appBar.avatarColor,
+      ),
     );
   }
 }
 
 class _Avatar extends StatelessWidget {
-  const _Avatar({required this.avatarColor, this.avatarUrl});
+  const _Avatar({this.avatarUrl, this.overflowMenuIcon, this.overflowMenuIconColor});
 
   final String? avatarUrl;
-  final Color avatarColor;
+  final IconData? overflowMenuIcon;
+  final Color? overflowMenuIconColor;
 
   @override
   Widget build(BuildContext context) {
@@ -145,7 +155,7 @@ class _Avatar extends StatelessWidget {
           ? Image.network(avatarUrl!, fit: BoxFit.cover)
           : ColoredBox(
               color: context.surface.containerHighest,
-              child: Icon(Icons.person, color: avatarColor),
+              child: Icon(overflowMenuIcon ?? Icons.person, color: overflowMenuIconColor),
             ),
     );
   }

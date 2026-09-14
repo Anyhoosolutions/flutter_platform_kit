@@ -104,10 +104,7 @@ class _AnyhooFormsGalleryState extends State<AnyhooFormsGallery> {
               padding: const EdgeInsets.all(DesignTokens.spacingMd),
               child: Column(
                 children: [
-                  AnyhooDateField(
-                    date: _date,
-                    onTap: () {},
-                  ),
+                  AnyhooDateField(date: _date, onTap: () {}),
                   const SizedBox(height: DesignTokens.spacingMd),
                   AnyhooCalendar(
                     selectedDate: _date,

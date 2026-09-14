@@ -51,6 +51,9 @@ melos:
         command: flutter analyze
         concurrency: 1
 
+    generate:
+      run: melos exec -c 1 --depends-on build_runner -- dart run build_runner build
+
     test:
       description: Run flutter test in lib and tool packages (excludes apps/goldens)
       exec:
