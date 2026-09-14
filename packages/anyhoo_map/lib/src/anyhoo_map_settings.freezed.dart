@@ -14,7 +14,8 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$AnyhooMapSettings {
 
- double get initialZoom; bool get fitToMarkers; EdgeInsets get cameraPadding; AnyhooGoogleMapSettings? get google; AnyhooFlutterMapSettings? get flutter;
+ double get initialZoom;/// Frames markers and circles after the first frame.
+ bool get fitToMarkers; EdgeInsets get cameraPadding; AnyhooGoogleMapSettings? get google; AnyhooFlutterMapSettings? get flutter;
 /// Create a copy of AnyhooMapSettings
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -238,6 +239,7 @@ class _AnyhooMapSettings extends AnyhooMapSettings {
   
 
 @override@JsonKey() final  double initialZoom;
+/// Frames markers and circles after the first frame.
 @override@JsonKey() final  bool fitToMarkers;
 @override@JsonKey() final  EdgeInsets cameraPadding;
 @override final  AnyhooGoogleMapSettings? google;
