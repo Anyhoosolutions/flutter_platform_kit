@@ -55,8 +55,8 @@ class AnyhooFirebaseAuthService<T extends AnyhooUser> implements AnyhooAuthServi
     String? googleServerClientId,
   })  : _firebaseAuth = firebaseAuth ?? firebase_auth.FirebaseAuth.instance,
         _googleClientId = _nonEmpty(googleClientId) ?? _nonEmpty(const String.fromEnvironment('GOOGLE_CLIENT_ID')),
-        _googleServerClientId = _nonEmpty(googleServerClientId) ??
-            _nonEmpty(const String.fromEnvironment('GOOGLE_SERVER_CLIENT_ID')) {
+        _googleServerClientId =
+            _nonEmpty(googleServerClientId) ?? _nonEmpty(const String.fromEnvironment('GOOGLE_SERVER_CLIENT_ID')) {
     // Listen to auth state changes and update current user
 
     _firebaseAuth.authStateChanges().listen((firebaseUser) {
@@ -129,9 +129,14 @@ class AnyhooFirebaseAuthService<T extends AnyhooUser> implements AnyhooAuthServi
           final userCredential = await _firebaseAuth.signInWithPopup(googleProvider);
           _log.info('✓ Google Sign-In popup completed. User ID: ${userCredential.user?.uid ?? 'null'}');
         } on firebase_auth.FirebaseAuthException catch (e, stackTrace) {
+          final extraInfo = {
+            'authDomain': _firebaseAuth.app.options.authDomain,
+            'options': _firebaseAuth.app.options,
+          };
           _log.severe(
               'FirebaseAuthException during signInWithPopup: code=${e.code} message=${e.message}', e, stackTrace);
-          SentryHelper.captureException(e, stackTrace: stackTrace, fatal: false);
+          _log.severe(extraInfo.toString());
+          SentryHelper.captureException(e, stackTrace: stackTrace, fatal: false, extraInfo: extraInfo);
           rethrow;
         }
         return;
