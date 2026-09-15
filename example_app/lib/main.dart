@@ -60,7 +60,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final converter = ExampleUserConverter();
-    final AnyhooAuthService authService = AnyhooFirebaseAuthService(firebaseAuth: firebaseInitializer.getAuth());
+    final AnyhooAuthService authService = AnyhooFirebaseAuthService(
+      firebaseAuth: firebaseInitializer.getAuth(),
+    );
 
     final authCubit = AnyhooAuthCubit<ExampleUser>(
       authService: authService,
