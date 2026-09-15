@@ -1,3 +1,7 @@
+## 0.0.33
+
+* Pass optional `googleServerClientId` / `googleClientId` into `GoogleSignIn.initialize()` so Android Google Sign-In does not fail with `serverClientId must be provided on Android`. Also honors `--dart-define=GOOGLE_SERVER_CLIENT_ID` and `GOOGLE_CLIENT_ID`.
+
 ## 0.0.32
 
 * Bug fixes for auto logging in on macOS

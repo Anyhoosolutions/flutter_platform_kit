@@ -18,12 +18,15 @@ final _log = Logger('AnyhooFirebaseAuthService');
 ///
 /// Example:
 /// ```dart
-/// final firebaseAuthService = AnyhooFirebaseAuthService<MyAppUser>(
-///   converter: MyAppUserConverter(),
+/// final firebaseAuthService = AnyhooFirebaseAuthService(
+///   firebaseAuth: FirebaseAuth.instance,
+///   googleServerClientId: 'xxxx.apps.googleusercontent.com',
 /// );
 /// ```
 class AnyhooFirebaseAuthService<T extends AnyhooUser> implements AnyhooAuthService {
   final firebase_auth.FirebaseAuth _firebaseAuth;
+  final String? _googleClientId;
+  final String? _googleServerClientId;
 
   /// Current authenticated user, null if not logged in.
   Map<String, dynamic>? _currentUser;
@@ -37,10 +40,23 @@ class AnyhooFirebaseAuthService<T extends AnyhooUser> implements AnyhooAuthServi
   /// Creates a Firebase authentication service.
   ///
   /// [firebaseAuth] is optional - defaults to [FirebaseAuth.instance].
-  /// Note: The converter is no longer needed here as it's used by the cubit, not the service.
+  ///
+  /// [googleServerClientId] is the **Web** OAuth client ID from Firebase /
+  /// Google Cloud (`….apps.googleusercontent.com`). Required for Google
+  /// Sign-In on Android with `google_sign_in` 7. If omitted, falls back to
+  /// `--dart-define=GOOGLE_SERVER_CLIENT_ID=...`, then to
+  /// `default_web_client_id` from `google-services.json`.
+  ///
+  /// [googleClientId] is the iOS (or other) client ID when not provided via
+  /// `GoogleService-Info.plist`. Falls back to `--dart-define=GOOGLE_CLIENT_ID=...`.
   AnyhooFirebaseAuthService({
     firebase_auth.FirebaseAuth? firebaseAuth,
-  }) : _firebaseAuth = firebaseAuth ?? firebase_auth.FirebaseAuth.instance {
+    String? googleClientId,
+    String? googleServerClientId,
+  })  : _firebaseAuth = firebaseAuth ?? firebase_auth.FirebaseAuth.instance,
+        _googleClientId = _nonEmpty(googleClientId) ?? _nonEmpty(const String.fromEnvironment('GOOGLE_CLIENT_ID')),
+        _googleServerClientId = _nonEmpty(googleServerClientId) ??
+            _nonEmpty(const String.fromEnvironment('GOOGLE_SERVER_CLIENT_ID')) {
     // Listen to auth state changes and update current user
 
     _firebaseAuth.authStateChanges().listen((firebaseUser) {
@@ -125,9 +141,21 @@ class AnyhooFirebaseAuthService<T extends AnyhooUser> implements AnyhooAuthServi
         _log.info('Creating GoogleSignIn instance...');
         final googleSignIn = GoogleSignIn.instance;
 
-        // Initialize (required in v7)
+        // Initialize (required in v7). Android Credential Manager needs the
+        // Web OAuth client as serverClientId; without it sign-in fails with
+        // "serverClientId must be provided on Android".
+        if (_googleServerClientId == null) {
+          _log.warning(
+            'Google Sign-In has no serverClientId. On Android this often fails. '
+            'Pass googleServerClientId (Firebase Web OAuth client) or '
+            '--dart-define=GOOGLE_SERVER_CLIENT_ID=...',
+          );
+        }
         _log.info('Initializing GoogleSignIn (this may take a moment)...');
-        await googleSignIn.initialize();
+        await googleSignIn.initialize(
+          clientId: _googleClientId,
+          serverClientId: _googleServerClientId,
+        );
         _log.info('✓ GoogleSignIn initialized successfully');
 
         // Sign in using authenticate() method
@@ -256,4 +284,11 @@ class AnyhooFirebaseAuthService<T extends AnyhooUser> implements AnyhooAuthServi
     };
     return map;
   }
+}
+
+String? _nonEmpty(String? value) {
+  if (value == null || value.isEmpty) {
+    return null;
+  }
+  return value;
 }
