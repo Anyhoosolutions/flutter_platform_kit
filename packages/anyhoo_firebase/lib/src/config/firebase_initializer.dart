@@ -24,8 +24,7 @@ class FirebaseInitializer {
   FirebaseStorage? _storage;
   final bool _shouldSetupErrorHandling;
 
-  FirebaseInitializer({required this.arguments, required this.emulatorConfig, bool shouldSetupErrorHandling = true})
-    : _shouldSetupErrorHandling = shouldSetupErrorHandling;
+  FirebaseInitializer({required this.arguments, required this.emulatorConfig, this._shouldSetupErrorHandling = true});
 
   Future<void> initialize(FirebaseOptions firebaseOptions) async {
     _log.info('!! Initializing Firebase');
