@@ -43,10 +43,17 @@ final places = await firestoreService.getCollection(
   'places',
   orderBy: 'name',
   descending: false,
+  where: [
+    FirestoreWhere.arrayContains('accessIds', userId),
+  ],
   whereNullFields: ['deletedAt'],
   limit: 20,
 );
+```
 
+`where` takes a list of [FirestoreWhere] filters (`equalTo`, `arrayContains`, `isNull`, …). Prefer that over reaching into the raw Firestore SDK. `whereNullFields` remains as a shorthand for null checks.
+
+```dart
 await for (final docs in firestoreService.watchCollection('places')) {
   // ...
 }
