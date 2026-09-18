@@ -6,8 +6,8 @@ homepage: https://anyhoosolutions.web.app/documentation/flutter_platform_kit
 publish_to: none
 
 environment:
-  sdk: ^3.10.3
-  flutter: ">=1.17.0"
+  sdk: ">=3.13.0 <4.0.0"
+  flutter: ">=3.47.4 " # Or the corresponding Flutter version
 
 dependencies:
   flutter:
