@@ -11,7 +11,7 @@ class FirestoreService {
   final FirebaseFirestore _firestore;
   final _log = Logger('FirestoreService');
 
-  FirestoreService({required FirebaseFirestore firestore}) : _firestore = firestore;
+  FirestoreService({required this._firestore});
 
   Stream<List<Map<String, dynamic>>> watchCollection(
     String path, {
