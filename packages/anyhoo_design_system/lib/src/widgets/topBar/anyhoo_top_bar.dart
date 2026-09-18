@@ -53,7 +53,7 @@ class AnyhooTopBar extends StatelessWidget implements PreferredSizeWidget {
                 children: [
                   if (showBackButton)
                     IconButton(
-                      // key: keys.topBar.backButton,
+                      key: keys.topBar.backButton,
                       onPressed: () {
                         onBack(context);
                       },
