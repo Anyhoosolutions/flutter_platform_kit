@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 class TopBarKeys {
   final avatar = const Key('topBarAvatar');
+  final backButton = const Key('topBarBackButton');
   final settings = const Key('topBarSettings');
   final profile = const Key('topBarProfile');
   final logout = const Key('topBarLogout');
