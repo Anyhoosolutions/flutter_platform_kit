@@ -5,8 +5,8 @@ version: 0.0.11
 homepage: https://github.com/anyhoosolutions/flutter_platform_kit/tree/main/packages/image_selector
 
 environment:
-  sdk: ^3.6.0
-  flutter: ">=3.10.0"
+  sdk: ">=3.13.0 <4.0.0"
+  flutter: ">=3.47.4 " # Or the corresponding Flutter version
 
 dependencies:
   flutter:
