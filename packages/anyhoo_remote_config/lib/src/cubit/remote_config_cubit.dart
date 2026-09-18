@@ -18,9 +18,8 @@ class RemoteConfigCubit<T extends AnyhooRemoteConfigValues> extends Cubit<Remote
   final T initialValues;
   StreamSubscription<void>? _configUpdateSubscription;
 
-  RemoteConfigCubit({required AnyhooRemoteConfigService service, required this.initialValues})
-    : _service = service,
-      super(RemoteConfigState(values: initialValues, latestUpdate: DateTime.now())) {
+  RemoteConfigCubit({required this._service, required this.initialValues})
+    : super(RemoteConfigState(values: initialValues, latestUpdate: DateTime.now())) {
     _initialize();
   }
 

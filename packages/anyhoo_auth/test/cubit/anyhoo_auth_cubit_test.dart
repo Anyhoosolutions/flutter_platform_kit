@@ -14,11 +14,7 @@ import 'package:mocktail/mocktail.dart';
 class MockAnyhooAuthService extends Mock implements AnyhooAuthService {}
 
 class SimpleAnyhooEnhanceUserService extends AnyhooEnhanceUserService<TestUser> {
-  SimpleAnyhooEnhanceUserService({
-    Future<Map<String, dynamic>> Function(Map<String, dynamic>)? enhanceUserCallback,
-    Future<TestUser> Function(TestUser)? saveUserCallback,
-  })  : _enhanceUserCallback = enhanceUserCallback,
-        _saveUserCallback = saveUserCallback;
+  SimpleAnyhooEnhanceUserService({this._enhanceUserCallback, this._saveUserCallback});
 
   final Future<Map<String, dynamic>> Function(Map<String, dynamic>)? _enhanceUserCallback;
   final Future<TestUser> Function(TestUser)? _saveUserCallback;
@@ -94,10 +90,7 @@ void main() {
     });
 
     test('initial state is correct when no user is logged in', () {
-      cubit = AnyhooAuthCubit(
-        authService: mockAuthService,
-        converter: testConverter,
-      );
+      cubit = AnyhooAuthCubit(authService: mockAuthService, converter: testConverter);
       expect(cubit.state.user, isNull);
       expect(cubit.state.isLoading, false);
       expect(cubit.state.errorMessage, isNull);
@@ -107,10 +100,7 @@ void main() {
       final testUser = TestUser(id: '123', email: 'test@example.com');
       when(() => mockAuthService.currentUser).thenReturn(testUser.toJson());
 
-      cubit = AnyhooAuthCubit(
-        authService: mockAuthService,
-        converter: testConverter,
-      );
+      cubit = AnyhooAuthCubit(authService: mockAuthService, converter: testConverter);
       expect(cubit.state.isLoading, equals(false));
       expect(cubit.state.user?.email, equals("test@example.com"));
     });
@@ -142,9 +132,11 @@ void main() {
 
         await expectLater(
           cubit.stream,
-          emits(isA<AnyhooAuthState<TestUser>>()
-              .having((s) => s.user?.toJson(), 'user', enhancedTestUser.toJson())
-              .having((s) => s.isLoading, 'isLoading', false)),
+          emits(
+            isA<AnyhooAuthState<TestUser>>()
+                .having((s) => s.user?.toJson(), 'user', enhancedTestUser.toJson())
+                .having((s) => s.isLoading, 'isLoading', false),
+          ),
         );
 
         await controller.close();
@@ -159,10 +151,7 @@ void main() {
         final controller = StreamController<Map<String, dynamic>?>();
         when(() => mockAuthService.authStateChanges).thenAnswer((_) => controller.stream);
 
-        cubit = AnyhooAuthCubit(
-          authService: mockAuthService,
-          converter: testConverter,
-        );
+        cubit = AnyhooAuthCubit(authService: mockAuthService, converter: testConverter);
 
         // Wait for init to complete (which will emit initial state with user)
         await Future.delayed(Duration.zero);
@@ -172,9 +161,11 @@ void main() {
 
         await expectLater(
           cubit.stream,
-          emits(isA<AnyhooAuthState<TestUser>>()
-              .having((s) => s.user, 'user', isNull)
-              .having((s) => s.isLoading, 'isLoading', false)),
+          emits(
+            isA<AnyhooAuthState<TestUser>>()
+                .having((s) => s.user, 'user', isNull)
+                .having((s) => s.isLoading, 'isLoading', false),
+          ),
         );
 
         await controller.close();
@@ -184,10 +175,7 @@ void main() {
         final controller = StreamController<Map<String, dynamic>?>();
         when(() => mockAuthService.authStateChanges).thenAnswer((_) => controller.stream);
 
-        cubit = AnyhooAuthCubit(
-          authService: mockAuthService,
-          converter: testConverter,
-        );
+        cubit = AnyhooAuthCubit(authService: mockAuthService, converter: testConverter);
 
         await Future.delayed(Duration.zero);
 
@@ -195,9 +183,11 @@ void main() {
 
         await expectLater(
           cubit.stream,
-          emits(isA<AnyhooAuthState<TestUser>>()
-              .having((s) => s.isLoading, 'isLoading', false)
-              .having((s) => s.errorMessage, 'errorMessage', contains('Stream error'))),
+          emits(
+            isA<AnyhooAuthState<TestUser>>()
+                .having((s) => s.isLoading, 'isLoading', false)
+                .having((s) => s.errorMessage, 'errorMessage', contains('Stream error')),
+          ),
         );
 
         await controller.close();
@@ -215,9 +205,7 @@ void main() {
         final controller = StreamController<Map<String, dynamic>?>();
         when(() => mockAuthService.authStateChanges).thenAnswer((_) => controller.stream);
 
-        enhanceUserService = SimpleAnyhooEnhanceUserService(
-          enhanceUserCallback: (_) async => enhancedUser1.toJson(),
-        );
+        enhanceUserService = SimpleAnyhooEnhanceUserService(enhanceUserCallback: (_) async => enhancedUser1.toJson());
 
         cubit = AnyhooAuthCubit(
           authService: mockAuthService,
@@ -231,9 +219,11 @@ void main() {
 
         await expectLater(
           cubit.stream,
-          emits(isA<AnyhooAuthState<TestUser>>()
-              .having((s) => s.user?.toJson(), 'user', enhancedUser2.toJson())
-              .having((s) => s.isLoading, 'isLoading', false)),
+          emits(
+            isA<AnyhooAuthState<TestUser>>()
+                .having((s) => s.user?.toJson(), 'user', enhancedUser2.toJson())
+                .having((s) => s.isLoading, 'isLoading', false),
+          ),
         );
 
         await controller.close();
@@ -242,10 +232,7 @@ void main() {
 
     group('Login Methods', () {
       setUp(() {
-        cubit = AnyhooAuthCubit(
-          authService: mockAuthService,
-          converter: testConverter,
-        );
+        cubit = AnyhooAuthCubit(authService: mockAuthService, converter: testConverter);
       });
 
       blocTest<AnyhooAuthCubit<TestUser>, AnyhooAuthState<TestUser>>(
@@ -379,10 +366,7 @@ void main() {
 
     group('Logout', () {
       setUp(() {
-        cubit = AnyhooAuthCubit(
-          authService: mockAuthService,
-          converter: testConverter,
-        );
+        cubit = AnyhooAuthCubit(authService: mockAuthService, converter: testConverter);
       });
 
       blocTest<AnyhooAuthCubit<TestUser>, AnyhooAuthState<TestUser>>(
@@ -392,9 +376,7 @@ void main() {
           return cubit;
         },
         act: (cubit) => cubit.logout(),
-        expect: () => [
-          isA<AnyhooAuthState<TestUser>>().having((s) => s.isLoading, 'isLoading', true),
-        ],
+        expect: () => [isA<AnyhooAuthState<TestUser>>().having((s) => s.isLoading, 'isLoading', true)],
       );
 
       blocTest<AnyhooAuthCubit<TestUser>, AnyhooAuthState<TestUser>>(
@@ -419,9 +401,7 @@ void main() {
         final testUser = TestUser(id: '123', email: 'test@example.com');
         final savedUser = TestUser(id: testUser.id, email: testUser.email, extra: 'saved');
 
-        enhanceUserService = SimpleAnyhooEnhanceUserService(
-          saveUserCallback: (_) async => savedUser,
-        );
+        enhanceUserService = SimpleAnyhooEnhanceUserService(saveUserCallback: (_) async => savedUser);
 
         cubit = AnyhooAuthCubit(
           authService: mockAuthService,
@@ -442,13 +422,9 @@ void main() {
         final testUser = TestUser(id: '123', email: 'test@example.com');
         final savedUser1 = TestUser(id: testUser.id, email: testUser.email, extra: 'saved1');
         final savedUser2 = TestUser(id: savedUser1.id, email: savedUser1.email, extra: 'saved2');
-        final enhanceUserService2 = SimpleAnyhooEnhanceUserService(
-          saveUserCallback: (_) async => savedUser2,
-        );
+        final enhanceUserService2 = SimpleAnyhooEnhanceUserService(saveUserCallback: (_) async => savedUser2);
 
-        enhanceUserService = SimpleAnyhooEnhanceUserService(
-          saveUserCallback: (_) async => savedUser1,
-        );
+        enhanceUserService = SimpleAnyhooEnhanceUserService(saveUserCallback: (_) async => savedUser1);
 
         cubit = AnyhooAuthCubit(
           authService: mockAuthService,
@@ -478,10 +454,7 @@ void main() {
 
         await Future.delayed(Duration.zero);
 
-        await expectLater(
-          cubit.saveUser(testUser),
-          throwsA(isA<Exception>()),
-        );
+        await expectLater(cubit.saveUser(testUser), throwsA(isA<Exception>()));
 
         expect(cubit.state.isLoading, false);
         expect(cubit.state.errorMessage, contains('Save failed'));
@@ -491,9 +464,7 @@ void main() {
         final testUser = TestUser(id: '123', email: 'test@example.com');
         final enhancedUser = TestUser(id: testUser.id, email: testUser.email, extra: 'refreshed');
 
-        enhanceUserService = SimpleAnyhooEnhanceUserService(
-          enhanceUserCallback: (_) async => enhancedUser.toJson(),
-        );
+        enhanceUserService = SimpleAnyhooEnhanceUserService(enhanceUserCallback: (_) async => enhancedUser.toJson());
 
         cubit = AnyhooAuthCubit(
           authService: mockAuthService,
@@ -514,9 +485,7 @@ void main() {
           enhanceUserCallback: (_) async => enhancedUser2.toJson(),
         );
 
-        enhanceUserService = SimpleAnyhooEnhanceUserService(
-          enhanceUserCallback: (_) async => enhancedUser1.toJson(),
-        );
+        enhanceUserService = SimpleAnyhooEnhanceUserService(enhanceUserCallback: (_) async => enhancedUser1.toJson());
 
         cubit = AnyhooAuthCubit(
           authService: mockAuthService,
@@ -533,9 +502,7 @@ void main() {
         final testUser = TestUser(id: '123', email: 'test@example.com');
         final enhancedUser = TestUser(id: testUser.id, email: testUser.email, extra: 'refreshed');
 
-        enhanceUserService = SimpleAnyhooEnhanceUserService(
-          enhanceUserCallback: (_) async => enhancedUser.toJson(),
-        );
+        enhanceUserService = SimpleAnyhooEnhanceUserService(enhanceUserCallback: (_) async => enhancedUser.toJson());
 
         cubit = AnyhooAuthCubit(
           authService: mockAuthService,
@@ -568,10 +535,7 @@ void main() {
         final controller = StreamController<Map<String, dynamic>?>();
         when(() => mockAuthService.authStateChanges).thenAnswer((_) => controller.stream);
 
-        cubit = AnyhooAuthCubit(
-          authService: mockAuthService,
-          converter: testConverter,
-        );
+        cubit = AnyhooAuthCubit(authService: mockAuthService, converter: testConverter);
 
         await Future.delayed(Duration.zero);
 
