@@ -1,20 +1,23 @@
 import 'package:anyhoo_firebase/src/services/firestore_document_converter.dart';
+import 'package:anyhoo_firebase/src/services/firestore_where.dart';
 import 'package:anyhoo_logging/anyhoo_logging.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:logging/logging.dart';
 
 export 'firestore_document_converter.dart' show FirestoreConversionException;
+export 'firestore_where.dart' show FirestoreWhere;
 
 class FirestoreService {
-  final FirebaseFirestore firestore;
+  final FirebaseFirestore _firestore;
   final _log = Logger('FirestoreService');
 
-  FirestoreService({required this.firestore});
+  FirestoreService({required FirebaseFirestore firestore}) : _firestore = firestore;
 
   Stream<List<Map<String, dynamic>>> watchCollection(
     String path, {
     String? orderBy,
     bool? descending,
+    List<FirestoreWhere>? where,
     List<String>? whereNullFields,
     int? limit,
   }) {
@@ -22,6 +25,7 @@ class FirestoreService {
       path,
       orderBy: orderBy,
       descending: descending,
+      where: where,
       whereNullFields: whereNullFields,
       limit: limit,
     ).snapshots().map(
@@ -30,13 +34,14 @@ class FirestoreService {
   }
 
   Stream<Map<String, dynamic>?> watchDocument(String path) {
-    return firestore.doc(path).snapshots().map((snapshot) => _readDocument(snapshot.data(), snapshot.id, path));
+    return _firestore.doc(path).snapshots().map((snapshot) => _readDocument(snapshot.data(), snapshot.id, path));
   }
 
   Future<List<Map<String, dynamic>>> getCollection(
     String path, {
     String? orderBy,
     bool? descending,
+    List<FirestoreWhere>? where,
     List<String>? whereNullFields,
     int? limit,
   }) {
@@ -44,6 +49,7 @@ class FirestoreService {
       path,
       orderBy: orderBy,
       descending: descending,
+      where: where,
       whereNullFields: whereNullFields,
       limit: limit,
     ).get().then(
@@ -53,7 +59,7 @@ class FirestoreService {
 
   Future<Map<String, dynamic>?> getDocument(String path) async {
     try {
-      final docRef = await firestore.doc(path).get();
+      final docRef = await _firestore.doc(path).get();
       return _readDocument(docRef.data(), docRef.id, path);
     } on FirestoreConversionException {
       rethrow;
@@ -70,7 +76,7 @@ class FirestoreService {
     String? docId,
     Map<String, String>? idFields,
   }) async {
-    final collectionRef = firestore.collection(path);
+    final collectionRef = _firestore.collection(path);
 
     String fullPath = '$path/$docId';
 
@@ -87,7 +93,7 @@ class FirestoreService {
 
     _log.info('fullPath: $fullPath');
     _log.info('data: $data');
-    await firestore.doc(fullPath).set(_writeDocument(data, fullPath));
+    await _firestore.doc(fullPath).set(_writeDocument(data, fullPath));
 
     return docId;
   }
@@ -95,7 +101,7 @@ class FirestoreService {
   Future<void> updateDocument(String path, String id, Map<String, dynamic> data) async {
     final documentPath = '$path/$id';
     try {
-      return await firestore.collection(path).doc(id).update(_writeDocument(data, documentPath));
+      return await _firestore.collection(path).doc(id).update(_writeDocument(data, documentPath));
     } on FirestoreConversionException {
       rethrow;
     } catch (e, stackTrace) {
@@ -105,19 +111,25 @@ class FirestoreService {
   }
 
   Future<void> deleteDocument(String path, String id) async {
-    return firestore.collection(path).doc(id).delete();
+    return _firestore.collection(path).doc(id).delete();
   }
 
   Query<Map<String, dynamic>> _collectionQuery(
     String path, {
     String? orderBy,
     bool? descending,
+    List<FirestoreWhere>? where,
     List<String>? whereNullFields,
     int? limit,
   }) {
-    Query<Map<String, dynamic>> query = firestore.collection(path);
+    Query<Map<String, dynamic>> query = _firestore.collection(path);
     if (orderBy != null) {
       query = query.orderBy(orderBy, descending: descending!);
+    }
+    if (where != null) {
+      for (final clause in where) {
+        query = clause.apply(query);
+      }
     }
     if (whereNullFields != null) {
       for (var field in whereNullFields) {

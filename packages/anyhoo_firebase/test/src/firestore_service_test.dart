@@ -128,6 +128,26 @@ void main() {
         verify(() => mockCollection.where('deletedAt', isNull: true)).called(1);
       });
 
+      test('applies where clauses when provided', () async {
+        final doc1 = MockQueryDocumentSnapshot();
+        when(() => doc1.id).thenReturn('doc1');
+        when(() => doc1.data()).thenReturn({'name': 'Test'});
+        when(() => mockQuerySnapshot.docs).thenReturn([doc1]);
+        when(() => mockQuery.snapshots()).thenAnswer((_) => Stream.value(mockQuerySnapshot));
+        when(() => mockQuery.where(any(), arrayContains: any(named: 'arrayContains'))).thenReturn(mockQuery);
+        when(() => mockCollection.where(any(), arrayContains: any(named: 'arrayContains'))).thenReturn(mockQuery);
+        when(() => mockFirestore.collection(any())).thenReturn(mockCollection);
+
+        await firestoreService
+            .watchCollection(
+              'test_collection',
+              where: [FirestoreWhere.arrayContains('accessIds', 'user-1')],
+            )
+            .first;
+
+        verify(() => mockCollection.where('accessIds', arrayContains: 'user-1')).called(1);
+      });
+
       test('applies limit when provided', () async {
         final doc1 = MockQueryDocumentSnapshot();
         when(() => doc1.id).thenReturn('doc1');
@@ -219,6 +239,7 @@ void main() {
         when(() => mockQuerySnapshot.docs).thenReturn([doc1]);
         when(() => mockQuery.get()).thenAnswer((_) async => mockQuerySnapshot);
         // After orderBy returns a Query, subsequent calls are on that Query
+        when(() => mockQuery.where(any(), isEqualTo: any(named: 'isEqualTo'))).thenReturn(mockQuery);
         when(() => mockQuery.where(any(), isNull: any(named: 'isNull'))).thenReturn(mockQuery);
         when(() => mockQuery.limit(any())).thenReturn(mockQuery);
         when(() => mockCollection.orderBy(any(), descending: any(named: 'descending'))).thenReturn(mockQuery);
@@ -228,6 +249,7 @@ void main() {
           'test_collection',
           orderBy: 'name',
           descending: true,
+          where: [FirestoreWhere.equalTo('ownerId', 'user-1')],
           whereNullFields: ['deletedAt'],
           limit: 10,
         );
@@ -235,6 +257,7 @@ void main() {
         // Verify orderBy is called on collection (returns a Query)
         verify(() => mockCollection.orderBy('name', descending: true)).called(1);
         // Verify where and limit are called on the Query returned from orderBy
+        verify(() => mockQuery.where('ownerId', isEqualTo: 'user-1')).called(1);
         verify(() => mockQuery.where('deletedAt', isNull: true)).called(1);
         verify(() => mockQuery.limit(10)).called(1);
       });
