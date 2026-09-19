@@ -313,10 +313,10 @@ final directories = <_widgetbook.WidgetbookNode>[
         name: 'screens',
         children: [
           _widgetbook.WidgetbookComponent(
-            name: 'AnyhooList',
+            name: 'AnyhooAppSettingsScreen',
             useCases: [
               _widgetbook.WidgetbookUseCase(
-                name: 'App Settings',
+                name: 'App Settings Screen',
                 builder:
                     _widgetbook_workspace_anyhoo_design_system_screens_app_settings_screen
                         .buildAppSettingsScreen,
@@ -324,7 +324,7 @@ final directories = <_widgetbook.WidgetbookNode>[
             ],
           ),
           _widgetbook.WidgetbookComponent(
-            name: 'AnyhooMetricCard',
+            name: 'AnyhooExecutiveDashboardScreen',
             useCases: [
               _widgetbook.WidgetbookUseCase(
                 name: 'Executive Dashboard',
