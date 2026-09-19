@@ -24,3 +24,4 @@ export 'src/galleries/anyhoo_feedback_gallery.dart';
 export 'src/galleries/anyhoo_forms_gallery.dart';
 export 'src/galleries/anyhoo_navigation_gallery.dart';
 export 'src/galleries/anyhoo_typography_gallery.dart';
+export 'src/galleries/anyhoo_colors_gallery.dart';
