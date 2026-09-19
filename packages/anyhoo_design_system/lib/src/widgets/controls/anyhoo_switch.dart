@@ -3,12 +3,7 @@ import 'package:flutter/material.dart';
 
 /// Kinetic Logic toggle switch with an optional leading label.
 class AnyhooSwitch extends StatelessWidget {
-  const AnyhooSwitch({
-    super.key,
-    required this.value,
-    required this.onChanged,
-    this.label,
-  });
+  const AnyhooSwitch({super.key, required this.value, required this.onChanged, this.label});
 
   final bool value;
   final ValueChanged<bool>? onChanged;
@@ -22,6 +17,7 @@ class AnyhooSwitch extends StatelessWidget {
   Widget build(BuildContext context) {
     final accent = context.accent;
     final surface = context.surface;
+    final buttonColor = surface.secondaryContainer;
     final enabled = onChanged != null;
 
     final control = Opacity(
@@ -54,7 +50,7 @@ class AnyhooSwitch extends StatelessWidget {
                     width: _thumbSize,
                     height: _thumbSize,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: buttonColor,
                       shape: BoxShape.circle,
                       border: Border.all(color: surface.cardBorder),
                     ),
@@ -74,10 +70,7 @@ class AnyhooSwitch extends StatelessWidget {
       child: Row(
         children: [
           Expanded(
-            child: Text(
-              label!,
-              style: AnyhooTypography.body(BodySize.large).copyWith(color: surface.primaryText),
-            ),
+            child: Text(label!, style: AnyhooTypography.body(BodySize.large).copyWith(color: surface.primaryText)),
           ),
           control,
         ],
