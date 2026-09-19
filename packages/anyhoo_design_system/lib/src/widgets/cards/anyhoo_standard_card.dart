@@ -1,4 +1,5 @@
 import 'package:anyhoo_design_system/anyhoo_design_system.dart';
+import 'package:anyhoo_design_system/src/widgets/cards/anyhoo_empty_card.dart';
 import 'package:flutter/material.dart';
 
 /// Simple elevated card with title, body, and an optional text action.
@@ -24,11 +25,8 @@ class AnyhooStandardCard extends StatelessWidget {
     final accent = context.accent;
     final showAction = actionLabel != null && onAction != null;
 
-    return AnyhooCardShell(
-      padding: const EdgeInsets.all(DesignTokens.spacingMd),
+    return AnyhooEmptyCard(
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        mainAxisSize: MainAxisSize.min,
         children: [
           Row(
             children: [
