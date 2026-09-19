@@ -29,6 +29,8 @@ import 'package:widgetbook_workspace/anyhoo_design_system/cards/anyhoo_cards_gal
     as _widgetbook_workspace_anyhoo_design_system_cards_anyhoo_cards_gallery;
 import 'package:widgetbook_workspace/anyhoo_design_system/chips/anyhoo_chips_gallery.dart'
     as _widgetbook_workspace_anyhoo_design_system_chips_anyhoo_chips_gallery;
+import 'package:widgetbook_workspace/anyhoo_design_system/colors/anyhoo_colors_gallery.dart'
+    as _widgetbook_workspace_anyhoo_design_system_colors_anyhoo_colors_gallery;
 import 'package:widgetbook_workspace/anyhoo_design_system/controls/anyhoo_controls_gallery.dart'
     as _widgetbook_workspace_anyhoo_design_system_controls_anyhoo_controls_gallery;
 import 'package:widgetbook_workspace/anyhoo_design_system/data/anyhoo_data_gallery.dart'
@@ -172,6 +174,22 @@ final directories = <_widgetbook.WidgetbookNode>[
                 builder:
                     _widgetbook_workspace_anyhoo_design_system_chips_anyhoo_chips_gallery
                         .buildAnyhooChipsGallery,
+              ),
+            ],
+          ),
+        ],
+      ),
+      _widgetbook.WidgetbookFolder(
+        name: 'colors',
+        children: [
+          _widgetbook.WidgetbookComponent(
+            name: 'AnyhooColorsGallery',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'AnyhooColorsGallery',
+                builder:
+                    _widgetbook_workspace_anyhoo_design_system_colors_anyhoo_colors_gallery
+                        .buildAnyhooTypographyGallery,
               ),
             ],
           ),
@@ -338,10 +356,10 @@ final directories = <_widgetbook.WidgetbookNode>[
         name: 'typography',
         children: [
           _widgetbook.WidgetbookComponent(
-            name: 'AnyhooHeadline',
+            name: 'AnyhooTypographyGallery',
             useCases: [
               _widgetbook.WidgetbookUseCase(
-                name: 'Gallery',
+                name: 'Typography',
                 builder:
                     _widgetbook_workspace_anyhoo_design_system_typography_anyhoo_typography_gallery
                         .buildAnyhooTypographyGallery,
