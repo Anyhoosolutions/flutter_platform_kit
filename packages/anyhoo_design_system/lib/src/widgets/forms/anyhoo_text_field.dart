@@ -2,8 +2,8 @@ import 'package:anyhoo_design_system/anyhoo_design_system.dart';
 import 'package:flutter/material.dart';
 
 /// Rounded-full search field with optional trailing filter action.
-class AnyhooSearchField extends StatelessWidget {
-  const AnyhooSearchField({
+class AnyhooTextField extends StatelessWidget {
+  const AnyhooTextField({
     super.key,
     this.controller,
     this.onChanged,
@@ -27,10 +27,7 @@ class AnyhooSearchField extends StatelessWidget {
     final accent = context.accent;
 
     return DecoratedBox(
-      decoration: BoxDecoration(
-        color: surface.containerHigh,
-        borderRadius: BorderRadius.circular(999),
-      ),
+      decoration: BoxDecoration(color: surface.containerHigh, borderRadius: BorderRadius.circular(999)),
       child: Row(
         children: [
           Padding(
@@ -41,14 +38,10 @@ class AnyhooSearchField extends StatelessWidget {
             child: TextField(
               controller: controller,
               onChanged: onChanged,
-              style: AnyhooTypography.body(
-                BodySize.large,
-              ).copyWith(color: surface.primaryText),
+              style: AnyhooTypography.body(BodySize.large).copyWith(color: surface.primaryText),
               decoration: InputDecoration(
                 hintText: hint,
-                hintStyle: AnyhooTypography.body(
-                  BodySize.large,
-                ).copyWith(color: surface.secondaryText),
+                hintStyle: AnyhooTypography.body(BodySize.large).copyWith(color: surface.secondaryText),
                 border: InputBorder.none,
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: DesignTokens.spacingSm,
@@ -61,13 +54,7 @@ class AnyhooSearchField extends StatelessWidget {
           if (onFilterTap != null)
             IconButton(
               onPressed: onFilterTap,
-              icon: Icon(
-                Icons.tune,
-                size: 20,
-                color: isFilterActive
-                    ? accent.primaryFixed
-                    : surface.secondaryText,
-              ),
+              icon: Icon(Icons.tune, size: 20, color: isFilterActive ? accent.primaryFixed : surface.secondaryText),
               constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
             ),
         ],

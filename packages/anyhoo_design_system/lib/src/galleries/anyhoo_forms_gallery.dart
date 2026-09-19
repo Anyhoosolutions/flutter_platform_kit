@@ -32,13 +32,9 @@ class _AnyhooFormsGalleryState extends State<AnyhooFormsGallery> {
               padding: const EdgeInsets.all(DesignTokens.spacingMd),
               child: Column(
                 children: [
-                  AnyhooSearchField(hint: 'Search...', onFilterTap: () {}),
+                  AnyhooTextField(hint: 'Search...', onFilterTap: () {}),
                   const SizedBox(height: DesignTokens.spacingMd),
-                  AnyhooSearchField(
-                    hint: 'Search with active filters...',
-                    onFilterTap: () {},
-                    isFilterActive: true,
-                  ),
+                  AnyhooTextField(hint: 'Search with active filters...', onFilterTap: () {}, isFilterActive: true),
                 ],
               ),
             ),
@@ -106,10 +102,7 @@ class _AnyhooFormsGalleryState extends State<AnyhooFormsGallery> {
                 children: [
                   AnyhooDateField(date: _date, onTap: () {}),
                   const SizedBox(height: DesignTokens.spacingMd),
-                  AnyhooCalendar(
-                    selectedDate: _date,
-                    onDateSelected: (value) => setState(() => _date = value),
-                  ),
+                  AnyhooCalendar(selectedDate: _date, onDateSelected: (value) => setState(() => _date = value)),
                 ],
               ),
             ),
