@@ -1,4 +1,5 @@
 import 'package:anyhoo_design_system/anyhoo_design_system.dart';
+import 'package:anyhoo_design_system/src/widgets/cards/anyhoo_empty_card.dart';
 import 'package:anyhoo_widget_extension_methods/anyhoo_widget_extension_methods.dart';
 import 'package:flutter/material.dart';
 
@@ -23,6 +24,14 @@ class AnyhooCardsGallery extends StatelessWidget {
         child: ListView(
           padding: const EdgeInsets.all(DesignTokens.marginMobile),
           children: [
+            'Empty card'.headline(size: HeadlineSize.small).pad(b: 4),
+            AnyhooEmptyCard(
+              child: const Text(
+                'This is a simple elevated card with standard padding. It uses Level 1 elevation to lift slightly off the background.',
+              ),
+            ),
+            const SizedBox(height: DesignTokens.spacingMd),
+
             'Standard card'.headline(size: HeadlineSize.small).pad(b: 4),
             AnyhooStandardCard(
               title: 'Standard Card',
