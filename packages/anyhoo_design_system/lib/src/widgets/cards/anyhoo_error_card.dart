@@ -1,9 +1,10 @@
 import 'package:anyhoo_design_system/anyhoo_design_system.dart';
+import 'package:anyhoo_design_system/src/widgets/cards/anyhoo_card.dart';
 import 'package:anyhoo_widget_extension_methods/anyhoo_widget_extension_methods.dart';
 import 'package:flutter/material.dart';
 
 /// Simple elevated card with title, body, and an optional text action.
-class AnyhooErrorCard extends StatelessWidget {
+class AnyhooErrorCard extends AnyhooCard {
   const AnyhooErrorCard({super.key, required this.title, required this.child});
 
   final String title;

@@ -1,9 +1,9 @@
 import 'package:anyhoo_design_system/anyhoo_design_system.dart';
-import 'package:anyhoo_design_system/src/widgets/cards/anyhoo_empty_card.dart';
+import 'package:anyhoo_design_system/src/widgets/cards/anyhoo_card.dart';
 import 'package:flutter/material.dart';
 
 /// Simple elevated card with title, body, and an optional text action.
-class AnyhooStandardCard extends StatelessWidget {
+class AnyhooStandardCard extends AnyhooCard {
   const AnyhooStandardCard({
     super.key,
     this.prefixIcon,

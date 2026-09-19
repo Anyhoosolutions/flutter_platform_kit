@@ -27,7 +27,6 @@ class _AnyhooAppSettingsScreenState extends State<AnyhooAppSettingsScreen> {
       color: surface.scaffoldBackground,
       child: Column(
         children: [
-          const AnyhooTopBar(topBarTitle: 'Settings', showBackButton: true),
           Expanded(
             child: ListView(
               padding: const EdgeInsets.all(DesignTokens.marginMobile),

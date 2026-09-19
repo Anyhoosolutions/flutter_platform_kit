@@ -1,8 +1,9 @@
 import 'package:anyhoo_design_system/anyhoo_design_system.dart';
+import 'package:anyhoo_design_system/src/widgets/cards/anyhoo_card.dart';
 import 'package:flutter/material.dart';
 
 /// Shared Level-1 elevated surface used by Kinetic Logic cards.
-class AnyhooCardShell extends StatelessWidget {
+class AnyhooCardShell extends AnyhooCard {
   const AnyhooCardShell({
     super.key,
     required this.child,

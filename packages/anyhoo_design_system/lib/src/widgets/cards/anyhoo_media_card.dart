@@ -1,8 +1,9 @@
 import 'package:anyhoo_design_system/anyhoo_design_system.dart';
+import 'package:anyhoo_design_system/src/widgets/cards/anyhoo_card.dart';
 import 'package:flutter/material.dart';
 
 /// Hero / media card with a 16:9 image, title, body, and optional actions.
-class AnyhooMediaCard extends StatelessWidget {
+class AnyhooMediaCard extends AnyhooCard {
   const AnyhooMediaCard({
     super.key,
     required this.title,
@@ -40,7 +41,8 @@ class AnyhooMediaCard extends StatelessWidget {
             aspectRatio: 16 / 9,
             child: ColoredBox(
               color: surface.containerHighest,
-              child: image ??
+              child:
+                  image ??
                   (imageUrl != null
                       ? Image.network(imageUrl!, fit: BoxFit.cover)
                       : Icon(Icons.image_outlined, size: 48, color: surface.secondaryText)),
@@ -80,22 +82,13 @@ class AnyhooMediaCard extends StatelessWidget {
                           style: FilledButton.styleFrom(
                             backgroundColor: accent.primaryFixed,
                             foregroundColor: accent.onPrimaryFixed,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: DesignTokens.spacingMd,
-                              vertical: 12,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(DesignTokens.radiusMd),
-                            ),
+                            padding: const EdgeInsets.symmetric(horizontal: DesignTokens.spacingMd, vertical: 12),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(DesignTokens.radiusMd)),
                             elevation: 0,
                           ),
                           child: Text(
                             primaryActionLabel!,
-                            style: AppFonts.inter.copyWith(
-                              fontSize: 14,
-                              height: 20 / 14,
-                              fontWeight: FontWeight.w500,
-                            ),
+                            style: AppFonts.inter.copyWith(fontSize: 14, height: 20 / 14, fontWeight: FontWeight.w500),
                           ),
                         ),
                       if (showPrimary && showSecondary) const SizedBox(width: DesignTokens.spacingSm),
@@ -105,21 +98,12 @@ class AnyhooMediaCard extends StatelessWidget {
                           style: OutlinedButton.styleFrom(
                             foregroundColor: accent.primaryFixed,
                             side: BorderSide(color: surface.cardBorder),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: DesignTokens.spacingMd,
-                              vertical: 12,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(DesignTokens.radiusMd),
-                            ),
+                            padding: const EdgeInsets.symmetric(horizontal: DesignTokens.spacingMd, vertical: 12),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(DesignTokens.radiusMd)),
                           ),
                           child: Text(
                             secondaryActionLabel!,
-                            style: AppFonts.inter.copyWith(
-                              fontSize: 14,
-                              height: 20 / 14,
-                              fontWeight: FontWeight.w500,
-                            ),
+                            style: AppFonts.inter.copyWith(fontSize: 14, height: 20 / 14, fontWeight: FontWeight.w500),
                           ),
                         ),
                     ],
