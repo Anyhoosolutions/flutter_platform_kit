@@ -1,4 +1,5 @@
 import 'package:anyhoo_design_system/anyhoo_design_system.dart';
+import 'package:anyhoo_design_system/src/widgets/controls/anyhoo_avatar.dart';
 import 'package:anyhoo_widget_extension_methods/anyhoo_widget_extension_methods.dart';
 import 'package:flutter/material.dart';
 
@@ -15,6 +16,9 @@ class _AnyhooControlsGalleryState extends State<AnyhooControlsGallery> {
   bool _rememberMe = true;
   String _radio = 'one';
 
+  static const _avatarUrl =
+      'https://lh3.googleusercontent.com/aida-public/AB6AXuD85TfYVe4kkVorC36HeCjWz_vrd2GD2G-sdRkJTTi1JIBVVReQ7RIif25yTw5oqPIqnJYe2kg0B6ctoQwzsIPeF4MrRJINhO1FXH-Ygx12jn8XcdhCftQzZRXMGo-7-J9ka1qEcJ63SZuhMTUnzgz1zx4gUgKpNnUFiICwu2ULJjRSHz18kmFedox-ek82oPrY4v1OaOUHOEI5xlPbiYo3z33l5NJxUcw0qAJlwygZIuOIPh9Gm_Vj';
+
   @override
   Widget build(BuildContext context) {
     final surface = context.surface;
@@ -27,17 +31,10 @@ class _AnyhooControlsGalleryState extends State<AnyhooControlsGallery> {
           children: [
             'Controls'.headline(size: HeadlineSize.small).pad(b: 4),
             AnyhooCardShell(
-              padding: const EdgeInsets.symmetric(
-                horizontal: DesignTokens.spacingSm,
-                vertical: DesignTokens.spacingMd,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: DesignTokens.spacingSm, vertical: DesignTokens.spacingMd),
               child: Column(
                 children: [
-                  AnyhooSwitch(
-                    label: 'Wi-Fi',
-                    value: _wifi,
-                    onChanged: (value) => setState(() => _wifi = value),
-                  ),
+                  AnyhooSwitch(label: 'Wi-Fi', value: _wifi, onChanged: (value) => setState(() => _wifi = value)),
                   AnyhooCheckbox(
                     label: 'Remember me',
                     value: _rememberMe,
@@ -60,6 +57,36 @@ class _AnyhooControlsGalleryState extends State<AnyhooControlsGallery> {
             ),
             const SizedBox(height: DesignTokens.spacingLg),
 
+            'Avatars'.headline(size: HeadlineSize.small).pad(b: 4),
+            AnyhooCardShell(
+              padding: const EdgeInsets.symmetric(horizontal: DesignTokens.spacingSm, vertical: DesignTokens.spacingMd),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      'With text'.body(),
+                      AnyhooAvatar(text: 'AB', imageUrl: null),
+                    ],
+                  ).pad(h: 16, b: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      'Selected with text'.body(),
+                      AnyhooAvatar(text: 'AB', imageUrl: null, highlighted: true),
+                    ],
+                  ).pad(h: 16, b: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      'With image'.body(),
+                      AnyhooAvatar(text: null, imageUrl: _avatarUrl),
+                    ],
+                  ).pad(h: 16),
+                ],
+              ),
+            ),
+
             'Progress & loaders'.headline(size: HeadlineSize.small).pad(b: 4),
             AnyhooCardShell(
               padding: const EdgeInsets.all(DesignTokens.spacingMd),
@@ -77,11 +104,7 @@ class _AnyhooControlsGalleryState extends State<AnyhooControlsGallery> {
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      AnyhooSkeleton(
-                        width: 60,
-                        height: 60,
-                        borderRadius: BorderRadius.circular(DesignTokens.radiusMd),
-                      ),
+                      AnyhooSkeleton(width: 60, height: 60, borderRadius: BorderRadius.circular(DesignTokens.radiusMd)),
                       const SizedBox(width: DesignTokens.spacingMd),
                       const Expanded(
                         child: Column(

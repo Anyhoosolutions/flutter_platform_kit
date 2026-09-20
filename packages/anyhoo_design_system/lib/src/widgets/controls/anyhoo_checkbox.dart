@@ -3,12 +3,7 @@ import 'package:flutter/material.dart';
 
 /// Kinetic Logic checkbox with an optional label.
 class AnyhooCheckbox extends StatelessWidget {
-  const AnyhooCheckbox({
-    super.key,
-    required this.value,
-    required this.onChanged,
-    this.label,
-  });
+  const AnyhooCheckbox({super.key, required this.value, required this.onChanged, this.label});
 
   final bool value;
   final ValueChanged<bool>? onChanged;
@@ -20,6 +15,7 @@ class AnyhooCheckbox extends StatelessWidget {
   Widget build(BuildContext context) {
     final accent = context.accent;
     final surface = context.surface;
+    final controls = context.controls;
     final enabled = onChanged != null;
 
     final box = AnimatedContainer(
@@ -29,14 +25,9 @@ class AnyhooCheckbox extends StatelessWidget {
       decoration: BoxDecoration(
         color: value ? accent.primaryFixed : Colors.transparent,
         borderRadius: BorderRadius.circular(DesignTokens.radiusSm),
-        border: Border.all(
-          color: value ? accent.primaryFixed : surface.cardBorder,
-          width: 2,
-        ),
+        border: Border.all(color: value ? accent.primaryFixed : controls.cardColors.borderColor!, width: 2),
       ),
-      child: value
-          ? Icon(Icons.check, size: 16, color: accent.onPrimaryFixed)
-          : null,
+      child: value ? Icon(Icons.check, size: 16, color: accent.onPrimaryFixed) : null,
     );
 
     final content = Opacity(
@@ -58,9 +49,7 @@ class AnyhooCheckbox extends StatelessWidget {
                   Flexible(
                     child: Text(
                       label!,
-                      style: AnyhooTypography.body(BodySize.large).copyWith(
-                        color: surface.primaryText,
-                      ),
+                      style: AnyhooTypography.body(BodySize.large).copyWith(color: surface.primaryText),
                     ),
                   ),
                 ],

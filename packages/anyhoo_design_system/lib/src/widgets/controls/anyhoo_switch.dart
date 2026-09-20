@@ -17,7 +17,8 @@ class AnyhooSwitch extends StatelessWidget {
   Widget build(BuildContext context) {
     final accent = context.accent;
     final surface = context.surface;
-    final buttonColor = surface.secondaryContainer;
+    final buttonColor = surface.scaffoldBackground;
+    final controls = context.controls;
     final enabled = onChanged != null;
 
     final control = Opacity(
@@ -39,7 +40,7 @@ class AnyhooSwitch extends StatelessWidget {
                 height: _trackHeight,
                 padding: const EdgeInsets.all(2),
                 decoration: BoxDecoration(
-                  color: value ? accent.primaryFixed : surface.cardBorder,
+                  color: value ? accent.primaryFixed : controls.cardColors.borderColor!,
                   borderRadius: BorderRadius.circular(_trackHeight / 2),
                 ),
                 child: AnimatedAlign(
@@ -52,7 +53,7 @@ class AnyhooSwitch extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: buttonColor,
                       shape: BoxShape.circle,
-                      border: Border.all(color: surface.cardBorder),
+                      border: Border.all(color: controls.cardColors.borderColor!),
                     ),
                   ),
                 ),

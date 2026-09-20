@@ -57,6 +57,7 @@ class _SegmentThumb extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final surface = context.surface;
+    final controls = context.controls;
 
     return GestureDetector(
       onTap: onTap,
@@ -66,7 +67,7 @@ class _SegmentThumb extends StatelessWidget {
         curve: Curves.easeInOut,
         padding: const EdgeInsets.symmetric(horizontal: DesignTokens.spacingSm, vertical: DesignTokens.spacingSm),
         decoration: BoxDecoration(
-          color: selected ? surface.cardBackground : Colors.transparent,
+          color: selected ? controls.cardColors.background : Colors.transparent,
           borderRadius: BorderRadius.circular(DesignTokens.radiusSm),
           boxShadow: selected ? AnyhooCardShell.level1Shadow : null,
         ),

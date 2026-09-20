@@ -3,12 +3,7 @@ import 'package:flutter/material.dart';
 
 /// Single accordion panel with expand/collapse.
 class AnyhooExpansionPanel extends StatefulWidget {
-  const AnyhooExpansionPanel({
-    super.key,
-    required this.title,
-    required this.child,
-    this.initiallyExpanded = false,
-  });
+  const AnyhooExpansionPanel({super.key, required this.title, required this.child, this.initiallyExpanded = false});
 
   final String title;
   final Widget child;
@@ -31,28 +26,19 @@ class _AnyhooExpansionPanelState extends State<AnyhooExpansionPanel> {
         InkWell(
           onTap: () => setState(() => _expanded = !_expanded),
           child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: DesignTokens.spacingMd,
-              vertical: DesignTokens.spacingMd,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: DesignTokens.spacingMd, vertical: DesignTokens.spacingMd),
             child: Row(
               children: [
                 Expanded(
                   child: Text(
                     widget.title,
-                    style: AnyhooTypography.label(LabelSize.large).copyWith(
-                      color: surface.primaryText,
-                    ),
+                    style: AnyhooTypography.label(LabelSize.large).copyWith(color: surface.primaryText),
                   ),
                 ),
                 AnimatedRotation(
                   turns: _expanded ? 0.5 : 0,
                   duration: const Duration(milliseconds: 200),
-                  child: Icon(
-                    Icons.expand_more,
-                    color: surface.secondaryText,
-                    size: 24,
-                  ),
+                  child: Icon(Icons.expand_more, color: surface.secondaryText, size: 24),
                 ),
               ],
             ),
@@ -68,14 +54,11 @@ class _AnyhooExpansionPanelState extends State<AnyhooExpansionPanel> {
               DesignTokens.spacingMd,
             ),
             child: DefaultTextStyle(
-              style: AnyhooTypography.body(BodySize.medium).copyWith(
-                color: surface.secondaryText,
-              ),
+              style: AnyhooTypography.body(BodySize.medium).copyWith(color: surface.secondaryText),
               child: widget.child,
             ),
           ),
-          crossFadeState:
-              _expanded ? CrossFadeState.showSecond : CrossFadeState.showFirst,
+          crossFadeState: _expanded ? CrossFadeState.showSecond : CrossFadeState.showFirst,
           duration: const Duration(milliseconds: 200),
         ),
       ],
@@ -85,11 +68,7 @@ class _AnyhooExpansionPanelState extends State<AnyhooExpansionPanel> {
 
 /// FAQ-style accordion list with optional header and divide-y separators.
 class AnyhooExpansionList extends StatelessWidget {
-  const AnyhooExpansionList({
-    super.key,
-    required this.panels,
-    this.headerTitle,
-  });
+  const AnyhooExpansionList({super.key, required this.panels, this.headerTitle});
 
   final String? headerTitle;
   final List<AnyhooExpansionPanel> panels;
@@ -97,6 +76,7 @@ class AnyhooExpansionList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final surface = context.surface;
+    final controls = context.controls;
 
     return AnyhooCardShell(
       padding: EdgeInsets.zero,
@@ -108,17 +88,15 @@ class AnyhooExpansionList extends StatelessWidget {
               padding: const EdgeInsets.all(DesignTokens.spacingMd),
               child: Text(
                 headerTitle!,
-                style: AnyhooTypography.headline(HeadlineSize.tiny).copyWith(
-                  color: surface.primaryText,
-                ),
+                style: AnyhooTypography.headline(HeadlineSize.tiny).copyWith(color: surface.primaryText),
               ),
             ),
-            Divider(height: 1, thickness: 1, color: surface.cardBorder.withValues(alpha: 0.3)),
+            Divider(height: 1, thickness: 1, color: controls.cardColors.borderColor!.withValues(alpha: 0.3)),
           ],
           for (var i = 0; i < panels.length; i++) ...[
             panels[i],
             if (i < panels.length - 1)
-              Divider(height: 1, thickness: 1, color: surface.cardBorder.withValues(alpha: 0.3)),
+              Divider(height: 1, thickness: 1, color: controls.cardColors.borderColor!.withValues(alpha: 0.3)),
           ],
         ],
       ),

@@ -29,6 +29,7 @@ class AnyhooMediaCard extends AnyhooCard {
   Widget build(BuildContext context) {
     final surface = context.surface;
     final accent = context.accent;
+    final controls = context.controls;
     final showPrimary = primaryActionLabel != null && onPrimaryAction != null;
     final showSecondary = secondaryActionLabel != null && onSecondaryAction != null;
 
@@ -97,7 +98,7 @@ class AnyhooMediaCard extends AnyhooCard {
                           onPressed: onSecondaryAction,
                           style: OutlinedButton.styleFrom(
                             foregroundColor: accent.primaryFixed,
-                            side: BorderSide(color: surface.cardBorder),
+                            side: BorderSide(color: controls.cardColors.borderColor!),
                             padding: const EdgeInsets.symmetric(horizontal: DesignTokens.spacingMd, vertical: 12),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(DesignTokens.radiusMd)),
                           ),

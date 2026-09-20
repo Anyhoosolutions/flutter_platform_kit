@@ -33,31 +33,19 @@ class _AnyhooDataGalleryState extends State<AnyhooDataGallery> {
                   'USR-001',
                   'Elena Rostova',
                   'Admin',
-                  const AnyhooChip(
-                    label: 'Active',
-                    variant: AnyhooChipVariant.primary,
-                    shape: AnyhooChipShape.pill,
-                  ),
+                  const AnyhooChip(label: 'Active', variant: AnyhooChipVariant.primary, shape: AnyhooChipShape.pill),
                 ],
                 [
                   'USR-002',
                   'Marcus Vance',
                   'Editor',
-                  const AnyhooChip(
-                    label: 'Pending',
-                    variant: AnyhooChipVariant.secondary,
-                    shape: AnyhooChipShape.pill,
-                  ),
+                  const AnyhooChip(label: 'Pending', variant: AnyhooChipVariant.secondary, shape: AnyhooChipShape.pill),
                 ],
                 [
                   'USR-003',
                   'Sarah Jenkins',
                   'Viewer',
-                  const AnyhooChip(
-                    label: 'Inactive',
-                    variant: AnyhooChipVariant.neutral,
-                    shape: AnyhooChipShape.pill,
-                  ),
+                  const AnyhooChip(label: 'Inactive', variant: AnyhooChipVariant.inactive, shape: AnyhooChipShape.pill),
                 ],
               ],
             ),
@@ -71,14 +59,15 @@ class _AnyhooDataGalleryState extends State<AnyhooDataGallery> {
                 children: [
                   'Status Badges'.label(size: LabelSize.large, color: surface.secondaryText),
                   const SizedBox(height: DesignTokens.spacingSm),
-                  const Wrap(
+                  Wrap(
                     spacing: 8,
                     runSpacing: 8,
                     children: [
-                      AnyhooChip(label: 'Primary', shape: AnyhooChipShape.pill, variant: AnyhooChipVariant.secondary),
+                      AnyhooChip(label: 'Primary', shape: AnyhooChipShape.pill, variant: AnyhooChipVariant.primary),
                       AnyhooChip(label: 'Secondary', shape: AnyhooChipShape.pill, variant: AnyhooChipVariant.secondary),
-                      AnyhooChip(label: 'Neutral', shape: AnyhooChipShape.pill, variant: AnyhooChipVariant.neutral),
-                      AnyhooChip(label: 'Alert', shape: AnyhooChipShape.pill, variant: AnyhooChipVariant.alert),
+                      AnyhooChip(label: 'Neutral', shape: AnyhooChipShape.pill, variant: AnyhooChipVariant.warning),
+                      AnyhooChip(label: 'Alert', shape: AnyhooChipShape.pill, variant: AnyhooChipVariant.error),
+                      AnyhooChip(label: 'Alert', shape: AnyhooChipShape.pill, variant: AnyhooChipVariant.inactive),
                     ],
                   ),
                   const SizedBox(height: DesignTokens.spacingMd),
@@ -149,10 +138,7 @@ class _AnyhooDataGalleryState extends State<AnyhooDataGallery> {
                   title: 'Data Synchronization',
                   subtitle: 'Manage offline access and background sync intervals',
                   showChevron: false,
-                  trailing: AnyhooSwitch(
-                    value: _sync,
-                    onChanged: (v) => setState(() => _sync = v),
-                  ),
+                  trailing: AnyhooSwitch(value: _sync, onChanged: (v) => setState(() => _sync = v)),
                 ),
                 AnyhooListItem(
                   leadingIcon: Icons.shield_outlined,
@@ -160,7 +146,7 @@ class _AnyhooDataGalleryState extends State<AnyhooDataGallery> {
                   title: 'Privacy & Permissions',
                   subtitle: 'Control application access to system resources',
                   showChevron: false,
-                  trailing: const AnyhooChip(label: 'Review', variant: AnyhooChipVariant.neutral),
+                  trailing: const AnyhooChip(label: 'Review', variant: AnyhooChipVariant.secondary),
                   onTap: () {},
                 ),
               ],

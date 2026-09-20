@@ -22,10 +22,11 @@ class AnyhooEmptyState extends StatelessWidget {
   Widget build(BuildContext context) {
     final surface = context.surface;
     final accent = context.accent;
+    final controls = context.controls;
 
     return CustomPaint(
       painter: _DashedBorderPainter(
-        color: surface.cardBorder.withValues(alpha: 0.5),
+        color: controls.cardColors.borderColor!.withValues(alpha: 0.5),
         radius: DesignTokens.radiusXl,
       ),
       child: Container(
@@ -37,10 +38,7 @@ class AnyhooEmptyState extends StatelessWidget {
             Container(
               width: 64,
               height: 64,
-              decoration: BoxDecoration(
-                color: surface.containerHigh,
-                shape: BoxShape.circle,
-              ),
+              decoration: BoxDecoration(color: surface.containerHigh, shape: BoxShape.circle),
               alignment: Alignment.center,
               child: Icon(icon, size: 32, color: surface.secondaryText),
             ),
@@ -48,17 +46,13 @@ class AnyhooEmptyState extends StatelessWidget {
             Text(
               title,
               textAlign: TextAlign.center,
-              style: AnyhooTypography.headline(HeadlineSize.small).copyWith(
-                color: surface.primaryText,
-              ),
+              style: AnyhooTypography.headline(HeadlineSize.small).copyWith(color: surface.primaryText),
             ),
             const SizedBox(height: DesignTokens.spacingSm),
             Text(
               message,
               textAlign: TextAlign.center,
-              style: AnyhooTypography.body(BodySize.medium).copyWith(
-                color: surface.secondaryText,
-              ),
+              style: AnyhooTypography.body(BodySize.medium).copyWith(color: surface.secondaryText),
             ),
             if (actionLabel != null && onAction != null) ...[
               const SizedBox(height: DesignTokens.spacingLg),
@@ -69,9 +63,7 @@ class AnyhooEmptyState extends StatelessWidget {
                 style: FilledButton.styleFrom(
                   backgroundColor: accent.primaryFixed,
                   foregroundColor: accent.onPrimaryFixed,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(DesignTokens.radiusMd),
-                  ),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(DesignTokens.radiusMd)),
                 ),
               ),
             ],
@@ -83,10 +75,7 @@ class AnyhooEmptyState extends StatelessWidget {
 }
 
 class _DashedBorderPainter extends CustomPainter {
-  _DashedBorderPainter({
-    required this.color,
-    required this.radius,
-  });
+  _DashedBorderPainter({required this.color, required this.radius});
 
   final Color color;
   final double radius;
@@ -112,10 +101,7 @@ class _DashedBorderPainter extends CustomPainter {
       var distance = 0.0;
       while (distance < metric.length) {
         final next = distance + dashWidth;
-        canvas.drawPath(
-          metric.extractPath(distance, next.clamp(0, metric.length)),
-          paint,
-        );
+        canvas.drawPath(metric.extractPath(distance, next.clamp(0, metric.length)), paint);
         distance = next + dashSpace;
       }
     }

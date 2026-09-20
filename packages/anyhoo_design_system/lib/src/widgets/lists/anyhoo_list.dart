@@ -3,11 +3,7 @@ import 'package:flutter/material.dart';
 
 /// Card-wrapped list with an optional header and dividers between [children].
 class AnyhooList extends StatelessWidget {
-  const AnyhooList({
-    super.key,
-    required this.children,
-    this.title,
-  });
+  const AnyhooList({super.key, required this.children, this.title});
 
   final String? title;
   final List<Widget> children;
@@ -15,7 +11,8 @@ class AnyhooList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final surface = context.surface;
-    final dividerColor = surface.cardBorder.withValues(alpha: 0.3);
+    final controls = context.controls;
+    final dividerColor = controls.cardColors.borderColor!.withValues(alpha: 0.3);
 
     return AnyhooCardShell(
       child: Material(
@@ -29,9 +26,7 @@ class AnyhooList extends StatelessWidget {
                 padding: const EdgeInsets.all(DesignTokens.spacingMd),
                 child: Text(
                   title!,
-                  style: AnyhooTypography.headline(HeadlineSize.small).copyWith(
-                    color: surface.primaryText,
-                  ),
+                  style: AnyhooTypography.headline(HeadlineSize.small).copyWith(color: surface.primaryText),
                 ),
               ),
               Divider(height: 1, thickness: 1, color: dividerColor),

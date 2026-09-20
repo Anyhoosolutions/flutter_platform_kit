@@ -22,6 +22,7 @@ class AnyhooDateField extends StatelessWidget {
   Widget build(BuildContext context) {
     final surface = context.surface;
     final accent = context.accent;
+    final controls = context.controls;
 
     return Material(
       type: MaterialType.transparency,
@@ -32,27 +33,19 @@ class AnyhooDateField extends StatelessWidget {
           decoration: BoxDecoration(
             color: surface.containerLow,
             borderRadius: BorderRadius.circular(DesignTokens.radiusMd),
-            border: Border.all(color: surface.cardBorder.withValues(alpha: 0.5)),
+            border: Border.all(color: controls.cardColors.borderColor!.withValues(alpha: 0.5)),
           ),
           child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: DesignTokens.spacingMd,
-              vertical: DesignTokens.spacingMd,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: DesignTokens.spacingMd, vertical: DesignTokens.spacingMd),
             child: Row(
               children: [
                 Icon(Icons.calendar_today, size: 20, color: accent.primaryFixed),
                 const SizedBox(width: DesignTokens.spacingSm),
                 Expanded(
                   child: Text(
-                    date != null
-                        ? (formatDate ?? _defaultFormatDate)(date!)
-                        : hint,
-                    style: AnyhooTypography.body(BodySize.large).copyWith(
-                      color: date != null
-                          ? surface.primaryText
-                          : surface.secondaryText,
-                    ),
+                    date != null ? (formatDate ?? _defaultFormatDate)(date!) : hint,
+                    style: AnyhooTypography.body(BodySize.large)
+                        .copyWith(color: date != null ? surface.primaryText : surface.secondaryText),
                   ),
                 ),
               ],
@@ -66,12 +59,7 @@ class AnyhooDateField extends StatelessWidget {
 
 /// Self-contained month calendar grid with navigation and day selection.
 class AnyhooCalendar extends StatefulWidget {
-  const AnyhooCalendar({
-    super.key,
-    this.selectedDate,
-    this.onDateSelected,
-    this.initialMonth,
-  });
+  const AnyhooCalendar({super.key, this.selectedDate, this.onDateSelected, this.initialMonth});
 
   final DateTime? selectedDate;
   final ValueChanged<DateTime>? onDateSelected;
@@ -124,8 +112,7 @@ class _AnyhooCalendarState extends State<AnyhooCalendar> {
   Widget build(BuildContext context) {
     final surface = context.surface;
     final accent = context.accent;
-    final monthLabel =
-        '${_monthNames[_visibleMonth.month - 1]} ${_visibleMonth.year}';
+    final monthLabel = '${_monthNames[_visibleMonth.month - 1]} ${_visibleMonth.year}';
     final days = _daysInMonthGrid(_visibleMonth);
 
     return AnyhooCardShell(
@@ -144,10 +131,8 @@ class _AnyhooCalendarState extends State<AnyhooCalendar> {
                 child: Text(
                   monthLabel,
                   textAlign: TextAlign.center,
-                  style: AnyhooTypography.label(LabelSize.large).copyWith(
-                    color: surface.primaryText,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: AnyhooTypography.label(LabelSize.large)
+                      .copyWith(color: surface.primaryText, fontWeight: FontWeight.w600),
                 ),
               ),
               IconButton(
@@ -165,9 +150,7 @@ class _AnyhooCalendarState extends State<AnyhooCalendar> {
                   child: Center(
                     child: Text(
                       label,
-                      style: AnyhooTypography.label(LabelSize.medium).copyWith(
-                        color: surface.secondaryText,
-                      ),
+                      style: AnyhooTypography.label(LabelSize.medium).copyWith(color: surface.secondaryText),
                     ),
                   ),
                 ),
@@ -235,7 +218,8 @@ class _DayCell extends StatelessWidget {
       return const SizedBox(height: 40);
     }
 
-    final selected = selectedDate != null &&
+    final selected =
+        selectedDate != null &&
         date!.year == selectedDate!.year &&
         date!.month == selectedDate!.month &&
         date!.day == selectedDate!.day;
@@ -270,19 +254,6 @@ class _DayCell extends StatelessWidget {
 }
 
 String _defaultFormatDate(DateTime date) {
-  const months = [
-    'Jan',
-    'Feb',
-    'Mar',
-    'Apr',
-    'May',
-    'Jun',
-    'Jul',
-    'Aug',
-    'Sep',
-    'Oct',
-    'Nov',
-    'Dec',
-  ];
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   return '${months[date.month - 1]} ${date.day}, ${date.year}';
 }

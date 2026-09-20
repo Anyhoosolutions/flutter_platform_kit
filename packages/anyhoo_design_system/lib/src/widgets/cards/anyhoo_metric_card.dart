@@ -59,7 +59,11 @@ class AnyhooMetricCard extends AnyhooCard {
                       ),
                       const Spacer(),
                       if (badgeLabel != null)
-                        AnyhooChip(label: badgeLabel!, variant: AnyhooChipVariant.surface, shape: AnyhooChipShape.pill),
+                        AnyhooChip(
+                          label: badgeLabel!,
+                          variant: AnyhooChipVariant.secondary,
+                          shape: AnyhooChipShape.pill,
+                        ),
                     ],
                   ),
                   const Spacer(),

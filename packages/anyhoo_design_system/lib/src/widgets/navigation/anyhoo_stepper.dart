@@ -3,11 +3,7 @@ import 'package:flutter/material.dart';
 
 /// Horizontal step indicator with completed / active / pending states.
 class AnyhooStepper extends StatelessWidget {
-  const AnyhooStepper({
-    super.key,
-    required this.steps,
-    required this.currentStep,
-  });
+  const AnyhooStepper({super.key, required this.steps, required this.currentStep});
 
   final List<String> steps;
 
@@ -19,7 +15,7 @@ class AnyhooStepper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final accent = context.accent;
-    final surface = context.surface;
+    final controls = context.controls;
 
     return Row(
       children: [
@@ -29,17 +25,10 @@ class AnyhooStepper extends StatelessWidget {
               child: Container(
                 height: 2,
                 margin: const EdgeInsets.only(bottom: 20),
-                color: i <= currentStep
-                    ? accent.primaryFixed
-                    : surface.cardBorder,
+                color: i <= currentStep ? accent.primaryFixed : controls.cardColors.borderColor!,
               ),
             ),
-          _StepNode(
-            label: steps[i],
-            index: i,
-            currentStep: currentStep,
-            circleSize: _circleSize,
-          ),
+          _StepNode(label: steps[i], index: i, currentStep: currentStep, circleSize: _circleSize),
         ],
       ],
     );
@@ -47,12 +36,7 @@ class AnyhooStepper extends StatelessWidget {
 }
 
 class _StepNode extends StatelessWidget {
-  const _StepNode({
-    required this.label,
-    required this.index,
-    required this.currentStep,
-    required this.circleSize,
-  });
+  const _StepNode({required this.label, required this.index, required this.currentStep, required this.circleSize});
 
   final String label;
   final int index;
@@ -63,6 +47,7 @@ class _StepNode extends StatelessWidget {
   Widget build(BuildContext context) {
     final accent = context.accent;
     final surface = context.surface;
+    final controls = context.controls;
 
     final completed = index < currentStep;
     final active = index == currentStep;
@@ -80,7 +65,7 @@ class _StepNode extends StatelessWidget {
       fillColor = null;
       labelColor = surface.primaryText;
     } else {
-      borderColor = surface.cardBorder;
+      borderColor = controls.cardColors.borderColor!;
       fillColor = null;
       labelColor = surface.secondaryText;
     }
@@ -101,19 +86,16 @@ class _StepNode extends StatelessWidget {
               ? Icon(Icons.check, size: 16, color: accent.onPrimaryFixed)
               : Text(
                   '${index + 1}',
-                  style: AnyhooTypography.label(LabelSize.medium).copyWith(
-                    color: active ? accent.primaryFixed : surface.secondaryText,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: AnyhooTypography.label(
+                    LabelSize.medium,
+                  ).copyWith(color: active ? accent.primaryFixed : surface.secondaryText, fontWeight: FontWeight.w600),
                 ),
         ),
         const SizedBox(height: DesignTokens.spacingXs),
         Text(
           label,
-          style: AnyhooTypography.label(LabelSize.medium).copyWith(
-            color: labelColor,
-            fontWeight: active ? FontWeight.w600 : FontWeight.w500,
-          ),
+          style: AnyhooTypography.label(LabelSize.medium)
+              .copyWith(color: labelColor, fontWeight: active ? FontWeight.w600 : FontWeight.w500),
         ),
       ],
     );

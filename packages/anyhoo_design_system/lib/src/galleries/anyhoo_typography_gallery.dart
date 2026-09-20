@@ -8,6 +8,7 @@ class AnyhooTypographyGallery extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final surface = context.surface;
+    final controls = context.controls;
 
     return SafeArea(
       child: ColoredBox(
@@ -26,7 +27,10 @@ class AnyhooTypographyGallery extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   'Typography Scale'.headline(size: HeadlineSize.small),
-                  Divider(height: DesignTokens.spacingLg, color: surface.cardBorder.withValues(alpha: 0.5)),
+                  Divider(
+                    height: DesignTokens.spacingLg,
+                    color: controls.cardColors.borderColor!.withValues(alpha: 0.5),
+                  ),
                   _ScaleRow(
                     role: 'Display Large',
                     sample: 'Precision Design'.display(size: DisplaySize.large),
@@ -41,9 +45,8 @@ class AnyhooTypographyGallery extends StatelessWidget {
                   ),
                   _ScaleRow(
                     role: 'Body Large',
-                    sample:
-                        'The target audience includes professional users who require high-density information without cognitive overload.'
-                            .body(size: BodySize.large, color: surface.primaryText),
+                    sample: 'The target audience includes professional users who require high-density information without cognitive overload.'
+                        .body(size: BodySize.large, color: surface.primaryText),
                   ),
                   _ScaleRow(
                     role: 'Label Medium',
@@ -89,6 +92,7 @@ class _ScaleRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final surface = context.surface;
+    final controls = context.controls;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -97,7 +101,7 @@ class _ScaleRow extends StatelessWidget {
         const SizedBox(height: DesignTokens.spacingSm),
         sample,
         if (showDivider)
-          Divider(height: DesignTokens.spacingLg, color: surface.cardBorder.withValues(alpha: 0.2))
+          Divider(height: DesignTokens.spacingLg, color: controls.cardColors.borderColor!.withValues(alpha: 0.2))
         else
           const SizedBox(height: DesignTokens.spacingSm),
       ],

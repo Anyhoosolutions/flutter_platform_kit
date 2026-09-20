@@ -10,6 +10,7 @@
 // **************************************************************************
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
+
 import 'package:widgetbook/widgetbook.dart' as _widgetbook;
 import 'package:widgetbook_workspace/anyhoo_auth/login_widget.dart'
     as _widgetbook_workspace_anyhoo_auth_login_widget;
@@ -199,10 +200,10 @@ final directories = <_widgetbook.WidgetbookNode>[
         name: 'controls',
         children: [
           _widgetbook.WidgetbookComponent(
-            name: 'AnyhooSwitch',
+            name: 'AnyhooControlsGallery',
             useCases: [
               _widgetbook.WidgetbookUseCase(
-                name: 'Gallery',
+                name: 'AnyhooControlsGallery',
                 builder:
                     _widgetbook_workspace_anyhoo_design_system_controls_anyhoo_controls_gallery
                         .buildAnyhooControlsGallery,
@@ -258,6 +259,17 @@ final directories = <_widgetbook.WidgetbookNode>[
             ],
           ),
           _widgetbook.WidgetbookComponent(
+            name: 'AnyhooFormsGallery',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Gallery',
+                builder:
+                    _widgetbook_workspace_anyhoo_design_system_forms_anyhoo_forms_gallery
+                        .buildAnyhooFormsGallery,
+              ),
+            ],
+          ),
+          _widgetbook.WidgetbookComponent(
             name: 'AnyhooMultiSelect',
             useCases: [
               _widgetbook.WidgetbookUseCase(
@@ -277,17 +289,6 @@ final directories = <_widgetbook.WidgetbookNode>[
                 builder:
                     _widgetbook_workspace_anyhoo_design_system_forms_anyhoo_multi_select
                         .buildSingleSelection,
-              ),
-            ],
-          ),
-          _widgetbook.WidgetbookComponent(
-            name: 'AnyhooSearchField',
-            useCases: [
-              _widgetbook.WidgetbookUseCase(
-                name: 'Gallery',
-                builder:
-                    _widgetbook_workspace_anyhoo_design_system_forms_anyhoo_forms_gallery
-                        .buildAnyhooFormsGallery,
               ),
             ],
           ),

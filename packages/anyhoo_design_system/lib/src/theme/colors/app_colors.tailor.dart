@@ -9,13 +9,88 @@ part of 'app_colors.dart';
 // TailorAnnotationsGenerator
 // **************************************************************************
 
+mixin _$AppColorsTailorMixin on ThemeExtension<AppColors> {
+  SurfaceColors get surface;
+  AccentColors get accent;
+  StatusColors get status;
+  ShimmerColors get shimmer;
+  AppBarColors get appBar;
+  ControlsColors get controls;
+
+  @override
+  AppColors copyWith({
+    SurfaceColors? surface,
+    AccentColors? accent,
+    StatusColors? status,
+    ShimmerColors? shimmer,
+    AppBarColors? appBar,
+    ControlsColors? controls,
+  }) {
+    return AppColors(
+      surface: surface ?? this.surface,
+      accent: accent ?? this.accent,
+      status: status ?? this.status,
+      shimmer: shimmer ?? this.shimmer,
+      appBar: appBar ?? this.appBar,
+      controls: controls ?? this.controls,
+    );
+  }
+
+  @override
+  AppColors lerp(covariant ThemeExtension<AppColors>? other, double t) {
+    if (other is! AppColors) return this as AppColors;
+    return AppColors(
+      surface: surface.lerp(other.surface, t),
+      accent: accent.lerp(other.accent, t),
+      status: status.lerp(other.status, t),
+      shimmer: shimmer.lerp(other.shimmer, t),
+      appBar: appBar.lerp(other.appBar, t),
+      controls: controls.lerp(other.controls, t),
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is AppColors &&
+            const DeepCollectionEquality().equals(surface, other.surface) &&
+            const DeepCollectionEquality().equals(accent, other.accent) &&
+            const DeepCollectionEquality().equals(status, other.status) &&
+            const DeepCollectionEquality().equals(shimmer, other.shimmer) &&
+            const DeepCollectionEquality().equals(appBar, other.appBar) &&
+            const DeepCollectionEquality().equals(controls, other.controls));
+  }
+
+  @override
+  int get hashCode {
+    return Object.hash(
+      runtimeType.hashCode,
+      const DeepCollectionEquality().hash(surface),
+      const DeepCollectionEquality().hash(accent),
+      const DeepCollectionEquality().hash(status),
+      const DeepCollectionEquality().hash(shimmer),
+      const DeepCollectionEquality().hash(appBar),
+      const DeepCollectionEquality().hash(controls),
+    );
+  }
+}
+
+extension AppColorsBuildContextProps on BuildContext {
+  AppColors get appColors => Theme.of(this).extension<AppColors>()!;
+  SurfaceColors get surface => appColors.surface;
+  AccentColors get accent => appColors.accent;
+  StatusColors get status => appColors.status;
+  ShimmerColors get shimmer => appColors.shimmer;
+  AppBarColors get appBar => appColors.appBar;
+  ControlsColors get controls => appColors.controls;
+}
+
 mixin _$SurfaceColorsTailorMixin on ThemeExtension<SurfaceColors> {
   Color get scaffoldBackground;
   Color get lowContrastBackground;
   Color get primaryText;
   Color get secondaryText;
-  Color get cardBackground;
-  Color get cardBorder;
   Color get containerHigh;
   Color get containerLow;
   Color get containerHighest;
@@ -32,8 +107,6 @@ mixin _$SurfaceColorsTailorMixin on ThemeExtension<SurfaceColors> {
     Color? lowContrastBackground,
     Color? primaryText,
     Color? secondaryText,
-    Color? cardBackground,
-    Color? cardBorder,
     Color? containerHigh,
     Color? containerLow,
     Color? containerHighest,
@@ -50,8 +123,6 @@ mixin _$SurfaceColorsTailorMixin on ThemeExtension<SurfaceColors> {
           lowContrastBackground ?? this.lowContrastBackground,
       primaryText: primaryText ?? this.primaryText,
       secondaryText: secondaryText ?? this.secondaryText,
-      cardBackground: cardBackground ?? this.cardBackground,
-      cardBorder: cardBorder ?? this.cardBorder,
       containerHigh: containerHigh ?? this.containerHigh,
       containerLow: containerLow ?? this.containerLow,
       containerHighest: containerHighest ?? this.containerHighest,
@@ -80,8 +151,6 @@ mixin _$SurfaceColorsTailorMixin on ThemeExtension<SurfaceColors> {
       )!,
       primaryText: Color.lerp(primaryText, other.primaryText, t)!,
       secondaryText: Color.lerp(secondaryText, other.secondaryText, t)!,
-      cardBackground: Color.lerp(cardBackground, other.cardBackground, t)!,
-      cardBorder: Color.lerp(cardBorder, other.cardBorder, t)!,
       containerHigh: Color.lerp(containerHigh, other.containerHigh, t)!,
       containerLow: Color.lerp(containerLow, other.containerLow, t)!,
       containerHighest: Color.lerp(
@@ -132,14 +201,6 @@ mixin _$SurfaceColorsTailorMixin on ThemeExtension<SurfaceColors> {
               other.secondaryText,
             ) &&
             const DeepCollectionEquality().equals(
-              cardBackground,
-              other.cardBackground,
-            ) &&
-            const DeepCollectionEquality().equals(
-              cardBorder,
-              other.cardBorder,
-            ) &&
-            const DeepCollectionEquality().equals(
               containerHigh,
               other.containerHigh,
             ) &&
@@ -182,8 +243,6 @@ mixin _$SurfaceColorsTailorMixin on ThemeExtension<SurfaceColors> {
       const DeepCollectionEquality().hash(lowContrastBackground),
       const DeepCollectionEquality().hash(primaryText),
       const DeepCollectionEquality().hash(secondaryText),
-      const DeepCollectionEquality().hash(cardBackground),
-      const DeepCollectionEquality().hash(cardBorder),
       const DeepCollectionEquality().hash(containerHigh),
       const DeepCollectionEquality().hash(containerLow),
       const DeepCollectionEquality().hash(containerHighest),
@@ -541,74 +600,4 @@ mixin _$ShimmerColorsTailorMixin on ThemeExtension<ShimmerColors> {
       const DeepCollectionEquality().hash(highlightColor),
     );
   }
-}
-
-mixin _$AppColorsTailorMixin on ThemeExtension<AppColors> {
-  SurfaceColors get surface;
-  AccentColors get accent;
-  StatusColors get status;
-  ShimmerColors get shimmer;
-  AppBarColors get appBar;
-
-  @override
-  AppColors copyWith({
-    SurfaceColors? surface,
-    AccentColors? accent,
-    StatusColors? status,
-    ShimmerColors? shimmer,
-    AppBarColors? appBar,
-  }) {
-    return AppColors(
-      surface: surface ?? this.surface,
-      accent: accent ?? this.accent,
-      status: status ?? this.status,
-      shimmer: shimmer ?? this.shimmer,
-      appBar: appBar ?? this.appBar,
-    );
-  }
-
-  @override
-  AppColors lerp(covariant ThemeExtension<AppColors>? other, double t) {
-    if (other is! AppColors) return this as AppColors;
-    return AppColors(
-      surface: surface.lerp(other.surface, t),
-      accent: accent.lerp(other.accent, t),
-      status: status.lerp(other.status, t),
-      shimmer: shimmer.lerp(other.shimmer, t),
-      appBar: appBar.lerp(other.appBar, t),
-    );
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is AppColors &&
-            const DeepCollectionEquality().equals(surface, other.surface) &&
-            const DeepCollectionEquality().equals(accent, other.accent) &&
-            const DeepCollectionEquality().equals(status, other.status) &&
-            const DeepCollectionEquality().equals(shimmer, other.shimmer) &&
-            const DeepCollectionEquality().equals(appBar, other.appBar));
-  }
-
-  @override
-  int get hashCode {
-    return Object.hash(
-      runtimeType.hashCode,
-      const DeepCollectionEquality().hash(surface),
-      const DeepCollectionEquality().hash(accent),
-      const DeepCollectionEquality().hash(status),
-      const DeepCollectionEquality().hash(shimmer),
-      const DeepCollectionEquality().hash(appBar),
-    );
-  }
-}
-
-extension AppColorsBuildContextProps on BuildContext {
-  AppColors get appColors => Theme.of(this).extension<AppColors>()!;
-  SurfaceColors get surface => appColors.surface;
-  AccentColors get accent => appColors.accent;
-  StatusColors get status => appColors.status;
-  ShimmerColors get shimmer => appColors.shimmer;
-  AppBarColors get appBar => appColors.appBar;
 }

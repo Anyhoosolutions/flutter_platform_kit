@@ -23,6 +23,7 @@ class AnyhooStandardCard extends AnyhooCard {
   Widget build(BuildContext context) {
     final surface = context.surface;
     final accent = context.accent;
+    final controls = context.controls;
     final showAction = actionLabel != null && onAction != null;
 
     return AnyhooEmptyCard(
@@ -57,7 +58,11 @@ class AnyhooStandardCard extends AnyhooCard {
           ),
           if (showAction) ...[
             const SizedBox(height: DesignTokens.spacingSm),
-            Divider(height: DesignTokens.spacingSm * 2, color: surface.cardBorder.withValues(alpha: 0.2)),
+            if (controls.cardColors.borderColor != null)
+              Divider(
+                height: DesignTokens.spacingSm * 2,
+                color: controls.cardColors.borderColor!.withValues(alpha: 0.2),
+              ),
             Align(
               alignment: Alignment.centerRight,
               child: TextButton(

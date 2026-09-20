@@ -23,16 +23,16 @@ class AnyhooCardShell extends AnyhooCard {
 
   @override
   Widget build(BuildContext context) {
-    final surface = context.surface;
+    final controls = context.controls;
 
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: backgroundColor ?? surface.cardBackground,
+        color: backgroundColor ?? controls.cardColors.background,
         image: backgroundImageUrl != null
             ? DecorationImage(image: NetworkImage(backgroundImageUrl!), fit: BoxFit.cover)
             : null,
         borderRadius: BorderRadius.circular(DesignTokens.radiusXl),
-        border: Border.all(color: surface.cardBorder.withValues(alpha: 0.3)),
+        border: Border.all(color: controls.cardColors.borderColor!.withValues(alpha: 0.3)),
         boxShadow: level1Shadow,
       ),
       child: ClipRRect(
