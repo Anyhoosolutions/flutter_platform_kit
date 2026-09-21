@@ -65,9 +65,9 @@ class _AnyhooDataGalleryState extends State<AnyhooDataGallery> {
                     children: [
                       AnyhooChip(label: 'Primary', shape: AnyhooChipShape.pill, variant: AnyhooChipVariant.primary),
                       AnyhooChip(label: 'Secondary', shape: AnyhooChipShape.pill, variant: AnyhooChipVariant.secondary),
-                      AnyhooChip(label: 'Neutral', shape: AnyhooChipShape.pill, variant: AnyhooChipVariant.warning),
-                      AnyhooChip(label: 'Alert', shape: AnyhooChipShape.pill, variant: AnyhooChipVariant.error),
-                      AnyhooChip(label: 'Alert', shape: AnyhooChipShape.pill, variant: AnyhooChipVariant.inactive),
+                      AnyhooChip(label: 'Warning', shape: AnyhooChipShape.pill, variant: AnyhooChipVariant.warning),
+                      AnyhooChip(label: 'Error', shape: AnyhooChipShape.pill, variant: AnyhooChipVariant.error),
+                      AnyhooChip(label: 'Inactive', shape: AnyhooChipShape.pill, variant: AnyhooChipVariant.inactive),
                     ],
                   ),
                   const SizedBox(height: DesignTokens.spacingMd),

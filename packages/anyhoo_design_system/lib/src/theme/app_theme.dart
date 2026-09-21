@@ -7,7 +7,7 @@ import 'colors/default_app_colors.dart';
 /// Configurable ThemeData factory for Anyhoo applications.
 class AnyhooTheme {
   static ThemeData light({AppColors? colors, List<ThemeExtension>? extraExtensions}) {
-    return _build(brightness: Brightness.light, colors: colors ?? darkNavyAppColors, extraExtensions: extraExtensions);
+    return _build(brightness: Brightness.light, colors: colors ?? lightNavyAppColors, extraExtensions: extraExtensions);
   }
 
   static ThemeData dark({AppColors? colors, List<ThemeExtension>? extraExtensions}) {

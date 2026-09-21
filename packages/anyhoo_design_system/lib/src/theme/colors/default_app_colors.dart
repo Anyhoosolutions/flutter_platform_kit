@@ -123,3 +123,101 @@ final darkNavyAppColors = AppColors(
     ),
   ),
 );
+
+final lightNavyAppColors = AppColors(
+  // ---------------------------------------------------------------------------
+  // Surface Colors (Soft Off-White & Light Cool Grey)
+  // ---------------------------------------------------------------------------
+  surface: const SurfaceColors(
+    scaffoldBackground: Color(0xFFF8FAFC), // Off-white canvas
+    lowContrastBackground: Color(0xFFF1F5F9), // Light grey container background
+    primaryText: Color(0xFF0F172A), // Deep navy-black for high legibility
+    secondaryText: Color(0xFF475569), // Muted slate text
+    containerLowest: Color(0xFFFFFFFF), // Pure white elevation base
+    containerLow: Color(0xFFF1F5F9), // Default card fill
+    containerHigh: Color(0xFFE2E8F0), // Elevated surfaces
+    containerHighest: Color(0xFFCBD5E1), // Dropdowns and floating overlays
+    outline: Color(0xFFE2E8F0), // Light grey-blue border
+    secondaryContainer: Color(0xFFEFF6FF), // Light blue secondary fill
+    onSecondaryContainer: Color(0xFF1E3A8A), // Dark blue text on secondary
+    inverseSurface: Color(0xFF0F172A), // Dark surface for inverse elements
+    inverseOnSurface: Color(0xFFF8FAFC), // Light text on inverse surface
+  ),
+
+  // ---------------------------------------------------------------------------
+  // Accent Colors (Primary Navy Blue & Cool Ice Accents)
+  // ---------------------------------------------------------------------------
+  accent: const AccentColors(
+    primaryFixed: Color(0xFF1E40AF), // Core navy blue brand color
+    onPrimaryFixed: Color(0xFFFFFFFF), // Text on primary
+    primaryDisabled: Color(0xFFE2E8F0), // Muted container for disabled
+    onPrimaryDisabled: Color(0xFF94A3B8), // Text on disabled
+    primaryContainer: Color(0xFFDBEAFE), // Soft light-blue accent tint
+    onPrimaryContainer: Color(0xFF1E3A8A), // Deep navy text on accent container
+    headline: Color(0xFF1D4ED8), // Vibrant blue for headings
+    inversePrimary: Color(0xFF60A5FA), // Soft blue for dark overlay contexts
+  ),
+
+  // ---------------------------------------------------------------------------
+  // Status Colors (Standard Visual Feedback)
+  // ---------------------------------------------------------------------------
+  status: const StatusColors(
+    error: Color(0xFFDC2626), // Standard red
+    errorContainer: Color(0xFFFEE2E2), // Soft red background tint
+    warning: Color(0xFFD97706), // Amber warning
+    success: Color(0xFF059669), // Emerald green
+  ),
+
+  // ---------------------------------------------------------------------------
+  // Shimmer Colors (Loading Visuals)
+  // ---------------------------------------------------------------------------
+  shimmer: const ShimmerColors(
+    baseColor: Color(0xFFE2E8F0), // Light slate base
+    highlightColor: Color(0xFFF8FAFC), // Bright sweep effect
+  ),
+
+  // ---------------------------------------------------------------------------
+  // AppBar Colors (Top and Bottom Navigation)
+  // ---------------------------------------------------------------------------
+  appBar: const AppBarColors(
+    topBarBackground: Color(0xFFFFFFFF), // Crisp white top app bar
+    topBarBorder: Color(0xFFE2E8F0), // Divider line
+    topBarText: Color(0xFF0F172A), // Dark title text
+    backButtonColor: Color(0xFF475569), // Slate icon color
+    avatarColor: Color(0xFF1E40AF), // Navy avatar accent
+    bottomBarBackground: Color(0xFFFFFFFF), // White bottom navigation bar
+    bottomBarIconColors: Color(0xFF64748B), // Unselected icon color
+    bottomBarIndicatorColor: Color(0xFFDBEAFE), // Active selection pill
+    bottomBarBorderColor: Color(0xFFE2E8F0), // Top border line
+  ),
+
+  // ---------------------------------------------------------------------------
+  // Component Controls Colors
+  // ---------------------------------------------------------------------------
+  controls: const ControlsColors(
+    switchColors: AnyhooSwitchColors(
+      background: Color(0xFFCBD5E1), // Inactive track
+      button: Color(0xFF1E40AF), // Active thumb color
+    ),
+    cardColors: ColorSet(
+      background: Color(0xFFFFFFFF), // Pure white card background
+      foreground: Color(0xFF0F172A), // Card text/content
+      borderColor: Color(0xFFE2E8F0), // Card border outline
+    ),
+    segmentColors: SegmentColors(
+      regular: ColorSet(background: Color(0xFFF1F5F9), foreground: Color(0xFF64748B), borderColor: Colors.transparent),
+      selected: ColorSet(background: Color(0xFF1E40AF), foreground: Color(0xFFFFFFFF), borderColor: Color(0xFF1D4ED8)),
+    ),
+    avatarColors: AvatarColors(
+      regular: ColorSet(background: Color(0xFFE2E8F0), foreground: Color(0xFF475569), borderColor: Color(0xFFCBD5E1)),
+      selected: ColorSet(background: Color(0xFF1E40AF), foreground: Color(0xFFFFFFFF), borderColor: Color(0xFF3B82F6)),
+    ),
+    chipColors: ChipColors(
+      primary: ColorSet(background: Color(0xFFDBEAFE), foreground: Color(0xFF1E3A8A), borderColor: Color(0xFF93C5FD)),
+      secondary: ColorSet(background: Color(0xFFF1F5F9), foreground: Color(0xFF334155), borderColor: Color(0xFFCBD5E1)),
+      error: ColorSet(background: Color(0xFFFEE2E2), foreground: Color(0xFF991B1B), borderColor: Color(0xFFFCA5A5)),
+      warning: ColorSet(background: Color(0xFFFEF3C7), foreground: Color(0xFF92400E), borderColor: Color(0xFFFDE68A)),
+      inactive: ColorSet(background: Color(0xFFF8FAFC), foreground: Color(0xFF94A3B8), borderColor: Color(0xFFE2E8F0)),
+    ),
+  ),
+);
