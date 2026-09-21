@@ -9,7 +9,7 @@ class AnyhooFormSlider extends StatelessWidget {
     required this.name,
     required this.min,
     required this.max,
-
+    this.validators,
     this.divisions,
     this.leadingIcon,
     this.trailingIcon,
@@ -19,6 +19,7 @@ class AnyhooFormSlider extends StatelessWidget {
   final double min;
   final double max;
   final int? divisions;
+  final List<FormFieldValidator<double>>? validators;
   final IconData? leadingIcon;
   final IconData? trailingIcon;
 
@@ -27,7 +28,7 @@ class AnyhooFormSlider extends StatelessWidget {
     return FormBuilderField(
       name: name,
       initialValue: min,
-      validator: FormBuilderValidators.compose([FormBuilderValidators.required()]),
+      validator: FormBuilderValidators.compose(validators ?? <FormFieldValidator<double>>[]),
       builder: (FormFieldState<double> field) {
         return AnyhooSlider(
           onChanged: (value) => field.didChange(value),

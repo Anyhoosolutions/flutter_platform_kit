@@ -10,10 +10,11 @@ class AnyhooFormTextField extends StatelessWidget {
     this.hint = 'Search',
     this.onFilterTap,
     this.isFilterActive = false,
+    this.validators,
   });
 
   final String name;
-
+  final List<FormFieldValidator<String>>? validators;
   final String hint;
   final VoidCallback? onFilterTap;
 
@@ -26,7 +27,7 @@ class AnyhooFormTextField extends StatelessWidget {
     return FormBuilderField(
       name: name,
       initialValue: '',
-      validator: FormBuilderValidators.compose([FormBuilderValidators.required()]),
+      validator: FormBuilderValidators.compose(validators ?? <FormFieldValidator<String>>[]),
       builder: (FormFieldState<String> field) {
         return AnyhooTextField(
           hint: hint,
