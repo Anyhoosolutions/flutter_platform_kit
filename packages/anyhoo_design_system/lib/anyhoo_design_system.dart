@@ -57,11 +57,11 @@ export 'src/widgets/dropdown/anyhoo_dropdown.dart';
 export 'src/widgets/dropdown/anyhoo_dropdown_group.dart';
 export 'src/widgets/dropdown/anyhoo_dropdown_option.dart';
 
-export 'src/widgets/forms/anyhoo_text_field.dart';
-export 'src/widgets/forms/anyhoo_segmented_control.dart';
-export 'src/widgets/forms/anyhoo_slider.dart';
-export 'src/widgets/forms/anyhoo_date_picker.dart';
-export 'src/widgets/forms/anyhoo_multi_select_section.dart';
+export 'src/widgets/controls/anyhoo_text_field.dart';
+export 'src/widgets/controls/anyhoo_segmented_control.dart';
+export 'src/widgets/controls/anyhoo_slider.dart';
+export 'src/widgets/controls/anyhoo_date_picker.dart';
+export 'src/widgets/controls/anyhoo_multi_select_section.dart';
 
 export 'src/widgets/data/anyhoo_data_table.dart';
 export 'src/widgets/data/anyhoo_notification_badge.dart';

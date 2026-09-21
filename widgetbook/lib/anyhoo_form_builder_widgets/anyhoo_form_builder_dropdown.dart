@@ -1,3 +1,4 @@
+import 'package:anyhoo_design_system/anyhoo_design_system.dart';
 import 'package:anyhoo_form_builder_widgets/anyhoo_form_builder_widgets.dart';
 import 'package:anyhoo_widget_extension_methods/anyhoo_widget_extension_methods.dart';
 import 'package:flutter/material.dart';
@@ -83,6 +84,12 @@ class _FormBuilderDropdownPageState extends State<_FormBuilderDropdownPage> {
             const SizedBox(height: 16),
 
             ...switches(),
+
+            const SizedBox(height: 16),
+            Divider(),
+            const SizedBox(height: 16),
+
+            ...segmentedControls(),
 
             const SizedBox(height: 16),
             Divider(),
@@ -180,6 +187,20 @@ class _FormBuilderDropdownPageState extends State<_FormBuilderDropdownPage> {
       const Text('Switches.').pad(b: 16),
       AnyhooFormSwitch(name: 'include', label: 'Include'),
       AnyhooFormSwitch(name: 'favorite', label: 'Favorite'),
+    ];
+  }
+
+  List<Widget> segmentedControls() {
+    return [
+      const Text('Segmented controls.').pad(b: 16),
+      AnyhooFormSegmentControl<String>(
+        name: 'cost',
+        segments: [
+          AnyhooSegment(value: 'cheap', label: 'Cheap'),
+          AnyhooSegment(value: 'medium', label: 'Medium'),
+          AnyhooSegment(value: 'expensive', label: 'Expensive'),
+        ],
+      ),
     ];
   }
 }
