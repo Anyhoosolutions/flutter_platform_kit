@@ -4,11 +4,12 @@ import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:anyhoo_design_system/anyhoo_design_system.dart';
 
 class AnyhooFormSwitch extends StatelessWidget {
-  const AnyhooFormSwitch({super.key, required this.name, required this.label, this.validators});
+  const AnyhooFormSwitch({super.key, required this.name, required this.label, this.validators, this.onChanged});
 
   final String label;
   final String name;
   final List<FormFieldValidator<bool>>? validators;
+  final void Function(bool)? onChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -24,6 +25,9 @@ class AnyhooFormSwitch extends StatelessWidget {
           value: isSelected,
           onChanged: (value) {
             field.didChange(value);
+            if (onChanged != null) {
+              onChanged!(value);
+            }
           },
         );
       },

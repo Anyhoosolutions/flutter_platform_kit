@@ -19,11 +19,13 @@ class AnyhooFormDropdown<T extends Object> extends StatelessWidget {
     this.semanticLabel,
     this.maxWidth = 280,
     this.maxVisibleOptions = 6,
+    this.singleOnChanged,
   }) : assert((options != null) ^ (groups != null), 'Provide exactly one of options or groups'),
        assert(onCreate == null || groups == null, 'onCreate is not supported with groups'),
        isMulti = false,
        multiInitialValue = null,
-       multiValidator = null;
+       multiValidator = null,
+       multiOnChanged = null;
 
   const AnyhooFormDropdown.multi({
     super.key,
@@ -40,13 +42,15 @@ class AnyhooFormDropdown<T extends Object> extends StatelessWidget {
     this.semanticLabel,
     this.maxWidth = 280,
     this.maxVisibleOptions = 6,
+    this.multiOnChanged,
   }) : assert((options != null) ^ (groups != null), 'Provide exactly one of options or groups'),
        assert(onCreate == null || groups == null, 'onCreate is not supported with groups'),
        isMulti = true,
        initialValue = null,
        multiInitialValue = initialValue,
        multiValidator = validator,
-       validator = null;
+       validator = null,
+       singleOnChanged = null;
 
   final bool isMulti;
   final String name;
@@ -64,6 +68,8 @@ class AnyhooFormDropdown<T extends Object> extends StatelessWidget {
   final String? semanticLabel;
   final double maxWidth;
   final int maxVisibleOptions;
+  final void Function(List<T>)? multiOnChanged;
+  final void Function(T?)? singleOnChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -78,7 +84,12 @@ class AnyhooFormDropdown<T extends Object> extends StatelessWidget {
             options: options,
             groups: groups,
             value: field.value ?? [],
-            onChanged: field.didChange,
+            onChanged: (value) {
+              field.didChange(value);
+              if (multiOnChanged != null) {
+                multiOnChanged!(value);
+              }
+            },
             label: label,
             hint: hint,
             onCreate: onCreate,
@@ -101,7 +112,12 @@ class AnyhooFormDropdown<T extends Object> extends StatelessWidget {
           options: options,
           groups: groups,
           value: field.value,
-          onChanged: field.didChange,
+          onChanged: (value) {
+            field.didChange(value);
+            if (singleOnChanged != null) {
+              singleOnChanged!(value);
+            }
+          },
           label: label,
           hint: hint,
           onCreate: onCreate,

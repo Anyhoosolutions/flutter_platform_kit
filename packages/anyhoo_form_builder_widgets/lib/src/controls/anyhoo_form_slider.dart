@@ -13,6 +13,7 @@ class AnyhooFormSlider extends StatelessWidget {
     this.divisions,
     this.leadingIcon,
     this.trailingIcon,
+    this.onChanged,
   });
 
   final String name;
@@ -22,6 +23,7 @@ class AnyhooFormSlider extends StatelessWidget {
   final List<FormFieldValidator<double>>? validators;
   final IconData? leadingIcon;
   final IconData? trailingIcon;
+  final void Function(double)? onChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +33,12 @@ class AnyhooFormSlider extends StatelessWidget {
       validator: FormBuilderValidators.compose(validators ?? <FormFieldValidator<double>>[]),
       builder: (FormFieldState<double> field) {
         return AnyhooSlider(
-          onChanged: (value) => field.didChange(value),
+          onChanged: (value) {
+            field.didChange(value);
+            if (onChanged != null) {
+              onChanged!(value);
+            }
+          },
           min: min,
           max: max,
           divisions: divisions,

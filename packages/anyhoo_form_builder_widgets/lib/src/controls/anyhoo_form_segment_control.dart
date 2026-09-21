@@ -4,11 +4,18 @@ import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:anyhoo_design_system/anyhoo_design_system.dart';
 
 class AnyhooFormSegmentControl<T> extends StatelessWidget {
-  const AnyhooFormSegmentControl({super.key, required this.name, required this.segments, this.validators});
+  const AnyhooFormSegmentControl({
+    super.key,
+    required this.name,
+    required this.segments,
+    this.validators,
+    this.onChanged,
+  });
 
   final String name;
   final List<AnyhooSegment<T>> segments;
   final List<FormFieldValidator<T>>? validators;
+  final void Function(T)? onChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +25,12 @@ class AnyhooFormSegmentControl<T> extends StatelessWidget {
       validator: FormBuilderValidators.compose(validators ?? <FormFieldValidator<T>>[]),
       builder: (FormFieldState<T> field) {
         return AnyhooSegmentedControl<T>(
-          onChanged: (value) => field.didChange(value),
+          onChanged: (value) {
+            field.didChange(value);
+            if (onChanged != null) {
+              onChanged!(value);
+            }
+          },
           segments: segments,
           selected: field.value ?? segments.first.value,
         );
