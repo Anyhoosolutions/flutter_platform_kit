@@ -76,6 +76,12 @@ class _FormBuilderDropdownPageState extends State<_FormBuilderDropdownPage> {
             Divider(),
             const SizedBox(height: 16),
 
+            ...radioGroup(),
+
+            const SizedBox(height: 16),
+            Divider(),
+            const SizedBox(height: 16),
+
             ElevatedButton(
               onPressed: () {
                 final ok = _formKey.currentState?.saveAndValidate() ?? false;
@@ -150,6 +156,16 @@ class _FormBuilderDropdownPageState extends State<_FormBuilderDropdownPage> {
       const Text('Checkboxes that can be selected and deselected.').pad(b: 16),
       AnyhooFormCheckbox(name: 'fun', label: 'Fun'),
       AnyhooFormCheckbox(name: 'boring', label: 'Boring'),
+    ];
+  }
+
+  List<Widget> radioGroup() {
+    return [
+      const Text('Checkboxes that can be selected and deselected.').pad(b: 16),
+      AnyhooFormRadioGroup(
+        name: 'size',
+        options: [('small', 'Small'), ('medium', 'Medium'), ('large', 'Large'), ('xl', 'XL'), ('xxl', 'XXL')],
+      ),
     ];
   }
 }

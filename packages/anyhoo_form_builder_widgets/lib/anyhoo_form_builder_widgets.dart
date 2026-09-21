@@ -8,3 +8,4 @@ export 'package:anyhoo_design_system/anyhoo_design_system.dart'
 export 'src/dropdowns/anyhoo_form_dropdown.dart';
 export 'src/filterChips/anyhoo_filter_chip.dart';
 export 'src/controls/anyhoo_form_checkbox.dart';
+export 'src/controls/anyhoo_form_radio_group.dart';
