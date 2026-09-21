@@ -10,10 +10,7 @@ export 'src/tokens/design_tokens.dart';
 
 export 'src/extensions/string_typography_extensions.dart';
 
-export 'src/widgets/buttons/anyhoo_add_button.dart';
-export 'src/widgets/buttons/anyhoo_minus_button.dart';
 export 'src/widgets/buttons/anyhoo_primary_button.dart';
-export 'src/widgets/buttons/anyhoo_remove_button.dart';
 export 'src/widgets/buttons/anyhoo_secondary_button.dart';
 export 'src/widgets/buttons/anyhoo_text_button.dart';
 export 'src/widgets/buttons/anyhoo_round_button.dart';
