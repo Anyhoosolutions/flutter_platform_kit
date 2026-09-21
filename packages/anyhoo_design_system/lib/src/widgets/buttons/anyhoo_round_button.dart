@@ -11,6 +11,7 @@ class AnyhooRoundButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final surface = context.surface;
+    final controls = context.controls;
 
     return Material(
       color: Colors.transparent,
@@ -23,7 +24,7 @@ class AnyhooRoundButton extends StatelessWidget {
           height: 40,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            border: Border.all(color: color ?? surface.cardBorder),
+            border: Border.all(color: color ?? controls.cardColors.borderColor!),
           ),
           child: Icon(icon, color: color ?? surface.secondaryText),
         ),

@@ -42,7 +42,7 @@
 			"type": "dart",
 			"program": "lib/main.dart",
 			"cwd": "${workspaceFolder}/widgetbook",
-			"args": ["-d", "chrome", "--web-port", "45678"]
+			"args": ["-d", "chrome", "--web-port", "45679"]
 		},
 		{
 			"name": "Launch Widgetbook (macos)",

@@ -1,7 +1,7 @@
 import 'package:anyhoo_design_system/anyhoo_design_system.dart';
 import 'package:flutter/material.dart';
 
-enum AnyhooChipVariant { primary, error, surface, secondary, neutral, alert }
+enum AnyhooChipVariant { primary, secondary, error, warning, inactive }
 
 enum AnyhooChipShape { rounded, pill }
 
@@ -43,9 +43,7 @@ class AnyhooChip extends StatelessWidget {
             label,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: AnyhooTypography.label(LabelSize.medium).copyWith(
-              color: colors.foreground,
-            ),
+            style: AnyhooTypography.label(LabelSize.medium).copyWith(color: colors.foreground),
           ),
         ),
         if (onDeleted != null) ...[
@@ -66,10 +64,7 @@ class AnyhooChip extends StatelessWidget {
         border: colors.borderColor == null ? null : Border.all(color: colors.borderColor!),
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: DesignTokens.spacingSm,
-          vertical: DesignTokens.spacingXs,
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: DesignTokens.spacingSm, vertical: DesignTokens.spacingXs),
         child: child,
       ),
     );
@@ -78,55 +73,45 @@ class AnyhooChip extends StatelessWidget {
 
     return Material(
       type: MaterialType.transparency,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: radius,
-        child: chip,
-      ),
+      child: InkWell(onTap: onTap, borderRadius: radius, child: chip),
     );
   }
 
   _ChipColors _colors(BuildContext context) {
-    final accent = context.accent;
-    final surface = context.surface;
-    final status = context.status;
+    final colors = context.controls.chipColors;
 
     return switch (variant) {
       AnyhooChipVariant.primary => _ChipColors(
-        background: accent.primaryContainer.withValues(alpha: 0.2),
-        foreground: accent.primaryFixed,
-      ),
-      AnyhooChipVariant.error => _ChipColors(
-        background: DesignTokens.errorRed.withValues(alpha: 0.1),
-        foreground: status.error,
-        borderColor: DesignTokens.errorRed.withValues(alpha: 0.2),
-      ),
-      AnyhooChipVariant.surface => _ChipColors(
-        background: surface.containerHigh,
-        foreground: surface.secondaryText,
+        background: colors.primary.background,
+        foreground: colors.primary.foreground,
+        borderColor: colors.primary.borderColor,
       ),
       AnyhooChipVariant.secondary => _ChipColors(
-        background: surface.secondaryContainer,
-        foreground: surface.onSecondaryContainer,
+        background: colors.secondary.background,
+        foreground: colors.secondary.foreground,
+        borderColor: colors.secondary.borderColor,
       ),
-      AnyhooChipVariant.neutral => _ChipColors(
-        background: surface.containerHighest,
-        foreground: surface.secondaryText,
+      AnyhooChipVariant.warning => _ChipColors(
+        background: colors.warning.background,
+        foreground: colors.warning.foreground,
+        borderColor: colors.warning.borderColor,
       ),
-      AnyhooChipVariant.alert => _ChipColors(
-        background: status.errorContainer,
-        foreground: status.error,
+      AnyhooChipVariant.error => _ChipColors(
+        background: colors.error.background,
+        foreground: colors.error.foreground,
+        borderColor: colors.error.borderColor,
+      ),
+      AnyhooChipVariant.inactive => _ChipColors(
+        background: colors.inactive.background,
+        foreground: colors.inactive.foreground,
+        borderColor: colors.inactive.borderColor,
       ),
     };
   }
 }
 
 class _ChipColors {
-  const _ChipColors({
-    required this.background,
-    required this.foreground,
-    this.borderColor,
-  });
+  const _ChipColors({required this.background, required this.foreground, this.borderColor});
 
   final Color background;
   final Color foreground;

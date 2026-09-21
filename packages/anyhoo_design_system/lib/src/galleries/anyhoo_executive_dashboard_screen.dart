@@ -17,6 +17,7 @@ class AnyhooExecutiveDashboardScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final surface = context.surface;
     final accent = context.accent;
+    final controls = context.controls;
 
     return Scaffold(
       body: Column(
@@ -74,7 +75,7 @@ class AnyhooExecutiveDashboardScreen extends StatelessWidget {
                             label: Text('Export Data', style: TextStyle(color: accent.primaryFixed)),
                             style: OutlinedButton.styleFrom(
                               minimumSize: const Size(0, 48),
-                              side: BorderSide(color: surface.cardBorder),
+                              side: BorderSide(color: controls.cardColors.borderColor!),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(DesignTokens.radiusMd)),
                             ),
                           ),
@@ -84,7 +85,7 @@ class AnyhooExecutiveDashboardScreen extends StatelessWidget {
                             label: Text('Configure', style: TextStyle(color: accent.primaryFixed)),
                             style: OutlinedButton.styleFrom(
                               minimumSize: const Size(0, 48),
-                              side: BorderSide(color: surface.cardBorder),
+                              side: BorderSide(color: controls.cardColors.borderColor!),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(DesignTokens.radiusMd)),
                             ),
                           ),
@@ -167,7 +168,7 @@ class AnyhooExecutiveDashboardScreen extends StatelessWidget {
                       'Viewer',
                       const AnyhooChip(
                         label: 'Offline',
-                        variant: AnyhooChipVariant.neutral,
+                        variant: AnyhooChipVariant.inactive,
                         shape: AnyhooChipShape.pill,
                       ).pad(h: 8),
                       'Yesterday',

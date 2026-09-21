@@ -1,7 +1,36 @@
+import 'package:anyhoo_design_system/src/theme/colors/controls_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:theme_tailor_annotation/theme_tailor_annotation.dart';
 
 part 'app_colors.tailor.dart';
+
+/// Root ThemeTailor extension used across all Anyhoo apps.
+/// Automatically generates BuildContext extensions (e.g. context.surface, context.accent).
+@immutable
+@TailorMixin(themeGetter: ThemeGetter.onBuildContextProps)
+class AppColors extends ThemeExtension<AppColors> with _$AppColorsTailorMixin {
+  const AppColors({
+    required this.surface,
+    required this.accent,
+    required this.status,
+    required this.shimmer,
+    required this.appBar,
+    required this.controls,
+  });
+
+  @override
+  final SurfaceColors surface;
+  @override
+  final AccentColors accent;
+  @override
+  final StatusColors status;
+  @override
+  final ShimmerColors shimmer;
+  @override
+  final AppBarColors appBar;
+  @override
+  final ControlsColors controls;
+}
 
 @immutable
 @TailorMixinComponent()
@@ -11,8 +40,6 @@ class SurfaceColors extends ThemeExtension<SurfaceColors> with _$SurfaceColorsTa
     required this.lowContrastBackground,
     required this.primaryText,
     required this.secondaryText,
-    required this.cardBackground,
-    required this.cardBorder,
     required this.containerHigh,
     required this.containerLow,
     required this.containerHighest,
@@ -32,10 +59,6 @@ class SurfaceColors extends ThemeExtension<SurfaceColors> with _$SurfaceColorsTa
   final Color primaryText;
   @override
   final Color secondaryText;
-  @override
-  final Color cardBackground;
-  @override
-  final Color cardBorder;
   @override
   final Color containerHigh;
   @override
@@ -148,29 +171,4 @@ class ShimmerColors extends ThemeExtension<ShimmerColors> with _$ShimmerColorsTa
   final Color baseColor;
   @override
   final Color highlightColor;
-}
-
-/// Root ThemeTailor extension used across all Anyhoo apps.
-/// Automatically generates BuildContext extensions (e.g. context.surface, context.accent).
-@immutable
-@TailorMixin(themeGetter: ThemeGetter.onBuildContextProps)
-class AppColors extends ThemeExtension<AppColors> with _$AppColorsTailorMixin {
-  const AppColors({
-    required this.surface,
-    required this.accent,
-    required this.status,
-    required this.shimmer,
-    required this.appBar,
-  });
-
-  @override
-  final SurfaceColors surface;
-  @override
-  final AccentColors accent;
-  @override
-  final StatusColors status;
-  @override
-  final ShimmerColors shimmer;
-  @override
-  final AppBarColors appBar;
 }

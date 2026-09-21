@@ -28,27 +28,29 @@ class AnyhooSecondaryButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final accent = context.accent;
     final surface = context.surface;
+    final controls = context.controls;
 
     final button = OutlinedButton(
       onPressed: onPressed,
-      style: OutlinedButton.styleFrom(
-        foregroundColor: accent.primaryFixed,
-        backgroundColor: surface.scaffoldBackground,
-        disabledForegroundColor: accent.primaryDisabled,
-        side: BorderSide(color: onPressed != null ? surface.outline : surface.cardBorder),
-        minimumSize: Size(fullWidth ? double.infinity : _minWidth, _height),
-        maximumSize: const Size(double.infinity, _height),
-        padding: const EdgeInsets.symmetric(horizontal: DesignTokens.spacingLg),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(DesignTokens.radiusMd)),
-        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-      ).copyWith(
-        overlayColor: WidgetStateProperty.resolveWith((states) {
-          if (states.contains(WidgetState.pressed) || states.contains(WidgetState.hovered)) {
-            return surface.containerHighest.withValues(alpha: 0.6);
-          }
-          return null;
-        }),
-      ),
+      style:
+          OutlinedButton.styleFrom(
+            foregroundColor: accent.primaryFixed,
+            backgroundColor: surface.scaffoldBackground,
+            disabledForegroundColor: accent.primaryDisabled,
+            side: BorderSide(color: onPressed != null ? surface.outline : controls.cardColors.borderColor!),
+            minimumSize: Size(fullWidth ? double.infinity : _minWidth, _height),
+            maximumSize: const Size(double.infinity, _height),
+            padding: const EdgeInsets.symmetric(horizontal: DesignTokens.spacingLg),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(DesignTokens.radiusMd)),
+            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          ).copyWith(
+            overlayColor: WidgetStateProperty.resolveWith((states) {
+              if (states.contains(WidgetState.pressed) || states.contains(WidgetState.hovered)) {
+                return surface.containerHighest.withValues(alpha: 0.6);
+              }
+              return null;
+            }),
+          ),
       child: AnyhooButtonContent(label: label, leadingIcon: leadingIcon, trailingIcon: trailingIcon),
     );
 

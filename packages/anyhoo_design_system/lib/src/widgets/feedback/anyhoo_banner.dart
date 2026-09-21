@@ -20,12 +20,13 @@ class AnyhooBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     final surface = context.surface;
     final accent = context.accent;
+    final controls = context.controls;
 
     return DecoratedBox(
       decoration: BoxDecoration(
         color: surface.secondaryContainer,
         borderRadius: BorderRadius.circular(DesignTokens.radiusMd),
-        border: Border.all(color: surface.cardBorder.withValues(alpha: 0.3)),
+        border: Border.all(color: controls.cardColors.borderColor!.withValues(alpha: 0.3)),
         boxShadow: AnyhooCardShell.level1Shadow,
       ),
       child: Padding(
@@ -44,17 +45,13 @@ class AnyhooBanner extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: AnyhooTypography.label(LabelSize.large).copyWith(
-                      color: surface.onSecondaryContainer,
-                      fontWeight: FontWeight.w700,
-                    ),
+                    style: AnyhooTypography.label(LabelSize.large)
+                        .copyWith(color: surface.onSecondaryContainer, fontWeight: FontWeight.w700),
                   ),
                   const SizedBox(height: DesignTokens.spacingSm),
                   Text(
                     message,
-                    style: AnyhooTypography.body(BodySize.medium).copyWith(
-                      color: surface.onSecondaryContainer,
-                    ),
+                    style: AnyhooTypography.body(BodySize.medium).copyWith(color: surface.onSecondaryContainer),
                   ),
                 ],
               ),

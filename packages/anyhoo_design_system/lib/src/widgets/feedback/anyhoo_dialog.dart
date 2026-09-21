@@ -73,17 +73,16 @@ class AnyhooDialog extends StatelessWidget {
     final surface = context.surface;
     final accent = context.accent;
     final status = context.status;
+    final controls = context.controls;
 
     return ConstrainedBox(
       constraints: const BoxConstraints(maxWidth: 384),
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: surface.cardBackground,
+          color: controls.cardColors.background,
           borderRadius: BorderRadius.circular(DesignTokens.radiusXl),
-          border: Border.all(color: surface.cardBorder.withValues(alpha: 0.5)),
-          boxShadow: const [
-            BoxShadow(color: Color(0x1A000000), offset: Offset(0, 8), blurRadius: 24),
-          ],
+          border: Border.all(color: controls.cardColors.borderColor!.withValues(alpha: 0.5)),
+          boxShadow: const [BoxShadow(color: Color(0x1A000000), offset: Offset(0, 8), blurRadius: 24)],
         ),
         child: Padding(
           padding: const EdgeInsets.all(DesignTokens.spacingLg),
@@ -97,10 +96,7 @@ class AnyhooDialog extends StatelessWidget {
                   if (leadingIcon != null) ...[
                     Container(
                       padding: const EdgeInsets.all(DesignTokens.spacingSm),
-                      decoration: BoxDecoration(
-                        color: status.errorContainer,
-                        shape: BoxShape.circle,
-                      ),
+                      decoration: BoxDecoration(color: status.errorContainer, shape: BoxShape.circle),
                       child: Icon(leadingIcon, color: status.error, size: 24),
                     ),
                     const SizedBox(width: DesignTokens.spacingMd),
@@ -111,16 +107,12 @@ class AnyhooDialog extends StatelessWidget {
                       children: [
                         Text(
                           title,
-                          style: AnyhooTypography.headline(HeadlineSize.small).copyWith(
-                            color: surface.primaryText,
-                          ),
+                          style: AnyhooTypography.headline(HeadlineSize.small).copyWith(color: surface.primaryText),
                         ),
                         const SizedBox(height: DesignTokens.spacingSm),
                         Text(
                           message,
-                          style: AnyhooTypography.body(BodySize.medium).copyWith(
-                            color: surface.secondaryText,
-                          ),
+                          style: AnyhooTypography.body(BodySize.medium).copyWith(color: surface.secondaryText),
                         ),
                       ],
                     ),
@@ -137,14 +129,9 @@ class AnyhooDialog extends StatelessWidget {
                       foregroundColor: accent.primaryFixed,
                       minimumSize: const Size(48, 48),
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(DesignTokens.radiusMd),
-                      ),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(DesignTokens.radiusMd)),
                     ),
-                    child: Text(
-                      cancelLabel,
-                      style: AnyhooTypography.label(LabelSize.large),
-                    ),
+                    child: Text(cancelLabel, style: AnyhooTypography.label(LabelSize.large)),
                   ),
                   const SizedBox(width: DesignTokens.spacingSm),
                   FilledButton(
@@ -154,14 +141,9 @@ class AnyhooDialog extends StatelessWidget {
                       foregroundColor: destructive ? DesignTokens.onError : accent.onPrimaryFixed,
                       minimumSize: const Size(48, 48),
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(DesignTokens.radiusMd),
-                      ),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(DesignTokens.radiusMd)),
                     ),
-                    child: Text(
-                      confirmLabel,
-                      style: AnyhooTypography.label(LabelSize.large),
-                    ),
+                    child: Text(confirmLabel, style: AnyhooTypography.label(LabelSize.large)),
                   ),
                 ],
               ),

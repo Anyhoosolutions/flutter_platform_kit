@@ -22,12 +22,13 @@ class _AnyhooAppSettingsScreenState extends State<AnyhooAppSettingsScreen> {
     final surface = context.surface;
     final accent = context.accent;
     final status = context.status;
+    final controls = context.controls;
 
     return ColoredBox(
       color: surface.scaffoldBackground,
       child: Column(
         children: [
-          const AnyhooTopBar(topBarTitle: 'Settings', showBackButton: true),
+          SizedBox(height: 40),
           Expanded(
             child: ListView(
               padding: const EdgeInsets.all(DesignTokens.marginMobile),
@@ -56,9 +57,8 @@ class _AnyhooAppSettingsScreenState extends State<AnyhooAppSettingsScreen> {
                           children: [
                             Text(
                               'Alex Sterling',
-                              style: AnyhooTypography.headline(
-                                HeadlineSize.medium,
-                              ).copyWith(color: surface.primaryText),
+                              style: AnyhooTypography.headline(HeadlineSize.medium)
+                                  .copyWith(color: surface.primaryText),
                             ),
                             Text(
                               'alex.sterling@example.com',
@@ -123,7 +123,8 @@ class _AnyhooAppSettingsScreenState extends State<AnyhooAppSettingsScreen> {
                         showChevron: false,
                         trailing: AnyhooSwitch(value: _darkMode, onChanged: (v) => setState(() => _darkMode = v)),
                       ),
-                      Divider(height: 1, color: surface.cardBorder.withValues(alpha: 0.3)),
+                      if (controls.cardColors.borderColor != null)
+                        Divider(height: 1, color: controls.cardColors.borderColor!.withValues(alpha: 0.3)),
                       Padding(
                         padding: const EdgeInsets.all(DesignTokens.spacingMd),
                         child: Column(
@@ -145,15 +146,13 @@ class _AnyhooAppSettingsScreenState extends State<AnyhooAppSettingsScreen> {
                                     children: [
                                       Text(
                                         'Language',
-                                        style: AnyhooTypography.label(
-                                          LabelSize.large,
-                                        ).copyWith(color: surface.primaryText),
+                                        style: AnyhooTypography.label(LabelSize.large)
+                                            .copyWith(color: surface.primaryText),
                                       ),
                                       Text(
                                         'Select interface language',
-                                        style: AnyhooTypography.body(
-                                          BodySize.medium,
-                                        ).copyWith(color: surface.secondaryText),
+                                        style: AnyhooTypography.body(BodySize.medium)
+                                            .copyWith(color: surface.secondaryText),
                                       ),
                                     ],
                                   ),
@@ -173,7 +172,8 @@ class _AnyhooAppSettingsScreenState extends State<AnyhooAppSettingsScreen> {
                           ],
                         ),
                       ),
-                      Divider(height: 1, color: surface.cardBorder.withValues(alpha: 0.3)),
+                      if (controls.cardColors.borderColor != null)
+                        Divider(height: 1, color: controls.cardColors.borderColor!.withValues(alpha: 0.3)),
                       Padding(
                         padding: const EdgeInsets.all(DesignTokens.spacingMd),
                         child: Column(
@@ -194,15 +194,13 @@ class _AnyhooAppSettingsScreenState extends State<AnyhooAppSettingsScreen> {
                                     children: [
                                       Text(
                                         'Notification Volume',
-                                        style: AnyhooTypography.label(
-                                          LabelSize.large,
-                                        ).copyWith(color: surface.primaryText),
+                                        style: AnyhooTypography.label(LabelSize.large)
+                                            .copyWith(color: surface.primaryText),
                                       ),
                                       Text(
                                         'Adjust alert frequency',
-                                        style: AnyhooTypography.body(
-                                          BodySize.medium,
-                                        ).copyWith(color: surface.secondaryText),
+                                        style: AnyhooTypography.body(BodySize.medium)
+                                            .copyWith(color: surface.secondaryText),
                                       ),
                                     ],
                                   ),

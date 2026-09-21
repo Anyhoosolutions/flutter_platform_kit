@@ -21,7 +21,7 @@ class DesignSystemDeviceFrameWrapper {
     final themeModeSelection = context.knobs.list(
       label: 'Theme mode',
       options: ThemeMode.values.map((e) => e.name).toList(),
-      initialOption: ThemeMode.light.name,
+      initialOption: ThemeMode.dark.name,
     );
     final themeMode = ThemeMode.values.firstWhere((e) => e.name == themeModeSelection);
 

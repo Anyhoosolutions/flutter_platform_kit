@@ -21,10 +21,7 @@ class AnyhooDropdown<T> extends StatefulWidget {
     this.semanticLabel,
     this.maxWidth = 280,
     this.maxVisibleOptions = 6,
-  }) : assert(
-         (options != null) ^ (groups != null),
-         'Provide exactly one of options or groups',
-       ),
+  }) : assert((options != null) ^ (groups != null), 'Provide exactly one of options or groups'),
        assert(onCreate == null || groups == null, 'onCreate is not supported with groups'),
        isMulti = false,
        singleValue = value,
@@ -45,10 +42,7 @@ class AnyhooDropdown<T> extends StatefulWidget {
     this.semanticLabel,
     this.maxWidth = 280,
     this.maxVisibleOptions = 6,
-  }) : assert(
-         (options != null) ^ (groups != null),
-         'Provide exactly one of options or groups',
-       ),
+  }) : assert((options != null) ^ (groups != null), 'Provide exactly one of options or groups'),
        assert(onCreate == null || groups == null, 'onCreate is not supported with groups'),
        isMulti = true,
        multiValue = value,
@@ -151,10 +145,7 @@ class _AnyhooDropdownState<T> extends State<AnyhooDropdown<T>> {
     if (groups == null) return const [];
     return [
       for (final group in groups)
-        AnyhooDropdownGroup<T>(
-          title: group.title,
-          options: group.options.where(_matchesSearch).toList(),
-        ),
+        AnyhooDropdownGroup<T>(title: group.title, options: group.options.where(_matchesSearch).toList()),
     ].where((group) => group.options.isNotEmpty).toList();
   }
 
@@ -268,32 +259,32 @@ class _AnyhooDropdownState<T> extends State<AnyhooDropdown<T>> {
                 return Theme(
                   data: theme,
                   child: TapRegion(
-                  groupId: _tapRegionGroup,
-                  child: CompositedTransformFollower(
-                    link: _layerLink,
-                    showWhenUnlinked: false,
-                    targetAnchor: _openAbove ? Alignment.topLeft : Alignment.bottomLeft,
-                    followerAnchor: _openAbove ? Alignment.bottomLeft : Alignment.topLeft,
-                    offset: Offset(0, _openAbove ? -_overlayGap : _overlayGap),
-                    child: UnconstrainedBox(
-                      clipBehavior: Clip.hardEdge,
-                      alignment: _openAbove ? Alignment.bottomLeft : Alignment.topLeft,
-                      child: _DropdownOverlay<T>(
-                        width: _triggerWidth > 0 ? _triggerWidth : fieldWidth,
-                        maxListHeight: _overlayMaxHeight,
-                        options: widget.groups == null ? _filteredOptions : null,
-                        groups: widget.groups == null ? null : _filteredGroups,
-                        isSelected: _isSelected,
-                        onOptionTap: _onOptionTap,
-                        onCreate: widget.onCreate,
-                        addController: _addController,
-                        onSubmitCreate: _submitCreate,
-                        searchEnabled: widget.searchEnabled,
-                        searchController: _searchController,
+                    groupId: _tapRegionGroup,
+                    child: CompositedTransformFollower(
+                      link: _layerLink,
+                      showWhenUnlinked: false,
+                      targetAnchor: _openAbove ? Alignment.topLeft : Alignment.bottomLeft,
+                      followerAnchor: _openAbove ? Alignment.bottomLeft : Alignment.topLeft,
+                      offset: Offset(0, _openAbove ? -_overlayGap : _overlayGap),
+                      child: UnconstrainedBox(
+                        clipBehavior: Clip.hardEdge,
+                        alignment: _openAbove ? Alignment.bottomLeft : Alignment.topLeft,
+                        child: _DropdownOverlay<T>(
+                          width: _triggerWidth > 0 ? _triggerWidth : fieldWidth,
+                          maxListHeight: _overlayMaxHeight,
+                          options: widget.groups == null ? _filteredOptions : null,
+                          groups: widget.groups == null ? null : _filteredGroups,
+                          isSelected: _isSelected,
+                          onOptionTap: _onOptionTap,
+                          onCreate: widget.onCreate,
+                          addController: _addController,
+                          onSubmitCreate: _submitCreate,
+                          searchEnabled: widget.searchEnabled,
+                          searchController: _searchController,
+                        ),
                       ),
                     ),
                   ),
-                ),
                 );
               },
               child: CompositedTransformTarget(
@@ -359,10 +350,7 @@ class _DropdownField<T> extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         if (label != null) ...[
-          Text(
-            label!,
-            style: AnyhooTypography.label(LabelSize.medium).copyWith(color: surface.secondaryText),
-          ),
+          Text(label!, style: AnyhooTypography.label(LabelSize.medium).copyWith(color: surface.secondaryText)),
           const SizedBox(height: DesignTokens.spacingXs),
         ],
         Semantics(
@@ -388,10 +376,7 @@ class _DropdownField<T> extends StatelessWidget {
                   child: Row(
                     children: [
                       Expanded(child: _valueChild(context)),
-                      Icon(
-                        isOpen ? Icons.expand_less : Icons.expand_more,
-                        color: surface.secondaryText,
-                      ),
+                      Icon(isOpen ? Icons.expand_less : Icons.expand_more, color: surface.secondaryText),
                     ],
                   ),
                 ),
@@ -442,22 +427,12 @@ class _DropdownField<T> extends StatelessWidget {
       );
     }
 
-    return _MultiValueChips<T>(
-      values: multiValue,
-      labelFor: labelFor,
-      iconFor: iconFor,
-      onRemove: onRemoveMulti,
-    );
+    return _MultiValueChips<T>(values: multiValue, labelFor: labelFor, iconFor: iconFor, onRemove: onRemoveMulti);
   }
 }
 
 class _MultiValueChips<T> extends StatelessWidget {
-  const _MultiValueChips({
-    required this.values,
-    required this.labelFor,
-    required this.iconFor,
-    required this.onRemove,
-  });
+  const _MultiValueChips({required this.values, required this.labelFor, required this.iconFor, required this.onRemove});
 
   final List<T> values;
   final String Function(T value) labelFor;
@@ -478,17 +453,9 @@ class _MultiValueChips<T> extends StatelessWidget {
         for (final value in visible)
           GestureDetector(
             onTap: () {},
-            child: AnyhooChip(
-              label: labelFor(value),
-              leadingIcon: iconFor(value),
-              onDeleted: () => onRemove(value),
-            ),
+            child: AnyhooChip(label: labelFor(value), leadingIcon: iconFor(value), onDeleted: () => onRemove(value)),
           ),
-        if (overflow)
-          AnyhooChip(
-            label: '+$hiddenCount items',
-            variant: AnyhooChipVariant.neutral,
-          ),
+        if (overflow) AnyhooChip(label: '+$hiddenCount items', variant: AnyhooChipVariant.inactive),
       ],
     );
   }
@@ -523,7 +490,8 @@ class _DropdownOverlay<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final surface = context.surface;
+    final controls = context.controls;
+
     final footerHeight = onCreate != null ? _AnyhooDropdownState._footerHeight : 0.0;
     final searchHeight = searchEnabled ? _AnyhooDropdownState._searchHeight : 0.0;
     final listMax = (maxListHeight - footerHeight - searchHeight - _AnyhooDropdownState._overlayPadding * 2)
@@ -539,11 +507,7 @@ class _DropdownOverlay<T> extends StatelessWidget {
         listChildren.add(_GroupHeader(title: group.title));
         for (final option in group.options) {
           listChildren.add(
-            _OptionRow<T>(
-              option: option,
-              selected: isSelected(option.value),
-              onTap: () => onOptionTap(option),
-            ),
+            _OptionRow<T>(option: option, selected: isSelected(option.value), onTap: () => onOptionTap(option)),
           );
         }
       }
@@ -554,11 +518,7 @@ class _DropdownOverlay<T> extends StatelessWidget {
       }
       for (final option in items) {
         listChildren.add(
-          _OptionRow<T>(
-            option: option,
-            selected: isSelected(option.value),
-            onTap: () => onOptionTap(option),
-          ),
+          _OptionRow<T>(option: option, selected: isSelected(option.value), onTap: () => onOptionTap(option)),
         );
       }
     }
@@ -566,7 +526,7 @@ class _DropdownOverlay<T> extends StatelessWidget {
     return Material(
       elevation: 8,
       shadowColor: Colors.black.withValues(alpha: 0.12),
-      color: surface.cardBackground,
+      color: controls.cardColors.background,
       borderRadius: BorderRadius.circular(DesignTokens.radiusLg),
       clipBehavior: Clip.antiAlias,
       child: SizedBox(
@@ -583,18 +543,11 @@ class _DropdownOverlay<T> extends StatelessWidget {
               if (listChildren.isNotEmpty)
                 ConstrainedBox(
                   constraints: BoxConstraints(maxHeight: listMax),
-                  child: ListView(
-                    padding: EdgeInsets.zero,
-                    shrinkWrap: true,
-                    children: listChildren,
-                  ),
+                  child: ListView(padding: EdgeInsets.zero, shrinkWrap: true, children: listChildren),
                 ),
               if (onCreate != null) ...[
                 const SizedBox(height: DesignTokens.spacingSm),
-                _AddNewFooter(
-                  controller: addController,
-                  onSubmit: onSubmitCreate,
-                ),
+                _AddNewFooter(controller: addController, onSubmit: onSubmitCreate),
               ],
             ],
           ),
@@ -606,14 +559,8 @@ class _DropdownOverlay<T> extends StatelessWidget {
   Widget _noMatches(BuildContext context) {
     final surface = context.surface;
     return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: DesignTokens.spacingMd,
-        vertical: DesignTokens.spacingSm,
-      ),
-      child: Text(
-        'No matches',
-        style: AnyhooTypography.body(BodySize.medium).copyWith(color: surface.secondaryText),
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: DesignTokens.spacingMd, vertical: DesignTokens.spacingSm),
+      child: Text('No matches', style: AnyhooTypography.body(BodySize.medium).copyWith(color: surface.secondaryText)),
     );
   }
 }
@@ -642,11 +589,7 @@ class _GroupHeader extends StatelessWidget {
 }
 
 class _OptionRow<T> extends StatelessWidget {
-  const _OptionRow({
-    required this.option,
-    required this.selected,
-    required this.onTap,
-  });
+  const _OptionRow({required this.option, required this.selected, required this.onTap});
 
   final AnyhooDropdownOption<T> option;
   final bool selected;
@@ -663,10 +606,7 @@ class _OptionRow<T> extends StatelessWidget {
       child: ColoredBox(
         color: selected ? accent.primaryFixed.withValues(alpha: 0.12) : Colors.transparent,
         child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: DesignTokens.spacingMd,
-            vertical: DesignTokens.spacingSm,
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: DesignTokens.spacingMd, vertical: DesignTokens.spacingSm),
           child: SizedBox(
             height: 32,
             child: Row(
@@ -762,9 +702,7 @@ class _AddNewFooter extends StatelessWidget {
                 style: AnyhooTypography.body(BodySize.medium).copyWith(color: surface.primaryText),
                 decoration: InputDecoration(
                   hintText: 'New option name...',
-                  hintStyle: AnyhooTypography.body(BodySize.medium).copyWith(
-                    color: surface.secondaryText,
-                  ),
+                  hintStyle: AnyhooTypography.body(BodySize.medium).copyWith(color: surface.secondaryText),
                   border: InputBorder.none,
                   isDense: true,
                   contentPadding: const EdgeInsets.symmetric(vertical: DesignTokens.spacingSm),
@@ -786,10 +724,7 @@ class _AddNewFooter extends StatelessWidget {
             child: SizedBox(
               width: 40,
               height: 40,
-              child: Icon(
-                Icons.add,
-                color: canSubmit ? accent.onPrimaryFixed : surface.secondaryText,
-              ),
+              child: Icon(Icons.add, color: canSubmit ? accent.onPrimaryFixed : surface.secondaryText),
             ),
           ),
         ),

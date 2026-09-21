@@ -3,13 +3,7 @@ import 'package:flutter/material.dart';
 
 /// Kinetic Logic radio button with an optional label.
 class AnyhooRadio<T> extends StatelessWidget {
-  const AnyhooRadio({
-    super.key,
-    required this.value,
-    required this.groupValue,
-    required this.onChanged,
-    this.label,
-  });
+  const AnyhooRadio({super.key, required this.value, required this.groupValue, required this.onChanged, this.label});
 
   final T value;
   final T? groupValue;
@@ -26,6 +20,7 @@ class AnyhooRadio<T> extends StatelessWidget {
     final accent = context.accent;
     final surface = context.surface;
     final enabled = onChanged != null;
+    final controls = context.controls;
 
     final indicator = AnimatedContainer(
       duration: const Duration(milliseconds: 150),
@@ -33,10 +28,7 @@ class AnyhooRadio<T> extends StatelessWidget {
       height: _outerSize,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        border: Border.all(
-          color: _selected ? accent.primaryFixed : surface.cardBorder,
-          width: 2,
-        ),
+        border: Border.all(color: _selected ? accent.primaryFixed : controls.cardColors.borderColor!, width: 2),
       ),
       alignment: Alignment.center,
       child: AnimatedOpacity(
@@ -45,10 +37,7 @@ class AnyhooRadio<T> extends StatelessWidget {
         child: Container(
           width: _innerSize,
           height: _innerSize,
-          decoration: BoxDecoration(
-            color: accent.primaryFixed,
-            shape: BoxShape.circle,
-          ),
+          decoration: BoxDecoration(color: accent.primaryFixed, shape: BoxShape.circle),
         ),
       ),
     );
@@ -73,9 +62,8 @@ class AnyhooRadio<T> extends StatelessWidget {
                   Flexible(
                     child: Text(
                       label!,
-                      style: AnyhooTypography.body(BodySize.large).copyWith(
-                        color: _selected ? surface.primaryText : surface.secondaryText,
-                      ),
+                      style: AnyhooTypography.body(BodySize.large)
+                          .copyWith(color: _selected ? surface.primaryText : surface.secondaryText),
                     ),
                   ),
                 ],

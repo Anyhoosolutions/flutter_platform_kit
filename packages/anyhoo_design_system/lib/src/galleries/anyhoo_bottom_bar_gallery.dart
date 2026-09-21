@@ -9,7 +9,7 @@ class AnyhooBottomBarGallery extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(child: Text('Hello').pad(l: 16)),
+      body: SafeArea(child: Text('Just showing the bottom bar here').pad(l: 32, t: 16)),
       bottomNavigationBar: AnyhooBottomBar(
         destinations: [
           AnyhooBottomBarButton(icon: Icons.home, label: 'Home', onTap: () {}),

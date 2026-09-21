@@ -1,8 +1,9 @@
 import 'package:anyhoo_design_system/anyhoo_design_system.dart';
+import 'package:anyhoo_design_system/src/widgets/cards/anyhoo_card.dart';
 import 'package:flutter/material.dart';
 
 /// Compact metric / bento-style info card with icon, optional badge, and value.
-class AnyhooMetricCard extends StatelessWidget {
+class AnyhooMetricCard extends AnyhooCard {
   const AnyhooMetricCard({
     super.key,
     required this.label,
@@ -37,10 +38,7 @@ class AnyhooMetricCard extends StatelessWidget {
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
-                    colors: [
-                      _secondaryContainer.withValues(alpha: 0.3),
-                      Colors.transparent,
-                    ],
+                    colors: [_secondaryContainer.withValues(alpha: 0.3), Colors.transparent],
                   ),
                 ),
               ),
@@ -56,17 +54,14 @@ class AnyhooMetricCard extends StatelessWidget {
                       Container(
                         width: 40,
                         height: 40,
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: _secondaryContainer,
-                        ),
+                        decoration: const BoxDecoration(shape: BoxShape.circle, color: _secondaryContainer),
                         child: Icon(icon, color: _onSecondaryContainer),
                       ),
                       const Spacer(),
                       if (badgeLabel != null)
                         AnyhooChip(
                           label: badgeLabel!,
-                          variant: AnyhooChipVariant.surface,
+                          variant: AnyhooChipVariant.secondary,
                           shape: AnyhooChipShape.pill,
                         ),
                     ],

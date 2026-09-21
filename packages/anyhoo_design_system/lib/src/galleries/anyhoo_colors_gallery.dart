@@ -20,9 +20,6 @@ class AnyhooColorsGallery extends StatelessWidget {
               ..._surfaceColors(context),
               const SizedBox(height: 8),
 
-              ..._appBarColors(context),
-              const SizedBox(height: 8),
-
               ..._accentColors(context),
               const SizedBox(height: 8),
 
@@ -30,6 +27,12 @@ class AnyhooColorsGallery extends StatelessWidget {
               const SizedBox(height: 8),
 
               ..._shimmerColors(context),
+              const SizedBox(height: 8),
+
+              ..._appBarColors(context),
+              const SizedBox(height: 8),
+
+              ...controlsColors(context),
               const SizedBox(height: 8),
             ],
           ).pad(h: 16),
@@ -48,8 +51,6 @@ class AnyhooColorsGallery extends StatelessWidget {
       _colors('lowContrastBackground', surface.lowContrastBackground),
       _colors('primaryText', surface.primaryText),
       _colors('secondaryText', surface.secondaryText),
-      _colors('cardBackground', surface.cardBackground),
-      _colors('cardBorder', surface.cardBorder),
       _colors('containerHigh', surface.containerHigh),
       _colors('containerLow', surface.containerLow),
       _colors('containerHighest', surface.containerHighest),
@@ -66,7 +67,7 @@ class AnyhooColorsGallery extends StatelessWidget {
     final appBar = context.appBar;
 
     return [
-      'Surface Colors'.headline(size: HeadlineSize.small).pad(b: DesignTokens.spacingSm),
+      'App bar Colors'.headline(size: HeadlineSize.small).pad(b: DesignTokens.spacingSm),
 
       _colors('topBarBackground', appBar.topBarBackground),
       _colors('topBarBorder', appBar.topBarBorder),
@@ -121,7 +122,27 @@ class AnyhooColorsGallery extends StatelessWidget {
     ];
   }
 
-  Widget _colors(String name, Color color) {
+  List<Widget> controlsColors(BuildContext context) {
+    return [
+      'Controls Colors'.headline(size: HeadlineSize.small).pad(b: DesignTokens.spacingSm),
+
+      'Switch Colors'.headline(size: HeadlineSize.tiny).pad(b: DesignTokens.spacingSm),
+      _colors('background', context.controls.switchColors.background),
+      _colors('button', context.controls.switchColors.button),
+
+      'Card Colors'.headline(size: HeadlineSize.tiny).pad(b: DesignTokens.spacingSm),
+      _colors('background', context.controls.cardColors.background),
+      _colors('cardBorder', context.controls.cardColors.borderColor),
+
+      'Segment Colors'.headline(size: HeadlineSize.tiny).pad(b: DesignTokens.spacingSm),
+      _colors('regular background', context.controls.segmentColors.regular.background),
+      _colors('regular foreground', context.controls.segmentColors.regular.foreground),
+      _colors('selected background', context.controls.segmentColors.selected.background),
+      _colors('selected foreground', context.controls.segmentColors.selected.foreground),
+    ];
+  }
+
+  Widget _colors(String name, Color? color) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -134,6 +155,7 @@ class AnyhooColorsGallery extends StatelessWidget {
           ),
           width: 100,
           height: 20,
+          child: color != null ? Text('Not set') : null,
         ),
       ],
     );

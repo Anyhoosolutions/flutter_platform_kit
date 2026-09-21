@@ -23,7 +23,7 @@ class AnyhooChipsGallery extends StatelessWidget {
               children: const [
                 AnyhooChip(label: 'bg-surface-container-lowest'),
                 AnyhooChip(label: 'bg-error-container', variant: AnyhooChipVariant.error),
-                AnyhooChip(label: '+12%', variant: AnyhooChipVariant.surface, shape: AnyhooChipShape.pill),
+                AnyhooChip(label: '+12%', variant: AnyhooChipVariant.secondary, shape: AnyhooChipShape.pill),
               ],
             ),
             const SizedBox(height: DesignTokens.spacingLg),
@@ -45,16 +45,8 @@ class AnyhooChipsGallery extends StatelessWidget {
               runSpacing: DesignTokens.spacingSm,
               children: [
                 const AnyhooChip(label: 'Filter', leadingIcon: Icons.filter_list),
-                AnyhooChip(
-                  label: 'Removable',
-                  shape: AnyhooChipShape.pill,
-                  onDeleted: () {},
-                ),
-                AnyhooChip(
-                  label: 'Tappable',
-                  variant: AnyhooChipVariant.surface,
-                  onTap: () {},
-                ),
+                AnyhooChip(label: 'Removable', shape: AnyhooChipShape.pill, onDeleted: () {}),
+                AnyhooChip(label: 'Tappable', variant: AnyhooChipVariant.secondary, onTap: () {}),
               ],
             ),
             const SizedBox(height: DesignTokens.spacingLg),
@@ -73,8 +65,7 @@ class AnyhooChipsGallery extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: DesignTokens.spacingSm),
-                  'Uses standard surface colors and typography for neutral content blocks.'
-                      .body(size: BodySize.medium),
+                  'Uses standard surface colors and typography for neutral content blocks.'.body(size: BodySize.medium),
                   const SizedBox(height: DesignTokens.spacingMd),
                   const AnyhooChip(label: 'bg-surface-container-lowest'),
                 ],
@@ -93,24 +84,18 @@ class AnyhooChipsGallery extends StatelessWidget {
                       const SizedBox(width: DesignTokens.spacingSm),
                       Text(
                         'Brand Override',
-                        style: AnyhooTypography.headline(HeadlineSize.small).copyWith(
-                          color: context.status.error,
-                        ),
+                        style: AnyhooTypography.headline(HeadlineSize.small).copyWith(color: context.status.error),
                       ),
                     ],
                   ),
                   const SizedBox(height: DesignTokens.spacingSm),
                   Text(
                     'Demonstrates critical state override using semantic error tokens for immediate attention.',
-                    style: AnyhooTypography.body(BodySize.medium).copyWith(
-                      color: context.status.error.withValues(alpha: 0.9),
-                    ),
+                    style: AnyhooTypography.body(BodySize.medium)
+                        .copyWith(color: context.status.error.withValues(alpha: 0.9)),
                   ),
                   const SizedBox(height: DesignTokens.spacingMd),
-                  const AnyhooChip(
-                    label: 'bg-error-container',
-                    variant: AnyhooChipVariant.error,
-                  ),
+                  const AnyhooChip(label: 'bg-error-container', variant: AnyhooChipVariant.error),
                 ],
               ),
             ),

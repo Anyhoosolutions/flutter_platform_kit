@@ -1,8 +1,9 @@
 import 'package:anyhoo_design_system/anyhoo_design_system.dart';
+import 'package:anyhoo_design_system/src/widgets/cards/anyhoo_card.dart';
 import 'package:flutter/material.dart';
 
 /// Horizontal profile card with avatar, identity text, and a compact action.
-class AnyhooProfileCard extends StatelessWidget {
+class AnyhooProfileCard extends AnyhooCard {
   const AnyhooProfileCard({
     super.key,
     required this.name,
@@ -70,9 +71,7 @@ class AnyhooProfileCard extends StatelessWidget {
                 foregroundColor: accent.onPrimaryFixed,
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: DesignTokens.spacingSm),
                 minimumSize: const Size(48, 40),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(DesignTokens.radiusMd),
-                ),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(DesignTokens.radiusMd)),
                 elevation: 0,
               ),
               child: Text(
@@ -111,7 +110,8 @@ class _Avatar extends StatelessWidget {
         color: surface.containerHighest,
       ),
       clipBehavior: Clip.antiAlias,
-      child: avatar ??
+      child:
+          avatar ??
           (avatarUrl != null
               ? Image.network(avatarUrl!, fit: BoxFit.cover)
               : Icon(Icons.person, color: surface.secondaryText)),

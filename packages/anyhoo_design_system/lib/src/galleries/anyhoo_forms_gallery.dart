@@ -15,7 +15,6 @@ class _AnyhooFormsGalleryState extends State<AnyhooFormsGallery> {
   double _volume = 65;
   double _brightness = 40;
   DateTime _date = DateTime(2023, 10, 24);
-  List<String> _multiSelectValue = const ['Cat'];
 
   @override
   Widget build(BuildContext context) {
@@ -32,13 +31,9 @@ class _AnyhooFormsGalleryState extends State<AnyhooFormsGallery> {
               padding: const EdgeInsets.all(DesignTokens.spacingMd),
               child: Column(
                 children: [
-                  AnyhooSearchField(hint: 'Search...', onFilterTap: () {}),
+                  AnyhooTextField(hint: 'Search...', onFilterTap: () {}),
                   const SizedBox(height: DesignTokens.spacingMd),
-                  AnyhooSearchField(
-                    hint: 'Search with active filters...',
-                    onFilterTap: () {},
-                    isFilterActive: true,
-                  ),
+                  AnyhooTextField(hint: 'Search with active filters...', onFilterTap: () {}, isFilterActive: true),
                 ],
               ),
             ),
@@ -86,19 +81,6 @@ class _AnyhooFormsGalleryState extends State<AnyhooFormsGallery> {
             ),
             const SizedBox(height: DesignTokens.spacingLg),
 
-            'Multi select'.headline(size: HeadlineSize.small).pad(b: 8),
-            AnyhooCardShell(
-              padding: const EdgeInsets.all(DesignTokens.spacingMd),
-              child: AnyhooMultiSelect<String>(
-                label: 'Animals',
-                labelBuilder: (item) => item,
-                value: _multiSelectValue,
-                items: const ['Dog', 'Cat', 'Bird', 'Cow'],
-                onChanged: (value) => setState(() => _multiSelectValue = value),
-              ),
-            ),
-            const SizedBox(height: DesignTokens.spacingLg),
-
             'Date Picker'.headline(size: HeadlineSize.small).pad(b: 8),
             AnyhooCardShell(
               padding: const EdgeInsets.all(DesignTokens.spacingMd),
@@ -106,10 +88,7 @@ class _AnyhooFormsGalleryState extends State<AnyhooFormsGallery> {
                 children: [
                   AnyhooDateField(date: _date, onTap: () {}),
                   const SizedBox(height: DesignTokens.spacingMd),
-                  AnyhooCalendar(
-                    selectedDate: _date,
-                    onDateSelected: (value) => setState(() => _date = value),
-                  ),
+                  AnyhooCalendar(selectedDate: _date, onDateSelected: (value) => setState(() => _date = value)),
                 ],
               ),
             ),
