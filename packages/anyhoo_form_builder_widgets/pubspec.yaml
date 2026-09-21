@@ -17,6 +17,9 @@ dependencies:
     path: ../anyhoo_design_system
   form_builder_validators: ^11.3.0
 
+  anyhoo_widget_extension_methods:
+    path: ../anyhoo_widget_extension_methods
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

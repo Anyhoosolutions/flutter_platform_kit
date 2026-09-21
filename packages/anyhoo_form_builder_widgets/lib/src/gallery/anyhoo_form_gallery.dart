@@ -3,22 +3,15 @@ import 'package:anyhoo_form_builder_widgets/anyhoo_form_builder_widgets.dart';
 import 'package:anyhoo_widget_extension_methods/anyhoo_widget_extension_methods.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
-import 'package:widgetbook_workspace/helpers/design_system_device_frame_wrapper.dart';
 
-@widgetbook.UseCase(name: 'Overview', type: AnyhooFormDropdown, path: 'anyhoo_form_builder_widgets')
-Widget buildAnyhooFormBuilderDropdownOverview(BuildContext context) {
-  return DesignSystemDeviceFrameWrapper.wrapInDeviceFrame(context, const _FormBuilderDropdownPage());
-}
-
-class _FormBuilderDropdownPage extends StatefulWidget {
-  const _FormBuilderDropdownPage();
+class AnyhooFormGallery extends StatefulWidget {
+  const AnyhooFormGallery({super.key});
 
   @override
-  State<_FormBuilderDropdownPage> createState() => _FormBuilderDropdownPageState();
+  State<AnyhooFormGallery> createState() => _AnyhooFormGalleryState();
 }
 
-class _FormBuilderDropdownPageState extends State<_FormBuilderDropdownPage> {
+class _AnyhooFormGalleryState extends State<AnyhooFormGallery> {
   final _formKey = GlobalKey<FormBuilderState>();
 
   static const _types = [
@@ -90,6 +83,12 @@ class _FormBuilderDropdownPageState extends State<_FormBuilderDropdownPage> {
             const SizedBox(height: 16),
 
             ...segmentedControls(),
+
+            const SizedBox(height: 16),
+            Divider(),
+            const SizedBox(height: 16),
+
+            ...sliders(),
 
             const SizedBox(height: 16),
             Divider(),
@@ -184,7 +183,7 @@ class _FormBuilderDropdownPageState extends State<_FormBuilderDropdownPage> {
 
   List<Widget> switches() {
     return [
-      const Text('Switches.').pad(b: 16),
+      const Text('Switches').pad(b: 16),
       AnyhooFormSwitch(name: 'include', label: 'Include'),
       AnyhooFormSwitch(name: 'favorite', label: 'Favorite'),
     ];
@@ -192,7 +191,7 @@ class _FormBuilderDropdownPageState extends State<_FormBuilderDropdownPage> {
 
   List<Widget> segmentedControls() {
     return [
-      const Text('Segmented controls.').pad(b: 16),
+      const Text('Segmented controls').pad(b: 16),
       AnyhooFormSegmentControl<String>(
         name: 'cost',
         segments: [
@@ -201,6 +200,13 @@ class _FormBuilderDropdownPageState extends State<_FormBuilderDropdownPage> {
           AnyhooSegment(value: 'expensive', label: 'Expensive'),
         ],
       ),
+    ];
+  }
+
+  List<Widget> sliders() {
+    return [
+      const Text('AnyhooFormSlider').pad(b: 16),
+      AnyhooFormSlider(name: 'distance', min: 3, max: 20, divisions: 7),
     ];
   }
 }

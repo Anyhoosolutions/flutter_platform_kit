@@ -11,3 +11,6 @@ export 'src/controls/anyhoo_form_checkbox.dart';
 export 'src/controls/anyhoo_form_radio_group.dart';
 export 'src/controls/anyhoo_form_switch.dart';
 export 'src/controls/anyhoo_form_segment_control.dart';
+export 'src/controls/anyhoo_form_slider.dart';
+
+export 'src/gallery/anyhoo_form_gallery.dart';

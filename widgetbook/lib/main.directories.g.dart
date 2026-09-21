@@ -52,7 +52,7 @@ import 'package:widgetbook_workspace/anyhoo_design_system/typography/anyhoo_typo
     as _widgetbook_workspace_anyhoo_design_system_typography_anyhoo_typography_gallery;
 import 'package:widgetbook_workspace/anyhoo_firebase/firebase_analytics_page.dart'
     as _widgetbook_workspace_anyhoo_firebase_firebase_analytics_page;
-import 'package:widgetbook_workspace/anyhoo_form_builder_widgets/anyhoo_form_builder_dropdown.dart'
+import 'package:widgetbook_workspace/anyhoo_form_builder_widgets/anyhoo_form_gallery.dart'
     as _widgetbook_workspace_anyhoo_form_builder_widgets_anyhoo_form_builder_dropdown;
 import 'package:widgetbook_workspace/anyhoo_image_selector/image_selector_widget.dart'
     as _widgetbook_workspace_anyhoo_image_selector_image_selector_widget;
