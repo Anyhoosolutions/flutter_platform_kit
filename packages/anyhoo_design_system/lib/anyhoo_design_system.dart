@@ -47,7 +47,6 @@ export 'src/widgets/feedback/anyhoo_dialog.dart';
 export 'src/widgets/feedback/anyhoo_toast.dart';
 
 export 'src/widgets/chips/anyhoo_chip.dart';
-export 'src/widgets/chips/anyhoo_filter_chip.dart';
 
 export 'src/widgets/navigation/anyhoo_breadcrumb.dart';
 export 'src/widgets/navigation/anyhoo_stepper.dart';

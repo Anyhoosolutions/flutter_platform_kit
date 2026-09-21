@@ -46,7 +46,18 @@ class AnyhooChipsGallery extends StatelessWidget {
               children: [
                 const AnyhooChip(label: 'Filter', leadingIcon: Icons.filter_list),
                 AnyhooChip(label: 'Removable', shape: AnyhooChipShape.pill, onDeleted: () {}),
-                AnyhooChip(label: 'Tappable', variant: AnyhooChipVariant.secondary, onTap: () {}),
+                AnyhooChip(label: 'Tappable', variant: AnyhooChipVariant.secondary, onPressed: () {}),
+              ],
+            ),
+            const SizedBox(height: DesignTokens.spacingLg),
+
+            'For filters'.headline(size: HeadlineSize.small).pad(b: 4),
+            Wrap(
+              spacing: DesignTokens.spacingSm,
+              runSpacing: DesignTokens.spacingSm,
+              children: [
+                AnyhooChip.filter(label: 'Selected', selected: true, onPressed: () {}),
+                AnyhooChip.filter(label: 'Not selected', selected: false, onPressed: () {}),
               ],
             ),
             const SizedBox(height: DesignTokens.spacingLg),

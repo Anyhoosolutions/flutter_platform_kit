@@ -7,13 +7,23 @@ enum AnyhooChipShape { rounded, pill }
 
 /// Compact Kinetic Logic chip / tag label.
 class AnyhooChip extends StatelessWidget {
+  factory AnyhooChip.filter({required String label, required bool selected, required VoidCallback onPressed}) {
+    return AnyhooChip(
+      label: label,
+      leadingIcon: selected ? Icons.check : null,
+      onPressed: onPressed,
+      shape: AnyhooChipShape.pill,
+      variant: selected ? AnyhooChipVariant.primary : AnyhooChipVariant.secondary,
+    );
+  }
+
   const AnyhooChip({
     super.key,
     required this.label,
     this.variant = AnyhooChipVariant.primary,
     this.shape = AnyhooChipShape.rounded,
     this.leadingIcon,
-    this.onTap,
+    this.onPressed,
     this.onDeleted,
   });
 
@@ -21,7 +31,7 @@ class AnyhooChip extends StatelessWidget {
   final AnyhooChipVariant variant;
   final AnyhooChipShape shape;
   final IconData? leadingIcon;
-  final VoidCallback? onTap;
+  final VoidCallback? onPressed;
   final VoidCallback? onDeleted;
 
   @override
@@ -69,11 +79,11 @@ class AnyhooChip extends StatelessWidget {
       ),
     );
 
-    if (onTap == null) return chip;
+    if (onPressed == null) return chip;
 
     return Material(
       type: MaterialType.transparency,
-      child: InkWell(onTap: onTap, borderRadius: radius, child: chip),
+      child: InkWell(onTap: onPressed, borderRadius: radius, child: chip),
     );
   }
 
