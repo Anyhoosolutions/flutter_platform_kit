@@ -4,10 +4,11 @@ import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:anyhoo_design_system/anyhoo_design_system.dart';
 
 class AnyhooFormCalendar extends StatelessWidget {
-  const AnyhooFormCalendar({super.key, required this.name, this.validators});
+  const AnyhooFormCalendar({super.key, required this.name, this.validators, this.onChanged});
 
   final String name;
   final List<FormFieldValidator<DateTime>>? validators;
+  final void Function(DateTime)? onChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -20,6 +21,9 @@ class AnyhooFormCalendar extends StatelessWidget {
           selectedDate: field.value ?? DateTime.now(),
           onDateSelected: (d) {
             field.didChange(d);
+            if (onChanged != null) {
+              onChanged!(d);
+            }
           },
         );
       },
