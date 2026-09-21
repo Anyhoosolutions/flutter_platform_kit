@@ -82,6 +82,12 @@ class _FormBuilderDropdownPageState extends State<_FormBuilderDropdownPage> {
             Divider(),
             const SizedBox(height: 16),
 
+            ...switches(),
+
+            const SizedBox(height: 16),
+            Divider(),
+            const SizedBox(height: 16),
+
             ElevatedButton(
               onPressed: () {
                 final ok = _formKey.currentState?.saveAndValidate() ?? false;
@@ -166,6 +172,14 @@ class _FormBuilderDropdownPageState extends State<_FormBuilderDropdownPage> {
         name: 'size',
         options: [('small', 'Small'), ('medium', 'Medium'), ('large', 'Large'), ('xl', 'XL'), ('xxl', 'XXL')],
       ),
+    ];
+  }
+
+  List<Widget> switches() {
+    return [
+      const Text('Switches.').pad(b: 16),
+      AnyhooFormSwitch(name: 'include', label: 'Include'),
+      AnyhooFormSwitch(name: 'favorite', label: 'Favorite'),
     ];
   }
 }

@@ -9,3 +9,4 @@ export 'src/dropdowns/anyhoo_form_dropdown.dart';
 export 'src/filterChips/anyhoo_filter_chip.dart';
 export 'src/controls/anyhoo_form_checkbox.dart';
 export 'src/controls/anyhoo_form_radio_group.dart';
+export 'src/controls/anyhoo_form_switch.dart';
