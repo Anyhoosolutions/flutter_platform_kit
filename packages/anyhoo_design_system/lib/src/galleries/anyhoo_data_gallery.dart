@@ -77,25 +77,28 @@ class _AnyhooDataGalleryState extends State<AnyhooDataGallery> {
                     spacing: 8,
                     runSpacing: 8,
                     children: [
-                      AnyhooFilterChip(
+                      AnyhooChip(
                         label: 'Selected',
-                        selected: _filters.contains('selected'),
-                        onSelected: (v) => setState(() {
-                          v ? _filters.add('selected') : _filters.remove('selected');
+                        leadingIcon: _filters.contains('selected') ? Icons.check : null,
+                        onPressed: () => setState(() {
+                          final name = 'selected';
+                          _filters.contains(name) ? _filters.add(name) : _filters.remove(name);
                         }),
                       ),
-                      AnyhooFilterChip(
+                      AnyhooChip(
                         label: 'Default Filter',
-                        selected: _filters.contains('default'),
-                        onSelected: (v) => setState(() {
-                          v ? _filters.add('default') : _filters.remove('default');
+                        leadingIcon: _filters.contains('default') ? Icons.check : null,
+                        onPressed: () => setState(() {
+                          final name = 'default';
+                          _filters.contains(name) ? _filters.add(name) : _filters.remove(name);
                         }),
                       ),
-                      AnyhooFilterChip(
+                      AnyhooChip(
                         label: 'Another Filter',
-                        selected: _filters.contains('another'),
-                        onSelected: (v) => setState(() {
-                          v ? _filters.add('another') : _filters.remove('another');
+                        leadingIcon: _filters.contains('another') ? Icons.check : null,
+                        onPressed: () => setState(() {
+                          final name = 'another';
+                          _filters.contains(name) ? _filters.add(name) : _filters.remove(name);
                         }),
                       ),
                     ],

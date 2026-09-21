@@ -2,6 +2,16 @@ import 'package:anyhoo_design_system/anyhoo_design_system.dart';
 import 'package:flutter/material.dart';
 
 class AnyhooRoundButton extends StatelessWidget {
+  factory AnyhooRoundButton.add({required VoidCallback onPressed, Color? color}) {
+    return AnyhooRoundButton(onPressed: onPressed, icon: Icons.add, color: color);
+  }
+  factory AnyhooRoundButton.minus({required VoidCallback onPressed, Color? color}) {
+    return AnyhooRoundButton(onPressed: onPressed, icon: Icons.abc, color: color);
+  }
+  factory AnyhooRoundButton.remove({required VoidCallback onPressed, Color? color}) {
+    return AnyhooRoundButton(onPressed: onPressed, icon: Icons.remove, color: color);
+  }
+
   const AnyhooRoundButton({super.key, required this.onPressed, required this.icon, this.color});
 
   final VoidCallback? onPressed;
