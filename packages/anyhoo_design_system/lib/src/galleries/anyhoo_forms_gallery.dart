@@ -15,7 +15,6 @@ class _AnyhooFormsGalleryState extends State<AnyhooFormsGallery> {
   double _volume = 65;
   double _brightness = 40;
   DateTime _date = DateTime(2023, 10, 24);
-  List<String> _multiSelectValue = const ['Cat'];
 
   @override
   Widget build(BuildContext context) {
@@ -78,19 +77,6 @@ class _AnyhooFormsGalleryState extends State<AnyhooFormsGallery> {
                     trailingIcon: Icons.brightness_high,
                   ),
                 ],
-              ),
-            ),
-            const SizedBox(height: DesignTokens.spacingLg),
-
-            'Multi select'.headline(size: HeadlineSize.small).pad(b: 8),
-            AnyhooCardShell(
-              padding: const EdgeInsets.all(DesignTokens.spacingMd),
-              child: AnyhooMultiSelect<String>(
-                label: 'Animals',
-                labelBuilder: (item) => item,
-                value: _multiSelectValue,
-                items: const ['Dog', 'Cat', 'Bird', 'Cow'],
-                onChanged: (value) => setState(() => _multiSelectValue = value),
               ),
             ),
             const SizedBox(height: DesignTokens.spacingLg),
