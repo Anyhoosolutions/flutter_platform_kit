@@ -14,5 +14,6 @@ export 'src/controls/anyhoo_form_segment_control.dart';
 export 'src/controls/anyhoo_form_slider.dart';
 export 'src/controls/anyhoo_form_date_picker.dart';
 export 'src/controls/anyhoo_form_calendar.dart';
+export 'src/controls/anyhoo_form_text_field.dart';
 
 export 'src/gallery/anyhoo_form_gallery.dart';

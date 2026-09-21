@@ -68,6 +68,8 @@ class _AnyhooFormGalleryState extends State<AnyhooFormGallery> {
             ..._divider(),
             ...datePickers(),
             ..._divider(),
+            ...textFields(),
+            ..._divider(),
 
             ElevatedButton(
               onPressed: () {
@@ -192,6 +194,10 @@ class _AnyhooFormGalleryState extends State<AnyhooFormGallery> {
       'Calendar'.headline(size: HeadlineSize.small).pad(t: 8, b: 8),
       AnyhooFormCalendar(name: 'caldate'),
     ];
+  }
+
+  List<Widget> textFields() {
+    return [const Text('AnyhooFormTextField').pad(b: 16), AnyhooFormTextField(name: 'search', hint: 'Search')];
   }
 
   List<Widget> _divider() {
