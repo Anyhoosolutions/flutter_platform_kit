@@ -1,4 +1,5 @@
 import 'package:anyhoo_form_builder_widgets/anyhoo_form_builder_widgets.dart';
+import 'package:anyhoo_widget_extension_methods/anyhoo_widget_extension_methods.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
@@ -57,40 +58,18 @@ class _FormBuilderDropdownPageState extends State<_FormBuilderDropdownPage> {
         key: _formKey,
         child: ListView(
           children: [
-            const Text(
-              'AnyhooFormBuilderDropdown wraps AnyhooDropdown in FormBuilderField. '
-              'Use .single (T) or .multi (List<T>). Same options/groups/searchEnabled/onCreate '
-              'as the design-system widget. name, initialValue, and validator are the form arguments.',
-            ),
+            ..._dropdowns(),
+
             const SizedBox(height: 16),
-            AnyhooFormBuilderDropdown<String>.single(
-              name: 'widgetType',
-              label: 'Single',
-              options: _types,
-              initialValue: 'elevated',
-              validator: (value) => value == null ? 'Required' : null,
-            ),
+            Divider(),
             const SizedBox(height: 16),
-            AnyhooFormBuilderDropdown<String>.multi(
-              name: 'tags',
-              label: 'Multi + onCreate',
-              options: _tags,
-              initialValue: const ['design'],
-              onCreate: (name) {
-                setState(() {
-                  _tags = [..._tags, AnyhooDropdownOption(value: name, label: name)];
-                });
-                return name;
-              },
-            ),
+
+            ...filterChips(),
+
             const SizedBox(height: 16),
-            AnyhooFormBuilderDropdown<String>.single(
-              name: 'animal',
-              label: 'Grouped + search',
-              groups: _groups,
-              searchEnabled: true,
-            ),
+            Divider(),
             const SizedBox(height: 16),
+
             ElevatedButton(
               onPressed: () {
                 final ok = _formKey.currentState?.saveAndValidate() ?? false;
@@ -100,13 +79,63 @@ class _FormBuilderDropdownPageState extends State<_FormBuilderDropdownPage> {
               },
               child: const Text('Save form'),
             ),
-            if (_saved.isNotEmpty) ...[
-              const SizedBox(height: 8),
-              Text(_saved),
-            ],
+
+            const SizedBox(height: 16),
+            if (_saved.isNotEmpty) ...[const SizedBox(height: 8), Text(_saved)],
           ],
         ),
       ),
     );
+  }
+
+  List<Widget> _dropdowns() {
+    return [
+      const Text(
+        'AnyhooFormBuilderDropdown wraps AnyhooDropdown in FormBuilderField. '
+        'Use .single (T) or .multi (List<T>). Same options/groups/searchEnabled/onCreate '
+        'as the design-system widget. name, initialValue, and validator are the form arguments.',
+      ),
+      const SizedBox(height: 16),
+      AnyhooFormBuilderDropdown<String>.single(
+        name: 'widgetType',
+        label: 'Single (elevated)',
+        options: _types,
+        initialValue: 'elevated',
+        validator: (value) => value == null ? 'Required' : null,
+      ),
+      const SizedBox(height: 16),
+      AnyhooFormBuilderDropdown<String>.multi(
+        name: 'tags',
+        label: 'Multi + onCreate (tags)',
+        options: _tags,
+        initialValue: const ['design'],
+        onCreate: (name) {
+          setState(() {
+            _tags = [..._tags, AnyhooDropdownOption(value: name, label: name)];
+          });
+          return name;
+        },
+      ),
+      const SizedBox(height: 16),
+      AnyhooFormBuilderDropdown<String>.single(
+        name: 'animal',
+        label: 'Grouped + search (animal)',
+        groups: _groups,
+        searchEnabled: true,
+      ),
+    ];
+  }
+
+  List<Widget> filterChips() {
+    return [
+      const Text('Filter chips that can be selected and deselected.').pad(b: 16),
+      Row(
+        spacing: 8,
+        children: [
+          AnyhooFormFilterChip(name: 'design', label: 'Design'),
+          AnyhooFormFilterChip(name: 'dev', label: 'Dev'),
+        ],
+      ),
+    ];
   }
 }
