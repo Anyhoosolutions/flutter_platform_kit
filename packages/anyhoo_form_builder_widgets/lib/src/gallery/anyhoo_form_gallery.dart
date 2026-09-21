@@ -53,46 +53,21 @@ class _AnyhooFormGalleryState extends State<AnyhooFormGallery> {
         child: ListView(
           children: [
             ..._dropdowns(),
-
-            const SizedBox(height: 16),
-            Divider(),
-            const SizedBox(height: 16),
-
+            ..._divider(),
             ...filterChips(),
-
-            const SizedBox(height: 16),
-            Divider(),
-            const SizedBox(height: 16),
-
+            ..._divider(),
             ...checkboxes(),
-
-            const SizedBox(height: 16),
-            Divider(),
-            const SizedBox(height: 16),
-
+            ..._divider(),
             ...radioGroup(),
-
-            const SizedBox(height: 16),
-            Divider(),
-            const SizedBox(height: 16),
-
+            ..._divider(),
             ...switches(),
-
-            const SizedBox(height: 16),
-            Divider(),
-            const SizedBox(height: 16),
-
+            ..._divider(),
             ...segmentedControls(),
-
-            const SizedBox(height: 16),
-            Divider(),
-            const SizedBox(height: 16),
-
+            ..._divider(),
             ...sliders(),
-
-            const SizedBox(height: 16),
-            Divider(),
-            const SizedBox(height: 16),
+            ..._divider(),
+            ...datePickers(),
+            ..._divider(),
 
             ElevatedButton(
               onPressed: () {
@@ -103,7 +78,6 @@ class _AnyhooFormGalleryState extends State<AnyhooFormGallery> {
               },
               child: const Text('Save form'),
             ),
-
             const SizedBox(height: 16),
             if (_saved.isNotEmpty) ...[const SizedBox(height: 8), Text(_saved)],
           ],
@@ -208,5 +182,19 @@ class _AnyhooFormGalleryState extends State<AnyhooFormGallery> {
       const Text('AnyhooFormSlider').pad(b: 16),
       AnyhooFormSlider(name: 'distance', min: 3, max: 20, divisions: 7),
     ];
+  }
+
+  List<Widget> datePickers() {
+    return [
+      'Date Pickers'.headline().pad(b: 16),
+      'Date Pickers'.headline(size: HeadlineSize.small).pad(b: 8),
+      AnyhooFormDatePicker(name: 'date'),
+      'Calendar'.headline(size: HeadlineSize.small).pad(t: 8, b: 8),
+      AnyhooFormCalendar(name: 'caldate'),
+    ];
+  }
+
+  List<Widget> _divider() {
+    return [SizedBox(height: 16), Divider(), const SizedBox(height: 16)];
   }
 }

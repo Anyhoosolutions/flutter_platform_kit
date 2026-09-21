@@ -61,6 +61,7 @@ export 'src/widgets/controls/anyhoo_text_field.dart';
 export 'src/widgets/controls/anyhoo_segmented_control.dart';
 export 'src/widgets/controls/anyhoo_slider.dart';
 export 'src/widgets/controls/anyhoo_date_picker.dart';
+export 'src/widgets/controls/anyhoo_calendar.dart';
 export 'src/widgets/controls/anyhoo_multi_select_section.dart';
 
 export 'src/widgets/data/anyhoo_data_table.dart';

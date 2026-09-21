@@ -12,6 +12,7 @@ class AnyhooFormSegmentControl<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FormBuilderField<T>(
+      initialValue: segments.first.value,
       name: name,
       validator: FormBuilderValidators.compose([FormBuilderValidators.required()]),
       builder: (FormFieldState<T> field) {

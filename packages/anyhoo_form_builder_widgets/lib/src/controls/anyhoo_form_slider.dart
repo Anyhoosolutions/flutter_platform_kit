@@ -26,6 +26,7 @@ class AnyhooFormSlider extends StatelessWidget {
   Widget build(BuildContext context) {
     return FormBuilderField(
       name: name,
+      initialValue: min,
       validator: FormBuilderValidators.compose([FormBuilderValidators.required()]),
       builder: (FormFieldState<double> field) {
         return AnyhooSlider(
