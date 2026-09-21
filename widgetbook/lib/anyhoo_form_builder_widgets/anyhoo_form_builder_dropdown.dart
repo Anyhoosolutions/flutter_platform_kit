@@ -5,7 +5,7 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
 import 'package:widgetbook_workspace/helpers/design_system_device_frame_wrapper.dart';
 
-@widgetbook.UseCase(name: 'Overview', type: AnyhooFormBuilderDropdown, path: 'anyhoo_form_builder_widgets')
+@widgetbook.UseCase(name: 'Overview', type: AnyhooFormDropdown, path: 'anyhoo_form_builder_widgets')
 Widget buildAnyhooFormBuilderDropdownOverview(BuildContext context) {
   return DesignSystemDeviceFrameWrapper.wrapInDeviceFrame(context, const _FormBuilderDropdownPage());
 }
@@ -96,7 +96,7 @@ class _FormBuilderDropdownPageState extends State<_FormBuilderDropdownPage> {
         'as the design-system widget. name, initialValue, and validator are the form arguments.',
       ),
       const SizedBox(height: 16),
-      AnyhooFormBuilderDropdown<String>.single(
+      AnyhooFormDropdown<String>.single(
         name: 'widgetType',
         label: 'Single (elevated)',
         options: _types,
@@ -104,7 +104,7 @@ class _FormBuilderDropdownPageState extends State<_FormBuilderDropdownPage> {
         validator: (value) => value == null ? 'Required' : null,
       ),
       const SizedBox(height: 16),
-      AnyhooFormBuilderDropdown<String>.multi(
+      AnyhooFormDropdown<String>.multi(
         name: 'tags',
         label: 'Multi + onCreate (tags)',
         options: _tags,
@@ -117,7 +117,7 @@ class _FormBuilderDropdownPageState extends State<_FormBuilderDropdownPage> {
         },
       ),
       const SizedBox(height: 16),
-      AnyhooFormBuilderDropdown<String>.single(
+      AnyhooFormDropdown<String>.single(
         name: 'animal',
         label: 'Grouped + search (animal)',
         groups: _groups,

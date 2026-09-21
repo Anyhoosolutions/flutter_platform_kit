@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 
 /// Form Builder adapter for [AnyhooDropdown].
-class AnyhooFormBuilderDropdown<T extends Object> extends StatelessWidget {
-  const AnyhooFormBuilderDropdown.single({
+class AnyhooFormDropdown<T extends Object> extends StatelessWidget {
+  const AnyhooFormDropdown.single({
     super.key,
     required this.name,
     this.options,
@@ -19,16 +19,13 @@ class AnyhooFormBuilderDropdown<T extends Object> extends StatelessWidget {
     this.semanticLabel,
     this.maxWidth = 280,
     this.maxVisibleOptions = 6,
-  }) : assert(
-         (options != null) ^ (groups != null),
-         'Provide exactly one of options or groups',
-       ),
+  }) : assert((options != null) ^ (groups != null), 'Provide exactly one of options or groups'),
        assert(onCreate == null || groups == null, 'onCreate is not supported with groups'),
        isMulti = false,
        multiInitialValue = null,
        multiValidator = null;
 
-  const AnyhooFormBuilderDropdown.multi({
+  const AnyhooFormDropdown.multi({
     super.key,
     required this.name,
     this.options,
@@ -43,10 +40,7 @@ class AnyhooFormBuilderDropdown<T extends Object> extends StatelessWidget {
     this.semanticLabel,
     this.maxWidth = 280,
     this.maxVisibleOptions = 6,
-  }) : assert(
-         (options != null) ^ (groups != null),
-         'Provide exactly one of options or groups',
-       ),
+  }) : assert((options != null) ^ (groups != null), 'Provide exactly one of options or groups'),
        assert(onCreate == null || groups == null, 'onCreate is not supported with groups'),
        isMulti = true,
        initialValue = null,
