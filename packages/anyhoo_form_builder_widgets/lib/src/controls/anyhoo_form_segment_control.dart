@@ -10,12 +10,14 @@ class AnyhooFormSegmentControl<T> extends StatelessWidget {
     required this.segments,
     this.validators,
     this.onChanged,
+    this.initialValue,
   });
 
   final String name;
   final List<AnyhooSegment<T>> segments;
   final List<FormFieldValidator<T>>? validators;
   final void Function(T)? onChanged;
+  final T? initialValue;
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +34,7 @@ class AnyhooFormSegmentControl<T> extends StatelessWidget {
             }
           },
           segments: segments,
-          selected: field.value ?? segments.first.value,
+          selected: field.value ?? initialValue ?? segments.first.value,
         );
       },
     );

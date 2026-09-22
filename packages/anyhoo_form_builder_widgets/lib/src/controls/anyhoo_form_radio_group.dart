@@ -6,17 +6,25 @@ import 'package:anyhoo_design_system/anyhoo_design_system.dart';
 typedef Label = String;
 
 class AnyhooFormRadioGroup<T> extends StatelessWidget {
-  const AnyhooFormRadioGroup({super.key, required this.name, required this.options, this.validators, this.onChanged});
+  const AnyhooFormRadioGroup({
+    super.key,
+    required this.name,
+    required this.options,
+    this.validators,
+    this.onChanged,
+    this.initialValue,
+  });
 
   final String name;
   final List<(T, Label)> options;
   final List<FormFieldValidator<T>>? validators;
   final void Function(T)? onChanged;
+  final T? initialValue;
 
   @override
   Widget build(BuildContext context) {
     return FormBuilderField<T>(
-      initialValue: options.first.$1,
+      initialValue: initialValue ?? options.first.$1,
       name: name,
       validator: FormBuilderValidators.compose(validators ?? <FormFieldValidator<T>>[]),
       builder: (FormFieldState<T> field) {
