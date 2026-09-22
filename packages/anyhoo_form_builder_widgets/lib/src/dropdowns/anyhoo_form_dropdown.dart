@@ -47,9 +47,9 @@ class AnyhooFormDropdown<T extends Object> extends StatelessWidget {
        assert(onCreate == null || groups == null, 'onCreate is not supported with groups'),
        isMulti = true,
        initialValue = null,
-       multiInitialValue = initialValue,
        multiValidator = validator,
        validator = null,
+       multiInitialValue = initialValue,
        singleOnChanged = null;
 
   final bool isMulti;
@@ -83,7 +83,7 @@ class AnyhooFormDropdown<T extends Object> extends StatelessWidget {
           return AnyhooDropdown<T>.multi(
             options: options,
             groups: groups,
-            value: field.value ?? [],
+            value: field.value ?? multiInitialValue ?? [],
             onChanged: (value) {
               field.didChange(value);
               if (multiOnChanged != null) {
@@ -111,7 +111,7 @@ class AnyhooFormDropdown<T extends Object> extends StatelessWidget {
         return AnyhooDropdown<T>.single(
           options: options,
           groups: groups,
-          value: field.value,
+          value: initialValue ?? field.value,
           onChanged: (value) {
             field.didChange(value);
             if (singleOnChanged != null) {

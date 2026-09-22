@@ -12,6 +12,7 @@ class AnyhooFormTextField extends StatelessWidget {
     this.isFilterActive = false,
     this.validators,
     this.onChanged,
+    this.initialValue = '',
   });
 
   final String name;
@@ -19,6 +20,7 @@ class AnyhooFormTextField extends StatelessWidget {
   final String hint;
   final VoidCallback? onFilterTap;
   final void Function(String)? onChanged;
+  final String initialValue;
 
   /// When true, the filter icon uses the accent color. When false, it uses
   /// [SurfaceColors.secondaryText] (same as the search icon).
@@ -28,7 +30,7 @@ class AnyhooFormTextField extends StatelessWidget {
   Widget build(BuildContext context) {
     return FormBuilderField(
       name: name,
-      initialValue: '',
+      initialValue: initialValue,
       validator: FormBuilderValidators.compose(validators ?? <FormFieldValidator<String>>[]),
       builder: (FormFieldState<String> field) {
         return AnyhooTextField(
