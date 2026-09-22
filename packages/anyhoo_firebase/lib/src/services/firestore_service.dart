@@ -99,11 +99,17 @@ class FirestoreService {
   }
 
   Future<void> updateDocument(String path, String id, Map<String, dynamic> data) async {
-    final documentPath = '$path/$id';
+    final Map<String, dynamic> convertedData;
     try {
-      return await _firestore.collection(path).doc(id).update(_writeDocument(data, documentPath));
-    } on FirestoreConversionException {
+      convertedData = toFirestoreDocument(data);
+    } on FirestoreConversionException catch (e, stackTrace) {
+      _log.warning('Error converting document for write at $path/$id: $e');
+      SentryHelper.captureException(e, stackTrace: stackTrace, fatal: false);
       rethrow;
+    }
+
+    try {
+      await _firestore.collection(path).doc(id).update(convertedData);
     } catch (e, stackTrace) {
       SentryHelper.captureException(e, stackTrace: stackTrace, fatal: false);
       throw Exception('Failed to update document at $path $id: $e');
