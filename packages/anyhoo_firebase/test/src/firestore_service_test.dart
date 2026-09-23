@@ -461,6 +461,15 @@ void main() {
         );
       });
 
+      test('does not update when conversion fails', () async {
+        expect(
+          () => firestoreService.updateDocument('test_collection', 'doc1', {'meta': _ThrowingMap()}),
+          throwsA(isA<FirestoreConversionException>()),
+        );
+
+        verifyNever(() => mockFirestore.collection(any()));
+      });
+
       test('converts DateTime fields to Timestamp', () async {
         when(() => mockCollection.doc('doc1')).thenReturn(mockDocument);
         when(() => mockDocument.update(any())).thenAnswer((_) async => {});
