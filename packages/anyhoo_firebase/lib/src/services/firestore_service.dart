@@ -74,12 +74,12 @@ class FirestoreService {
   }) async {
     final collectionRef = _firestore.collection(path);
 
-    String fullPath = '$path/$docId';
+    var fullPath = fullTrimmedPath(path, docId ?? '');
 
     if (docId == null) {
       final newDocRef = collectionRef.doc();
       docId = newDocRef.id;
-      fullPath = '$path/$docId';
+      fullPath = fullTrimmedPath(path, docId);
     }
     if (idFields?.entries != null) {
       for (final idField in idFields!.entries) {
@@ -110,7 +110,9 @@ class FirestoreService {
     }
 
     try {
-      await _firestore.collection(path).doc(id).update(convertedData);
+      final fullPath = fullTrimmedPath(path, id);
+
+      await _firestore.doc(fullPath).update(convertedData);
     } catch (e, stackTrace) {
       SentryHelper.captureException(e, stackTrace: stackTrace, fatal: false);
       throw Exception('Failed to update document at $path $id: $e');
@@ -147,5 +149,15 @@ class FirestoreService {
       query = query.limit(limit);
     }
     return query;
+  }
+
+  String _trimPath(String path) {
+    return path.trim().replaceAll(RegExp(r'/+$'), '');
+  }
+
+  String fullTrimmedPath(String path, String id) {
+    final trimmedPath = _trimPath(path);
+    final trimmedId = id.trim();
+    return '$trimmedPath/$trimmedId';
   }
 }
