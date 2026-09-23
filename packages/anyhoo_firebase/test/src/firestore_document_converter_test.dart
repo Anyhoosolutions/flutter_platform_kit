@@ -84,21 +84,16 @@ void main() {
         'deletedAt': null,
       }, 'doc1');
 
-      expect(result, {
-        'name': 'Test',
-        'count': 3,
-        'ratio': 1.5,
-        'active': true,
-        'deletedAt': null,
-        'id': 'doc1',
-      });
+      expect(result, {'name': 'Test', 'count': 3, 'ratio': 1.5, 'active': true, 'deletedAt': null, 'id': 'doc1'});
     });
 
     test('wraps conversion failures with document and field path', () {
       expect(
         () => fromFirestoreDocument(
           {
-            'meta': {'history': [_ThrowingMap()]},
+            'meta': {
+              'history': [_ThrowingMap()],
+            },
           },
           'doc1',
           documentPath: 'places/doc1',
@@ -216,11 +211,7 @@ void main() {
       final increment = FieldValue.increment(1);
       final delete = FieldValue.delete();
 
-      final result = toFirestoreDocument({
-        'createdAt': serverTimestamp,
-        'count': increment,
-        'obsolete': delete,
-      });
+      final result = toFirestoreDocument({'createdAt': serverTimestamp, 'count': increment, 'obsolete': delete});
 
       expect(result['createdAt'], same(serverTimestamp));
       expect(result['count'], same(increment));
@@ -228,10 +219,7 @@ void main() {
     });
 
     test('leaves existing Timestamp and GeoPoint unchanged', () {
-      final result = toFirestoreDocument({
-        'updatedAt': timestamp,
-        'location': geoPoint,
-      });
+      final result = toFirestoreDocument({'updatedAt': timestamp, 'location': geoPoint});
 
       expect(result['updatedAt'], timestamp);
       expect(result['location'], geoPoint);
@@ -246,23 +234,18 @@ void main() {
     });
 
     test('leaves numbers, bools, and null unchanged', () {
-      final result = toFirestoreDocument({
-        'count': 3,
-        'active': true,
-        'deletedAt': null,
-      });
+      final result = toFirestoreDocument({'count': 3, 'active': true, 'deletedAt': null});
 
       expect(result, {'count': 3, 'active': true, 'deletedAt': null});
     });
 
     test('wraps conversion failures with document and field path', () {
       expect(
-        () => toFirestoreDocument(
-          {
-            'meta': {'history': [_ThrowingMap()]},
+        () => toFirestoreDocument({
+          'meta': {
+            'history': [_ThrowingMap()],
           },
-          documentPath: 'places/doc1',
-        ),
+        }),
         throwsA(
           isA<FirestoreConversionException>()
               .having((e) => e.documentPath, 'documentPath', 'places/doc1')
@@ -283,10 +266,7 @@ void main() {
 
   group('round trip', () {
     test('Timestamp survives fromFirestore then toFirestore', () {
-      final converted = fromFirestoreDocument({
-        'updatedAt': timestamp,
-        'location': geoPoint,
-      }, 'doc1');
+      final converted = fromFirestoreDocument({'updatedAt': timestamp, 'location': geoPoint}, 'doc1');
       final back = toFirestoreDocument(converted!);
 
       expect(back['updatedAt'], timestamp);
