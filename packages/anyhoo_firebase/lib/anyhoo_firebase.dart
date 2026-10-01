@@ -16,5 +16,3 @@ export 'src/services/storage/anyhoo_firebase_upload_task.dart';
 export 'src/services/storage/anyhoo_fake_upload_task.dart';
 export 'src/os_tool.dart';
 export 'src/widgets/firebase_analytics_page.dart';
-
-export 'src/services/timestamp_converter.dart';

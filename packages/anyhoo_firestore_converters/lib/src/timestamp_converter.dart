@@ -1,4 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_firestore_platform_interface/cloud_firestore_platform_interface.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 class TimestampConverter implements JsonConverter<DateTime, Object> {
