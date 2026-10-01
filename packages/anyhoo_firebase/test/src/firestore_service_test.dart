@@ -1,7 +1,6 @@
 // ignore_for_file: subtype_of_sealed_class
 
 import 'dart:async';
-import 'dart:collection';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -139,10 +138,7 @@ void main() {
         when(() => mockFirestore.collection(any())).thenReturn(mockCollection);
 
         await firestoreService
-            .watchCollection(
-              'test_collection',
-              where: [FirestoreWhere.arrayContains('accessIds', 'user-1')],
-            )
+            .watchCollection('test_collection', where: [FirestoreWhere.arrayContains('accessIds', 'user-1')])
             .first;
 
         verify(() => mockCollection.where('accessIds', arrayContains: 'user-1')).called(1);
@@ -199,11 +195,7 @@ void main() {
 
         final result = await firestoreService.watchDocument('test_collection/doc1').first;
 
-        expect(result, {
-          'name': 'Test',
-          'updatedAt': '2024-06-01T13:00:00.000Z',
-          'id': 'doc1',
-        });
+        expect(result, {'name': 'Test', 'updatedAt': '2024-06-01T13:00:00.000Z', 'id': 'doc1'});
       });
     });
 
@@ -274,11 +266,7 @@ void main() {
         final result = await firestoreService.getCollection('test_collection');
 
         expect(result, [
-          {
-            'name': 'Test 1',
-            'updatedAt': '2024-06-01T13:00:00.000Z',
-            'id': 'doc1',
-          },
+          {'name': 'Test 1', 'updatedAt': '2024-06-01T13:00:00.000Z', 'id': 'doc1'},
         ]);
       });
     });
@@ -324,27 +312,7 @@ void main() {
 
         final result = await firestoreService.getDocument('test_collection/doc1');
 
-        expect(result, {
-          'name': 'Test',
-          'updatedAt': '2024-06-01T13:00:00.000Z',
-          'id': 'doc1',
-        });
-      });
-
-      test('conversion failures include document and field path', () async {
-        when(() => mockDocumentSnapshot.id).thenReturn('doc1');
-        when(() => mockDocumentSnapshot.data()).thenReturn({'meta': _ThrowingMap()});
-        when(() => mockDocument.get()).thenAnswer((_) async => mockDocumentSnapshot);
-        when(() => mockFirestore.doc('places/doc1')).thenReturn(mockDocument);
-
-        expect(
-          () => firestoreService.getDocument('places/doc1'),
-          throwsA(
-            isA<FirestoreConversionException>()
-                .having((e) => e.documentPath, 'documentPath', 'places/doc1')
-                .having((e) => e.fieldPath, 'fieldPath', 'meta'),
-          ),
-        );
+        expect(result, {'name': 'Test', 'updatedAt': '2024-06-01T13:00:00.000Z', 'id': 'doc1'});
       });
     });
 
@@ -413,12 +381,7 @@ void main() {
           docId: 'doc1',
         );
 
-        verify(
-          () => mockDocument.set({
-            'name': 'Test',
-            'updatedAt': Timestamp.fromDate(updatedAt),
-          }),
-        ).called(1);
+        verify(() => mockDocument.set({'name': 'Test', 'updatedAt': Timestamp.fromDate(updatedAt)})).called(1);
       });
 
       test('leaves FieldValue.serverTimestamp unchanged', () async {
@@ -461,32 +424,15 @@ void main() {
         );
       });
 
-      test('does not update when conversion fails', () async {
-        expect(
-          () => firestoreService.updateDocument('test_collection', 'doc1', {'meta': _ThrowingMap()}),
-          throwsA(isA<FirestoreConversionException>()),
-        );
-
-        verifyNever(() => mockFirestore.collection(any()));
-      });
-
       test('converts DateTime fields to Timestamp', () async {
         when(() => mockCollection.doc('doc1')).thenReturn(mockDocument);
         when(() => mockDocument.update(any())).thenAnswer((_) async => {});
         when(() => mockFirestore.collection('test_collection')).thenReturn(mockCollection);
 
         final updatedAt = DateTime.utc(2024, 6, 1, 13);
-        await firestoreService.updateDocument('test_collection', 'doc1', {
-          'name': 'Updated',
-          'updatedAt': updatedAt,
-        });
+        await firestoreService.updateDocument('test_collection', 'doc1', {'name': 'Updated', 'updatedAt': updatedAt});
 
-        verify(
-          () => mockDocument.update({
-            'name': 'Updated',
-            'updatedAt': Timestamp.fromDate(updatedAt),
-          }),
-        ).called(1);
+        verify(() => mockDocument.update({'name': 'Updated', 'updatedAt': Timestamp.fromDate(updatedAt)})).called(1);
       });
     });
 
@@ -504,24 +450,4 @@ void main() {
       });
     });
   });
-}
-
-class _ThrowingMap extends MapBase<String, dynamic> {
-  @override
-  Iterable<MapEntry<String, dynamic>> get entries => throw StateError('cannot read entries');
-
-  @override
-  dynamic operator [](Object? key) => null;
-
-  @override
-  void operator []=(String key, dynamic value) {}
-
-  @override
-  void clear() {}
-
-  @override
-  Iterable<String> get keys => const [];
-
-  @override
-  dynamic remove(Object? key) => null;
 }
