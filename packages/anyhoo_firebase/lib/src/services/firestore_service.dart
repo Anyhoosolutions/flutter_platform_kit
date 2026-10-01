@@ -1,10 +1,8 @@
-import 'package:anyhoo_firebase/src/services/firestore_document_converter.dart';
 import 'package:anyhoo_firebase/src/services/firestore_where.dart';
 import 'package:anyhoo_logging/anyhoo_logging.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:logging/logging.dart';
 
-export 'firestore_document_converter.dart' show FirestoreConversionException;
 export 'firestore_where.dart' show FirestoreWhere;
 
 class FirestoreService {
@@ -28,11 +26,11 @@ class FirestoreService {
       where: where,
       whereNullFields: whereNullFields,
       limit: limit,
-    ).snapshots().map((snapshot) => snapshot.docs.map((doc) => fromFirestoreDocument(doc.data(), doc.id)!).toList());
+    ).snapshots().map((snapshot) => snapshot.docs.map((doc) => doc.data()).toList());
   }
 
   Stream<Map<String, dynamic>?> watchDocument(String path) {
-    return _firestore.doc(path).snapshots().map((snapshot) => fromFirestoreDocument(snapshot.data(), snapshot.id));
+    return _firestore.doc(path).snapshots().map((snapshot) => snapshot.data());
   }
 
   Future<List<Map<String, dynamic>>> getCollection(
@@ -50,15 +48,13 @@ class FirestoreService {
       where: where,
       whereNullFields: whereNullFields,
       limit: limit,
-    ).get().then((snapshot) => snapshot.docs.map((doc) => fromFirestoreDocument(doc.data(), doc.id)!).toList());
+    ).get().then((snapshot) => snapshot.docs.map((doc) => doc.data()).toList());
   }
 
   Future<Map<String, dynamic>?> getDocument(String path) async {
     try {
       final docRef = await _firestore.doc(path).get();
-      return fromFirestoreDocument(docRef.data(), docRef.id);
-    } on FirestoreConversionException {
-      rethrow;
+      return docRef.data();
     } catch (e, stackTrace) {
       _log.warning('Error getting document at $path: $e');
       SentryHelper.captureException(e, stackTrace: stackTrace, fatal: false);
@@ -89,30 +85,16 @@ class FirestoreService {
 
     _log.info('fullPath: $fullPath');
     _log.info('data: $data');
-    await _firestore.doc(fullPath).set(toFirestoreDocument(data));
+    await _firestore.doc(fullPath).set(data);
 
     return docId;
   }
 
   Future<void> updateDocument(String path, String id, Map<String, dynamic> data) async {
-    final Map<String, dynamic> convertedData;
-    try {
-      convertedData = toFirestoreDocument(data);
-    } on FirestoreConversionException catch (e, stackTrace) {
-      _log.warning('Error converting document for write at $path/$id: $e');
-      SentryHelper.captureException(
-        e,
-        stackTrace: stackTrace,
-        fatal: false,
-        extraInfo: {'path': path, 'id': id, 'data': data},
-      );
-      rethrow;
-    }
-
     try {
       final fullPath = fullTrimmedPath(path, id);
 
-      await _firestore.doc(fullPath).update(convertedData);
+      await _firestore.doc(fullPath).update(data);
     } catch (e, stackTrace) {
       SentryHelper.captureException(e, stackTrace: stackTrace, fatal: false);
       throw Exception('Failed to update document at $path $id: $e');
