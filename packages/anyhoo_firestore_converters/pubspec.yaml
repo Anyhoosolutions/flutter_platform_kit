@@ -1,27 +1,14 @@
 name: anyhoo_firestore_converters
-description: "A new Flutter package project."
+description: Shared Firestore JSON converters that compile on Flutter and the Dart VM.
 version: 0.0.1
-homepage:
 publish_to: none
 
 environment:
-  sdk: ^3.13.3
-  flutter: ">=1.17.0"
+  sdk: ^3.12.0
 
 dependencies:
-  cloud_firestore_platform_interface: ^8.0.7
-  flutter:
-    sdk: flutter
-  freezed_annotation: ^3.1.0
   json_annotation: ^4.12.0
 
 dev_dependencies:
-  build_runner: ^2.16.1
-  flutter_test:
-    sdk: flutter
-  freezed: ^4.0.2
-  flutter_lints: ^6.0.0
-  json_serializable: ^6.14.1
-
-flutter:
-  # To add assets to your package, add an assets section, like this:
+  lints: ^6.0.0
+  test: ^1.26.3
