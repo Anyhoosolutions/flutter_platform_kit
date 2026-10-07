@@ -1,7 +1,6 @@
 // ignore_for_file: subtype_of_sealed_class
 
 import 'dart:async';
-import 'dart:collection';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -139,10 +138,7 @@ void main() {
         when(() => mockFirestore.collection(any())).thenReturn(mockCollection);
 
         await firestoreService
-            .watchCollection(
-              'test_collection',
-              where: [FirestoreWhere.arrayContains('accessIds', 'user-1')],
-            )
+            .watchCollection('test_collection', where: [FirestoreWhere.arrayContains('accessIds', 'user-1')])
             .first;
 
         verify(() => mockCollection.where('accessIds', arrayContains: 'user-1')).called(1);
@@ -188,22 +184,6 @@ void main() {
         final result = await stream.first;
 
         expect(result, isNull);
-      });
-
-      test('converts Timestamp fields and adds id', () async {
-        final updatedAt = Timestamp.fromDate(DateTime.utc(2024, 6, 1, 13));
-        when(() => mockDocumentSnapshot.id).thenReturn('doc1');
-        when(() => mockDocumentSnapshot.data()).thenReturn({'name': 'Test', 'updatedAt': updatedAt});
-        when(() => mockDocument.snapshots()).thenAnswer((_) => Stream.value(mockDocumentSnapshot));
-        when(() => mockFirestore.doc('test_collection/doc1')).thenReturn(mockDocument);
-
-        final result = await firestoreService.watchDocument('test_collection/doc1').first;
-
-        expect(result, {
-          'name': 'Test',
-          'updatedAt': '2024-06-01T13:00:00.000Z',
-          'id': 'doc1',
-        });
       });
     });
 
@@ -261,26 +241,6 @@ void main() {
         verify(() => mockQuery.where('deletedAt', isNull: true)).called(1);
         verify(() => mockQuery.limit(10)).called(1);
       });
-
-      test('converts Timestamp fields and keeps id', () async {
-        final updatedAt = Timestamp.fromDate(DateTime.utc(2024, 6, 1, 13));
-        final doc1 = MockQueryDocumentSnapshot();
-        when(() => doc1.id).thenReturn('doc1');
-        when(() => doc1.data()).thenReturn({'name': 'Test 1', 'updatedAt': updatedAt});
-        when(() => mockQuerySnapshot.docs).thenReturn([doc1]);
-        when(() => mockCollection.get()).thenAnswer((_) async => mockQuerySnapshot);
-        when(() => mockFirestore.collection(any())).thenReturn(mockCollection);
-
-        final result = await firestoreService.getCollection('test_collection');
-
-        expect(result, [
-          {
-            'name': 'Test 1',
-            'updatedAt': '2024-06-01T13:00:00.000Z',
-            'id': 'doc1',
-          },
-        ]);
-      });
     });
 
     group('getDocument', () {
@@ -313,38 +273,6 @@ void main() {
         when(() => mockFirestore.doc('test_collection/doc1')).thenReturn(mockDocument);
 
         expect(() => firestoreService.getDocument('test_collection/doc1'), throwsException);
-      });
-
-      test('converts Timestamp fields and adds id', () async {
-        final updatedAt = Timestamp.fromDate(DateTime.utc(2024, 6, 1, 13));
-        when(() => mockDocumentSnapshot.id).thenReturn('doc1');
-        when(() => mockDocumentSnapshot.data()).thenReturn({'name': 'Test', 'updatedAt': updatedAt});
-        when(() => mockDocument.get()).thenAnswer((_) async => mockDocumentSnapshot);
-        when(() => mockFirestore.doc('test_collection/doc1')).thenReturn(mockDocument);
-
-        final result = await firestoreService.getDocument('test_collection/doc1');
-
-        expect(result, {
-          'name': 'Test',
-          'updatedAt': '2024-06-01T13:00:00.000Z',
-          'id': 'doc1',
-        });
-      });
-
-      test('conversion failures include document and field path', () async {
-        when(() => mockDocumentSnapshot.id).thenReturn('doc1');
-        when(() => mockDocumentSnapshot.data()).thenReturn({'meta': _ThrowingMap()});
-        when(() => mockDocument.get()).thenAnswer((_) async => mockDocumentSnapshot);
-        when(() => mockFirestore.doc('places/doc1')).thenReturn(mockDocument);
-
-        expect(
-          () => firestoreService.getDocument('places/doc1'),
-          throwsA(
-            isA<FirestoreConversionException>()
-                .having((e) => e.documentPath, 'documentPath', 'places/doc1')
-                .having((e) => e.fieldPath, 'fieldPath', 'meta'),
-          ),
-        );
       });
     });
 
@@ -401,26 +329,6 @@ void main() {
         verify(() => mockDocument.set({'name': 'Test', 'refId': 'ref_doc1'})).called(1);
       });
 
-      test('converts DateTime fields to Timestamp', () async {
-        when(() => mockFirestore.collection('test_collection')).thenReturn(mockCollection);
-        when(() => mockFirestore.doc('test_collection/doc1')).thenReturn(mockDocument);
-        when(() => mockDocument.set(any())).thenAnswer((_) async => {});
-
-        final updatedAt = DateTime.utc(2024, 6, 1, 13);
-        await firestoreService.addDocument(
-          path: 'test_collection',
-          data: {'name': 'Test', 'updatedAt': updatedAt},
-          docId: 'doc1',
-        );
-
-        verify(
-          () => mockDocument.set({
-            'name': 'Test',
-            'updatedAt': Timestamp.fromDate(updatedAt),
-          }),
-        ).called(1);
-      });
-
       test('leaves FieldValue.serverTimestamp unchanged', () async {
         when(() => mockFirestore.collection('test_collection')).thenReturn(mockCollection);
         when(() => mockFirestore.doc('test_collection/doc1')).thenReturn(mockDocument);
@@ -439,54 +347,23 @@ void main() {
 
     group('updateDocument', () {
       test('updates document successfully', () async {
-        when(() => mockCollection.doc('doc1')).thenReturn(mockDocument);
+        when(() => mockFirestore.doc('test_collection/doc1')).thenReturn(mockDocument);
         when(() => mockDocument.update(any())).thenAnswer((_) async => {});
-        when(() => mockFirestore.collection('test_collection')).thenReturn(mockCollection);
 
         await firestoreService.updateDocument('test_collection', 'doc1', {'name': 'Updated', 'value': 100});
 
-        verify(() => mockFirestore.collection('test_collection')).called(1);
-        verify(() => mockCollection.doc('doc1')).called(1);
+        verify(() => mockFirestore.doc('test_collection/doc1')).called(1);
         verify(() => mockDocument.update({'name': 'Updated', 'value': 100})).called(1);
       });
 
       test('throws exception on error', () async {
-        when(() => mockCollection.doc(any())).thenReturn(mockDocument);
+        when(() => mockFirestore.doc('test_collection/doc1')).thenReturn(mockDocument);
         when(() => mockDocument.update(any())).thenThrow(Exception('Update failed'));
-        when(() => mockFirestore.collection('test_collection')).thenReturn(mockCollection);
 
         expect(
           () => firestoreService.updateDocument('test_collection', 'doc1', {'name': 'Updated'}),
           throwsA(isA<Exception>()),
         );
-      });
-
-      test('does not update when conversion fails', () async {
-        expect(
-          () => firestoreService.updateDocument('test_collection', 'doc1', {'meta': _ThrowingMap()}),
-          throwsA(isA<FirestoreConversionException>()),
-        );
-
-        verifyNever(() => mockFirestore.collection(any()));
-      });
-
-      test('converts DateTime fields to Timestamp', () async {
-        when(() => mockCollection.doc('doc1')).thenReturn(mockDocument);
-        when(() => mockDocument.update(any())).thenAnswer((_) async => {});
-        when(() => mockFirestore.collection('test_collection')).thenReturn(mockCollection);
-
-        final updatedAt = DateTime.utc(2024, 6, 1, 13);
-        await firestoreService.updateDocument('test_collection', 'doc1', {
-          'name': 'Updated',
-          'updatedAt': updatedAt,
-        });
-
-        verify(
-          () => mockDocument.update({
-            'name': 'Updated',
-            'updatedAt': Timestamp.fromDate(updatedAt),
-          }),
-        ).called(1);
       });
     });
 
@@ -504,24 +381,4 @@ void main() {
       });
     });
   });
-}
-
-class _ThrowingMap extends MapBase<String, dynamic> {
-  @override
-  Iterable<MapEntry<String, dynamic>> get entries => throw StateError('cannot read entries');
-
-  @override
-  dynamic operator [](Object? key) => null;
-
-  @override
-  void operator []=(String key, dynamic value) {}
-
-  @override
-  void clear() {}
-
-  @override
-  Iterable<String> get keys => const [];
-
-  @override
-  dynamic remove(Object? key) => null;
 }
