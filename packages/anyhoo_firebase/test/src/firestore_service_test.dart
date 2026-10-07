@@ -402,21 +402,18 @@ void main() {
 
     group('updateDocument', () {
       test('updates document successfully', () async {
-        when(() => mockCollection.doc('doc1')).thenReturn(mockDocument);
+        when(() => mockFirestore.doc('test_collection/doc1')).thenReturn(mockDocument);
         when(() => mockDocument.update(any())).thenAnswer((_) async => {});
-        when(() => mockFirestore.collection('test_collection')).thenReturn(mockCollection);
 
         await firestoreService.updateDocument('test_collection', 'doc1', {'name': 'Updated', 'value': 100});
 
-        verify(() => mockFirestore.collection('test_collection')).called(1);
-        verify(() => mockCollection.doc('doc1')).called(1);
+        verify(() => mockFirestore.doc('test_collection/doc1')).called(1);
         verify(() => mockDocument.update({'name': 'Updated', 'value': 100})).called(1);
       });
 
       test('throws exception on error', () async {
-        when(() => mockCollection.doc(any())).thenReturn(mockDocument);
+        when(() => mockFirestore.doc('test_collection/doc1')).thenReturn(mockDocument);
         when(() => mockDocument.update(any())).thenThrow(Exception('Update failed'));
-        when(() => mockFirestore.collection('test_collection')).thenReturn(mockCollection);
 
         expect(
           () => firestoreService.updateDocument('test_collection', 'doc1', {'name': 'Updated'}),
