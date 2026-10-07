@@ -26,11 +26,14 @@ class FirestoreService {
       where: where,
       whereNullFields: whereNullFields,
       limit: limit,
-    ).snapshots().map((snapshot) => snapshot.docs.map((doc) => doc.data()).toList());
+    ).snapshots().map((snapshot) => snapshot.docs.map((doc) => {'id': doc.id, ...doc.data()}).toList());
   }
 
   Stream<Map<String, dynamic>?> watchDocument(String path) {
-    return _firestore.doc(path).snapshots().map((snapshot) => snapshot.data());
+    return _firestore
+        .doc(path)
+        .snapshots()
+        .map((snapshot) => snapshot.data() != null ? {'id': snapshot.id, ...snapshot.data()!} : null);
   }
 
   Future<List<Map<String, dynamic>>> getCollection(
@@ -48,13 +51,16 @@ class FirestoreService {
       where: where,
       whereNullFields: whereNullFields,
       limit: limit,
-    ).get().then((snapshot) => snapshot.docs.map((doc) => doc.data()).toList());
+    ).get().then((snapshot) => snapshot.docs.map((doc) => {'id': doc.id, ...doc.data()}).toList());
   }
 
   Future<Map<String, dynamic>?> getDocument(String path) async {
     try {
       final docRef = await _firestore.doc(path).get();
-      return docRef.data();
+      if (docRef.data() == null) {
+        return null;
+      }
+      return {'id': docRef.id, ...docRef.data()!};
     } catch (e, stackTrace) {
       _log.warning('Error getting document at $path: $e');
       SentryHelper.captureException(e, stackTrace: stackTrace, fatal: false);
@@ -68,33 +74,40 @@ class FirestoreService {
     String? docId,
     Map<String, String>? idFields,
   }) async {
-    final collectionRef = _firestore.collection(path);
+    try {
+      final collectionRef = _firestore.collection(path);
 
-    var fullPath = fullTrimmedPath(path, docId ?? '');
+      var fullPath = fullTrimmedPath(path, docId ?? '');
 
-    if (docId == null) {
-      final newDocRef = collectionRef.doc();
-      docId = newDocRef.id;
-      fullPath = fullTrimmedPath(path, docId);
-    }
-    if (idFields?.entries != null) {
-      for (final idField in idFields!.entries) {
-        data[idField.key] = idField.value + docId;
+      if (docId == null) {
+        final newDocRef = collectionRef.doc();
+        docId = newDocRef.id;
+        fullPath = fullTrimmedPath(path, docId);
       }
+      if (idFields?.entries != null) {
+        for (final idField in idFields!.entries) {
+          data[idField.key] = idField.value + docId;
+        }
+      }
+
+      _log.info('fullPath: $fullPath');
+      _log.info('data: $data');
+      await _firestore.doc(fullPath).set(data);
+
+      return docId;
+    } catch (e, stackTrace) {
+      SentryHelper.captureException(e, stackTrace: stackTrace, fatal: false);
+      // ignore: avoid_print
+      print('Failed to add document at $path: $e');
+      throw Exception('Failed to add document at $path: $e');
     }
-
-    _log.info('fullPath: $fullPath');
-    _log.info('data: $data');
-    await _firestore.doc(fullPath).set(data);
-
-    return docId;
   }
 
   Future<void> updateDocument(String path, String id, Map<String, dynamic> data) async {
     try {
       final fullPath = fullTrimmedPath(path, id);
-
-      await _firestore.doc(fullPath).update(data);
+      final ref = _firestore.doc(fullPath);
+      await ref.update(data);
     } catch (e, stackTrace) {
       SentryHelper.captureException(e, stackTrace: stackTrace, fatal: false);
       throw Exception('Failed to update document at $path $id: $e');
