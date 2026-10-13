@@ -54,6 +54,8 @@ import 'package:widgetbook_workspace/anyhoo_firebase/firebase_analytics_page.dar
     as _widgetbook_workspace_anyhoo_firebase_firebase_analytics_page;
 import 'package:widgetbook_workspace/anyhoo_form_builder_widgets/anyhoo_form_gallery.dart'
     as _widgetbook_workspace_anyhoo_form_builder_widgets_anyhoo_form_builder_dropdown;
+import 'package:widgetbook_workspace/anyhoo_form_builder_widgets/anyhoo_form_switch.dart'
+    as _widgetbook_workspace_anyhoo_form_builder_widgets_anyhoo_form_switch;
 import 'package:widgetbook_workspace/anyhoo_image_selector/image_selector_widget.dart'
     as _widgetbook_workspace_anyhoo_image_selector_image_selector_widget;
 import 'package:widgetbook_workspace/anyhoo_search_bar/anyhoo_search_bar.dart'
@@ -371,6 +373,17 @@ final directories = <_widgetbook.WidgetbookNode>[
             builder:
                 _widgetbook_workspace_anyhoo_form_builder_widgets_anyhoo_form_builder_dropdown
                     .buildAnyhooFormBuilderDropdownOverview,
+          ),
+        ],
+      ),
+      _widgetbook.WidgetbookComponent(
+        name: 'AnyhooFormSwitch',
+        useCases: [
+          _widgetbook.WidgetbookUseCase(
+            name: 'AnyhooFormSwitch',
+            builder:
+                _widgetbook_workspace_anyhoo_form_builder_widgets_anyhoo_form_switch
+                    .buildAnyhooFormSwitch,
           ),
         ],
       ),
