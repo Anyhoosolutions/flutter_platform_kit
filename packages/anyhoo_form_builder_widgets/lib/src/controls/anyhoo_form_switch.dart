@@ -28,7 +28,7 @@ class AnyhooFormSwitch extends StatelessWidget {
       builder: (FormFieldState<bool> field) {
         return AnyhooSwitch(
           label: label,
-          value: field.value ?? initialValue,
+          value: field.value,
           onChanged: (value) {
             field.didChange(value);
             if (onChanged != null) {
