@@ -14,7 +14,19 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$EmulatorConfig {
 
- String get host; String? get hostIp; bool get useDeviceEmulator; bool? get overrideUseFirebaseEmulator; bool get useFirebaseAuth; bool get useFirebaseFirestore; bool get useFirebaseStorage; int get authPort; int get firestorePort; int get storagePort;
+ String get host; String? get hostIp; bool get useDeviceEmulator; bool? get overrideUseFirebaseEmulator; bool get useFirebaseAuth; bool get useFirebaseFirestore; bool get useFirebaseStorage; int get authPort; int get firestorePort; int get storagePort;/// Project id sent to the emulators.
+///
+/// Applied only while the emulator is enabled (`Arguments.shouldUseFirebaseEmulator`
+/// or [overrideUseFirebaseEmulator]). `FirebaseInitializer` keeps the
+/// `FirebaseOptions` passed to `initialize` and replaces `projectId` with this
+/// value, so Auth, Firestore, and Storage stay on the default app.
+///
+/// Match the project the emulator was started with (`.firebaserc`, or
+/// `firebase emulators:start --project …`). `firebase.json` does not hold this
+/// id. A `demo-` prefix marks a demo project that does not need a real Firebase
+/// project. When null or blank, the project id from `FirebaseOptions` is used
+/// unchanged.
+ String? get emulatorProjectId;
 /// Create a copy of EmulatorConfig
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +37,16 @@ $EmulatorConfigCopyWith<EmulatorConfig> get copyWith => _$EmulatorConfigCopyWith
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is EmulatorConfig&&(identical(other.host, host) || other.host == host)&&(identical(other.hostIp, hostIp) || other.hostIp == hostIp)&&(identical(other.useDeviceEmulator, useDeviceEmulator) || other.useDeviceEmulator == useDeviceEmulator)&&(identical(other.overrideUseFirebaseEmulator, overrideUseFirebaseEmulator) || other.overrideUseFirebaseEmulator == overrideUseFirebaseEmulator)&&(identical(other.useFirebaseAuth, useFirebaseAuth) || other.useFirebaseAuth == useFirebaseAuth)&&(identical(other.useFirebaseFirestore, useFirebaseFirestore) || other.useFirebaseFirestore == useFirebaseFirestore)&&(identical(other.useFirebaseStorage, useFirebaseStorage) || other.useFirebaseStorage == useFirebaseStorage)&&(identical(other.authPort, authPort) || other.authPort == authPort)&&(identical(other.firestorePort, firestorePort) || other.firestorePort == firestorePort)&&(identical(other.storagePort, storagePort) || other.storagePort == storagePort));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is EmulatorConfig&&(identical(other.host, host) || other.host == host)&&(identical(other.hostIp, hostIp) || other.hostIp == hostIp)&&(identical(other.useDeviceEmulator, useDeviceEmulator) || other.useDeviceEmulator == useDeviceEmulator)&&(identical(other.overrideUseFirebaseEmulator, overrideUseFirebaseEmulator) || other.overrideUseFirebaseEmulator == overrideUseFirebaseEmulator)&&(identical(other.useFirebaseAuth, useFirebaseAuth) || other.useFirebaseAuth == useFirebaseAuth)&&(identical(other.useFirebaseFirestore, useFirebaseFirestore) || other.useFirebaseFirestore == useFirebaseFirestore)&&(identical(other.useFirebaseStorage, useFirebaseStorage) || other.useFirebaseStorage == useFirebaseStorage)&&(identical(other.authPort, authPort) || other.authPort == authPort)&&(identical(other.firestorePort, firestorePort) || other.firestorePort == firestorePort)&&(identical(other.storagePort, storagePort) || other.storagePort == storagePort)&&(identical(other.emulatorProjectId, emulatorProjectId) || other.emulatorProjectId == emulatorProjectId));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,host,hostIp,useDeviceEmulator,overrideUseFirebaseEmulator,useFirebaseAuth,useFirebaseFirestore,useFirebaseStorage,authPort,firestorePort,storagePort);
+int get hashCode => Object.hash(runtimeType,host,hostIp,useDeviceEmulator,overrideUseFirebaseEmulator,useFirebaseAuth,useFirebaseFirestore,useFirebaseStorage,authPort,firestorePort,storagePort,emulatorProjectId);
 
 @override
 String toString() {
-  return 'EmulatorConfig(host: $host, hostIp: $hostIp, useDeviceEmulator: $useDeviceEmulator, overrideUseFirebaseEmulator: $overrideUseFirebaseEmulator, useFirebaseAuth: $useFirebaseAuth, useFirebaseFirestore: $useFirebaseFirestore, useFirebaseStorage: $useFirebaseStorage, authPort: $authPort, firestorePort: $firestorePort, storagePort: $storagePort)';
+  return 'EmulatorConfig(host: $host, hostIp: $hostIp, useDeviceEmulator: $useDeviceEmulator, overrideUseFirebaseEmulator: $overrideUseFirebaseEmulator, useFirebaseAuth: $useFirebaseAuth, useFirebaseFirestore: $useFirebaseFirestore, useFirebaseStorage: $useFirebaseStorage, authPort: $authPort, firestorePort: $firestorePort, storagePort: $storagePort, emulatorProjectId: $emulatorProjectId)';
 }
 
 
@@ -45,7 +57,7 @@ abstract mixin class $EmulatorConfigCopyWith<$Res>  {
   factory $EmulatorConfigCopyWith(EmulatorConfig value, $Res Function(EmulatorConfig) _then) = _$EmulatorConfigCopyWithImpl;
 @useResult
 $Res call({
- String host, String? hostIp, bool useDeviceEmulator, bool? overrideUseFirebaseEmulator, bool useFirebaseAuth, bool useFirebaseFirestore, bool useFirebaseStorage, int authPort, int firestorePort, int storagePort
+ String host, String? hostIp, bool useDeviceEmulator, bool? overrideUseFirebaseEmulator, bool useFirebaseAuth, bool useFirebaseFirestore, bool useFirebaseStorage, int authPort, int firestorePort, int storagePort, String? emulatorProjectId
 });
 
 
@@ -62,7 +74,7 @@ class _$EmulatorConfigCopyWithImpl<$Res>
 
 /// Create a copy of EmulatorConfig
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? host = null,Object? hostIp = freezed,Object? useDeviceEmulator = null,Object? overrideUseFirebaseEmulator = freezed,Object? useFirebaseAuth = null,Object? useFirebaseFirestore = null,Object? useFirebaseStorage = null,Object? authPort = null,Object? firestorePort = null,Object? storagePort = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? host = null,Object? hostIp = freezed,Object? useDeviceEmulator = null,Object? overrideUseFirebaseEmulator = freezed,Object? useFirebaseAuth = null,Object? useFirebaseFirestore = null,Object? useFirebaseStorage = null,Object? authPort = null,Object? firestorePort = null,Object? storagePort = null,Object? emulatorProjectId = freezed,}) {
   return _then(_self.copyWith(
 host: null == host ? _self.host : host // ignore: cast_nullable_to_non_nullable
 as String,hostIp: freezed == hostIp ? _self.hostIp : hostIp // ignore: cast_nullable_to_non_nullable
@@ -74,7 +86,8 @@ as bool,useFirebaseStorage: null == useFirebaseStorage ? _self.useFirebaseStorag
 as bool,authPort: null == authPort ? _self.authPort : authPort // ignore: cast_nullable_to_non_nullable
 as int,firestorePort: null == firestorePort ? _self.firestorePort : firestorePort // ignore: cast_nullable_to_non_nullable
 as int,storagePort: null == storagePort ? _self.storagePort : storagePort // ignore: cast_nullable_to_non_nullable
-as int,
+as int,emulatorProjectId: freezed == emulatorProjectId ? _self.emulatorProjectId : emulatorProjectId // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 
@@ -159,10 +172,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String host,  String? hostIp,  bool useDeviceEmulator,  bool? overrideUseFirebaseEmulator,  bool useFirebaseAuth,  bool useFirebaseFirestore,  bool useFirebaseStorage,  int authPort,  int firestorePort,  int storagePort)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String host,  String? hostIp,  bool useDeviceEmulator,  bool? overrideUseFirebaseEmulator,  bool useFirebaseAuth,  bool useFirebaseFirestore,  bool useFirebaseStorage,  int authPort,  int firestorePort,  int storagePort,  String? emulatorProjectId)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _EmulatorConfig() when $default != null:
-return $default(_that.host,_that.hostIp,_that.useDeviceEmulator,_that.overrideUseFirebaseEmulator,_that.useFirebaseAuth,_that.useFirebaseFirestore,_that.useFirebaseStorage,_that.authPort,_that.firestorePort,_that.storagePort);case _:
+return $default(_that.host,_that.hostIp,_that.useDeviceEmulator,_that.overrideUseFirebaseEmulator,_that.useFirebaseAuth,_that.useFirebaseFirestore,_that.useFirebaseStorage,_that.authPort,_that.firestorePort,_that.storagePort,_that.emulatorProjectId);case _:
   return orElse();
 
 }
@@ -180,10 +193,10 @@ return $default(_that.host,_that.hostIp,_that.useDeviceEmulator,_that.overrideUs
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String host,  String? hostIp,  bool useDeviceEmulator,  bool? overrideUseFirebaseEmulator,  bool useFirebaseAuth,  bool useFirebaseFirestore,  bool useFirebaseStorage,  int authPort,  int firestorePort,  int storagePort)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String host,  String? hostIp,  bool useDeviceEmulator,  bool? overrideUseFirebaseEmulator,  bool useFirebaseAuth,  bool useFirebaseFirestore,  bool useFirebaseStorage,  int authPort,  int firestorePort,  int storagePort,  String? emulatorProjectId)  $default,) {final _that = this;
 switch (_that) {
 case _EmulatorConfig():
-return $default(_that.host,_that.hostIp,_that.useDeviceEmulator,_that.overrideUseFirebaseEmulator,_that.useFirebaseAuth,_that.useFirebaseFirestore,_that.useFirebaseStorage,_that.authPort,_that.firestorePort,_that.storagePort);case _:
+return $default(_that.host,_that.hostIp,_that.useDeviceEmulator,_that.overrideUseFirebaseEmulator,_that.useFirebaseAuth,_that.useFirebaseFirestore,_that.useFirebaseStorage,_that.authPort,_that.firestorePort,_that.storagePort,_that.emulatorProjectId);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -200,10 +213,10 @@ return $default(_that.host,_that.hostIp,_that.useDeviceEmulator,_that.overrideUs
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String host,  String? hostIp,  bool useDeviceEmulator,  bool? overrideUseFirebaseEmulator,  bool useFirebaseAuth,  bool useFirebaseFirestore,  bool useFirebaseStorage,  int authPort,  int firestorePort,  int storagePort)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String host,  String? hostIp,  bool useDeviceEmulator,  bool? overrideUseFirebaseEmulator,  bool useFirebaseAuth,  bool useFirebaseFirestore,  bool useFirebaseStorage,  int authPort,  int firestorePort,  int storagePort,  String? emulatorProjectId)?  $default,) {final _that = this;
 switch (_that) {
 case _EmulatorConfig() when $default != null:
-return $default(_that.host,_that.hostIp,_that.useDeviceEmulator,_that.overrideUseFirebaseEmulator,_that.useFirebaseAuth,_that.useFirebaseFirestore,_that.useFirebaseStorage,_that.authPort,_that.firestorePort,_that.storagePort);case _:
+return $default(_that.host,_that.hostIp,_that.useDeviceEmulator,_that.overrideUseFirebaseEmulator,_that.useFirebaseAuth,_that.useFirebaseFirestore,_that.useFirebaseStorage,_that.authPort,_that.firestorePort,_that.storagePort,_that.emulatorProjectId);case _:
   return null;
 
 }
@@ -215,7 +228,7 @@ return $default(_that.host,_that.hostIp,_that.useDeviceEmulator,_that.overrideUs
 
 
 class _EmulatorConfig implements EmulatorConfig {
-   _EmulatorConfig({this.host = 'localhost', this.hostIp = null, this.useDeviceEmulator = true, this.overrideUseFirebaseEmulator = null, this.useFirebaseAuth = true, this.useFirebaseFirestore = true, this.useFirebaseStorage = true, this.authPort = 9099, this.firestorePort = 8080, this.storagePort = 9199});
+   _EmulatorConfig({this.host = 'localhost', this.hostIp = null, this.useDeviceEmulator = true, this.overrideUseFirebaseEmulator = null, this.useFirebaseAuth = true, this.useFirebaseFirestore = true, this.useFirebaseStorage = true, this.authPort = 9099, this.firestorePort = 8080, this.storagePort = 9199, this.emulatorProjectId = null});
   
 
 @override@JsonKey() final  String host;
@@ -228,6 +241,19 @@ class _EmulatorConfig implements EmulatorConfig {
 @override@JsonKey() final  int authPort;
 @override@JsonKey() final  int firestorePort;
 @override@JsonKey() final  int storagePort;
+/// Project id sent to the emulators.
+///
+/// Applied only while the emulator is enabled (`Arguments.shouldUseFirebaseEmulator`
+/// or [overrideUseFirebaseEmulator]). `FirebaseInitializer` keeps the
+/// `FirebaseOptions` passed to `initialize` and replaces `projectId` with this
+/// value, so Auth, Firestore, and Storage stay on the default app.
+///
+/// Match the project the emulator was started with (`.firebaserc`, or
+/// `firebase emulators:start --project …`). `firebase.json` does not hold this
+/// id. A `demo-` prefix marks a demo project that does not need a real Firebase
+/// project. When null or blank, the project id from `FirebaseOptions` is used
+/// unchanged.
+@override@JsonKey() final  String? emulatorProjectId;
 
 /// Create a copy of EmulatorConfig
 /// with the given fields replaced by the non-null parameter values.
@@ -239,16 +265,16 @@ _$EmulatorConfigCopyWith<_EmulatorConfig> get copyWith => __$EmulatorConfigCopyW
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _EmulatorConfig&&(identical(other.host, host) || other.host == host)&&(identical(other.hostIp, hostIp) || other.hostIp == hostIp)&&(identical(other.useDeviceEmulator, useDeviceEmulator) || other.useDeviceEmulator == useDeviceEmulator)&&(identical(other.overrideUseFirebaseEmulator, overrideUseFirebaseEmulator) || other.overrideUseFirebaseEmulator == overrideUseFirebaseEmulator)&&(identical(other.useFirebaseAuth, useFirebaseAuth) || other.useFirebaseAuth == useFirebaseAuth)&&(identical(other.useFirebaseFirestore, useFirebaseFirestore) || other.useFirebaseFirestore == useFirebaseFirestore)&&(identical(other.useFirebaseStorage, useFirebaseStorage) || other.useFirebaseStorage == useFirebaseStorage)&&(identical(other.authPort, authPort) || other.authPort == authPort)&&(identical(other.firestorePort, firestorePort) || other.firestorePort == firestorePort)&&(identical(other.storagePort, storagePort) || other.storagePort == storagePort));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _EmulatorConfig&&(identical(other.host, host) || other.host == host)&&(identical(other.hostIp, hostIp) || other.hostIp == hostIp)&&(identical(other.useDeviceEmulator, useDeviceEmulator) || other.useDeviceEmulator == useDeviceEmulator)&&(identical(other.overrideUseFirebaseEmulator, overrideUseFirebaseEmulator) || other.overrideUseFirebaseEmulator == overrideUseFirebaseEmulator)&&(identical(other.useFirebaseAuth, useFirebaseAuth) || other.useFirebaseAuth == useFirebaseAuth)&&(identical(other.useFirebaseFirestore, useFirebaseFirestore) || other.useFirebaseFirestore == useFirebaseFirestore)&&(identical(other.useFirebaseStorage, useFirebaseStorage) || other.useFirebaseStorage == useFirebaseStorage)&&(identical(other.authPort, authPort) || other.authPort == authPort)&&(identical(other.firestorePort, firestorePort) || other.firestorePort == firestorePort)&&(identical(other.storagePort, storagePort) || other.storagePort == storagePort)&&(identical(other.emulatorProjectId, emulatorProjectId) || other.emulatorProjectId == emulatorProjectId));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,host,hostIp,useDeviceEmulator,overrideUseFirebaseEmulator,useFirebaseAuth,useFirebaseFirestore,useFirebaseStorage,authPort,firestorePort,storagePort);
+int get hashCode => Object.hash(runtimeType,host,hostIp,useDeviceEmulator,overrideUseFirebaseEmulator,useFirebaseAuth,useFirebaseFirestore,useFirebaseStorage,authPort,firestorePort,storagePort,emulatorProjectId);
 
 @override
 String toString() {
-  return 'EmulatorConfig(host: $host, hostIp: $hostIp, useDeviceEmulator: $useDeviceEmulator, overrideUseFirebaseEmulator: $overrideUseFirebaseEmulator, useFirebaseAuth: $useFirebaseAuth, useFirebaseFirestore: $useFirebaseFirestore, useFirebaseStorage: $useFirebaseStorage, authPort: $authPort, firestorePort: $firestorePort, storagePort: $storagePort)';
+  return 'EmulatorConfig(host: $host, hostIp: $hostIp, useDeviceEmulator: $useDeviceEmulator, overrideUseFirebaseEmulator: $overrideUseFirebaseEmulator, useFirebaseAuth: $useFirebaseAuth, useFirebaseFirestore: $useFirebaseFirestore, useFirebaseStorage: $useFirebaseStorage, authPort: $authPort, firestorePort: $firestorePort, storagePort: $storagePort, emulatorProjectId: $emulatorProjectId)';
 }
 
 
@@ -259,7 +285,7 @@ abstract mixin class _$EmulatorConfigCopyWith<$Res> implements $EmulatorConfigCo
   factory _$EmulatorConfigCopyWith(_EmulatorConfig value, $Res Function(_EmulatorConfig) _then) = __$EmulatorConfigCopyWithImpl;
 @override @useResult
 $Res call({
- String host, String? hostIp, bool useDeviceEmulator, bool? overrideUseFirebaseEmulator, bool useFirebaseAuth, bool useFirebaseFirestore, bool useFirebaseStorage, int authPort, int firestorePort, int storagePort
+ String host, String? hostIp, bool useDeviceEmulator, bool? overrideUseFirebaseEmulator, bool useFirebaseAuth, bool useFirebaseFirestore, bool useFirebaseStorage, int authPort, int firestorePort, int storagePort, String? emulatorProjectId
 });
 
 
@@ -276,7 +302,7 @@ class __$EmulatorConfigCopyWithImpl<$Res>
 
 /// Create a copy of EmulatorConfig
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? host = null,Object? hostIp = freezed,Object? useDeviceEmulator = null,Object? overrideUseFirebaseEmulator = freezed,Object? useFirebaseAuth = null,Object? useFirebaseFirestore = null,Object? useFirebaseStorage = null,Object? authPort = null,Object? firestorePort = null,Object? storagePort = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? host = null,Object? hostIp = freezed,Object? useDeviceEmulator = null,Object? overrideUseFirebaseEmulator = freezed,Object? useFirebaseAuth = null,Object? useFirebaseFirestore = null,Object? useFirebaseStorage = null,Object? authPort = null,Object? firestorePort = null,Object? storagePort = null,Object? emulatorProjectId = freezed,}) {
   return _then(_EmulatorConfig(
 host: null == host ? _self.host : host // ignore: cast_nullable_to_non_nullable
 as String,hostIp: freezed == hostIp ? _self.hostIp : hostIp // ignore: cast_nullable_to_non_nullable
@@ -288,7 +314,8 @@ as bool,useFirebaseStorage: null == useFirebaseStorage ? _self.useFirebaseStorag
 as bool,authPort: null == authPort ? _self.authPort : authPort // ignore: cast_nullable_to_non_nullable
 as int,firestorePort: null == firestorePort ? _self.firestorePort : firestorePort // ignore: cast_nullable_to_non_nullable
 as int,storagePort: null == storagePort ? _self.storagePort : storagePort // ignore: cast_nullable_to_non_nullable
-as int,
+as int,emulatorProjectId: freezed == emulatorProjectId ? _self.emulatorProjectId : emulatorProjectId // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 
