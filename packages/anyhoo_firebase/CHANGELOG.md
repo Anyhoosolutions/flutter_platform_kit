@@ -1,3 +1,7 @@
+## 0.0.20
+
+* Add optional `EmulatorConfig.emulatorProjectId` so emulator runs can use a different Firebase project id than production `FirebaseOptions`
+
 ## 0.0.19
 
 * Add `FirestoreWhere` filters for `getCollection` / `watchCollection`

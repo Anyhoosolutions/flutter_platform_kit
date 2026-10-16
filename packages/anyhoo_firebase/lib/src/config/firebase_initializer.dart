@@ -1,6 +1,7 @@
 import 'package:anyhoo_core/models/arguments.dart';
 import 'package:anyhoo_core/widgets/error_display_widget.dart';
 import 'package:anyhoo_firebase/src/config/emulator_config.dart';
+import 'package:anyhoo_firebase/src/config/firebase_options_for_emulator.dart';
 import 'package:anyhoo_firebase/src/os_tool.dart';
 import 'package:anyhoo_logging/anyhoo_logging.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -24,16 +25,25 @@ class FirebaseInitializer {
   FirebaseStorage? _storage;
   final bool _shouldSetupErrorHandling;
 
-  FirebaseInitializer({required this.arguments, required this.emulatorConfig, this._shouldSetupErrorHandling = true});
+  FirebaseInitializer({
+    required this.arguments,
+    required this.emulatorConfig,
+    this._shouldSetupErrorHandling = true,
+  });
 
   Future<void> initialize(FirebaseOptions firebaseOptions) async {
     _log.info('!! Initializing Firebase');
     _log.info('!! useFakeData: ${arguments.useFakeData}');
     _log.info('!! useFirebaseAuth: ${emulatorConfig.useFirebaseAuth}');
-    _log.info('!! useFirebaseFirestore: ${emulatorConfig.useFirebaseFirestore}');
+    _log.info(
+      '!! useFirebaseFirestore: ${emulatorConfig.useFirebaseFirestore}',
+    );
     _log.info('!! useFirebaseStorage: ${emulatorConfig.useFirebaseStorage}');
     _log.info('!! hostIp: ${emulatorConfig.hostIp}');
-    _log.info('!! overrideUseFirebaseEmulator: ${emulatorConfig.overrideUseFirebaseEmulator}');
+    _log.info(
+      '!! overrideUseFirebaseEmulator: ${emulatorConfig.overrideUseFirebaseEmulator}',
+    );
+    _log.info('!! emulatorProjectId: ${emulatorConfig.emulatorProjectId}');
 
     if (arguments.useFakeData) {
       _log.info('!! Using fake data, skipping Firebase initialization');
@@ -69,14 +79,32 @@ class FirebaseInitializer {
     }
   }
 
-  Future<FirebaseApp> _ensureFirebaseApp(FirebaseOptions firebaseOptions) async {
+  Future<FirebaseApp> _ensureFirebaseApp(
+    FirebaseOptions firebaseOptions,
+  ) async {
+    final options = firebaseOptionsForEmulator(
+      options: firebaseOptions,
+      emulatorEnabled: _isEmulatorEnabled(),
+      emulatorProjectId: emulatorConfig.emulatorProjectId,
+    );
+    if (options.projectId != firebaseOptions.projectId) {
+      _log.info(
+        '!! Using emulator project id: ${options.projectId} (options had ${firebaseOptions.projectId})',
+      );
+    }
+
     if (Firebase.apps.isNotEmpty) {
       _log.info('!! Firebase already initialized, using existing app');
+      if (options.projectId != firebaseOptions.projectId) {
+        _log.warning(
+          '!! emulatorProjectId is set but Firebase was already initialized; project id was not changed',
+        );
+      }
       return Firebase.app();
     }
 
     try {
-      final firebase = await Firebase.initializeApp(options: firebaseOptions);
+      final firebase = await Firebase.initializeApp(options: options);
       _log.info('!! Firebase initialized');
       return firebase;
     } on FirebaseException catch (e) {
@@ -90,7 +118,9 @@ class FirebaseInitializer {
 
   bool _isEmulatorEnabled() {
     if (emulatorConfig.overrideUseFirebaseEmulator != null) {
-      _log.info('Firebase emulator is ${emulatorConfig.overrideUseFirebaseEmulator! ? 'enabled' : 'disabled'}');
+      _log.info(
+        'Firebase emulator is ${emulatorConfig.overrideUseFirebaseEmulator! ? 'enabled' : 'disabled'}',
+      );
       return emulatorConfig.overrideUseFirebaseEmulator!;
     }
     final isEnabled = arguments.shouldUseFirebaseEmulator();
@@ -113,7 +143,9 @@ class FirebaseInitializer {
       if (_isEmulatorEnabled()) {
         final host = _getHost();
         if (host != null) {
-          _log.info('!! Configuring Auth emulator with host: $host, port: ${emulatorConfig.authPort}');
+          _log.info(
+            '!! Configuring Auth emulator with host: $host, port: ${emulatorConfig.authPort}',
+          );
           await _auth!.useAuthEmulator(host, emulatorConfig.authPort);
           _log.info('!! Successfully configured Auth emulator');
           // On web and macOS desktop, brief delay so the native channel is ready
@@ -122,11 +154,17 @@ class FirebaseInitializer {
             _log.info('!! Auth emulator ready delay completed');
           }
         } else {
-          _log.warning('!! Auth emulator was enabled but host is null; Auth will use production Identity Toolkit');
+          _log.warning(
+            '!! Auth emulator was enabled but host is null; Auth will use production Identity Toolkit',
+          );
         }
       } else {
-        _log.info('!! Auth emulator is DISABLED - using production Firebase Auth');
-        _log.info('!! Firebase Auth will connect to: https://identitytoolkit.googleapis.com');
+        _log.info(
+          '!! Auth emulator is DISABLED - using production Firebase Auth',
+        );
+        _log.info(
+          '!! Firebase Auth will connect to: https://identitytoolkit.googleapis.com',
+        );
       }
     } catch (e, stackTrace) {
       _log.info('!! Error: $e');
@@ -172,7 +210,9 @@ class FirebaseInitializer {
             'projectId=${Firebase.app().options.projectId}',
           );
         } else {
-          _log.warning('!! Firestore emulator was enabled but host is null; Firestore will use production');
+          _log.warning(
+            '!! Firestore emulator was enabled but host is null; Firestore will use production',
+          );
           debugPrint(
             'FIRESTORE_TRANSPORT: production (emulator flag on but host was null) '
             'projectId=${Firebase.app().options.projectId}',
@@ -210,7 +250,9 @@ class FirebaseInitializer {
     }
 
     _log.info('!! hostIp: ${emulatorConfig.hostIp}');
-    _log.info('!! arguments.shouldUseEmulator(): ${arguments.shouldUseFirebaseEmulator()}');
+    _log.info(
+      '!! arguments.shouldUseEmulator(): ${arguments.shouldUseFirebaseEmulator()}',
+    );
     _log.info('!! OSTool.getPlatformType(): ${OSTool.getPlatformType()}');
     if (arguments.shouldUseFirebaseEmulator()) {
       final platform = OSTool.getPlatformType();
@@ -234,7 +276,9 @@ class FirebaseInitializer {
         (PlatformType.linux, _) => 'localhost',
         (PlatformType.fuchsia, _) => 'localhost',
       };
-      _log.info('!! Emulator host for $platform (useDeviceEmulator: ${arguments.useDeviceEmulator}): $host');
+      _log.info(
+        '!! Emulator host for $platform (useDeviceEmulator: ${arguments.useDeviceEmulator}): $host',
+      );
       return host;
     } else {
       _log.info('!! host: null');
@@ -263,7 +307,9 @@ class FirebaseInitializer {
             '!! Successfully configured Storage emulator with host: $host, port: ${emulatorConfig.storagePort}',
           );
         } else {
-          _log.warning('!! Storage emulator was enabled but host is null; Storage will use production');
+          _log.warning(
+            '!! Storage emulator was enabled but host is null; Storage will use production',
+          );
         }
       }
       _log.info('!! Storage configured: ${_storage!}');
@@ -297,13 +343,18 @@ class FirebaseInitializer {
         errorDetails.exception,
         errorDetails.stack,
       );
-      SentryHelper.captureException(errorDetails.exception, stackTrace: errorDetails.stack, fatal: true);
+      SentryHelper.captureException(
+        errorDetails.exception,
+        stackTrace: errorDetails.stack,
+        fatal: true,
+      );
       return ErrorDisplayWidget(errorDetails: errorDetails);
     };
 
     // Pass all uncaught asynchronous errors that aren't handled by the Flutter framework to Crashlytics and Sentry
     PlatformDispatcher.instance.onError = (error, stack) {
-      if ((!kDebugMode && !kIsWeb) || (arguments.useFirebaseAnalytics ?? false)) {
+      if ((!kDebugMode && !kIsWeb) ||
+          (arguments.useFirebaseAnalytics ?? false)) {
         FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
       }
       SentryHelper.captureException(error, stackTrace: stack, fatal: true);
@@ -318,7 +369,9 @@ class FirebaseInitializer {
         if (!kDebugMode || (arguments.useFirebaseAnalytics ?? false)) {
           final analytics = FirebaseAnalytics.instance;
           await analytics.setAnalyticsCollectionEnabled(true);
-          await analytics.setSessionTimeoutDuration(const Duration(minutes: 30));
+          await analytics.setSessionTimeoutDuration(
+            const Duration(minutes: 30),
+          );
           await analytics.logAppOpen();
           _log.info('XX Firebase Analytics initialized successfully');
         } else {

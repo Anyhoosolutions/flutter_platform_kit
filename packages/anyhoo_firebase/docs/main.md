@@ -24,6 +24,20 @@ final storageService = AnyhooFirebaseStorageService(storage: firebaseInitializer
 
 `Arguments.shouldUseFirebaseEmulator()` decides whether emulators are used, unless `EmulatorConfig.overrideUseFirebaseEmulator` is set. `arguments.useFakeData` skips Firebase initialization entirely.
 
+### Emulator project id
+
+`EmulatorConfig.emulatorProjectId` is optional. When the emulator is enabled and this is set, initialization keeps the `FirebaseOptions` you passed in and replaces only `projectId`. Auth, Firestore, and Storage still use the default app. When it is null or blank, the project id from `FirebaseOptions` is unchanged.
+
+That id is what the emulator partitions data under. It should match the project the emulator was started with (`.firebaserc`, or `firebase emulators:start --project …`). `firebase.json` does not contain it. A `demo-` prefix marks a demo project that does not need a real Firebase project.
+
+```dart
+final emulatorConfig = EmulatorConfig(
+  hostIp: 'localhost',
+  firestorePort: 8080,
+  emulatorProjectId: 'demo-listwhatever',
+);
+```
+
 ## FirestoreService
 
 Pass collection paths (`users`) or document paths (`users/abc`). Collection reads always include an `id` field. Document reads do the same.
