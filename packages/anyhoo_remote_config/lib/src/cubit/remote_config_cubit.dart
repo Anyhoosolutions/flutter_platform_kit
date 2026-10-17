@@ -39,6 +39,7 @@ class RemoteConfigCubit<T extends AnyhooRemoteConfigValues<T>>
   final AnyhooRemoteConfigService service;
   StreamSubscription<void>? _configUpdateSubscription;
   Future<void> _pendingUpdate = Future<void>.value();
+  var _closing = false;
 
   RemoteConfigCubit({required this.service, required T initialValues})
     : super(
@@ -62,11 +63,11 @@ class RemoteConfigCubit<T extends AnyhooRemoteConfigValues<T>>
   }
 
   Future<void> _readAndEmit() async {
-    if (isClosed) {
+    if (isClosed || _closing) {
       return;
     }
     final allValues = await service.getAll();
-    if (isClosed) {
+    if (isClosed || _closing) {
       return;
     }
     final nextValues = state.values.withMap(allValues);
@@ -83,9 +84,9 @@ class RemoteConfigCubit<T extends AnyhooRemoteConfigValues<T>>
 
   @override
   Future<void> close() async {
+    _closing = true;
     await _configUpdateSubscription?.cancel();
     _configUpdateSubscription = null;
-    await _pendingUpdate;
     await service.dispose();
     return super.close();
   }
