@@ -9,10 +9,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 /// [updateIfPublished] changes it later and does nothing when they have never shared.
 class PublicProfileCubit extends Cubit<PublicProfileState> {
   PublicProfileCubit({
-    required PublicProfileRepository repository,
+    required this._repository,
     required this.userId,
-  }) : _repository = repository,
-       super(const PublicProfileState());
+  }) : super(const PublicProfileState());
 
   final PublicProfileRepository _repository;
   final String userId;
