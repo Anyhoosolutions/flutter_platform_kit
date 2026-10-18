@@ -110,6 +110,8 @@ class AnyhooMockAuthService implements AnyhooAuthService {
         'displayName': email.split('@').first,
         'photoURL': null,
         'emailVerified': true,
+        'isAnonymous': false,
+        'providerIds': ['password'],
       };
     }
 
@@ -126,6 +128,8 @@ class AnyhooMockAuthService implements AnyhooAuthService {
       'displayName': 'Google User',
       'photoURL': null,
       'emailVerified': true,
+      'isAnonymous': false,
+      'providerIds': ['google.com'],
     };
     _currentUser = user;
     _emitAuthState();
@@ -140,6 +144,8 @@ class AnyhooMockAuthService implements AnyhooAuthService {
       'displayName': 'Apple User',
       'photoURL': null,
       'emailVerified': true,
+      'isAnonymous': false,
+      'providerIds': ['apple.com'],
     };
     _currentUser = user;
     _emitAuthState();
@@ -154,6 +160,8 @@ class AnyhooMockAuthService implements AnyhooAuthService {
       'displayName': 'Anonymous User',
       'photoURL': null,
       'emailVerified': false,
+      'isAnonymous': true,
+      'providerIds': <String>[],
     };
     _currentUser = user;
     _emitAuthState();

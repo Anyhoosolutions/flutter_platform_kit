@@ -57,9 +57,8 @@ class AnyhooFirebaseAuthService<T extends AnyhooUser> implements AnyhooAuthServi
         _googleClientId = _nonEmpty(googleClientId) ?? _nonEmpty(const String.fromEnvironment('GOOGLE_CLIENT_ID')),
         _googleServerClientId =
             _nonEmpty(googleServerClientId) ?? _nonEmpty(const String.fromEnvironment('GOOGLE_SERVER_CLIENT_ID')) {
-    // Listen to auth state changes and update current user
-
-    _firebaseAuth.authStateChanges().listen((firebaseUser) {
+    // userChanges includes profile updates such as display name and email verification.
+    _firebaseAuth.userChanges().listen((firebaseUser) {
       _log.info('Auth state changed (uid): ${firebaseUser?.uid ?? 'null'}');
       if (firebaseUser != null) {
         final userData = _firebaseUserToMap(firebaseUser);
@@ -72,7 +71,7 @@ class AnyhooFirebaseAuthService<T extends AnyhooUser> implements AnyhooAuthServi
 
   @override
   Stream<Map<String, dynamic>?> get authStateChanges {
-    return _firebaseAuth.authStateChanges().map((firebaseUser) {
+    return _firebaseAuth.userChanges().map((firebaseUser) {
       _log.info('Auth state changed (uid): ${firebaseUser?.uid ?? 'null'}');
       if (firebaseUser != null) {
         return _firebaseUserToMap(firebaseUser);
@@ -281,6 +280,8 @@ class AnyhooFirebaseAuthService<T extends AnyhooUser> implements AnyhooAuthServi
       'displayName': firebaseUser.displayName,
       'photoURL': firebaseUser.photoURL,
       'emailVerified': firebaseUser.emailVerified,
+      'isAnonymous': firebaseUser.isAnonymous,
+      'providerIds': firebaseUser.providerData.map((info) => info.providerId).toList(),
       'phoneNumber': firebaseUser.phoneNumber,
       'metadata': {
         'creationTime': firebaseUser.metadata.creationTime?.toIso8601String(),
