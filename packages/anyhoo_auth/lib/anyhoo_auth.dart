@@ -7,6 +7,7 @@ library;
 export 'cubit/anyhoo_auth_cubit.dart';
 export 'cubit/anyhoo_auth_state.dart';
 export 'models/anyhoo_user_converter.dart';
+export 'services/anyhoo_auth_exception.dart';
 export 'services/anyhoo_auth_service.dart';
 export 'services/anyhoo_firebase_auth_service.dart';
 export 'services/anyhoo_mock_auth_service.dart';

@@ -1,3 +1,5 @@
+import 'package:anyhoo_auth/services/anyhoo_auth_exception.dart';
+
 /// Abstract interface for authentication services.
 ///
 /// Implement this interface to create custom authentication services.
@@ -54,4 +56,25 @@ abstract class AnyhooAuthService {
 
   /// Clear the current user without calling logout API.
   void clearUser();
+
+  /// Updates the Firebase Auth display name for the signed-in user.
+  Future<void> updateDisplayName(String displayName);
+
+  /// Sends a verification email to the signed-in user.
+  Future<void> sendEmailVerification();
+
+  /// Reauthenticates with [currentPassword] and sets [newPassword].
+  ///
+  /// Throws [AnyhooAuthException] with `wrong-password` or `weak-password`.
+  Future<void> updatePassword({
+    required String currentPassword,
+    required String newPassword,
+  });
+
+  /// Deletes the signed-in Firebase Auth user.
+  ///
+  /// Pass [currentPassword] for an email/password account so the session can
+  /// be reauthenticated first. Throws [AnyhooAuthException] with
+  /// `requires-recent-login` when Firebase still requires a fresh sign-in.
+  Future<void> deleteAccount({String? currentPassword});
 }

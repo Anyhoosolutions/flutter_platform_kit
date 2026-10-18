@@ -1,4 +1,6 @@
 import 'dart:async';
+
+import 'package:anyhoo_auth/services/anyhoo_auth_exception.dart';
 import 'package:anyhoo_auth/services/anyhoo_auth_service.dart';
 
 /// Mock implementation of [AnyhooAuthService] for testing and development.
@@ -185,6 +187,52 @@ class AnyhooMockAuthService implements AnyhooAuthService {
   void clearUser() {
     _currentUser = null;
     _emitAuthState();
+  }
+
+  @override
+  Future<void> updateDisplayName(String displayName) async {
+    final user = _requireUser();
+    _currentUser = {...user, 'displayName': displayName};
+    _emitAuthState();
+  }
+
+  @override
+  Future<void> sendEmailVerification() async {
+    final user = _requireUser();
+    _currentUser = {...user, 'emailVerified': true};
+    _emitAuthState();
+  }
+
+  @override
+  Future<void> updatePassword({
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    _requireUser();
+    if (currentPassword.isEmpty) {
+      throw const AnyhooAuthException('wrong-password');
+    }
+    if (newPassword.length < 6) {
+      throw const AnyhooAuthException('weak-password');
+    }
+  }
+
+  @override
+  Future<void> deleteAccount({String? currentPassword}) async {
+    _requireUser();
+    if (currentPassword != null && currentPassword.isEmpty) {
+      throw const AnyhooAuthException('wrong-password');
+    }
+    _currentUser = null;
+    _emitAuthState();
+  }
+
+  Map<String, dynamic> _requireUser() {
+    final user = _currentUser;
+    if (user == null) {
+      throw const AnyhooAuthException('no-user');
+    }
+    return user;
   }
 
   /// Dispose the stream controller.
