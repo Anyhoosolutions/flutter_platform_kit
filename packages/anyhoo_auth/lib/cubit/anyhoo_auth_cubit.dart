@@ -219,6 +219,65 @@ class AnyhooAuthCubit<T extends AnyhooUser> extends Cubit<AnyhooAuthState<T>> {
     emit(state.copyWith(user: updatedUser, isLoading: false));
   }
 
+  Future<void> updateDisplayName(String displayName) async {
+    _log.info('Updating display name');
+    emit(state.copyWith(isLoading: true, errorMessage: null));
+    try {
+      await authService.updateDisplayName(displayName);
+      emit(state.copyWith(isLoading: false, errorMessage: null));
+    } catch (e, stackTrace) {
+      _log.severe('Error updating display name', e);
+      SentryHelper.captureException(e, stackTrace: stackTrace, fatal: false);
+      emit(state.copyWith(isLoading: false, errorMessage: e.toString()));
+      rethrow;
+    }
+  }
+
+  Future<void> sendEmailVerification() async {
+    _log.info('Sending email verification');
+    emit(state.copyWith(isLoading: true, errorMessage: null));
+    try {
+      await authService.sendEmailVerification();
+      emit(state.copyWith(isLoading: false, errorMessage: null));
+    } catch (e, stackTrace) {
+      _log.severe('Error sending email verification', e);
+      SentryHelper.captureException(e, stackTrace: stackTrace, fatal: false);
+      emit(state.copyWith(isLoading: false, errorMessage: e.toString()));
+      rethrow;
+    }
+  }
+
+  Future<void> updatePassword({
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    _log.info('Updating password');
+    emit(state.copyWith(isLoading: true, errorMessage: null));
+    try {
+      await authService.updatePassword(currentPassword: currentPassword, newPassword: newPassword);
+    } catch (e, stackTrace) {
+      _log.severe('Error updating password', e);
+      SentryHelper.captureException(e, stackTrace: stackTrace, fatal: false);
+      emit(state.copyWith(isLoading: false, errorMessage: e.toString()));
+      rethrow;
+    }
+    emit(state.copyWith(isLoading: false, errorMessage: null));
+  }
+
+  Future<void> deleteAccount({String? currentPassword}) async {
+    _log.info('Deleting account');
+    emit(state.copyWith(isLoading: true, errorMessage: null));
+    try {
+      await authService.deleteAccount(currentPassword: currentPassword);
+      emit(state.copyWith(isLoading: false, errorMessage: null));
+    } catch (e, stackTrace) {
+      _log.severe('Error deleting account', e);
+      SentryHelper.captureException(e, stackTrace: stackTrace, fatal: false);
+      emit(state.copyWith(isLoading: false, errorMessage: e.toString()));
+      rethrow;
+    }
+  }
+
   T copyAnyhooUser(T user) {
     return safeFromJson((json) => converter.fromJson(json), user.toJson());
   }

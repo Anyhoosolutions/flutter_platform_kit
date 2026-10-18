@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:anyhoo_auth/services/anyhoo_auth_exception.dart';
 import 'package:anyhoo_auth/services/anyhoo_auth_service.dart';
 import 'package:anyhoo_logging/anyhoo_logging.dart';
 import 'package:anyhoo_models/anyhoo_models.dart';
@@ -57,9 +58,8 @@ class AnyhooFirebaseAuthService<T extends AnyhooUser> implements AnyhooAuthServi
         _googleClientId = _nonEmpty(googleClientId) ?? _nonEmpty(const String.fromEnvironment('GOOGLE_CLIENT_ID')),
         _googleServerClientId =
             _nonEmpty(googleServerClientId) ?? _nonEmpty(const String.fromEnvironment('GOOGLE_SERVER_CLIENT_ID')) {
-    // Listen to auth state changes and update current user
-
-    _firebaseAuth.authStateChanges().listen((firebaseUser) {
+    // userChanges includes profile updates such as display name and email verification.
+    _firebaseAuth.userChanges().listen((firebaseUser) {
       _log.info('Auth state changed (uid): ${firebaseUser?.uid ?? 'null'}');
       if (firebaseUser != null) {
         final userData = _firebaseUserToMap(firebaseUser);
@@ -72,7 +72,7 @@ class AnyhooFirebaseAuthService<T extends AnyhooUser> implements AnyhooAuthServi
 
   @override
   Stream<Map<String, dynamic>?> get authStateChanges {
-    return _firebaseAuth.authStateChanges().map((firebaseUser) {
+    return _firebaseAuth.userChanges().map((firebaseUser) {
       _log.info('Auth state changed (uid): ${firebaseUser?.uid ?? 'null'}');
       if (firebaseUser != null) {
         return _firebaseUserToMap(firebaseUser);
@@ -273,6 +273,79 @@ class AnyhooFirebaseAuthService<T extends AnyhooUser> implements AnyhooAuthServi
     _currentUser = null;
   }
 
+  @override
+  Future<void> updateDisplayName(String displayName) async {
+    final user = _requireUser();
+    try {
+      await user.updateDisplayName(displayName);
+      await user.reload();
+      final refreshed = _firebaseAuth.currentUser;
+      if (refreshed != null) {
+        setUser(_firebaseUserToMap(refreshed));
+      }
+    } on firebase_auth.FirebaseAuthException catch (error) {
+      throw _authException(error);
+    }
+  }
+
+  @override
+  Future<void> sendEmailVerification() async {
+    final user = _requireUser();
+    try {
+      await user.sendEmailVerification();
+    } on firebase_auth.FirebaseAuthException catch (error) {
+      throw _authException(error);
+    }
+  }
+
+  @override
+  Future<void> updatePassword({
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    final user = _requireUser();
+    final email = user.email;
+    if (email == null || email.isEmpty) {
+      throw const AnyhooAuthException('no-email');
+    }
+    try {
+      final credential = firebase_auth.EmailAuthProvider.credential(
+        email: email,
+        password: currentPassword,
+      );
+      await user.reauthenticateWithCredential(credential);
+      await user.updatePassword(newPassword);
+    } on firebase_auth.FirebaseAuthException catch (error) {
+      throw _authException(error);
+    }
+  }
+
+  @override
+  Future<void> deleteAccount({String? currentPassword}) async {
+    final user = _requireUser();
+    try {
+      final email = user.email;
+      if (currentPassword != null && email != null && email.isNotEmpty) {
+        final credential = firebase_auth.EmailAuthProvider.credential(
+          email: email,
+          password: currentPassword,
+        );
+        await user.reauthenticateWithCredential(credential);
+      }
+      await user.delete();
+    } on firebase_auth.FirebaseAuthException catch (error) {
+      throw _authException(error);
+    }
+  }
+
+  firebase_auth.User _requireUser() {
+    final user = _firebaseAuth.currentUser;
+    if (user == null) {
+      throw const AnyhooAuthException('no-user');
+    }
+    return user;
+  }
+
   /// Converts a Firebase User to a Map that can be used by the converter.
   Map<String, dynamic> _firebaseUserToMap(firebase_auth.User firebaseUser) {
     final map = {
@@ -281,6 +354,8 @@ class AnyhooFirebaseAuthService<T extends AnyhooUser> implements AnyhooAuthServi
       'displayName': firebaseUser.displayName,
       'photoURL': firebaseUser.photoURL,
       'emailVerified': firebaseUser.emailVerified,
+      'isAnonymous': firebaseUser.isAnonymous,
+      'providerIds': firebaseUser.providerData.map((info) => info.providerId).toList(),
       'phoneNumber': firebaseUser.phoneNumber,
       'metadata': {
         'creationTime': firebaseUser.metadata.creationTime?.toIso8601String(),
@@ -289,6 +364,14 @@ class AnyhooFirebaseAuthService<T extends AnyhooUser> implements AnyhooAuthServi
     };
     return map;
   }
+}
+
+AnyhooAuthException _authException(firebase_auth.FirebaseAuthException error) {
+  final code = switch (error.code) {
+    'invalid-credential' => 'wrong-password',
+    _ => error.code,
+  };
+  return AnyhooAuthException(code, message: error.message);
 }
 
 String? _nonEmpty(String? value) {

@@ -530,6 +530,35 @@ void main() {
       });
     });
 
+    group('Account actions', () {
+      test('updateDisplayName delegates to the auth service', () async {
+        when(() => mockAuthService.updateDisplayName(any())).thenAnswer((_) async {});
+        cubit = AnyhooAuthCubit(authService: mockAuthService, converter: testConverter);
+
+        await cubit.updateDisplayName('Ada');
+
+        verify(() => mockAuthService.updateDisplayName('Ada')).called(1);
+        expect(cubit.state.isLoading, isFalse);
+      });
+
+      test('updatePassword surfaces the auth service error', () async {
+        when(
+          () => mockAuthService.updatePassword(
+            currentPassword: any(named: 'currentPassword'),
+            newPassword: any(named: 'newPassword'),
+          ),
+        ).thenThrow(Exception('weak-password'));
+        cubit = AnyhooAuthCubit(authService: mockAuthService, converter: testConverter);
+
+        expect(
+          () => cubit.updatePassword(currentPassword: 'secret', newPassword: 'short'),
+          throwsA(isA<Exception>()),
+        );
+        expect(cubit.state.errorMessage, contains('weak-password'));
+        expect(cubit.state.isLoading, isFalse);
+      });
+    });
+
     group('Subscription Management', () {
       test('cancels subscription on close', () async {
         final controller = StreamController<Map<String, dynamic>?>();
