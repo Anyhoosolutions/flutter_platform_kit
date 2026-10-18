@@ -1,17 +1,21 @@
 import 'package:anyhoo_remote_config/anyhoo_remote_config.dart';
 
-class RemoteConfigValues extends AnyhooRemoteConfigValues {
-  Map<String, String> values = {};
+class RemoteConfigValues
+    extends AnyhooRemoteConfigValues<RemoteConfigValues> {
+  RemoteConfigValues([Map<String, String>? values]) : values = {...?values};
+
+  final Map<String, String> values;
 
   @override
-  void fromMap(Map<String, dynamic> map) {
-    values.clear();
-    values.addAll(map.cast<String, String>());
+  RemoteConfigValues withMap(Map<String, dynamic> map) {
+    return RemoteConfigValues(
+      map.map((key, value) => MapEntry(key, value.toString())),
+    );
   }
 
   @override
   Map<String, dynamic> toMap() {
-    return values.cast<String, dynamic>();
+    return Map<String, dynamic>.from(values);
   }
 
   @override

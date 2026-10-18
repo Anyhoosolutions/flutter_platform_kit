@@ -1,4 +1,4 @@
-import 'dart:async'; // Added for StreamController
+import 'dart:async';
 
 import 'package:anyhoo_remote_config/anyhoo_remote_config.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
@@ -7,54 +7,79 @@ import 'package:logging/logging.dart';
 class FirebaseAnyhooRemoteConfigService implements AnyhooRemoteConfigService {
   final _log = Logger('FirebaseRemoteConfigService');
 
+  final Duration minimumFetchInterval;
+  final Duration fetchTimeout;
+  final FirebaseRemoteConfig _remoteConfig;
   final Map<String, dynamic> _defaults = {};
+  final _configUpdateController = StreamController<void>.broadcast();
+  StreamSubscription<RemoteConfigUpdate>? _updatedSubscription;
 
-  FirebaseAnyhooRemoteConfigService({required Map<String, dynamic> defaults}) {
+  FirebaseAnyhooRemoteConfigService({
+    required Map<String, dynamic> defaults,
+    this.minimumFetchInterval = const Duration(hours: 1),
+    this.fetchTimeout = const Duration(seconds: 10),
+    FirebaseRemoteConfig? remoteConfig,
+  }) : _remoteConfig = remoteConfig ?? FirebaseRemoteConfig.instance {
     _defaults.addAll(defaults);
   }
-
-  // Stream controller for config updates
-  final _configUpdateController = StreamController<void>.broadcast();
 
   @override
   Future<void> setupRemoteConfig() async {
     _log.info('Setting up remote config');
-    final remoteConfig = FirebaseRemoteConfig.instance;
-    remoteConfig.setConfigSettings(
-      RemoteConfigSettings(fetchTimeout: const Duration(seconds: 10), minimumFetchInterval: const Duration(hours: 1)),
+    await _remoteConfig.setConfigSettings(
+      RemoteConfigSettings(
+        fetchTimeout: fetchTimeout,
+        minimumFetchInterval: minimumFetchInterval,
+      ),
     );
+    await _remoteConfig.setDefaults(_defaults);
+    await _remoteConfig.activate();
 
-    await remoteConfig.setDefaults(_defaults);
-
-    remoteConfig.onConfigUpdated.listen((event) async {
+    _updatedSubscription = _remoteConfig.onConfigUpdated.listen((event) async {
       _log.info('Remote config updated: ${event.updatedKeys}');
-      await remoteConfig.activate();
-      await getAll(); // Update our local values
-      _configUpdateController.add(null); // Notify listeners
+      await _remoteConfig.activate();
+      _notify();
     });
 
-    // Fetch and activate config immediately
-    await remoteConfig.fetch();
-    await remoteConfig.activate();
+    unawaited(_fetchInBackground());
+  }
 
-    // Load initial values
-    await getAll();
+  Future<void> _fetchInBackground() async {
+    try {
+      await _remoteConfig.fetch();
+      final activated = await _remoteConfig.activate();
+      if (activated) {
+        _notify();
+      }
+    } catch (error, stackTrace) {
+      _log.warning('Remote config fetch failed', error, stackTrace);
+    }
+  }
+
+  void _notify() {
+    if (!_configUpdateController.isClosed) {
+      _configUpdateController.add(null);
+    }
   }
 
   @override
   Future<Map<String, String>> getAll() async {
-    final remoteConfig = FirebaseRemoteConfig.instance;
-    final allValues = remoteConfig.getAll().map((key, value) => MapEntry(key, value.asString()));
+    final allValues = _remoteConfig.getAll().map(
+      (key, value) => MapEntry(key, value.asString()),
+    );
     _log.info('All remote config: $allValues');
     return allValues;
-  }
-
-  void dispose() {
-    _configUpdateController.close();
   }
 
   @override
   Stream<void> getConfigUpdatesStream() {
     return _configUpdateController.stream;
+  }
+
+  @override
+  Future<void> dispose() async {
+    await _updatedSubscription?.cancel();
+    _updatedSubscription = null;
+    await _configUpdateController.close();
   }
 }
