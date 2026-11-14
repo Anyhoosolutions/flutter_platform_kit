@@ -547,7 +547,7 @@ class _DropdownOverlay<T> extends StatelessWidget {
                 ),
               if (onCreate != null) ...[
                 const SizedBox(height: DesignTokens.spacingSm),
-                _AddNewFooter(controller: addController, onSubmit: onSubmitCreate),
+                _AddNewFooter(controller: addController, onSubmit: onSubmitCreate, autofocus: !searchEnabled),
               ],
             ],
           ),
@@ -676,10 +676,14 @@ class _SearchField extends StatelessWidget {
 }
 
 class _AddNewFooter extends StatelessWidget {
-  const _AddNewFooter({required this.controller, required this.onSubmit});
+  const _AddNewFooter({required this.controller, required this.onSubmit, required this.autofocus});
 
   final TextEditingController controller;
   final VoidCallback onSubmit;
+
+  /// Puts the cursor in the field when the dropdown opens, unless a search
+  /// field is shown and should take focus instead.
+  final bool autofocus;
 
   @override
   Widget build(BuildContext context) {
@@ -699,6 +703,7 @@ class _AddNewFooter extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: DesignTokens.spacingSm),
               child: TextField(
                 controller: controller,
+                autofocus: autofocus,
                 style: AnyhooTypography.body(BodySize.medium).copyWith(color: surface.primaryText),
                 decoration: InputDecoration(
                   hintText: 'New option name...',
