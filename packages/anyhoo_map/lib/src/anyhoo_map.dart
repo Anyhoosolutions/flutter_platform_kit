@@ -20,6 +20,13 @@ class AnyhooMap extends StatefulWidget {
   final ValueChanged<AnyhooLatLong>? onMapTapped;
   final AnyhooMarkerWidgetBuilder? markerBuilder;
 
+  /// The device's position, drawn as a "you are here" dot. It is not a
+  /// marker: it isn't tappable and `fitToMarkers` leaves it out.
+  final AnyhooLatLong? userLocation;
+
+  /// Replaces the default [AnyhooUserLocationDot]. Ignored by the Google engine.
+  final Widget? userLocationMarker;
+
   const AnyhooMap({
     super.key,
     required this.mapType,
@@ -32,6 +39,8 @@ class AnyhooMap extends StatefulWidget {
     this.onMarkerTapped,
     this.onMapTapped,
     this.markerBuilder,
+    this.userLocation,
+    this.userLocationMarker,
   });
 
   @override
@@ -67,6 +76,7 @@ class _AnyhooMapState extends State<AnyhooMap> {
         selectedMarkerId: widget.selectedMarkerId,
         onMarkerTapped: widget.onMarkerTapped,
         onMapTapped: widget.onMapTapped,
+        userLocation: widget.userLocation,
       );
     } else if (widget.mapType == AnyhooMapType.flutter) {
       return FlutterMapView(
@@ -79,6 +89,8 @@ class _AnyhooMapState extends State<AnyhooMap> {
         onMarkerTapped: widget.onMarkerTapped,
         onMapTapped: widget.onMapTapped,
         markerBuilder: widget.markerBuilder,
+        userLocation: widget.userLocation,
+        userLocationMarker: widget.userLocationMarker,
       );
     } else {
       throw Exception('Invalid map type: ${widget.mapType}');

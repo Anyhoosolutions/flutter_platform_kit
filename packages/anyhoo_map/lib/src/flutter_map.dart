@@ -3,6 +3,7 @@ import 'package:anyhoo_map/src/anyhoo_latlong.dart';
 import 'package:anyhoo_map/src/anyhoo_map_controller.dart';
 import 'package:anyhoo_map/src/anyhoo_map_settings.dart';
 import 'package:anyhoo_map/src/anyhoo_marker.dart';
+import 'package:anyhoo_map/src/anyhoo_user_location_dot.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:http/http.dart';
@@ -19,6 +20,8 @@ class FlutterMapView extends StatefulWidget {
   final ValueChanged<String>? onMarkerTapped;
   final ValueChanged<AnyhooLatLong>? onMapTapped;
   final AnyhooMarkerWidgetBuilder? markerBuilder;
+  final AnyhooLatLong? userLocation;
+  final Widget? userLocationMarker;
 
   const FlutterMapView({
     super.key,
@@ -31,6 +34,8 @@ class FlutterMapView extends StatefulWidget {
     this.onMarkerTapped,
     this.onMapTapped,
     this.markerBuilder,
+    this.userLocation,
+    this.userLocationMarker,
   });
 
   @override
@@ -220,6 +225,24 @@ class _FlutterMapViewState extends State<FlutterMapView> {
                   borderColor: circle.strokeColor,
                   borderStrokeWidth: circle.strokeWidth,
                 ),
+            ],
+          ),
+        if (widget.userLocation case final user?)
+          MarkerLayer(
+            markers: [
+              Marker(
+                key: const ValueKey('anyhoo-user-location'),
+                point: LatLng(user.latitude, user.longitude),
+                width: 48,
+                height: 48,
+                child: IgnorePointer(
+                  child: Center(
+                    child:
+                        widget.userLocationMarker ??
+                        const AnyhooUserLocationDot(),
+                  ),
+                ),
+              ),
             ],
           ),
         MarkerLayer(

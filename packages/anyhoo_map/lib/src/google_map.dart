@@ -15,6 +15,7 @@ class GoogleMapView extends StatefulWidget {
   final String? selectedMarkerId;
   final ValueChanged<String>? onMarkerTapped;
   final ValueChanged<AnyhooLatLong>? onMapTapped;
+  final AnyhooLatLong? userLocation;
 
   const GoogleMapView({
     super.key,
@@ -26,6 +27,7 @@ class GoogleMapView extends StatefulWidget {
     this.selectedMarkerId,
     this.onMarkerTapped,
     this.onMapTapped,
+    this.userLocation,
   });
 
   @override
@@ -102,25 +104,39 @@ class _GoogleMapViewState extends State<GoogleMapView> {
         zoom: widget.settings.initialZoom,
       ),
       padding: widget.settings.cameraPadding,
-      markers: widget.markers.map((marker) {
-        final selected = marker.id == widget.selectedMarkerId;
-        return Marker(
-          markerId: MarkerId(marker.id),
-          position: LatLng(marker.location.latitude, marker.location.longitude),
-          infoWindow: InfoWindow(
-            title: marker.title,
-            snippet: marker.description,
+      markers: {
+        if (widget.userLocation case final user?)
+          Marker(
+            markerId: const MarkerId('anyhoo-user-location'),
+            position: LatLng(user.latitude, user.longitude),
+            icon: BitmapDescriptor.defaultMarkerWithHue(
+              BitmapDescriptor.hueGreen,
+            ),
+            zIndexInt: -1,
           ),
-          icon: BitmapDescriptor.defaultMarkerWithHue(
-            selected ? BitmapDescriptor.hueAzure : BitmapDescriptor.hueRed,
-          ),
-          zIndexInt: selected ? 1 : 0,
-          consumeTapEvents: widget.onMarkerTapped != null,
-          onTap: widget.onMarkerTapped == null
-              ? null
-              : () => widget.onMarkerTapped!(marker.id),
-        );
-      }).toSet(),
+        ...widget.markers.map((marker) {
+          final selected = marker.id == widget.selectedMarkerId;
+          return Marker(
+            markerId: MarkerId(marker.id),
+            position: LatLng(
+              marker.location.latitude,
+              marker.location.longitude,
+            ),
+            infoWindow: InfoWindow(
+              title: marker.title,
+              snippet: marker.description,
+            ),
+            icon: BitmapDescriptor.defaultMarkerWithHue(
+              selected ? BitmapDescriptor.hueAzure : BitmapDescriptor.hueRed,
+            ),
+            zIndexInt: selected ? 1 : 0,
+            consumeTapEvents: widget.onMarkerTapped != null,
+            onTap: widget.onMarkerTapped == null
+                ? null
+                : () => widget.onMarkerTapped!(marker.id),
+          );
+        }),
+      },
       circles: {
         for (final circle in widget.circles)
           Circle(
