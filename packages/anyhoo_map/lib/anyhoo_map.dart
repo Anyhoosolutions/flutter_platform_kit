@@ -13,3 +13,4 @@ export 'src/anyhoo_marker.dart';
 export 'src/anyhoo_map_settings.dart';
 export 'src/anyhoo_map_controller.dart';
 export 'src/anyhoo_tile_provider.dart';
+export 'src/anyhoo_user_location_dot.dart';
