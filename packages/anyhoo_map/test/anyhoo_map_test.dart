@@ -147,4 +147,48 @@ void main() {
 
     expect(find.byType(AnyhooMap), findsOneWidget);
   });
+
+  testWidgets('user location shows a dot that is not a tappable marker', (
+    tester,
+  ) async {
+    final tapped = <String>[];
+    await tester.pumpWidget(
+      _wrap(
+        AnyhooMap(
+          mapType: AnyhooMapType.flutter,
+          location: const AnyhooLatLong(latitude: 0, longitude: 0),
+          markers: const [],
+          userLocation: const AnyhooLatLong(latitude: 0, longitude: 0),
+          settings: _testSettings,
+          onMarkerTapped: tapped.add,
+        ),
+      ),
+    );
+    await tester.pump();
+
+    expect(find.byType(AnyhooUserLocationDot), findsOneWidget);
+    await tester.tap(find.byType(AnyhooUserLocationDot), warnIfMissed: false);
+    // flutter_map holds a single tap until the double-tap window passes.
+    await tester.pump(const Duration(milliseconds: 500));
+    expect(tapped, isEmpty);
+  });
+
+  testWidgets('user location can use a custom marker', (tester) async {
+    await tester.pumpWidget(
+      _wrap(
+        AnyhooMap(
+          mapType: AnyhooMapType.flutter,
+          location: const AnyhooLatLong(latitude: 0, longitude: 0),
+          markers: const [],
+          userLocation: const AnyhooLatLong(latitude: 0, longitude: 0),
+          userLocationMarker: const Icon(Icons.person_pin, key: Key('me')),
+          settings: _testSettings,
+        ),
+      ),
+    );
+    await tester.pump();
+
+    expect(find.byKey(const Key('me')), findsOneWidget);
+    expect(find.byType(AnyhooUserLocationDot), findsNothing);
+  });
 }
