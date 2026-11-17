@@ -96,7 +96,8 @@ class AnyhooTopBar extends StatelessWidget implements PreferredSizeWidget {
         .map(
           (item) => IconButton(
             key: item.key,
-            onPressed: () {},
+            tooltip: item.label,
+            onPressed: item.onTap,
             icon: Icon(item.icon, color: item.color ?? appBar.backButtonColor),
           ),
         )
