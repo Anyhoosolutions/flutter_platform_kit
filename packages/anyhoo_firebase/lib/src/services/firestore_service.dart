@@ -14,7 +14,7 @@ class FirestoreService {
   Stream<List<Map<String, dynamic>>> watchCollection(
     String path, {
     String? orderBy,
-    bool? descending,
+    bool descending = true,
     List<FirestoreWhere>? where,
     List<String>? whereNullFields,
     int? limit,
@@ -39,7 +39,7 @@ class FirestoreService {
   Future<List<Map<String, dynamic>>> getCollection(
     String path, {
     String? orderBy,
-    bool? descending,
+    bool descending = true,
     List<FirestoreWhere>? where,
     List<String>? whereNullFields,
     int? limit,
