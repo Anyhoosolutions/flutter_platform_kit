@@ -121,14 +121,14 @@ class FirestoreService {
   Query<Map<String, dynamic>> _collectionQuery(
     String path, {
     String? orderBy,
-    bool? descending,
+    bool descending = true,
     List<FirestoreWhere>? where,
     List<String>? whereNullFields,
     int? limit,
   }) {
     Query<Map<String, dynamic>> query = _firestore.collection(path);
     if (orderBy != null) {
-      query = query.orderBy(orderBy, descending: descending!);
+      query = query.orderBy(orderBy, descending: descending);
     }
     if (where != null) {
       for (final clause in where) {
