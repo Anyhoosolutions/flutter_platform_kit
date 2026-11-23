@@ -246,9 +246,18 @@ class AnyhooFirebaseAuthService<T extends AnyhooUser> implements AnyhooAuthServi
 
   @override
   Future<void> loginWithAnonymous() async {
-    throw UnimplementedError(
-      'Anonymous Sign-In requires additional setup. See documentation for implementation details.',
-    );
+    try {
+      final existing = _firebaseAuth.currentUser;
+      if (existing != null && existing.isAnonymous) {
+        _log.info('Already signed in anonymously; skipping signInAnonymously');
+        return;
+      }
+      await _firebaseAuth.signInAnonymously();
+    } catch (e, stackTrace) {
+      _log.severe('Error logging in anonymously', e);
+      SentryHelper.captureException(e, stackTrace: stackTrace, fatal: false);
+      rethrow;
+    }
   }
 
   @override
