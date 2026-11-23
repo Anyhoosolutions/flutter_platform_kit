@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:anyhoo_auth/services/anyhoo_enhance_user_service.dart';
 import 'package:anyhoo_auth/models/anyhoo_user_converter.dart';
 import 'package:anyhoo_core/anyhoo_core.dart';
+import 'package:anyhoo_auth/services/anyhoo_auth_exception.dart';
 import 'package:anyhoo_auth/services/anyhoo_auth_service.dart';
 import 'package:anyhoo_auth/cubit/anyhoo_auth_state.dart';
 import 'package:anyhoo_extension_methods/anyhoo_extension_methods.dart';
@@ -168,6 +169,40 @@ class AnyhooAuthCubit<T extends AnyhooUser> extends Cubit<AnyhooAuthState<T>> {
       rethrow;
     }
   }
+
+  /// Upgrade the signed-in guest by linking a Google account. Keeps the uid.
+  Future<void> linkWithGoogle() => _link('Google', authService.linkWithGoogle);
+
+  /// Upgrade the signed-in guest by linking an Apple account. Keeps the uid.
+  Future<void> linkWithApple() => _link('Apple', authService.linkWithApple);
+
+  /// Upgrade the signed-in guest by linking an email and password. Keeps the uid.
+  Future<void> linkWithEmailAndPassword(String email, String password) =>
+      _link('email', () => authService.linkWithEmailAndPassword(email, password));
+
+  Future<void> _link(String provider, Future<void> Function() link) async {
+    _log.info('Linking $provider to the current user');
+    emit(state.copyWith(isLoading: true, errorMessage: null));
+    try {
+      await link();
+      // The auth stream publishes the upgraded user; clear the spinner in case
+      // it does not fire for a link.
+      emit(state.copyWith(isLoading: false, errorMessage: null));
+    } catch (e, stackTrace) {
+      _log.severe('Error linking $provider', e);
+      // An already-used credential is an expected outcome the app handles.
+      if (!(e is AnyhooAuthException && _expectedLinkCodes.contains(e.code))) {
+        SentryHelper.captureException(e, stackTrace: stackTrace, fatal: false);
+      }
+      emit(state.copyWith(isLoading: false, errorMessage: e.toString()));
+      rethrow;
+    }
+  }
+
+  static const _expectedLinkCodes = {
+    AnyhooAuthException.credentialAlreadyInUse,
+    AnyhooAuthException.emailAlreadyInUse,
+  };
 
   /// Log out the current user.
   Future<void> logout() async {

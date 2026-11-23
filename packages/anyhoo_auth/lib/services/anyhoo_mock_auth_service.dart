@@ -170,6 +170,33 @@ class AnyhooMockAuthService implements AnyhooAuthService {
   }
 
   @override
+  Future<void> linkWithGoogle() => _link(email: 'google.user@example.com', providerId: 'google.com');
+
+  @override
+  Future<void> linkWithApple() => _link(email: 'apple.user@example.com', providerId: 'apple.com');
+
+  @override
+  Future<void> linkWithEmailAndPassword(String email, String password) async {
+    if (password.length < 6) {
+      throw const AnyhooAuthException('weak-password');
+    }
+    await _link(email: email, providerId: 'password');
+  }
+
+  Future<void> _link({required String email, required String providerId}) async {
+    final user = _requireUser();
+    await Future.delayed(loginDelay);
+    final providers = (user['providerIds'] as List?)?.cast<String>() ?? const <String>[];
+    _currentUser = {
+      ...user,
+      'email': email,
+      'isAnonymous': false,
+      'providerIds': [...providers, providerId],
+    };
+    _emitAuthState();
+  }
+
+  @override
   Future<void> logout() async {
     // Simulate API delay
     await Future.delayed(logoutDelay);

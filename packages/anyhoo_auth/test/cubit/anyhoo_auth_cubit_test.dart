@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:anyhoo_auth/cubit/anyhoo_auth_cubit.dart';
 import 'package:anyhoo_auth/cubit/anyhoo_auth_state.dart';
 import 'package:anyhoo_auth/models/anyhoo_user_converter.dart';
+import 'package:anyhoo_auth/services/anyhoo_auth_exception.dart';
 import 'package:anyhoo_auth/services/anyhoo_auth_service.dart';
 import 'package:anyhoo_auth/services/anyhoo_enhance_user_service.dart';
 import 'package:anyhoo_models/anyhoo_models.dart';
@@ -361,6 +362,65 @@ void main() {
               .having((s) => s.errorMessage, 'errorMessage', contains('Anonymous login failed')),
         ],
         errors: () => [isA<Exception>()],
+      );
+    });
+
+    group('Linking a guest account', () {
+      setUp(() {
+        cubit = AnyhooAuthCubit(authService: mockAuthService, converter: testConverter);
+      });
+
+      blocTest<AnyhooAuthCubit<TestUser>, AnyhooAuthState<TestUser>>(
+        'linkWithGoogle emits loading then clears it on success',
+        build: () {
+          when(() => mockAuthService.linkWithGoogle()).thenAnswer((_) async {});
+          return cubit;
+        },
+        act: (cubit) => cubit.linkWithGoogle(),
+        expect: () => [
+          isA<AnyhooAuthState<TestUser>>().having((s) => s.isLoading, 'isLoading', true),
+          isA<AnyhooAuthState<TestUser>>()
+              .having((s) => s.isLoading, 'isLoading', false)
+              .having((s) => s.errorMessage, 'errorMessage', isNull),
+        ],
+        verify: (_) => verify(() => mockAuthService.linkWithGoogle()).called(1),
+      );
+
+      blocTest<AnyhooAuthCubit<TestUser>, AnyhooAuthState<TestUser>>(
+        'linkWithApple delegates to the service',
+        build: () {
+          when(() => mockAuthService.linkWithApple()).thenAnswer((_) async {});
+          return cubit;
+        },
+        act: (cubit) => cubit.linkWithApple(),
+        verify: (_) => verify(() => mockAuthService.linkWithApple()).called(1),
+      );
+
+      blocTest<AnyhooAuthCubit<TestUser>, AnyhooAuthState<TestUser>>(
+        'linkWithEmailAndPassword passes the credentials to the service',
+        build: () {
+          when(() => mockAuthService.linkWithEmailAndPassword(any(), any())).thenAnswer((_) async {});
+          return cubit;
+        },
+        act: (cubit) => cubit.linkWithEmailAndPassword('a@b.com', 'secret1'),
+        verify: (_) => verify(() => mockAuthService.linkWithEmailAndPassword('a@b.com', 'secret1')).called(1),
+      );
+
+      blocTest<AnyhooAuthCubit<TestUser>, AnyhooAuthState<TestUser>>(
+        'a credential already in use is rethrown so the app can offer to sign in',
+        build: () {
+          when(() => mockAuthService.linkWithGoogle())
+              .thenThrow(const AnyhooAuthException(AnyhooAuthException.credentialAlreadyInUse));
+          return cubit;
+        },
+        act: (cubit) => cubit.linkWithGoogle(),
+        expect: () => [
+          isA<AnyhooAuthState<TestUser>>().having((s) => s.isLoading, 'isLoading', true),
+          isA<AnyhooAuthState<TestUser>>()
+              .having((s) => s.isLoading, 'isLoading', false)
+              .having((s) => s.errorMessage, 'errorMessage', contains('credential-already-in-use')),
+        ],
+        errors: () => [isA<AnyhooAuthException>()],
       );
     });
 

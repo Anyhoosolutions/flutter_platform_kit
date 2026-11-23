@@ -142,52 +142,11 @@ class AnyhooFirebaseAuthService<T extends AnyhooUser> implements AnyhooAuthServi
         return;
       } else {
         _log.info('Platform: Mobile (iOS/Android)');
-        // For mobile platforms (iOS/Android), use google_sign_in package
-        _log.info('Creating GoogleSignIn instance...');
-        final googleSignIn = GoogleSignIn.instance;
-
-        // Initialize (required in v7). Android Credential Manager needs the
-        // Web OAuth client as serverClientId; without it sign-in fails with
-        // "serverClientId must be provided on Android".
-        if (_googleServerClientId == null) {
-          _log.warning(
-            'Google Sign-In has no serverClientId. On Android this often fails. '
-            'Pass googleServerClientId (Firebase Web OAuth client) or '
-            '--dart-define=GOOGLE_SERVER_CLIENT_ID=...',
-          );
-        }
-        _log.info('Initializing GoogleSignIn (this may take a moment)...');
-        await googleSignIn.initialize(
-          clientId: _googleClientId,
-          serverClientId: _googleServerClientId,
-        );
-        _log.info('✓ GoogleSignIn initialized successfully');
-
-        // Sign in using authenticate() method
-        _log.info('Calling GoogleSignIn.authenticate()...');
-        final googleUser = await googleSignIn.authenticate();
-        _log.info('✓ GoogleSignIn.authenticate() completed. User email: ${googleUser.email}');
-
-        // Obtain the auth details from the request
-        _log.info('Obtaining authentication details...');
-        final googleAuth = googleUser.authentication;
-        _log.info('✓ Auth details obtained. idToken: ${googleAuth.idToken?.substring(0, 20) ?? 'null'}...');
-
-        // Create a new credential
-        // Note: In google_sign_in v7, accessToken may not be available
-        // Firebase Auth can work with just idToken for Google Sign-In
-        _log.info('Creating Firebase credential...');
-        final credential = firebase_auth.GoogleAuthProvider.credential(
-          idToken: googleAuth.idToken,
-        );
-        _log.info('✓ Firebase credential created');
-
+        final credential = await _googleMobileCredential();
         _log.info('Signing in to Firebase with credential...');
         _log.info('Firebase Auth instance: ${_firebaseAuth.app.name}');
         _log.info('Firebase Auth app options: ${_firebaseAuth.app.options.projectId}');
         _log.info('Firebase Auth current user before sign-in: ${_firebaseAuth.currentUser?.uid ?? 'null'}');
-        _log.info('Credential idToken length: ${googleAuth.idToken?.length ?? 0}');
-        _log.info('Credential idToken preview: ${googleAuth.idToken?.substring(0, 50) ?? 'null'}...');
 
         // Try to catch the actual error before timeout
         try {
@@ -220,21 +179,50 @@ class AnyhooFirebaseAuthService<T extends AnyhooUser> implements AnyhooAuthServi
     }
   }
 
+  /// Runs the native Google Sign-In flow (google_sign_in v7) and returns the
+  /// Firebase credential. Shared by sign-in and account linking.
+  Future<firebase_auth.AuthCredential> _googleMobileCredential() async {
+    final googleSignIn = GoogleSignIn.instance;
+
+    // Initialize (required in v7). Android Credential Manager needs the
+    // Web OAuth client as serverClientId; without it sign-in fails with
+    // "serverClientId must be provided on Android".
+    if (_googleServerClientId == null) {
+      _log.warning(
+        'Google Sign-In has no serverClientId. On Android this often fails. '
+        'Pass googleServerClientId (Firebase Web OAuth client) or '
+        '--dart-define=GOOGLE_SERVER_CLIENT_ID=...',
+      );
+    }
+    await googleSignIn.initialize(
+      clientId: _googleClientId,
+      serverClientId: _googleServerClientId,
+    );
+    final googleUser = await googleSignIn.authenticate();
+    final googleAuth = googleUser.authentication;
+
+    // In google_sign_in v7 accessToken may not be available; Firebase Auth
+    // works with just the idToken.
+    return firebase_auth.GoogleAuthProvider.credential(idToken: googleAuth.idToken);
+  }
+
+  Future<firebase_auth.AuthCredential> _appleCredential() async {
+    final appleCredential = await SignInWithApple.getAppleIDCredential(
+      scopes: [
+        AppleIDAuthorizationScopes.email,
+        AppleIDAuthorizationScopes.fullName,
+      ],
+    );
+    return firebase_auth.OAuthProvider('apple.com').credential(
+      idToken: appleCredential.identityToken,
+      accessToken: appleCredential.authorizationCode,
+    );
+  }
+
   @override
   Future<void> loginWithApple() async {
     try {
-      final appleCredential = await SignInWithApple.getAppleIDCredential(
-        scopes: [
-          AppleIDAuthorizationScopes.email,
-          AppleIDAuthorizationScopes.fullName,
-        ],
-      );
-
-      final oauthProvider = firebase_auth.OAuthProvider('apple.com');
-      final credential = oauthProvider.credential(
-        idToken: appleCredential.identityToken,
-        accessToken: appleCredential.authorizationCode,
-      );
+      final credential = await _appleCredential();
       await _firebaseAuth.signInWithCredential(credential);
       return;
     } catch (e, stackTrace) {
@@ -246,9 +234,70 @@ class AnyhooFirebaseAuthService<T extends AnyhooUser> implements AnyhooAuthServi
 
   @override
   Future<void> loginWithAnonymous() async {
-    throw UnimplementedError(
-      'Anonymous Sign-In requires additional setup. See documentation for implementation details.',
-    );
+    try {
+      final existing = _firebaseAuth.currentUser;
+      if (existing != null && existing.isAnonymous) {
+        _log.info('Already signed in anonymously; skipping signInAnonymously');
+        return;
+      }
+      await _firebaseAuth.signInAnonymously();
+    } catch (e, stackTrace) {
+      _log.severe('Error logging in anonymously', e);
+      SentryHelper.captureException(e, stackTrace: stackTrace, fatal: false);
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> linkWithGoogle() async {
+    final user = _requireUser();
+    try {
+      if (kIsWeb) {
+        await user.linkWithPopup(firebase_auth.GoogleAuthProvider());
+      } else {
+        await user.linkWithCredential(await _googleMobileCredential());
+      }
+      await _refreshCurrentUser(user);
+    } on firebase_auth.FirebaseAuthException catch (error) {
+      throw _authException(error);
+    }
+  }
+
+  @override
+  Future<void> linkWithApple() async {
+    final user = _requireUser();
+    try {
+      if (kIsWeb) {
+        await user.linkWithPopup(firebase_auth.OAuthProvider('apple.com'));
+      } else {
+        await user.linkWithCredential(await _appleCredential());
+      }
+      await _refreshCurrentUser(user);
+    } on firebase_auth.FirebaseAuthException catch (error) {
+      throw _authException(error);
+    }
+  }
+
+  @override
+  Future<void> linkWithEmailAndPassword(String email, String password) async {
+    final user = _requireUser();
+    try {
+      final credential = firebase_auth.EmailAuthProvider.credential(email: email, password: password);
+      await user.linkWithCredential(credential);
+      await _refreshCurrentUser(user);
+    } on firebase_auth.FirebaseAuthException catch (error) {
+      throw _authException(error);
+    }
+  }
+
+  /// Linking changes `isAnonymous` and the provider list on the same user
+  /// object, so reload and publish the new snapshot.
+  Future<void> _refreshCurrentUser(firebase_auth.User user) async {
+    await user.reload();
+    final refreshed = _firebaseAuth.currentUser;
+    if (refreshed != null) {
+      setUser(_firebaseUserToMap(refreshed));
+    }
   }
 
   @override

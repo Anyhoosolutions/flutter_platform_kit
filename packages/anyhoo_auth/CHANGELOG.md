@@ -1,3 +1,8 @@
+## 0.0.34
+
+* `loginWithAnonymous` now works with Firebase (it used to throw `UnimplementedError`), so `LoginWidgetSettings.showAnonymousSignIn` can be turned on.
+* Add `linkWithGoogle`, `linkWithApple` and `linkWithEmailAndPassword` to `AnyhooAuthService` and `AnyhooAuthCubit` to upgrade a guest in place (the uid is kept). `credential-already-in-use` / `email-already-in-use` surface as `AnyhooAuthException`.
+
 ## 0.0.33
 
 * Pass optional `googleServerClientId` / `googleClientId` into `GoogleSignIn.initialize()` so Android Google Sign-In does not fail with `serverClientId must be provided on Android`. Also honors `--dart-define=GOOGLE_SERVER_CLIENT_ID` and `GOOGLE_CLIENT_ID`.

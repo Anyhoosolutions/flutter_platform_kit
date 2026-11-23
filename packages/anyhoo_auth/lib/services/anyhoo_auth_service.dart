@@ -46,6 +46,26 @@ abstract class AnyhooAuthService {
   /// Throws an exception if login fails or if anonymous login is not supported.
   Future<void> loginWithAnonymous();
 
+  /// Upgrades the signed-in anonymous user by linking a Google account.
+  ///
+  /// The uid is kept, so everything the guest owns stays theirs.
+  /// Throws [AnyhooAuthException] with `credential-already-in-use` when the
+  /// Google account already belongs to another user, or `no-user` when nobody
+  /// is signed in.
+  Future<void> linkWithGoogle();
+
+  /// Upgrades the signed-in anonymous user by linking an Apple account.
+  ///
+  /// Throws the same [AnyhooAuthException] codes as [linkWithGoogle].
+  Future<void> linkWithApple();
+
+  /// Upgrades the signed-in anonymous user by linking an email and password.
+  ///
+  /// Throws [AnyhooAuthException] with `email-already-in-use` or
+  /// `credential-already-in-use` when the email already has an account,
+  /// `weak-password`, or `no-user`.
+  Future<void> linkWithEmailAndPassword(String email, String password);
+
   /// Log out the current user.
   ///
   /// Clears the current user and optionally calls the logout API.
